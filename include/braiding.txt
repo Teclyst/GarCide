@@ -1,0 +1,879 @@
+/*
+    Copyright (C) 2004 Juan Gonzalez-Meneses.
+
+    This file is part of Braiding.
+
+    Braiding is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    any later version.
+
+    Braiding is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Braiding; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+*/
+/*
+    braiding.h,  v 1.0.   04/10/2004
+    Juan Gonzalez-Meneses <meneses(at)us.es>
+*/
+
+
+#include "cbraid.h"
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+
+
+namespace Braiding {
+
+using CBraid::ArtinBraid;
+using CBraid::ArtinFactor;
+using CBraid::sint16;
+using std::list;
+
+///////////////////////////////////////////////////////
+//
+//  CL(B)  computes the Canonical length of a braid B,
+//         given in Left Canonical Form
+//
+///////////////////////////////////////////////////////
+
+template<class P>
+sint16  CL(CBraid::Braid<P> B);
+
+
+///////////////////////////////////////////////////////
+//
+//  Sup(B)  computes the supremun of a braid B,
+//          given in Left Canonical Form
+//
+///////////////////////////////////////////////////////
+
+template<class P>
+sint16  Sup(CBraid::Braid<P> B);
+
+
+///////////////////////////////////////////////////////
+//
+//  Cycling(B)  computes the cycling of a braid B,
+//              given in Left Canonical Form
+//
+///////////////////////////////////////////////////////
+
+template<class P>
+CBraid::Braid<P> Cycling(CBraid::Braid<P> B);
+
+
+///////////////////////////////////////////////////////
+//
+//  Decycling(B)  computes the decycling of a braid B,
+//                given in Left Canonical Form
+//
+///////////////////////////////////////////////////////
+
+template<class P>
+CBraid::Braid<P> Decycling(CBraid::Braid<P> B);
+
+/////////////////////////////////////////////////////////////
+//
+//  WordToBraid(w,n)  Transforms a word w (list of letters)
+//                    into a braid on n strands in LCF.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+CBraid::Braid<P> WordToBraid(list<sint16> w, sint16 n);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  PrintBraidWord(B)  Shows on the screen the braid B (given in LCF)
+//                     written as a word in Artin generators.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+void PrintBraidWord(CBraid::Braid<P> B);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  PrintBraidWord(B,f)  Prints on the file f the braid B (given in LCF)
+//                       written as a word in Artin generators.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+void PrintBraidWord(CBraid::Braid<P> B, char * file);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  PrintWord(word,n,power)  Shows on the screen the braid "word"
+//                           on n strands raised to some "power".
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+void PrintWord(list<sint16> & word, sint16 n, sint16 power);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  PrintWord(word,n,power,file)  Prints on "file" the braid "word"
+//                                on n strands raised to some "power".
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+void PrintWord(list<sint16> & word, sint16 n, sint16 power, char * file);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  Crossing(word,n,power,cross)  Computes the crossing numbers of
+//                           the braid on n strands given by
+//				     "word" raised to "power".
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+sint16 ** Crossing(list<sint16> word, sint16 n, sint16 power, sint16 ** cross);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  SendToSSS(B)  Computes a braid conjugate to B that
+//                belongs to its Super Summit Set.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+CBraid::Braid<P> SendToSSS(CBraid::Braid<P> B);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  SendToSSS(B,C)  Computes a braid conjugate to B that
+//                  belongs to its Super Summit Set, and a braid
+//                  C that conjugates B to the result.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+CBraid::Braid<P> SendToSSS(CBraid::Braid<P> B, CBraid::Braid<P> & C);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  LeftWedge(F1,F2)  Given two simple factors F1 and F2, computes
+//                    their left lcm. That is, the smallest simple factor
+//                    F such that F1<F and F2<F.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+CBraid::Factor<P> LeftWedge(CBraid::Factor<P> F1, CBraid::Factor<P> F2);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  RightWedge(F1,F2)  Given two simple factors F1 and F2, computes
+//                    their right lcm. That is, the smallest simple factor
+//                    F such that F>F1 and F>F2.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+CBraid::Factor<P> RightWedge(CBraid::Factor<P> F1, CBraid::Factor<P> F2);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  Remainder(B,F)   Given a positive braid B in LCF and a simple
+//                   factor F, computes the simple factor S such
+//                   that BS=LeftWedge(B,F).
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+CBraid::Factor<P> Remainder(CBraid::Braid<P> B, CBraid::Factor<P> F);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  LeftMeet(B1,B2)  Given two braids B1 and B2, computes
+//                    their left gcd. That is, the smallest braid
+//                    B such that B<B1 and B<B2.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+CBraid::Braid<P> LeftMeet(CBraid::Braid<P> B1, CBraid::Braid<P> B2);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  LeftWedge(B1,B2)  Given two braids B1 and B2, computes
+//                    their left lcm. That is, the smallest braid
+//                    B such that B1<B and B2<B.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+CBraid::Braid<P> LeftWedge(CBraid::Braid<P> B1, CBraid::Braid<P> B2);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  MinSS(B,F)   Given a braid B in its Summit Set (and in LCF),
+//               computes the minimal simple factor R such that
+//               F<R and B^R is in the Summit Set.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+CBraid::Factor<P> MinSS(CBraid::Braid<P> B, CBraid::Factor<P> F);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  MinSSS(B,F)  Given a braid B in its Super Summit Set (and in LCF),
+//               computes the minimal simple factor R such that
+//               F<R and B^R is in the Super Summit Set.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+CBraid::Factor<P> MinSSS(CBraid::Braid<P> B, CBraid::Factor<P> F);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  MinSSS(B)  Given a braid B in its Super Summit Set (and in LCF),
+//             computes the set of minimal simple factors R that
+//             B^R is in the Super Summit Set.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+list<CBraid::Factor<P>> MinSSS(CBraid::Braid<P> B);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  SSS(B)  Given a braid B, computes its Super Summit Set.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+list<CBraid::Braid<P>> SSS(CBraid::Braid<P> B);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  Trajectory(B)  Computes the trajectory of a braid B, that is,
+//                 a list containing the iterated cyclings of B,
+//                 until the first repetition.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+list<CBraid::Braid<P> > Trajectory(CBraid::Braid<P> B);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  SendToUSS(B)  Computes a braid conjugate to B that
+//                belongs to its Ultra Summit Set.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+CBraid::Braid<P> SendToUSS(CBraid::Braid<P> B);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  SendToUSS(B,C)  Computes a braid conjugate to B that
+//                  belongs to its Ultra Summit Set, and a braid
+//                  C that conjugates B to the result.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+CBraid::Braid<P> SendToUSS(CBraid::Braid<P> B, CBraid::Braid<P> & C);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  Transport(B,F)   Given a braid B (in its USS and in LCF),
+//                   and a simple factor F such that B^F is in its SSS,
+//                   computes the transport of F.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+CBraid::Factor<P> Transport(CBraid::Braid<P> B, CBraid::Factor<P> F);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  Returns(B,F)   Given a braid B (in its USS and in LCF), and a simple factor
+//                 F such that B^F is in its SSS, computes the iterated
+//                 transports of F that send B to an element in the trajectory
+//                 of B^F, until the first repetition.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+list<CBraid::Factor<P>> Returns(CBraid::Braid<P> B, CBraid::Factor<P> F);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  Pullback(B,F)   Given a braid B (in its USS and in LCF), and a
+//                  simple factor F, computes the pullback of F.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+CBraid::Factor<P> Pullback(CBraid::Braid<P> B, CBraid::Factor<P> F);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  MainPullback(B,F)   Given a braid B (in its USS and in LCF), and a
+//                      simple factor F, computes a suitable iterated pullback
+//                      of F (the factor p_B(F) in Gebhardt's paper).
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+CBraid::Factor<P> MainPullback(CBraid::Braid<P> B, CBraid::Factor<P> F);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  MinUSS(B,F)  Given a braid B in its Ultra Summit Set (and in LCF),
+//               computes the minimal simple factor R such that
+//               F<R and B^R is in the Ultra Summit Set.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+CBraid::Factor<P> MinUSS(CBraid::Braid<P>B, CBraid::Factor<P> F);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  MinUSS(B)  Given a braid B in its Ultra Summit Set (and in LCF),
+//             computes the set of minimal simple factors R that
+//             B^R is in the Ultra Summit Set.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+list<CBraid::Factor<P>> MinUSS(CBraid::Braid<P> B);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  USS(B)  Given a braid B, computes its Ultra Summit Set.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+list<list<CBraid::Braid<P>> > USS(CBraid::Braid<P> B);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  USS(B,mins,prev)  Given a braid B, computes its Ultra Summit Set,
+//                    and stores in the lists 'mins' and 'prev'
+//                    the following data:
+//                    for each i, the first braid of the orbit i is obtained by
+//                    conjugation of the first element of the orbit prev[i]
+//                    by the simple element mins[i].
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+list<list<CBraid::Braid<P>> > USS(CBraid::Braid<P> B,
+			    list<CBraid::Factor<P>> & mins, list<sint16> & prev);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  TreePath(B,uss,mins,prev)  Computes a braid that conjugates
+//                             the first element in the Ultra Summit Set uss
+//                             to the braid B (which must be in the uss).
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+CBraid::Braid<P>   TreePath(CBraid::Braid<P> B, list<list<CBraid::Braid<P>> > & uss,
+		      list<CBraid::Factor<P>> & mins, list<sint16> & prev);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  AreConjugate(B1,B2,C)  Determines if the braids B1 and B2 are
+//                         conjugate, and computes a conjugating
+//                         element C.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+bool AreConjugate(CBraid::Braid<P> B1, CBraid::Braid<P> B2, CBraid::Braid<P> & C);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  Centralizer(uss,mins,prev)  Computes the centralizer of the first
+//                              element in the Ultra Summit Set uss.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+list<CBraid::Braid<P>> Centralizer(list<list<CBraid::Braid<P>> > & uss,
+			     list<CBraid::Factor<P>> & mins, list<sint16> & prev);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  Centralizer(B)  Computes the centralizer of the braid B.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+list<CBraid::Braid<P>> Centralizer(CBraid::Braid<P> B);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  Tableau(F,tab)  Computes the tableau associated to a
+//                  simple factor F, and stores it in tab.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+void Tableau(CBraid::Factor<P> F, sint16 **& tab);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  Circles(B)  Determines if a braid B in LCF
+//              preserves a family of circles.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+bool Circles(CBraid::Braid<P> B);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  ThurstonType(B)  Determines if a braid B is periodic (1),
+//                   reducible (2) or pseudo-Anosov (3).
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+int ThurstonType(CBraid::Braid<P> B);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  ThurstonType(uss)  Determines if the braids in the Ultra
+//                     Summit Set uss are periodic (1),
+//                     reducible (2) or pseudo-Anosov (3).
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+int ThurstonType(list<list<CBraid::Braid<P>> > & uss);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  Rigidity(B)  Computes the rigidity of a braid B.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+sint16 Rigidity(CBraid::Braid<P> B);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  Rigidity(uss)  Computes the maximal rigidity of a braid
+//                 in the Ultra Summit Set uss.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+sint16 Rigidity(list<list<CBraid::Braid<P>> > & uss);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  ReadIndex()   Asks to type the number of strands.
+//
+/////////////////////////////////////////////////////////////
+
+sint16 ReadIndex();
+
+
+/////////////////////////////////////////////////////////////
+//
+//  ReadWord(n)   Asks to type a braid word on n strands,
+//               and returns the braid word.
+//
+/////////////////////////////////////////////////////////////
+
+list<sint16> ReadWord(sint16 n);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  ReadPower()   Asks to type the power to which the braid
+//                will be raised.
+//
+/////////////////////////////////////////////////////////////
+
+sint16 ReadPower();
+
+
+/////////////////////////////////////////////////////////////
+//
+//  RaisePower(B,k)   Raises the braid B to the power k.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+CBraid::Braid<P> RaisePower(CBraid::Braid<P> B, sint16 k);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  ReadFileName()   Asks to type the name of a file.
+//
+/////////////////////////////////////////////////////////////
+
+char* ReadFileName();
+
+
+/////////////////////////////////////////////////////////////
+//
+//  PrintUSS(word,n,p,power,file)   Prints the Ultra Summit Set
+//                                  of the braid (word)^power to "file".
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+void PrintUSS(list<list<CBraid::Braid<P>> > &  uss, list<sint16> word,
+	      sint16 n, sint16 power, char * file, sint16 type,
+	      sint16 rigidity);
+
+
+/////////////////////////////////////////////////////////////
+//
+//   FileName(iteration,max_iteration,type,orbit,rigidity,cl)
+//      Creates the file name corresponding to the given data.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+char * FileName(sint16 iteration, sint16 max_iteration, sint16 type,
+		sint16 orbit, sint16 rigidity, sint16 cl);
+
+
+
+
+///////////////////////////////////////////////////////
+//
+//  Reverse(B)  computes the revese of a braid B, 
+//              that is, B written backwards.
+//              B must be given in left canonical form.
+//
+///////////////////////////////////////////////////////
+
+template<class P>
+ CBraid::Braid<P> Reverse(CBraid::Braid<P> B);
+
+
+
+/////////////////////////////////////////////////////////////
+//
+//  RightMeet(B1,B2)  Given two braids B1 and B2, computes  
+//                    their right gcd. That is, the greatest braid
+//                    B such that B1>B and B2>B. 
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+CBraid::Braid<P> RightMeet(CBraid::Braid<P> B1, CBraid::Braid<P> B2);
+
+
+
+/////////////////////////////////////////////////////////////
+//
+//  LeftJoin(B1,B2)  Given two braids B1 and B2, computes  
+//                    their left lcm. That is, the smallest braid
+//                    B such that B1<B and B2<B. 
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+CBraid::Braid<P> LeftJoin(CBraid::Braid<P> B1, CBraid::Braid<P> B2);
+
+/////////////////////////////////////////////////////////////
+//
+//  RightJoin(B1,B2)  Given two braids B1 and B2, computes  
+//                    their right lcm. That is, the smallest braid
+//                    B such that B>B1 and B>B2. 
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+CBraid::Braid<P> RightJoin(CBraid::Braid<P> B1, CBraid::Braid<P> B2);
+
+
+///////////////////////////////////////////////////////
+//
+//  InitialFactor(B)  computes the initial factor of a braid B, 
+//                    given in Left Canonical Form
+//
+///////////////////////////////////////////////////////
+
+template<class P>
+CBraid::Factor<P>  InitialFactor(CBraid::Braid<P> B);
+
+///////////////////////////////////////////////////////
+//
+//  PreferredPrefix(B)  computes the preferred prefix of a braid B, 
+//                      given in Left Canonical Form
+//
+///////////////////////////////////////////////////////
+
+template<class P>
+CBraid::Factor<P>  PreferredPrefix(CBraid::Braid<P> B);
+
+
+///////////////////////////////////////////////////////
+//
+//  Sliding(B)  computes the cyclic sliding of a braid B, 
+//                given in Left Canonical Form
+//
+///////////////////////////////////////////////////////
+
+template<class P>
+ CBraid::Braid<P> Sliding(CBraid::Braid<P> B);
+
+///////////////////////////////////////////////////////
+//
+//  PreferredSuffix(B)  computes the preferred suffix of a braid B, 
+//                      given in Left Canonical Form
+//
+///////////////////////////////////////////////////////
+
+template<class P>
+CBraid::Factor<P>  PreferredSuffix(CBraid::Braid<P> B);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  Trajectory_Sliding(B)  Computes the trajectory under cyclic sliding 
+//                         of a braid B, that is, a list containing eta^k(B), 
+//                         for k=0,1,... until the first repetition. 
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+list<CBraid::Braid<P> > Trajectory_Sliding(CBraid::Braid<P> B);
+
+/////////////////////////////////////////////////////////////
+//
+//  Trajectory_Sliding(B,C,d)  Computes the trajectory of a braid B for cyclic sliding,   
+//                     a braid C that conjugates B to the
+//                     first element of a closed orbit under sliding,
+//                     and the number d of slidings needed to reach that element
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+list<CBraid::Braid<P> > Trajectory_Sliding(CBraid::Braid<P> B, CBraid::Braid<P> & C, sint16 & d);
+
+/////////////////////////////////////////////////////////////
+//
+//  SendToSC(B)  Computes a braid conjugate to B that 
+//                belongs to its Sliding Circuits Set.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+CBraid::Braid<P> SendToSC(CBraid::Braid<P> B);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  SendToSC(B,C)  Computes a braid conjugate to B that 
+//                  belongs to its Sliding Circuits Set, and a braid 
+//                  C that conjugates B to the result.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+CBraid::Braid<P> SendToSC(CBraid::Braid<P> B, CBraid::Braid<P> & C);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  Transport_Sliding(B,F)   Given a braid B (in its SC and in LCF), and a simple factor
+//                   F such that B^F is in its SSS, computes the transport of F for sliding.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+CBraid::Factor<P> Transport_Sliding(CBraid::Braid<P> B, CBraid::Factor<P> F);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  Returns_Sliding(B,F)   Given a braid B (in its SC and in LCF), and a simple factor
+//                 F such that B^F is in its SSS, computes the iterated transports 
+//                 of F for sliding that send B to an element in the circuit of B^F.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+list<CBraid::Factor<P>> Returns_Sliding(CBraid::Braid<P> B, CBraid::Factor<P> F); 
+
+
+
+/////////////////////////////////////////////////////////////
+//
+//  Pullback_Sliding(B,F)   Given a braid B (in its SC and in LCF), and a 
+//                          simple factor F such that B^F is super summit, 
+//                          computes the pullback of F at s(B) for sliding.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+CBraid::Factor<P> Pullback_Sliding(CBraid::Braid<P> B, CBraid::Factor<P> F);
+
+
+
+/////////////////////////////////////////////////////////////
+//
+//  MainPullback_Sliding(B,F)   Given a braid B (in its SC and in LCF), and a 
+//                      simple factor F, computes the first repeated iterated 
+//                      pullback for cyclic sliding of F.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+CBraid::Factor<P> MainPullback_Sliding(CBraid::Braid<P> B, CBraid::Factor<P> F);
+
+// Mar�a Cumplido Cabello
+
+
+/////////////////////////////////////////////////////////////
+//
+//  MinSC(B,F)  Given a braid B in its Set of Sliding Circuits (and in LCF),
+//               computes the minimal simple factor R such that
+//               F<R and B^R is in the Set of Sliding Circuits.
+//
+/////////////////////////////////////////////////////////////
+
+
+template<class P>
+CBraid::Factor<P> MinSC(CBraid::Braid<P> B, CBraid::Factor<P> F);
+
+
+
+/////////////////////////////////////////////////////////////
+//
+//  MinSC(B)  Given a braid B in its Set of Sliding Circuits (and in LCF),
+//             computes the set of minimal simple factors R that
+//             B^R is in the Set of Sliding Circuits.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+list<CBraid::Factor<P>> MinSC(CBraid::Braid<P> B);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  SC(B)  Given a braid B, computes its Set of Cyclic Slidings.
+//
+/////////////////////////////////////////////////////////////
+
+template<class P>
+list<list<CBraid::Braid<P>> > SC(CBraid::Braid<P> B);
+
+
+/////////////////////////////////////////////////////////////
+//
+//  SC(B,mins,prev)  Given a braid B, computes its Set of Sliding Circuits,
+//                    and stores in the lists 'mins' and 'prev' the following data:
+//                    for each i, the first braid of the orbit i is obtained by
+//                    conjugation of the first element of the orbit prev[i]
+//                    by the simple element mins[i].
+//
+/////////////////////////////////////////////////////////////
+
+
+
+template<class P>
+list<list<CBraid::Braid<P>> > SC(CBraid::Braid<P> B, list<CBraid::Factor<P>> & mins, list<sint16> & prev);
+
+
+////////////////////////////////////////////////////////////////////////////////////////
+//
+//  PrintSC(sc,word,n,power,file,type)   Prints the Set of Sliding Circuits
+//                                       of the braid (word)^power to "file".
+//
+////////////////////////////////////////////////////////////////////////////////////////
+
+template<class P>
+void PrintSC(list<list<CBraid::Braid<P>> > &  sc, list<sint16> word, sint16 n,
+	      sint16 power, char * file, sint16 type);
+
+////////////////////////////////////////////////////////////////////////////////////
+//
+//  AreConjugateSC(B1,B2,C)  Determines if the braids B1 and B2 are
+//                           conjugate by testing their set of sliding circuits, 
+//                           and computes a conjugating element C.
+//
+//////////////////////////////////////////////////////////////////////////////////
+
+template<class P>
+bool AreConjugateSC(CBraid::Braid<P> B1, CBraid::Braid<P> B2, CBraid::Braid<P> & C);
+
+
+
+////////////////////////////////////////////////////////////////////////////////////
+//
+//  AreConjugateSC2(B1,B2,C)  Determines if the braids B1 and B2 are
+//                           conjugate by the procedure of contruct SC(B1), 
+//                           and computes a conjugating element C.
+//
+//////////////////////////////////////////////////////////////////////////////////
+
+template<class P>
+bool AreConjugateSC2(CBraid::Braid<P> B1, CBraid::Braid<P> B2, CBraid::Braid<P> & C);
+
+
+
+
+
+
+} // namespace Braiding

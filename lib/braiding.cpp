@@ -47,16 +47,18 @@ using std::endl;
 //
 ///////////////////////////////////////////////////////
 
-sint16  CL(ArtinBraid B)
+template<class P>
+sint16 CL(CBraid::Braid<P> B)
 {
   sint16 n=0;
-  ArtinBraid::ConstFactorItr it;
+  typename CBraid::Braid<P>::ConstFactorItr it;
 
   for(it=B.FactorList.begin(); it!=B.FactorList.end(); it++)
     n++;
 
   return n;
-}
+
+};
 
 
 ///////////////////////////////////////////////////////
@@ -66,7 +68,8 @@ sint16  CL(ArtinBraid B)
 //
 ///////////////////////////////////////////////////////
 
-sint16  Sup(ArtinBraid B)
+template<class P>
+sint16  Sup(CBraid::Braid<P> B)
 {
   sint16 s;
 
@@ -84,7 +87,8 @@ sint16  Sup(ArtinBraid B)
 //
 ///////////////////////////////////////////////////////
 
-ArtinBraid Cycling(ArtinBraid B)
+template<class P>
+CBraid::Braid<P> Cycling(CBraid::Braid<P> B)
 {
 
   sint16 n;
@@ -96,7 +100,7 @@ ArtinBraid Cycling(ArtinBraid B)
 
   n=B.Index();
 
-  ArtinFactor F=ArtinFactor(n);
+  CBraid::Factor<P> F=CBraid::Factor<P>(n);
 
   F=*B.FactorList.begin();
   B.FactorList.push_back(F.Flip(-B.LeftDelta));
@@ -114,7 +118,8 @@ ArtinBraid Cycling(ArtinBraid B)
 //
 ///////////////////////////////////////////////////////
 
-ArtinBraid Decycling(ArtinBraid B)
+template<class P>
+CBraid::Braid<P> Decycling(CBraid::Braid<P> B)
 {
   sint16 n;
 
@@ -125,7 +130,7 @@ ArtinBraid Decycling(ArtinBraid B)
 
   n=B.Index();
 
-  ArtinFactor F=ArtinFactor(n);
+  CBraid::Factor<P> F=CBraid::Factor<P>(n);
 
   F=B.FactorList.back();
   B.FactorList.push_front(F.Flip(B.LeftDelta));
@@ -143,11 +148,12 @@ ArtinBraid Decycling(ArtinBraid B)
 //
 /////////////////////////////////////////////////////////////
 
-ArtinBraid WordToBraid(list<sint16> w, sint16 n)
+template<class P>
+CBraid::Braid<P> WordToBraid(list<sint16> w, sint16 n)
 {
-  ArtinBraid B=ArtinBraid(n);
-  ArtinBraid B2=ArtinBraid(n);
-  ArtinFactor F=ArtinFactor(n);
+  CBraid::Braid<P> B=CBraid::Braid<P>(n);
+  CBraid::Braid<P> B2=CBraid::Braid<P>(n);
+  CBraid::Factor<P> F=CBraid::Factor<P>(n);
   sint16 k, sigma, i;
   list<sint16>::iterator it;
 
@@ -182,7 +188,7 @@ ArtinBraid WordToBraid(list<sint16> w, sint16 n)
 	      F[i]=F[i+1];
 	      F[i+1]=k;
 	      F=(~F).Flip();
-	      B2=(!ArtinBraid(ArtinFactor(n,1)))*ArtinBraid(F);
+	      B2=(!CBraid::Braid<P>(CBraid::Factor<P>(n,1)))*CBraid::Braid<P>(F);
 	    }
 	  B.RightMultiply(B2);
 	}
@@ -201,7 +207,8 @@ ArtinBraid WordToBraid(list<sint16> w, sint16 n)
 //
 /////////////////////////////////////////////////////////////
 
-void PrintBraidWord(ArtinBraid B)
+template<class P>
+void PrintBraidWord(CBraid::Braid<P> B)
 {
   if(B.LeftDelta==1)
     {
@@ -216,9 +223,9 @@ void PrintBraidWord(ArtinBraid B)
 	cout << " . ";
     }
   sint16 i, j, k, n=B.Index();
-  ArtinFactor F=ArtinFactor(n);
+  CBraid::Factor<P> F=CBraid::Factor<P>(n);
 
-  list<ArtinFactor>::iterator it;
+  typename list<CBraid::Factor<P>>::iterator it;
 
   for(it=B.FactorList.begin(); it!=B.FactorList.end(); it++)
     {
@@ -263,7 +270,8 @@ void PrintBraidWord(ArtinBraid B)
 //
 /////////////////////////////////////////////////////////////
 
-void PrintBraidWord(ArtinBraid B, char * file)
+template<class P>
+void PrintBraidWord(CBraid::Braid<P> B, char * file)
 {
   std::ofstream f(file,std::ios::app);
 
@@ -280,9 +288,9 @@ void PrintBraidWord(ArtinBraid B, char * file)
 	f << " . ";
     }
   sint16 i, j, k, n=B.Index();
-  ArtinFactor F=ArtinFactor(n);
+  CBraid::Factor<P> F=CBraid::Factor<P>(n);
 
-  list<ArtinFactor>::iterator it;
+  typename list<CBraid::Factor<P>>::iterator it;
 
   for(it=B.FactorList.begin(); it!=B.FactorList.end(); it++)
     {
@@ -325,6 +333,7 @@ void PrintBraidWord(ArtinBraid B, char * file)
 //
 /////////////////////////////////////////////////////////////
 
+template<class P>
 void PrintWord(list<sint16> & word, sint16 n, sint16 power)
 {
   list<sint16>::iterator itw;
@@ -354,6 +363,7 @@ void PrintWord(list<sint16> & word, sint16 n, sint16 power)
 //
 /////////////////////////////////////////////////////////////
 
+template<class P>
 void PrintWord(list<sint16> & word, sint16 n, sint16 power, char * file)
 {
   list<sint16>::iterator itw;
@@ -388,6 +398,7 @@ void PrintWord(list<sint16> & word, sint16 n, sint16 power, char * file)
 //
 /////////////////////////////////////////////////////////////
 
+template<class P>
 void Crossing(list<sint16> word, sint16 n, sint16 power, sint16 ** cross)
 {
   sint16 i,j,k,l,m;
@@ -463,15 +474,15 @@ void Crossing(list<sint16> word, sint16 n, sint16 power, sint16 ** cross)
 //
 /////////////////////////////////////////////////////////////
 
-
-ArtinBraid SendToSSS(ArtinBraid B)
+template<class P>
+CBraid::Braid<P> SendToSSS(CBraid::Braid<P> B)
 {
   sint16 n, k, j, p, l;
 
   n=B.Index();
   k=n*(n-1)/2;
 
-  ArtinBraid B2=ArtinBraid(n), B3=ArtinBraid(n);
+  CBraid::Braid<P> B2=CBraid::Braid<P>(n), B3=CBraid::Braid<P>(n);
 
   B.MakeLCF();
 
@@ -524,17 +535,18 @@ ArtinBraid SendToSSS(ArtinBraid B)
 //
 /////////////////////////////////////////////////////////////
 
-ArtinBraid SendToSSS(ArtinBraid B, ArtinBraid & C)
+template<class P>
+CBraid::Braid<P> SendToSSS(CBraid::Braid<P> B, CBraid::Braid<P> & C)
 {
   sint16 n, k, j, p, l;
 
   n=B.Index();
   k=n*(n-1)/2;
 
-  ArtinBraid B2=ArtinBraid(n), B3=ArtinBraid(n), C2=ArtinBraid(n);
+  CBraid::Braid<P> B2=CBraid::Braid<P>(n), B3=CBraid::Braid<P>(n), C2=CBraid::Braid<P>(n);
 
   B.MakeLCF();
-  C=ArtinBraid(n);
+  C=CBraid::Braid<P>(n);
 
   j=0;
   B2=B;
@@ -560,14 +572,14 @@ ArtinBraid SendToSSS(ArtinBraid B, ArtinBraid & C)
           p++;
           j=0;
           C=C*C2;
-          C2=ArtinBraid(n);
+          C2=CBraid::Braid<P>(n);
 	}
     }
 
   j=0;
   B2=B3;
   l=Sup(B2);
-  C2=ArtinBraid(n);
+  C2=CBraid::Braid<P>(n);
   while (j <= k)
     {
       C2.LeftMultiply(B2.FactorList.back());
@@ -581,7 +593,7 @@ ArtinBraid SendToSSS(ArtinBraid B, ArtinBraid & C)
 	  l--;
 	  j=0;
 	  C=C*(!C2);
-	  C2=ArtinBraid(n);
+	  C2=CBraid::Braid<P>(n);
 	}
     }
 
@@ -599,7 +611,8 @@ ArtinBraid SendToSSS(ArtinBraid B, ArtinBraid & C)
 //
 /////////////////////////////////////////////////////////////
 
-ArtinFactor LeftWedge(ArtinFactor F1, ArtinFactor F2)
+template<class P>
+CBraid::Factor<P> LeftWedge(CBraid::Factor<P> F1, CBraid::Factor<P> F2)
 {
   return (~RightMeet(~F1,~F2)).Flip();
 }
@@ -613,7 +626,8 @@ ArtinFactor LeftWedge(ArtinFactor F1, ArtinFactor F2)
 //
 /////////////////////////////////////////////////////////////
 
-ArtinFactor RightWedge(ArtinFactor F1, ArtinFactor F2)
+template<class P>
+CBraid::Factor<P> RightWedge(CBraid::Factor<P> F1, CBraid::Factor<P> F2)
 {
   return !LeftWedge(!F1,!F2);
 }
@@ -627,16 +641,17 @@ ArtinFactor RightWedge(ArtinFactor F1, ArtinFactor F2)
 //
 /////////////////////////////////////////////////////////////
 
-ArtinFactor Remainder(ArtinBraid B, ArtinFactor F)
+template<class P>
+CBraid::Factor<P> Remainder(CBraid::Braid<P> B, CBraid::Factor<P> F)
 {
-  ArtinFactor Fi= F;
+  CBraid::Factor<P> Fi= F;
   if(B.LeftDelta!=0)
     {
       Fi.Identity();
       return Fi;
     }
 
-  list<ArtinFactor>::iterator it;
+  typename list<CBraid::Factor<P>>::iterator it;
   for(it=B.FactorList.begin(); it!=B.FactorList.end(); it++)
     {
 
@@ -656,12 +671,12 @@ ArtinFactor Remainder(ArtinBraid B, ArtinFactor F)
 //
 /////////////////////////////////////////////////////////////
 
-
-ArtinBraid LeftMeet(ArtinBraid B1, ArtinBraid B2)
+template<class P>
+CBraid::Braid<P> LeftMeet(CBraid::Braid<P> B1, CBraid::Braid<P> B2)
 {
   sint16 n=B1.Index(), shift=0;
-  ArtinBraid B=ArtinBraid(n);
-  ArtinFactor F1=ArtinFactor(n,0), F2=ArtinFactor(n,0), F=ArtinFactor(n,1);
+  CBraid::Braid<P> B=CBraid::Braid<P>(n);
+  CBraid::Factor<P> F1=CBraid::Factor<P>(n,0), F2=CBraid::Factor<P>(n,0), F=CBraid::Factor<P>(n,1);
 
 
   B1.MakeLCF();
@@ -681,25 +696,25 @@ ArtinBraid LeftMeet(ArtinBraid B1, ArtinBraid B2)
   while(!F.CompareWithIdentity())
     {
       if(B1.LeftDelta>0)
-	F1=ArtinFactor(n,1);
+	F1=CBraid::Factor<P>(n,1);
       else if(CL(B1)==0)
-	F1=ArtinFactor(n,0);
+	F1=CBraid::Factor<P>(n,0);
       else
 	F1=*B1.FactorList.begin();
 
       if(B2.LeftDelta>0)
-	F2=ArtinFactor(n,1);
+	F2=CBraid::Factor<P>(n,1);
       else if(CL(B2)==0)
-	F2=ArtinFactor(n,0);
+	F2=CBraid::Factor<P>(n,0);
       else
 	F2=*B2.FactorList.begin();
 
       F=LeftMeet(F1,F2);
 
       B.RightMultiply(F);
-      B1.LeftMultiply(!(ArtinBraid(F)));
+      B1.LeftMultiply(!(CBraid::Braid<P>(F)));
       B1.MakeLCF();
-      B2.LeftMultiply(!(ArtinBraid(F)));
+      B2.LeftMultiply(!(CBraid::Braid<P>(F)));
       B2.MakeLCF();
     }
 
@@ -718,11 +733,12 @@ ArtinBraid LeftMeet(ArtinBraid B1, ArtinBraid B2)
 //
 /////////////////////////////////////////////////////////////
 
-ArtinBraid LeftWedge(ArtinBraid B1, ArtinBraid B2)
+template<class P>
+CBraid::Braid<P> LeftWedge(CBraid::Braid<P> B1, CBraid::Braid<P> B2)
 {
   sint16 n=B1.Index(), shift=0;
-  ArtinBraid B=ArtinBraid(n);
-  ArtinFactor  F2=ArtinFactor(n,0), F=ArtinFactor(n,1);
+  CBraid::Braid<P> B=CBraid::Braid<P>(n);
+  CBraid::Factor<P>  F2=CBraid::Factor<P>(n,0), F=CBraid::Factor<P>(n,1);
 
   B1.MakeLCF();
   B2.MakeLCF();
@@ -743,9 +759,9 @@ ArtinBraid LeftWedge(ArtinBraid B1, ArtinBraid B2)
   while(!B2.CompareWithIdentity())
     {
       if(B2.LeftDelta>0)
-	F2=ArtinFactor(n,1);
+	F2=CBraid::Factor<P>(n,1);
       else if(CL(B2)==0)
-	F2=ArtinFactor(n,0);
+	F2=CBraid::Factor<P>(n,0);
       else
 	F2=*B2.FactorList.begin();
 
@@ -753,9 +769,9 @@ ArtinBraid LeftWedge(ArtinBraid B1, ArtinBraid B2)
 
       B.RightMultiply(F);
       B1.RightMultiply(F);
-      B1.LeftMultiply(!(ArtinBraid(F2)));
+      B1.LeftMultiply(!(CBraid::Braid<P>(F2)));
       B1.MakeLCF();
-      B2.LeftMultiply(!(ArtinBraid(F2)));
+      B2.LeftMultiply(!(CBraid::Braid<P>(F2)));
       B2.MakeLCF();
 
 
@@ -776,12 +792,13 @@ ArtinBraid LeftWedge(ArtinBraid B1, ArtinBraid B2)
 //
 /////////////////////////////////////////////////////////////
 
-ArtinFactor MinSS(ArtinBraid B, ArtinFactor F)
+template<class P>
+CBraid::Factor<P> MinSS(CBraid::Braid<P> B, CBraid::Factor<P> F)
 {
-  ArtinFactor R2=F;
-  ArtinBraid W=B;
+  CBraid::Factor<P> R2=F;
+  CBraid::Braid<P> W=B;
   W.LeftDelta=0;
-  ArtinFactor R=ArtinFactor(F.Index(),0);
+  CBraid::Factor<P> R=CBraid::Factor<P>(F.Index(),0);
 
   while(R2.CompareWithIdentity()==0)
     {
@@ -800,16 +817,17 @@ ArtinFactor MinSS(ArtinBraid B, ArtinFactor F)
 //
 /////////////////////////////////////////////////////////////
 
-ArtinFactor MinSSS(ArtinBraid B, ArtinFactor F)
+template<class P>
+CBraid::Factor<P> MinSSS(CBraid::Braid<P> B, CBraid::Factor<P> F)
 {
-  ArtinFactor R=MinSS(B,F);
+  CBraid::Factor<P> R=MinSS(B,F);
   sint16 cl=CL(B);
-  ArtinBraid B2=!(ArtinBraid(R))*B*R;
+  CBraid::Braid<P> B2=!(CBraid::Braid<P>(R))*B*R;
   B2.MakeRCF();
   while(CL(B2)>cl)
     {
       R=R*(*B2.FactorList.begin());
-      B2=(!(ArtinBraid(R))*B*R).MakeRCF();
+      B2=(!(CBraid::Braid<P>(R))*B*R).MakeRCF();
     }
   return R;
 }
@@ -823,17 +841,18 @@ ArtinFactor MinSSS(ArtinBraid B, ArtinFactor F)
 //
 /////////////////////////////////////////////////////////////
 
-list<ArtinFactor> MinSSS(ArtinBraid B)
+template<class P>
+list<CBraid::Factor<P>> MinSSS(CBraid::Braid<P> B)
 {
   sint16 i,j,k,test;
   sint16 n=B.Index();
   sint16 *table=new sint16[n];
 
-  list<ArtinFactor> Min;
+  list<CBraid::Factor<P>> Min;
 
   for(i=0; i<n; i++)
     table[i]=0;
-  ArtinFactor F=ArtinFactor(n);
+  CBraid::Factor<P> F=CBraid::Factor<P>(n);
   for(i=1; i<n; i++)
     {
       test=1;
@@ -865,24 +884,25 @@ list<ArtinFactor> MinSSS(ArtinBraid B)
 //
 /////////////////////////////////////////////////////////////
 
-list<ArtinBraid> SSS(ArtinBraid B)
+template<class P>
+list<CBraid::Braid<P>> SSS(CBraid::Braid<P> B)
 {
-  ArtinBraid B2=SendToSSS(B);
-  ArtinFactor F=ArtinFactor(B.Index());
-  list<ArtinFactor> Min;
-  list<ArtinFactor>::iterator itf;
+  CBraid::Braid<P> B2=SendToSSS(B);
+  CBraid::Factor<P> F=CBraid::Factor<P>(B.Index());
+  list<CBraid::Factor<P>> Min;
+  typename list<CBraid::Factor<P>>::iterator itf;
 
-  list<ArtinBraid> sss;
+  list<CBraid::Braid<P>> sss;
   sss.push_back(B2);
 
-  list<ArtinBraid>::iterator it=sss.begin();
+  typename list<CBraid::Braid<P>>::iterator it=sss.begin();
   while(it!=sss.end())
     {
       Min=MinSSS(*it);
       for(itf=Min.begin(); itf!=Min.end(); itf++)
 	{
 	  F=*itf;
-	  B2=((!ArtinBraid(F))*(*it)*F).MakeLCF();
+	  B2=((!CBraid::Braid<P>(F))*(*it)*F).MakeLCF();
 	  if (find(sss.begin(),sss.end(),B2)==sss.end())
 	    sss.push_back(B2);
 	}
@@ -900,10 +920,11 @@ list<ArtinBraid> SSS(ArtinBraid B)
 //
 /////////////////////////////////////////////////////////////
 
-list<ArtinBraid > Trajectory(ArtinBraid B)
+template<class P>
+list<CBraid::Braid<P> > Trajectory(CBraid::Braid<P> B)
 {
-  list<ArtinBraid > p;
-  list<ArtinBraid>::iterator it;
+  list<CBraid::Braid<P> > p;
+  typename list<CBraid::Braid<P>>::iterator it;
 
   while (find(p.begin(),p.end(),B)==p.end())
     {
@@ -922,10 +943,11 @@ list<ArtinBraid > Trajectory(ArtinBraid B)
 //
 /////////////////////////////////////////////////////////////
 
-ArtinBraid SendToUSS(ArtinBraid B)
+template<class P>
+CBraid::Braid<P> SendToUSS(CBraid::Braid<P> B)
 {
-  ArtinBraid B2=SendToSSS(B);
-  list<ArtinBraid> T=Trajectory(B2);
+  CBraid::Braid<P> B2=SendToSSS(B);
+  list<CBraid::Braid<P>> T=Trajectory(B2);
   return Cycling(T.back());
 }
 
@@ -938,14 +960,15 @@ ArtinBraid SendToUSS(ArtinBraid B)
 //
 /////////////////////////////////////////////////////////////
 
-ArtinBraid SendToUSS(ArtinBraid B, ArtinBraid & C)
+template<class P>
+CBraid::Braid<P> SendToUSS(CBraid::Braid<P> B, CBraid::Braid<P> & C)
 {
-  ArtinBraid B2=SendToSSS(B,C);
-  list<ArtinBraid> T=Trajectory(B2);
+  CBraid::Braid<P> B2=SendToSSS(B,C);
+  list<CBraid::Braid<P>> T=Trajectory(B2);
 
-  ArtinBraid D=Cycling(T.back());
+  CBraid::Braid<P> D=Cycling(T.back());
 
-  list<ArtinBraid>::iterator it=T.begin();
+  typename list<CBraid::Braid<P>>::iterator it=T.begin();
 
   while((*it)!=D)
     {
@@ -970,10 +993,11 @@ ArtinBraid SendToUSS(ArtinBraid B, ArtinBraid & C)
 //
 /////////////////////////////////////////////////////////////
 
-ArtinFactor Transport(ArtinBraid B, ArtinFactor F)
+template<class P>
+CBraid::Factor<P> Transport(CBraid::Braid<P> B, CBraid::Factor<P> F)
 {
-  ArtinBraid B2=((!ArtinBraid(F))*B*F).MakeLCF();
-  ArtinBraid B3=((!ArtinBraid(*B.FactorList.begin()))*F*(*B2.FactorList.begin())).MakeLCF();
+  CBraid::Braid<P> B2=((!CBraid::Braid<P>(F))*B*F).MakeLCF();
+  CBraid::Braid<P> B3=((!CBraid::Braid<P>(*B.FactorList.begin()))*F*(*B2.FactorList.begin())).MakeLCF();
   return *B3.FactorList.begin();
 }
 
@@ -987,17 +1011,17 @@ ArtinFactor Transport(ArtinBraid B, ArtinFactor F)
 //
 /////////////////////////////////////////////////////////////
 
-
-list<ArtinFactor> Returns(ArtinBraid B, ArtinFactor F)
+template<class P>
+list<CBraid::Factor<P>> Returns(CBraid::Braid<P> B, CBraid::Factor<P> F)
 {
-  list<ArtinFactor> ret;
-  list<ArtinFactor>::iterator it=ret.end();
+  list<CBraid::Factor<P>> ret;
+  typename list<CBraid::Factor<P>>::iterator it=ret.end();
   sint16 n=B.Index();
-  ArtinBraid B1=B, C1=ArtinBraid(n), C2=ArtinBraid(n);
+  CBraid::Braid<P> B1=B, C1=CBraid::Braid<P>(n), C2=CBraid::Braid<P>(n);
   sint16 i, N=1;
-  ArtinFactor F1=F;
+  CBraid::Factor<P> F1=F;
 
-  C1=ArtinBraid((*B1.FactorList.begin()).Flip(B1.LeftDelta));
+  C1=CBraid::Braid<P>((*B1.FactorList.begin()).Flip(B1.LeftDelta));
   B1=Cycling(B1);
   while(B1!=B)
     {
@@ -1010,7 +1034,7 @@ list<ArtinFactor> Returns(ArtinBraid B, ArtinFactor F)
     {
       ret.push_back(F1);
 
-      B1=((!ArtinBraid(F1))*B*F1).MakeLCF();
+      B1=((!CBraid::Braid<P>(F1))*B*F1).MakeLCF();
 
       C2.Identity();
 
@@ -1020,12 +1044,12 @@ list<ArtinFactor> Returns(ArtinBraid B, ArtinFactor F)
 	  B1=Cycling(B1);
 	}
 
-      ArtinBraid B2=((!C1)*F1*C2).MakeLCF();
+      CBraid::Braid<P> B2=((!C1)*F1*C2).MakeLCF();
 
       if (B2.LeftDelta==1)
-	F1=ArtinFactor(n,1);
+	F1=CBraid::Factor<P>(n,1);
       else if (B2.CompareWithIdentity())
-	F1=ArtinFactor(n,0);
+	F1=CBraid::Factor<P>(n,0);
       else
 	F1=*B2.FactorList.begin();
 
@@ -1047,38 +1071,39 @@ list<ArtinFactor> Returns(ArtinBraid B, ArtinFactor F)
 //
 /////////////////////////////////////////////////////////////
 
-ArtinFactor Pullback(ArtinBraid B, ArtinFactor F)
+template<class P>
+CBraid::Factor<P> Pullback(CBraid::Braid<P> B, CBraid::Factor<P> F)
 {
-  ArtinFactor F1=(*B.FactorList.begin());
+  CBraid::Factor<P> F1=(*B.FactorList.begin());
   F1=F1.Flip(B.LeftDelta+1);
-  ArtinFactor F2=F;
+  CBraid::Factor<P> F2=F;
   F2=F2.Flip();
 
-  ArtinBraid B2=ArtinBraid(F1)*F2;
+  CBraid::Braid<P> B2=CBraid::Braid<P>(F1)*F2;
 
-  ArtinFactor delta=ArtinFactor(B.Index(),1);
+  CBraid::Factor<P> delta=CBraid::Factor<P>(B.Index(),1);
   B2= (B2*Remainder(B2,delta)).MakeLCF();
 
   (B2.LeftDelta)--;
 
-  ArtinFactor b0=ArtinFactor(B.Index());
+  CBraid::Factor<P> b0=CBraid::Factor<P>(B.Index());
 
   if (B2.LeftDelta==1)
-    b0=ArtinFactor(B.Index(),1);
+    b0=CBraid::Factor<P>(B.Index(),1);
   else if (B2.CompareWithIdentity())
-    b0=ArtinFactor(B.Index(),0);
+    b0=CBraid::Factor<P>(B.Index(),0);
   else
     b0=*B2.FactorList.begin();
 
-  ArtinFactor bi=F.Flip(B.LeftDelta);
+  CBraid::Factor<P> bi=F.Flip(B.LeftDelta);
 
-  list<ArtinFactor>::iterator it;
+  typename list<CBraid::Factor<P>>::iterator it;
   for(it=B.FactorList.begin(); it!=B.FactorList.end(); it++)
     {
       if(it!=B.FactorList.begin())
 	bi=(!(*it))*LeftWedge(bi,*it);
     }
-  ArtinFactor b=LeftWedge(b0,bi);
+  CBraid::Factor<P> b=LeftWedge(b0,bi);
   return MinSSS(B,b);
 }
 
@@ -1091,18 +1116,19 @@ ArtinFactor Pullback(ArtinBraid B, ArtinFactor F)
 //
 /////////////////////////////////////////////////////////////
 
-ArtinFactor MainPullback(ArtinBraid B, ArtinFactor F)
+template<class P>
+CBraid::Factor<P> MainPullback(CBraid::Braid<P> B, CBraid::Factor<P> F)
 {
-  list<ArtinFactor> ret;
-  list<ArtinFactor>::iterator it=ret.end();
+  list<CBraid::Factor<P>> ret;
+  typename list<CBraid::Factor<P>>::iterator it=ret.end();
 
-  ArtinBraid B2=B;
+  CBraid::Braid<P> B2=B;
   sint16 i;
 
-  list<ArtinBraid> T=Trajectory(B);
-  list<ArtinBraid>::reverse_iterator itb;
+  list<CBraid::Braid<P>> T=Trajectory(B);
+  typename list<CBraid::Braid<P>>::reverse_iterator itb;
 
-  ArtinFactor F2=F;
+  CBraid::Factor<P> F2=F;
   while (it==ret.end())
     {
 
@@ -1114,7 +1140,7 @@ ArtinFactor MainPullback(ArtinBraid B, ArtinFactor F)
       it=find(ret.begin(),ret.end(),F2);
     }
 
-  list<ArtinFactor>::iterator it2=it;
+  typename list<CBraid::Factor<P>>::iterator it2=it;
 
   sint16 l=0;
   while(it2!=ret.end())
@@ -1155,13 +1181,13 @@ ArtinFactor MainPullback(ArtinBraid B, ArtinFactor F)
 /////////////////////////////////////////////////////////////
 
 
-
-ArtinFactor MinUSS(ArtinBraid B, ArtinFactor F)
+template<class P>
+CBraid::Factor<P> MinUSS(CBraid::Braid<P> B, CBraid::Factor<P> F)
 {
-  ArtinFactor F2=MinSSS(B,F);
+  CBraid::Factor<P> F2=MinSSS(B,F);
 
-  list<ArtinFactor> ret=Returns(B,F2);
-  list<ArtinFactor>::iterator it;
+  list<CBraid::Factor<P>> ret=Returns(B,F2);
+  typename list<CBraid::Factor<P>>::iterator it;
 
   for(it=ret.begin(); it!=ret.end(); it++)
     {
@@ -1191,17 +1217,18 @@ ArtinFactor MinUSS(ArtinBraid B, ArtinFactor F)
 //
 /////////////////////////////////////////////////////////////
 
-list<ArtinFactor> MinUSS(ArtinBraid B)
+template<class P>
+list<CBraid::Factor<P>> MinUSS(CBraid::Braid<P> B)
 {
   sint16 i,j,k,test;
   sint16 n=B.Index();
   sint16 *table=new sint16[n];
 
-  list<ArtinFactor> Min;
+  list<CBraid::Factor<P>> Min;
 
   for(i=0; i<n; i++)
     table[i]=0;
-  ArtinFactor F=ArtinFactor(n);
+  CBraid::Factor<P> F=CBraid::Factor<P>(n);
   for(i=1; i<n; i++)
     {
       test=1;
@@ -1239,21 +1266,22 @@ list<ArtinFactor> MinUSS(ArtinBraid B)
 //
 /////////////////////////////////////////////////////////////
 
-list<list<ArtinBraid> > USS(ArtinBraid B)
+template<class P>
+list<list<CBraid::Braid<P>> > USS(CBraid::Braid<P> B)
 {
-  list<list<ArtinBraid> > uss;
-  ArtinFactor F=ArtinFactor(B.Index());
-  list<ArtinFactor> Min;
-  list<ArtinFactor>::iterator itf, itf2;
-  list<ArtinBraid>::iterator itb;
+  list<list<CBraid::Braid<P>> > uss;
+  CBraid::Factor<P> F=CBraid::Factor<P>(B.Index());
+  list<CBraid::Factor<P>> Min;
+  typename list<CBraid::Factor<P>>::iterator itf, itf2;
+  typename list<CBraid::Braid<P>>::iterator itb;
 
-  ArtinBraid B2=SendToUSS(B);
-  list<ArtinBraid> T=Trajectory(B2);
+  CBraid::Braid<P> B2=SendToUSS(B);
+  list<CBraid::Braid<P>> T=Trajectory(B2);
 
-  list<ArtinBraid>::reverse_iterator rit=T.rbegin();
+  typename list<CBraid::Braid<P>>::reverse_iterator rit=T.rbegin();
   uss.push_back(Trajectory(Cycling(*rit)));
 
-  B2=((!ArtinBraid(ArtinFactor(B.Index(),1)))*(Cycling(*rit))*ArtinFactor(B.Index(),1)).MakeLCF();
+  B2=((!CBraid::Braid<P>(CBraid::Factor<P>(B.Index(),1)))*(Cycling(*rit))*CBraid::Factor<P>(B.Index(),1)).MakeLCF();
   for(itb=(*uss.begin()).begin(); itb!=(*uss.begin()).end(); itb++)
     {
       if(B2==*itb)
@@ -1263,7 +1291,7 @@ list<list<ArtinBraid> > USS(ArtinBraid B)
   if(itb==(*uss.begin()).end())
     uss.push_back(Trajectory(B2));
 
-  list<list<ArtinBraid> >::iterator it=uss.begin(), it2;
+  typename list<list<CBraid::Braid<P>> >::iterator it=uss.begin(), it2;
   while(it!=uss.end())
     {
 
@@ -1273,7 +1301,7 @@ list<list<ArtinBraid> > USS(ArtinBraid B)
 	{
 	  F=*itf;
 
-	  B2=((!ArtinBraid(F))*(*(*it).begin())*F).MakeLCF();
+	  B2=((!CBraid::Braid<P>(F))*(*(*it).begin())*F).MakeLCF();
 
 	  T=Trajectory(B2);
 	  for(itb=T.begin(); itb!=T.end(); itb++)
@@ -1291,7 +1319,7 @@ list<list<ArtinBraid> > USS(ArtinBraid B)
 	    {
 	      uss.push_back(T);
 
-	      B2=((!ArtinBraid(ArtinFactor(B.Index(),1)))*(*T.begin())*ArtinFactor(B.Index(),1)).MakeLCF();
+	      B2=((!CBraid::Braid<P>(CBraid::Factor<P>(B.Index(),1)))*(*T.begin())*CBraid::Factor<P>(B.Index(),1)).MakeLCF();
 	      for(itb=T.begin();itb!=T.end(); itb++)
 		{
 		  if(B2==*itb)
@@ -1318,28 +1346,29 @@ list<list<ArtinBraid> > USS(ArtinBraid B)
 //
 /////////////////////////////////////////////////////////////
 
-list<list<ArtinBraid> > USS(ArtinBraid B, list<ArtinFactor> & mins, list<sint16> & prev)
+template<class P>
+list<list<CBraid::Braid<P>> > USS(CBraid::Braid<P> B, list<CBraid::Factor<P>> & mins, list<sint16> & prev)
 {
-  list<list<ArtinBraid> > uss;
+  list<list<CBraid::Braid<P>> > uss;
 
-  ArtinBraid B2=SendToUSS(B);
-  list<ArtinBraid> T=Trajectory(B2);
-  list<ArtinBraid>::reverse_iterator rit=T.rbegin();
+  CBraid::Braid<P> B2=SendToUSS(B);
+  list<CBraid::Braid<P>> T=Trajectory(B2);
+  typename list<CBraid::Braid<P>>::reverse_iterator rit=T.rbegin();
   uss.push_back(Trajectory(Cycling(*rit)));
 
-  ArtinFactor F=ArtinFactor(B.Index());
-  list<ArtinFactor> Min;
-  list<ArtinFactor>::iterator itf, itf2;
-  list<ArtinBraid>::iterator itb;
+  CBraid::Factor<P> F=CBraid::Factor<P>(B.Index());
+  list<CBraid::Factor<P>> Min;
+  typename list<CBraid::Factor<P>>::iterator itf, itf2;
+  typename list<CBraid::Braid<P>>::iterator itb;
 
   sint16 current=0;
   mins.clear();
   prev.clear();
 
-  mins.push_back(ArtinFactor(B.Index(),0));
+  mins.push_back(CBraid::Factor<P>(B.Index(),0));
   prev.push_back(1);
 
-  list<list<ArtinBraid> >::iterator it=uss.begin(), it2;
+  typename list<list<CBraid::Braid<P>> >::iterator it=uss.begin(), it2;
   while(it!=uss.end())
     {
       current++;
@@ -1349,7 +1378,7 @@ list<list<ArtinBraid> > USS(ArtinBraid B, list<ArtinFactor> & mins, list<sint16>
       for(itf=Min.begin(); itf!=Min.end(); itf++)
 	{
 	  F=*itf;
-	  B2=((!ArtinBraid(F))*(*(*it).begin())*F).MakeLCF();
+	  B2=((!CBraid::Braid<P>(F))*(*(*it).begin())*F).MakeLCF();
 	  T=Trajectory(B2);
 	  for(itb=T.begin(); itb!=T.end(); itb++)
 	    {
@@ -1385,19 +1414,20 @@ list<list<ArtinBraid> > USS(ArtinBraid B, list<ArtinFactor> & mins, list<sint16>
 //
 /////////////////////////////////////////////////////////////
 
-ArtinBraid   TreePath(ArtinBraid B, list<list<ArtinBraid> > & uss, list<ArtinFactor> & mins, list<sint16> & prev)
+template<class P>
+CBraid::Braid<P>   TreePath(CBraid::Braid<P> B, list<list<CBraid::Braid<P>> > & uss, list<CBraid::Factor<P>> & mins, list<sint16> & prev)
 {
   sint16 n=B.Index();
-  ArtinBraid C=ArtinBraid(n);
-  list<list<ArtinBraid> >::iterator it;
-  list<ArtinBraid>::iterator itb, itb2;
+  CBraid::Braid<P> C=CBraid::Braid<P>(n);
+  typename list<list<CBraid::Braid<P>> >::iterator it;
+  typename list<CBraid::Braid<P>>::iterator itb, itb2;
   sint16 current=0;
   list<sint16>::iterator itprev;
-  list<ArtinFactor>::iterator itmins;
+  typename list<CBraid::Factor<P>>::iterator itmins;
   sint16 i;
 
   if(CL(B)==0)
-    return ArtinBraid(n);
+    return CBraid::Braid<P>(n);
 
   for(it=uss.begin(); it!=uss.end(); it++)
     {
@@ -1445,12 +1475,13 @@ ArtinBraid   TreePath(ArtinBraid B, list<list<ArtinBraid> > & uss, list<ArtinFac
 //
 /////////////////////////////////////////////////////////////
 
-bool AreConjugate(ArtinBraid B1, ArtinBraid B2, ArtinBraid & C)
+template<class P>
+bool AreConjugate(CBraid::Braid<P> B1, CBraid::Braid<P> B2, CBraid::Braid<P> & C)
 {
   sint16 n=B1.Index();
-  ArtinBraid C1=ArtinBraid(n), C2=ArtinBraid(n);
+  CBraid::Braid<P> C1=CBraid::Braid<P>(n), C2=CBraid::Braid<P>(n);
 
-  ArtinBraid BT1=SendToUSS(B1,C1), BT2=SendToUSS(B2,C2);
+  CBraid::Braid<P> BT1=SendToUSS(B1,C1), BT2=SendToUSS(B2,C2);
 
 
   if(CL(BT1)!=CL(BT2) || Sup(BT1)!=Sup(BT2))
@@ -1462,21 +1493,21 @@ bool AreConjugate(ArtinBraid B1, ArtinBraid B2, ArtinBraid & C)
       return true;
     }
 
-  list<ArtinFactor> mins;
+  list<CBraid::Factor<P>> mins;
   list<sint16> prev;
 
-  list<list<ArtinBraid> > uss=USS(BT1,mins,prev);
+  list<list<CBraid::Braid<P>> > uss=USS(BT1,mins,prev);
 
-  list<list<ArtinBraid> >::iterator   it;
-  list<ArtinBraid>::iterator    itb;
+  typename list<list<CBraid::Braid<P>> >::iterator   it;
+  typename list<CBraid::Braid<P>>::iterator    itb;
   sint16  current=0;
-  ArtinBraid D1=ArtinBraid(n), D2=ArtinBraid(n);
+  CBraid::Braid<P> D1=CBraid::Braid<P>(n), D2=CBraid::Braid<P>(n);
 
 
   for(it=uss.begin(); it!=uss.end(); it++)
     {
       current++;
-      D2=ArtinBraid(n);
+      D2=CBraid::Braid<P>(n);
       for(itb=(*it).begin(); itb!=(*it).end(); itb++)
 	{
 	  if(*itb==BT2)
@@ -1491,7 +1522,7 @@ bool AreConjugate(ArtinBraid B1, ArtinBraid B2, ArtinBraid & C)
     return false;
 
   list<sint16>::iterator itprev;
-  list<ArtinFactor>::iterator itmins;
+  typename list<CBraid::Factor<P>>::iterator itmins;
   sint16 i;
 
   while(current!=1)
@@ -1521,32 +1552,32 @@ bool AreConjugate(ArtinBraid B1, ArtinBraid B2, ArtinBraid & C)
 //
 /////////////////////////////////////////////////////////////
 
-
-list<ArtinBraid> Centralizer(list<list<ArtinBraid> > & uss, list<ArtinFactor> & mins, list<sint16> & prev)
+template<class P>
+list<CBraid::Braid<P>> Centralizer(list<list<CBraid::Braid<P>> > & uss, list<CBraid::Factor<P>> & mins, list<sint16> & prev)
 {
-  ArtinBraid B=*(*uss.begin()).begin();
+  CBraid::Braid<P> B=*(*uss.begin()).begin();
   sint16  n=B.Index();
-  list<ArtinBraid> Cent;
-  list<list<ArtinBraid> >::iterator it;
-  list<ArtinBraid>::iterator itb;
-  ArtinBraid C=ArtinBraid(n), D=ArtinBraid(n), E=ArtinBraid(n), B2=ArtinBraid(n);
+  list<CBraid::Braid<P>> Cent;
+  typename list<list<CBraid::Braid<P>> >::iterator it;
+  typename list<CBraid::Braid<P>>::iterator itb;
+  CBraid::Braid<P> C=CBraid::Braid<P>(n), D=CBraid::Braid<P>(n), E=CBraid::Braid<P>(n), B2=CBraid::Braid<P>(n);
   sint16 cl=CL(B), sup=Sup(B), i;
   list<sint16> word;
-  list<ArtinFactor> Min;
-  list<ArtinFactor>::iterator itMin;
+  list<CBraid::Factor<P>> Min;
+  typename list<CBraid::Factor<P>>::iterator itMin;
   list<sint16>::iterator itprev;
-  list<ArtinFactor>::iterator itmins;
+  typename list<CBraid::Factor<P>>::iterator itmins;
 
   if(cl==0 && sup%2==0)
     {
       word.push_back(1);
-      C=WordToBraid(word,n);
+      C=WordToBraid<P>(word,n);
       Cent.push_back(C);
       word.clear();
 
       for(i=1; i<n; i++)
 	word.push_back(i);
-      C=WordToBraid(word,n);
+      C=WordToBraid<P>(word,n);
       Cent.push_back(C);
 
       return Cent;
@@ -1556,7 +1587,7 @@ list<ArtinBraid> Centralizer(list<list<ArtinBraid> > & uss, list<ArtinFactor> & 
     {
       Min=MinUSS(B);
       for(itMin=Min.begin(); itMin!=Min.end(); itMin++)
-	Cent.push_back(ArtinBraid(*itMin));
+	Cent.push_back(CBraid::Braid<P>(*itMin));
 
       return Cent;
     }
@@ -1577,7 +1608,7 @@ list<ArtinBraid> Centralizer(list<list<ArtinBraid> > & uss, list<ArtinFactor> & 
       for(itMin=Min.begin(); itMin!=Min.end(); itMin++)
 	{
 	  C=D*(*itMin);
-	  B2=((!ArtinBraid(*itMin))*(*(*it).begin())*(*itMin)).MakeLCF();
+	  B2=((!CBraid::Braid<P>(*itMin))*(*(*it).begin())*(*itMin)).MakeLCF();
 	  E=TreePath(B2,uss,mins,prev);
 	  C=C*(!E);
 	  C.MakeLCF();
@@ -1598,19 +1629,20 @@ list<ArtinBraid> Centralizer(list<list<ArtinBraid> > & uss, list<ArtinFactor> & 
 //
 /////////////////////////////////////////////////////////////
 
-list<ArtinBraid> Centralizer(ArtinBraid B)
+template<class P>
+list<CBraid::Braid<P>> Centralizer(CBraid::Braid<P> B)
 {
   sint16 n=B.Index();
-  list<ArtinFactor> mins;
+  list<CBraid::Factor<P>> mins;
   list<sint16> prev;
-  list<list<ArtinBraid> > uss=USS(B,mins,prev);
+  list<list<CBraid::Braid<P>> > uss=USS(B,mins,prev);
 
-  list<ArtinBraid> Cent=Centralizer(uss,mins,prev);
+  list<CBraid::Braid<P>> Cent=Centralizer(uss,mins,prev);
 
-  ArtinBraid C=ArtinBraid(n);
+  CBraid::Braid<P> C=CBraid::Braid<P>(n);
   SendToUSS(B,C);
 
-  list<ArtinBraid>::iterator it;
+  typename list<CBraid::Braid<P>>::iterator it;
 
   for(it=Cent.begin(); it!=Cent.end(); it++)
     {
@@ -1630,7 +1662,8 @@ list<ArtinBraid> Centralizer(ArtinBraid B)
 //
 /////////////////////////////////////////////////////////////
 
-void Tableau(ArtinFactor F, sint16 **& tab)
+template<class P>
+void Tableau(CBraid::Factor<P> F, sint16 **& tab)
 {
   sint16 i,j;
   sint16 n=F.Index();
@@ -1670,7 +1703,8 @@ void Tableau(ArtinFactor F, sint16 **& tab)
 //
 /////////////////////////////////////////////////////////////
 
-bool Circles(ArtinBraid B)
+template<class P>
+bool Circles(CBraid::Braid<P> B)
 {
   sint16 j, k, t, d, n=B.Index();
   sint16 * disj=new sint16[n+1];
@@ -1687,7 +1721,7 @@ bool Circles(ArtinBraid B)
   delta=delta%2;
 
   sint16 *** tabarray=new sint16**[cl+delta];
-  list<ArtinFactor>::iterator it=B.FactorList.begin();
+  typename list<CBraid::Factor<P>>::iterator it=B.FactorList.begin();
 
   for (j=0; j<cl+delta; j++)
     {
@@ -1697,7 +1731,7 @@ bool Circles(ArtinBraid B)
 	  tabarray[j][k]=new sint16[n];
 	}
       if(delta && j==0)
-	Tableau(ArtinFactor(n,1),tabarray[j]);
+	Tableau(CBraid::Factor<P>(n,1),tabarray[j]);
       else
 	{
 	  Tableau(*it,tabarray[j]);
@@ -1774,14 +1808,15 @@ bool Circles(ArtinBraid B)
 //
 /////////////////////////////////////////////////////////////
 
-int ThurstonType(ArtinBraid B)
+template<class P>
+int ThurstonType(CBraid::Braid<P> B)
 {
   sint16 i, n=B.Index();
 
   sint16 somereducible=0, somePA=0;
 
   B.MakeLCF();
-  ArtinBraid pot=B;
+  CBraid::Braid<P> pot=B;
 
   for(i=0;i<n;i++)
     {
@@ -1791,8 +1826,8 @@ int ThurstonType(ArtinBraid B)
     }
 
 
-  list<list<ArtinBraid> > uss=USS(B);
-  list<list<ArtinBraid> >::iterator  it;
+  list<list<CBraid::Braid<P>> > uss=USS(B);
+  typename list<list<CBraid::Braid<P>> >::iterator  it;
 
   sint16 type=3;
 
@@ -1824,14 +1859,15 @@ int ThurstonType(ArtinBraid B)
 //
 /////////////////////////////////////////////////////////////
 
-int ThurstonType(list<list<ArtinBraid> > & uss)
+template<class P>
+int ThurstonType(list<list<CBraid::Braid<P>> > & uss)
 {
-  ArtinBraid B=*(*uss.begin()).begin();
+  CBraid::Braid<P> B=*(*uss.begin()).begin();
   sint16 i, n=B.Index();
 
   sint16 somereducible=0, somePA=0;
 
-  ArtinBraid pot=B;
+  CBraid::Braid<P> pot=B;
 
   for(i=0;i<n;i++)
     {
@@ -1841,7 +1877,7 @@ int ThurstonType(list<list<ArtinBraid> > & uss)
     }
 
 
-  list<list<ArtinBraid> >::iterator  it;
+  typename list<list<CBraid::Braid<P>> >::iterator  it;
 
   sint16 type=3;
 
@@ -1875,19 +1911,20 @@ int ThurstonType(list<list<ArtinBraid> > & uss)
 //
 /////////////////////////////////////////////////////////////
 
-sint16 Rigidity(ArtinBraid B)
+template<class P>
+sint16 Rigidity(CBraid::Braid<P> B)
 {
-  ArtinBraid B2=B.MakeLCF(), B3=B2;
+  CBraid::Braid<P> B2=B.MakeLCF(), B3=B2;
   sint16 cl=CL(B2), rigidity=0;
 
   if(cl==0)
     return rigidity;
 
-  ArtinFactor F=(*B3.FactorList.begin()).Flip(B3.LeftDelta);
+  CBraid::Factor<P> F=(*B3.FactorList.begin()).Flip(B3.LeftDelta);
   B3=B3*F;
   B3.MakeLCF();
 
-  list<ArtinFactor>::iterator it2, it3;
+  typename list<CBraid::Factor<P>>::iterator it2, it3;
 
   it3=B3.FactorList.begin();
 
@@ -1909,9 +1946,10 @@ sint16 Rigidity(ArtinBraid B)
 //
 /////////////////////////////////////////////////////////////
 
-sint16 Rigidity(list<list<ArtinBraid> > & uss)
+template<class P>
+sint16 Rigidity(list<list<CBraid::Braid<P>> > & uss)
 {
-  list<list<ArtinBraid> >::iterator it;
+  typename list<list<CBraid::Braid<P>> >::iterator it;
 
   sint16 rigidity=0, next, conjecture=0;
 
@@ -2007,9 +2045,10 @@ sint16 ReadPower()
 //
 /////////////////////////////////////////////////////////////
 
-ArtinBraid RaisePower(ArtinBraid B, sint16 k)
+template<class P>
+CBraid::Braid<P> RaisePower(CBraid::Braid<P> B, sint16 k)
 {
-  ArtinBraid  original=B;
+  CBraid::Braid<P>  original=B;
   sint16 i;
   if(k==0)
     B.Identity();
@@ -2055,16 +2094,17 @@ char* ReadFileName()
 //
 ////////////////////////////////////////////////////////////////////////////////////////
 
-void PrintUSS(list<list<ArtinBraid> > &  uss, list<sint16> word, sint16 n,
+template<class P>
+void PrintUSS(list<list<CBraid::Braid<P>> > &  uss, list<sint16> word, sint16 n,
 	      sint16 power, char * file, sint16 type, sint16 rigidity)
 {
   std::ofstream f(file);
 
   sint16 orbits=0;
 
-  list<list<ArtinBraid> >::iterator it;
-  list<ArtinBraid>::iterator oit, itb;
-  ArtinBraid B2=ArtinBraid(n);
+  typename list<list<CBraid::Braid<P>> >::iterator it;
+  typename list<CBraid::Braid<P>>::iterator oit, itb;
+  CBraid::Braid<P> B2=CBraid::Braid<P>(n);
 
   for(it=uss.begin(); it!=uss.end(); it++)
     orbits++;
@@ -2163,13 +2203,13 @@ void PrintUSS(list<list<ArtinBraid> > &  uss, list<sint16> word, sint16 n,
       else
 	f << rigidity << "-rigid.";
 
-      if(((!ArtinBraid(ArtinFactor(n,1)))*(*(*it).begin())*ArtinBraid(ArtinFactor(n,1))).MakeLCF()==B2)
+      if(((!CBraid::Braid<P>(CBraid::Factor<P>(n,1)))*(*(*it).begin())*CBraid::Braid<P>(CBraid::Factor<P>(n,1))).MakeLCF()==B2)
 	f << "     Conjugate to the previous orbit by Delta.";
       else
 	{
 	  for(itb=(*it).begin(); itb!=(*it).end(); itb++)
 	    {
-	      if(((*(*it).begin())*ArtinBraid(ArtinFactor(n,1))).MakeLCF()==(ArtinBraid(ArtinFactor(n,1))*(*itb)).MakeLCF())
+	      if(((*(*it).begin())*CBraid::Braid<P>(CBraid::Factor<P>(n,1))).MakeLCF()==(CBraid::Braid<P>(CBraid::Factor<P>(n,1))*(*itb)).MakeLCF())
 		break;
 	    }
 	  if(itb!=(*it).end())
@@ -2284,10 +2324,11 @@ char * FileName(sint16 iteration, sint16 max_iteration, sint16 type, sint16 orbi
 //
 ///////////////////////////////////////////////////////
 
- ArtinBraid Reverse(ArtinBraid B)
+template<class P>
+CBraid::Braid<P> Reverse(CBraid::Braid<P> B)
 {
   sint16 i, l=CL(B);
-  ArtinBraid B2=ArtinBraid(B.Index());
+  CBraid::Braid<P> B2=CBraid::Braid<P>(B.Index());
   B2.RightDelta=B.LeftDelta;
   
   for(i=0;i<l;i++)
@@ -2310,8 +2351,8 @@ char * FileName(sint16 iteration, sint16 max_iteration, sint16 type, sint16 orbi
 //
 /////////////////////////////////////////////////////////////
 
-
-ArtinBraid RightMeet(ArtinBraid B1, ArtinBraid B2)
+template<class P>
+CBraid::Braid<P> RightMeet(CBraid::Braid<P> B1, CBraid::Braid<P> B2)
 {
   return Reverse(LeftMeet(Reverse(B1),Reverse(B2)));
 }
@@ -2328,12 +2369,12 @@ ArtinBraid RightMeet(ArtinBraid B1, ArtinBraid B2)
 //
 /////////////////////////////////////////////////////////////
 
-
-ArtinBraid LeftJoin(ArtinBraid B1, ArtinBraid B2)
+template<class P>
+CBraid::Braid<P> LeftJoin(CBraid::Braid<P> B1, CBraid::Braid<P> B2)
 {
  sint16 n=B1.Index(), shift=0;
- ArtinBraid B=ArtinBraid(n);
- ArtinFactor  F2=ArtinFactor(n,0), F=ArtinFactor(n,1);
+ CBraid::Braid<P> B=CBraid::Braid<P>(n);
+ CBraid::Factor<P>  F2=CBraid::Factor<P>(n,0), F=CBraid::Factor<P>(n,1);
 
 
  B1.MakeLCF();
@@ -2350,9 +2391,9 @@ ArtinBraid LeftJoin(ArtinBraid B1, ArtinBraid B2)
  while(!B2.CompareWithIdentity()) 
  {
   if(B2.LeftDelta>0)
-    F2=ArtinFactor(n,1); 
+    F2=CBraid::Factor<P>(n,1); 
   else if(CL(B2)==0)
-    F2=ArtinFactor(n,0);
+    F2=CBraid::Factor<P>(n,0);
   else
     F2=B2.FactorList.front();
 
@@ -2392,7 +2433,8 @@ ArtinBraid LeftJoin(ArtinBraid B1, ArtinBraid B2)
 //
 /////////////////////////////////////////////////////////////
 
-ArtinBraid RightJoin(ArtinBraid B1, ArtinBraid B2)
+template<class P>
+CBraid::Braid<P> RightJoin(CBraid::Braid<P> B1, CBraid::Braid<P> B2)
 {
   return Reverse(LeftJoin(Reverse(B1),Reverse(B2)));
 }
@@ -2404,10 +2446,11 @@ ArtinBraid RightJoin(ArtinBraid B1, ArtinBraid B2)
 //
 ///////////////////////////////////////////////////////
 
-ArtinFactor  InitialFactor(ArtinBraid B)
+template<class P>
+CBraid::Factor<P>  InitialFactor(CBraid::Braid<P> B)
 {
  sint16 n=B.Index();
- ArtinFactor F=ArtinFactor(n,0);
+ CBraid::Factor<P> F=CBraid::Factor<P>(n,0);
 
  if(CL(B)>0) 
    F=(B.FactorList.front()).Flip(-B.LeftDelta);
@@ -2423,9 +2466,10 @@ ArtinFactor  InitialFactor(ArtinBraid B)
 //
 ///////////////////////////////////////////////////////
 
-ArtinFactor  PreferredPrefix(ArtinBraid B)
+template<class P>
+CBraid::Factor<P>  PreferredPrefix(CBraid::Braid<P> B)
 {
-ArtinFactor F=ArtinFactor(B.Index(),0);
+CBraid::Factor<P> F=CBraid::Factor<P>(B.Index(),0);
 
 if(CL(B)>0) 
   F=LeftMeet(InitialFactor(B),~B.FactorList.back());
@@ -2443,9 +2487,10 @@ return F;
 //
 ///////////////////////////////////////////////////////
 
- ArtinBraid Sliding(ArtinBraid B)
+template<class P>
+CBraid::Braid<P> Sliding(CBraid::Braid<P> B)
 {
-  ArtinFactor F=ArtinFactor(B.Index());
+  CBraid::Factor<P> F=CBraid::Factor<P>(B.Index());
 
   if(CL(B)==0)
     return B;
@@ -2466,7 +2511,8 @@ return F;
 //
 ///////////////////////////////////////////////////////
 
-ArtinFactor  PreferredSuffix(ArtinBraid B)
+template<class P>
+CBraid::Factor<P>  PreferredSuffix(CBraid::Braid<P> B)
 {
  return  !(PreferredPrefix(Reverse(B)));
 }
@@ -2484,9 +2530,10 @@ ArtinFactor  PreferredSuffix(ArtinBraid B)
 //
 /////////////////////////////////////////////////////////////
 
-list<ArtinBraid > Trajectory_Sliding(ArtinBraid B)
+template<class P>
+list<CBraid::Braid<P> > Trajectory_Sliding(CBraid::Braid<P> B)
  {
-  list<ArtinBraid > p;
+  list<CBraid::Braid<P> > p;
 
   while (find(p.begin(),p.end(),B)==p.end())
    {
@@ -2513,13 +2560,14 @@ list<ArtinBraid > Trajectory_Sliding(ArtinBraid B)
 //
 /////////////////////////////////////////////////////////////
 
-list<ArtinBraid > Trajectory_Sliding(ArtinBraid B, ArtinBraid & C, sint16 & d)
+template<class P>
+list<CBraid::Braid<P> > Trajectory_Sliding(CBraid::Braid<P> B, CBraid::Braid<P> & C, sint16 & d)
 {
-  list<ArtinBraid > p;
-  list<ArtinBraid>::iterator it;
+  list<CBraid::Braid<P> > p;
+  typename list<CBraid::Braid<P>>::iterator it;
  
   sint16 n=B.Index();
-  C=ArtinBraid(n);
+  C=CBraid::Braid<P>(n);
   d=0;
 
    while (find(p.begin(),p.end(),B)==p.end())
@@ -2530,8 +2578,8 @@ list<ArtinBraid > Trajectory_Sliding(ArtinBraid B, ArtinBraid & C, sint16 & d)
      d++;
    }
 
-  ArtinBraid B2=ArtinBraid(n);
-  ArtinBraid C2=ArtinBraid(n);
+  CBraid::Braid<P> B2=CBraid::Braid<P>(n);
+  CBraid::Braid<P> C2=CBraid::Braid<P>(n);
 
   C2.RightMultiply(PreferredPrefix(B));
   B2=Sliding(B);
@@ -2563,10 +2611,10 @@ list<ArtinBraid > Trajectory_Sliding(ArtinBraid B, ArtinBraid & C, sint16 & d)
 //
 /////////////////////////////////////////////////////////////
 
-
-ArtinBraid SendToSC(ArtinBraid B)
+template<class P>
+CBraid::Braid<P> SendToSC(CBraid::Braid<P> B)
 {
-  list<ArtinBraid> T=Trajectory_Sliding(B);
+  list<CBraid::Braid<P>> T=Trajectory_Sliding(B);
   return Sliding(T.back()); 
 }
 
@@ -2587,11 +2635,11 @@ ArtinBraid SendToSC(ArtinBraid B)
 //
 /////////////////////////////////////////////////////////////
 
-
-ArtinBraid SendToSC(ArtinBraid B, ArtinBraid & C)
+template<class P>
+CBraid::Braid<P> SendToSC(CBraid::Braid<P> B, CBraid::Braid<P> & C)
 {
   sint16 d;
-  list<ArtinBraid> T=Trajectory_Sliding(B,C,d);
+  list<CBraid::Braid<P>> T=Trajectory_Sliding(B,C,d);
 
   return Sliding(T.back());
 
@@ -2611,17 +2659,18 @@ ArtinBraid SendToSC(ArtinBraid B, ArtinBraid & C)
 //
 /////////////////////////////////////////////////////////////
 
-ArtinFactor Transport_Sliding(ArtinBraid B, ArtinFactor F)
+template<class P>
+CBraid::Factor<P> Transport_Sliding(CBraid::Braid<P> B, CBraid::Factor<P> F)
 {
-ArtinBraid B2=((!ArtinBraid(F))*B*F).MakeLCF();
-ArtinBraid B3=((!ArtinBraid(PreferredPrefix(B)))*F*(PreferredPrefix(B2))).MakeLCF(); 
+CBraid::Braid<P> B2=((!CBraid::Braid<P>(F))*B*F).MakeLCF();
+CBraid::Braid<P> B3=((!CBraid::Braid<P>(PreferredPrefix(B)))*F*(PreferredPrefix(B2))).MakeLCF(); 
 
-ArtinFactor F2=ArtinFactor(B2.Index(),0);
+CBraid::Factor<P> F2=CBraid::Factor<P>(B2.Index(),0);
 
 if(CL(B3)>0)
   F2=B3.FactorList.front();
 else if (B3.LeftDelta==1)
-  F2=ArtinFactor(B2.Index(),1);
+  F2=CBraid::Factor<P>(B2.Index(),1);
 
 
 return F2;
@@ -2642,12 +2691,12 @@ return F2;
 //
 /////////////////////////////////////////////////////////////
 
-
-list<ArtinFactor> Returns_Sliding(ArtinBraid B, ArtinFactor F) 
+template<class P>
+list<CBraid::Factor<P>> Returns_Sliding(CBraid::Braid<P> B, CBraid::Factor<P> F) 
 {
- list<ArtinFactor> ret;
- list<ArtinFactor>::iterator it=ret.end();
- ArtinBraid B1=B;
+ list<CBraid::Factor<P>> ret;
+ typename list<CBraid::Factor<P>>::iterator it=ret.end();
+ CBraid::Braid<P> B1=B;
  sint16 i, N=1;  
 
 
@@ -2694,28 +2743,29 @@ return ret;
 //
 /////////////////////////////////////////////////////////////
 
-ArtinFactor Pullback_Sliding(ArtinBraid B, ArtinFactor F)
+template<class P>
+CBraid::Factor<P> Pullback_Sliding(CBraid::Braid<P> B, CBraid::Factor<P> F)
 {
 
- ArtinBraid B2=ArtinBraid(B.Index());
- B2=(ArtinBraid(PreferredPrefix(B))*F).MakeLCF();
+ CBraid::Braid<P> B2=CBraid::Braid<P>(B.Index());
+ B2=(CBraid::Braid<P>(PreferredPrefix(B))*F).MakeLCF();
 
- ArtinBraid B3= ArtinBraid(B.Index());
- B3=(!ArtinBraid(F)*(Sliding(B)*F)).MakeLCF();
+ CBraid::Braid<P> B3= CBraid::Braid<P>(B.Index());
+ B3=(!CBraid::Braid<P>(F)*(Sliding(B)*F)).MakeLCF();
 
- ArtinFactor F2=ArtinFactor(B.Index());
+ CBraid::Factor<P> F2=CBraid::Factor<P>(B.Index());
  F2=PreferredSuffix(B3);
    
- ArtinBraid C=ArtinBraid(B.Index());
- C=RightMeet(B2,ArtinBraid(F2));
+ CBraid::Braid<P> C=CBraid::Braid<P>(B.Index());
+ C=RightMeet(B2,CBraid::Braid<P>(F2));
  
 
  B2=(B2*(!C)).MakeLCF();
 
  if (B2.CompareWithIdentity())
-   return ArtinFactor(B.Index(),0);
+   return CBraid::Factor<P>(B.Index(),0);
  else if (CL(B2)==0)
-   return ArtinFactor(B.Index(),1);
+   return CBraid::Factor<P>(B.Index(),1);
  else
    return B2.FactorList.front();
 
@@ -2737,23 +2787,24 @@ ArtinFactor Pullback_Sliding(ArtinBraid B, ArtinFactor F)
 //
 /////////////////////////////////////////////////////////////
 
-ArtinFactor MainPullback_Sliding(ArtinBraid B, ArtinFactor F)
+template<class P>
+CBraid::Factor<P> MainPullback_Sliding(CBraid::Braid<P> B, CBraid::Factor<P> F)
 {
 
 
-list<ArtinFactor> ret;
-list<ArtinFactor>::iterator it=ret.end();
+list<CBraid::Factor<P>> ret;
+typename list<CBraid::Factor<P>>::iterator it=ret.end();
 
-ArtinBraid B2=B; 
+CBraid::Braid<P> B2=B; 
 
-list<ArtinBraid> T=Trajectory_Sliding(B);
-list<ArtinBraid>::reverse_iterator itb;
+list<CBraid::Braid<P>> T=Trajectory_Sliding(B);
+typename list<CBraid::Braid<P>>::reverse_iterator itb;
 
 if(F.CompareWithDelta())
   return F;  
 
 
-ArtinFactor F2=F;
+CBraid::Factor<P> F2=F;
 while (it==ret.end())
 {
 
@@ -2768,7 +2819,7 @@ while (it==ret.end())
 return *it;
 }
 
-// María Cumplido Cabello
+// Marï¿½a Cumplido Cabello
 
 
 /////////////////////////////////////////////////////////////
@@ -2780,13 +2831,13 @@ return *it;
 /////////////////////////////////////////////////////////////
 
 
-
-ArtinFactor MinSC(ArtinBraid B, ArtinFactor F) 
+template<class P>
+CBraid::Factor<P> MinSC(CBraid::Braid<P> B, CBraid::Factor<P> F) 
 {
-  ArtinFactor F2=MinSSS(B,F);
+  CBraid::Factor<P> F2=MinSSS(B,F);
 
-  list<ArtinFactor> ret=Returns_Sliding(B,F2);
-  list<ArtinFactor>::iterator it;
+  list<CBraid::Factor<P>> ret=Returns_Sliding(B,F2);
+  typename list<CBraid::Factor<P>>::iterator it;
 
   for(it=ret.begin(); it!=ret.end(); it++)
     {
@@ -2804,7 +2855,7 @@ ArtinFactor MinSC(ArtinBraid B, ArtinFactor F)
 	return *it;
     }
 
-return ArtinFactor(B.Index(),1);
+return CBraid::Factor<P>(B.Index(),1);
 }
 
 
@@ -2817,17 +2868,18 @@ return ArtinFactor(B.Index(),1);
 //
 /////////////////////////////////////////////////////////////
 
-list<ArtinFactor> MinSC(ArtinBraid B)
+template<class P>
+list<CBraid::Factor<P>> MinSC(CBraid::Braid<P> B)
 {
   sint16 i,j,k,test;
   sint16 n=B.Index();
   sint16 *table=new sint16[n];
 
-  list<ArtinFactor> Min;
+  list<CBraid::Factor<P>> Min;
 
   for(i=0; i<n; i++)
     table[i]=0;
-  ArtinFactor F=ArtinFactor(n);
+  CBraid::Factor<P> F=CBraid::Factor<P>(n);
   for(i=1; i<n; i++)
     {
       test=1;
@@ -2866,21 +2918,21 @@ list<ArtinFactor> MinSC(ArtinBraid B)
 //
 /////////////////////////////////////////////////////////////
 
-
-list<list<ArtinBraid> > SC(ArtinBraid B)
+template<class P>
+list<list<CBraid::Braid<P>> > SC(CBraid::Braid<P> B)
 {
-  list<list<ArtinBraid> > sc;
-  ArtinFactor F=ArtinFactor(B.Index());
-  list<ArtinFactor> Min;
-  list<ArtinFactor>::iterator itf, itf2;
-  list<ArtinBraid>::iterator itb;
+  list<list<CBraid::Braid<P>> > sc;
+  CBraid::Factor<P> F=CBraid::Factor<P>(B.Index());
+  list<CBraid::Factor<P>> Min;
+  typename list<CBraid::Factor<P>>::iterator itf, itf2;
+  typename list<CBraid::Braid<P>>::iterator itb;
 
-  ArtinBraid B2=SendToSC(B);
-  list<ArtinBraid> T=Trajectory_Sliding(B2);  
+  CBraid::Braid<P> B2=SendToSC(B);
+  list<CBraid::Braid<P>> T=Trajectory_Sliding(B2);  
   
   sc.push_back(Trajectory_Sliding(B2));
 
-  B2=((!ArtinBraid(ArtinFactor(B.Index(),1)))*(B2)*ArtinFactor(B.Index(),1)).MakeLCF();
+  B2=((!CBraid::Braid<P>(CBraid::Factor<P>(B.Index(),1)))*(B2)*CBraid::Factor<P>(B.Index(),1)).MakeLCF();
  
   for(itb=(*sc.begin()).begin(); itb!=(*sc.begin()).end(); itb++)
     {
@@ -2893,7 +2945,7 @@ list<list<ArtinBraid> > SC(ArtinBraid B)
     sc.push_back(Trajectory_Sliding(B2));
 
  
-  list<list<ArtinBraid> >::iterator it=sc.begin(), it2;
+  typename list<list<CBraid::Braid<P>> >::iterator it=sc.begin(), it2;
 
   while(it!=sc.end())
     {
@@ -2903,7 +2955,7 @@ list<list<ArtinBraid> > SC(ArtinBraid B)
       for(itf=Min.begin(); itf!=Min.end(); itf++)
 	{
 	  F=*itf;	  	  
-      B2=((!ArtinBraid(F))*(*(*it).begin())*F).MakeLCF();     	  
+      B2=((!CBraid::Braid<P>(F))*(*(*it).begin())*F).MakeLCF();     	  
 	  T=Trajectory_Sliding(B2);
  	  for(itb=T.begin(); itb!=T.end(); itb++)
 	    {
@@ -2919,7 +2971,7 @@ list<list<ArtinBraid> > SC(ArtinBraid B)
 	  if(itb==T.end())
 	    {
 	      sc.push_back(T);
-	      B2=((!ArtinBraid(ArtinFactor(B.Index(),1)))*(*T.begin())*ArtinFactor(B.Index(),1)).MakeLCF(); 
+	      B2=((!CBraid::Braid<P>(CBraid::Factor<P>(B.Index(),1)))*(*T.begin())*CBraid::Factor<P>(B.Index(),1)).MakeLCF(); 
 	      for(itb=T.begin();itb!=T.end(); itb++)
 		{
 		  if(B2==*itb)
@@ -2942,16 +2994,17 @@ list<list<ArtinBraid> > SC(ArtinBraid B)
 //
 ////////////////////////////////////////////////////////////////////////////////////////
 
-void PrintSC(list<list<ArtinBraid> > &  sc, list<sint16> word, sint16 n,
+template<class P>
+void PrintSC(list<list<CBraid::Braid<P>> > &  sc, list<sint16> word, sint16 n,
 	      sint16 power, char * file, sint16 type)
 {
   std::ofstream f(file);
 
   sint16 orbits=0;
 
-  list<list<ArtinBraid> >::iterator it;
-  list<ArtinBraid>::iterator oit, itb;
-  ArtinBraid B2=ArtinBraid(n);
+  typename list<list<CBraid::Braid<P>> >::iterator it;
+  typename list<CBraid::Braid<P>>::iterator oit, itb;
+  CBraid::Braid<P> B2=CBraid::Braid<P>(n);
 
   for(it=sc.begin(); it!=sc.end(); it++)
     orbits++;
@@ -3032,13 +3085,13 @@ void PrintSC(list<list<ArtinBraid> > &  sc, list<sint16> word, sint16 n,
       f << "-------------------" << endl <<
 	" Circuit number " << orbits++ << "        ";
 
-      if(((!ArtinBraid(ArtinFactor(n,1)))*(*(*it).begin())*ArtinBraid(ArtinFactor(n,1))).MakeLCF()==B2)
+      if(((!CBraid::Braid<P>(CBraid::Factor<P>(n,1)))*(*(*it).begin())*CBraid::Braid<P>(CBraid::Factor<P>(n,1))).MakeLCF()==B2)
 	f << "     Conjugate to the previous circuit by Delta.";
       else
 	{
 	  for(itb=(*it).begin(); itb!=(*it).end(); itb++)
 	    {
-	      if(((*(*it).begin())*ArtinBraid(ArtinFactor(n,1))).MakeLCF()==(ArtinBraid(ArtinFactor(n,1))*(*itb)).MakeLCF())
+	      if(((*(*it).begin())*CBraid::Braid<P>(CBraid::Factor<P>(n,1))).MakeLCF()==(CBraid::Braid<P>(CBraid::Factor<P>(n,1))*(*itb)).MakeLCF())
 		break;
 	    }
 	  if(itb!=(*it).end())
@@ -3072,27 +3125,28 @@ void PrintSC(list<list<ArtinBraid> > &  sc, list<sint16> word, sint16 n,
 //
 /////////////////////////////////////////////////////////////
 
-list<list<ArtinBraid> > SC(ArtinBraid B, list<ArtinFactor> & mins, list<sint16> & prev)
+template<class P>
+list<list<CBraid::Braid<P>> > SC(CBraid::Braid<P> B, list<CBraid::Factor<P>> & mins, list<sint16> & prev)
 {
-  list<list<ArtinBraid> > sc;
+  list<list<CBraid::Braid<P>> > sc;
 
-  ArtinBraid B2=SendToSC(B);
-  list<ArtinBraid> T=Trajectory_Sliding(B2);
+  CBraid::Braid<P> B2=SendToSC(B);
+  list<CBraid::Braid<P>> T=Trajectory_Sliding(B2);
   sc.push_back(Trajectory_Sliding(B2));
 
-  ArtinFactor F=ArtinFactor(B.Index());
-  list<ArtinFactor> Min;
-  list<ArtinFactor>::iterator itf, itf2;
-  list<ArtinBraid>::iterator itb;
+  CBraid::Factor<P> F=CBraid::Factor<P>(B.Index());
+  list<CBraid::Factor<P>> Min;
+  typename list<CBraid::Factor<P>>::iterator itf, itf2;
+  typename list<CBraid::Braid<P>>::iterator itb;
 
   sint16 current=0;
   mins.clear();
   prev.clear();
 
-  mins.push_back(ArtinFactor(B.Index(),0));
+  mins.push_back(CBraid::Factor<P>(B.Index(),0));
   prev.push_back(1);
 
-  list<list<ArtinBraid> >::iterator it=sc.begin(), it2;
+  typename list<list<CBraid::Braid<P>> >::iterator it=sc.begin(), it2;
   while(it!=sc.end())
     {
       current++;
@@ -3102,7 +3156,7 @@ list<list<ArtinBraid> > SC(ArtinBraid B, list<ArtinFactor> & mins, list<sint16> 
       for(itf=Min.begin(); itf!=Min.end(); itf++)
 	{
 	  F=*itf;
-	  B2=((!ArtinBraid(F))*(*(*it).begin())*F).MakeLCF();
+	  B2=((!CBraid::Braid<P>(F))*(*(*it).begin())*F).MakeLCF();
       T=Trajectory_Sliding(B2);
 	  for(itb=T.begin(); itb!=T.end(); itb++)
 	    {
@@ -3138,12 +3192,13 @@ list<list<ArtinBraid> > SC(ArtinBraid B, list<ArtinFactor> & mins, list<sint16> 
 //
 //////////////////////////////////////////////////////////////////////////////////
 
-bool AreConjugateSC(ArtinBraid B1, ArtinBraid B2, ArtinBraid & C)
+template<class P>
+bool AreConjugateSC(CBraid::Braid<P> B1, CBraid::Braid<P> B2, CBraid::Braid<P> & C)
 {
   sint16 n=B1.Index();
-  ArtinBraid C1=ArtinBraid(n), C2=ArtinBraid(n);
+  CBraid::Braid<P> C1=CBraid::Braid<P>(n), C2=CBraid::Braid<P>(n);
 
-  ArtinBraid BT1=SendToSC(B1,C1), BT2=SendToSC(B2,C2);
+  CBraid::Braid<P> BT1=SendToSC(B1,C1), BT2=SendToSC(B2,C2);
 
   if(CL(BT1)!=CL(BT2) || Sup(BT1)!=Sup(BT2))
     return false;
@@ -3154,21 +3209,21 @@ bool AreConjugateSC(ArtinBraid B1, ArtinBraid B2, ArtinBraid & C)
       return true;
     }
 
-  list<ArtinFactor> mins;
+  list<CBraid::Factor<P>> mins;
   list<sint16> prev;
 
-  list<list<ArtinBraid> > sc=SC(BT1,mins,prev);
+  list<list<CBraid::Braid<P>> > sc=SC(BT1,mins,prev);
 
-  list<list<ArtinBraid> >::iterator   it;
-  list<ArtinBraid>::iterator    itb;
+  typename list<list<CBraid::Braid<P>> >::iterator   it;
+  typename list<CBraid::Braid<P>>::iterator    itb;
   sint16  current=0;
-  ArtinBraid D1=ArtinBraid(n), D2=ArtinBraid(n);
+  CBraid::Braid<P> D1=CBraid::Braid<P>(n), D2=CBraid::Braid<P>(n);
 
 
   for(it=sc.begin(); it!=sc.end(); it++)
     {
       current++;
-      D2=ArtinBraid(n);
+      D2=CBraid::Braid<P>(n);
       for(itb=(*it).begin(); itb!=(*it).end(); itb++)
 	{
 	  if(*itb==BT2)
@@ -3183,7 +3238,7 @@ bool AreConjugateSC(ArtinBraid B1, ArtinBraid B2, ArtinBraid & C)
     return false;
 
   list<sint16>::iterator itprev;
-  list<ArtinFactor>::iterator itmins;
+  typename list<CBraid::Factor<P>>::iterator itmins;
   sint16 i;
 
   while(current!=1)
@@ -3215,22 +3270,22 @@ bool AreConjugateSC(ArtinBraid B1, ArtinBraid B2, ArtinBraid & C)
 //
 //////////////////////////////////////////////////////////////////////////////////
 
-
-bool AreConjugateSC2(ArtinBraid B1, ArtinBraid B2, ArtinBraid & C)
+template<class P>
+bool AreConjugateSC2(CBraid::Braid<P> B1, CBraid::Braid<P> B2, CBraid::Braid<P> & C)
 {
-  list<list<ArtinBraid> > sc; 
+  list<list<CBraid::Braid<P>> > sc; 
   sint16 n=B1.Index();
-  ArtinFactor F=ArtinFactor(n);
-  list<ArtinFactor> Min;
-  list<ArtinFactor>::iterator itf, itf2;
-  list<ArtinBraid>::iterator itb;
+  CBraid::Factor<P> F=CBraid::Factor<P>(n);
+  list<CBraid::Factor<P>> Min;
+  typename list<CBraid::Factor<P>>::iterator itf, itf2;
+  typename list<CBraid::Braid<P>>::iterator itb;
   
-  ArtinBraid C1=ArtinBraid(n), C2=ArtinBraid(n);
-  ArtinBraid BT1=SendToSC(B1,C1), BT2=SendToSC(B2,C2); 
+  CBraid::Braid<P> C1=CBraid::Braid<P>(n), C2=CBraid::Braid<P>(n);
+  CBraid::Braid<P> BT1=SendToSC(B1,C1), BT2=SendToSC(B2,C2); 
 
-  ArtinBraid D1=ArtinBraid(n), D2=ArtinBraid(n); 
+  CBraid::Braid<P> D1=CBraid::Braid<P>(n), D2=CBraid::Braid<P>(n); 
 
-  list<ArtinFactor> mins;
+  list<CBraid::Factor<P>> mins;
   list<sint16> prev;
   
   sint16 current=0;
@@ -3239,23 +3294,23 @@ bool AreConjugateSC2(ArtinBraid B1, ArtinBraid B2, ArtinBraid & C)
   prev.clear();
 
   list<sint16>::iterator itprev;
-  list<ArtinFactor>::iterator itmins;
+  typename list<CBraid::Factor<P>>::iterator itmins;
   sint16 i;  
   
-  mins.push_back(ArtinFactor(B1.Index(),0));
+  mins.push_back(CBraid::Factor<P>(B1.Index(),0));
   prev.push_back(1);
 
-  list<ArtinBraid> T=Trajectory_Sliding(BT1);
+  list<CBraid::Braid<P>> T=Trajectory_Sliding(BT1);
   
   sc.push_back(Trajectory_Sliding(BT1));  
  
-  list<list<ArtinBraid> >::iterator it=sc.begin(), it2;
+  typename list<list<CBraid::Braid<P>> >::iterator it=sc.begin(), it2;
 
   while(it!=sc.end()) 
     {    
       current++;               
        current2++;
-       D2=ArtinBraid(n);
+       D2=CBraid::Braid<P>(n);
        for(itb=(*it).begin(); itb!=(*it).end(); itb++)
 	    {
 	      if(*itb==BT2) 
@@ -3284,7 +3339,7 @@ bool AreConjugateSC2(ArtinBraid B1, ArtinBraid B2, ArtinBraid & C)
   for(itf=Min.begin(); itf!=Min.end(); itf++) 
 	 {
 	  F=*itf;   	  
-      BT1=((!ArtinBraid(F))*(*(*it).begin())*F).MakeLCF(); 
+      BT1=((!CBraid::Braid<P>(F))*(*(*it).begin())*F).MakeLCF(); 
           	  
 	  T=Trajectory_Sliding(BT1); 
  	  for(itb=T.begin(); itb!=T.end(); itb++) 

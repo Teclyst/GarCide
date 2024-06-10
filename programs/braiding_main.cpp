@@ -102,7 +102,7 @@ int main()
 	      n=ReadIndex();
 	      word=ReadWord(n);
 	      B=ArtinBraid(n);
-	      B=WordToBraid(word,n);
+	      B=WordToBraid<CBraid::ArtinPresentation>(word,n);
 
 	      if(p)
 		{
@@ -122,7 +122,7 @@ int main()
 		  f << endl << "The Left Normal Form of the braid on "
 		    << n << " strands" << endl << endl;
 		  f.close();
-		  PrintWord(word,n,power,file);
+		  PrintWord<ArtinPresentation>(word,n,power,file);
 		  f.open(file,ios::app);
 
 		  f << endl << endl;
@@ -143,7 +143,7 @@ int main()
 		  f << endl << "The Right Normal Form of the braid on "
 		    << n << " strands" << endl << endl;
 		  f.close();
-		  PrintWord(word,n,power,file);
+		  PrintWord<ArtinPresentation>(word,n,power,file);
 		  f.open(file,ios::app);
 
 		  f << endl << endl;
@@ -166,7 +166,7 @@ int main()
 		power=ReadPower();
 
 	      B=ArtinBraid(n);
-	      B=WordToBraid(word,n);
+	      B=WordToBraid<ArtinPresentation>(word,n);
 
 	      if(p && power!=1)
 		B=RaisePower(B,power);
@@ -192,7 +192,7 @@ int main()
 	      f << "The permutation associated to the braid on "
 		<< n << " strands" << endl << endl;
 	      f.close();
-	      PrintWord(word,n,power,file);
+	      PrintWord<ArtinPresentation>(word,n,power,file);
 	      f.open(file,ios::app);
 	      f << endl << endl << " is:" << endl << endl;
 
@@ -242,7 +242,7 @@ int main()
 	      for(i=1; i<n; i++)
 		cross[i]=new sint16[n+1];
 
-	      Crossing(word,n,power,cross);
+	      Crossing<ArtinPresentation>(word,n,power,cross);
 
 	      f.open(file);
 
@@ -251,7 +251,7 @@ int main()
 	      f << "The crossing numbers of the braid on " << n
 		<< " strands" << endl << endl;
 	      f.close();
-	      PrintWord(word,n,power,file);
+	      PrintWord<ArtinPresentation>(word,n,power,file);
 	      f.open(file,ios::app);
 	      f << endl << endl << "are: " << endl << endl << "    ";
 
@@ -304,7 +304,7 @@ int main()
 		power=ReadPower();
 
 	      B1=ArtinBraid(n);
-	      B1=WordToBraid(word,n);
+	      B1=WordToBraid<ArtinPresentation>(word,n);
 	      if(p && power!=1)
 		B1=RaisePower(B1,power);
 
@@ -315,7 +315,7 @@ int main()
 		power2=ReadPower();
 
 	      B2=ArtinBraid(n);
-	      B2=WordToBraid(word2,n);
+	      B2=WordToBraid<ArtinPresentation>(word2,n);
 	      if(p && power2!=1)
 		B2=RaisePower(B2,power2);
 
@@ -346,13 +346,13 @@ int main()
 		f << "The gcd of the braids on " << n << " strands"
 		  << endl << endl;
 	      f.close();
-	      PrintWord(word,n,power,file);
+	      PrintWord<ArtinPresentation>(word,n,power,file);
 	      f.open(file,ios::app);
 
 	      f << endl << endl << "and" << endl << endl;
 
 	      f.close();
-	      PrintWord(word2,n,power2,file);
+	      PrintWord<ArtinPresentation>(word2,n,power2,file);
 	      f.open(file,ios::app);
 
 	      f << endl << endl << "is:" << endl << endl;
@@ -373,7 +373,7 @@ int main()
 		power=ReadPower();
 
 	      B1=ArtinBraid(n);
-	      B1=WordToBraid(word,n);
+	      B1=WordToBraid<ArtinPresentation>(word,n);
 	      if(p && power!=1)
 		B1=RaisePower(B1,power);
 
@@ -384,7 +384,7 @@ int main()
 		power2=ReadPower();
 
 	      B2=ArtinBraid(n);
-	      B2=WordToBraid(word2,n);
+	      B2=WordToBraid<ArtinPresentation>(word2,n);
 	      if(p && power2!=1)
 		B2=RaisePower(B2,power2);
 
@@ -412,13 +412,13 @@ int main()
 
 	      f << "The braids on " << n << " strands" << endl << endl;
 	      f.close();
-	      PrintWord(word,n,power,file);
+	      PrintWord<ArtinPresentation>(word,n,power,file);
 	      f.open(file,ios::app);
 
 	      f << endl << endl << "and" << endl << endl;
 
 	      f.close();
-	      PrintWord(word2,n,power2,file);
+	      PrintWord<ArtinPresentation>(word2,n,power2,file);
 	      f.open(file,ios::app);
 
 
@@ -451,7 +451,7 @@ if(c=='d')
 		power=ReadPower();
 
 	      B1=ArtinBraid(n);
-	      B1=WordToBraid(word,n);
+	      B1=WordToBraid<ArtinPresentation>(word,n);
 	      if(p && power!=1)
 		B1=RaisePower(B1,power);
 
@@ -462,7 +462,7 @@ if(c=='d')
 		power2=ReadPower();
 
 	      B2=ArtinBraid(n);
-	      B2=WordToBraid(word2,n);
+	      B2=WordToBraid<ArtinPresentation>(word2,n);
 	      if(p && power2!=1)
 		B2=RaisePower(B2,power2);
 
@@ -490,13 +490,13 @@ if(c=='d')
 
 	      f << "The braids on " << n << " strands" << endl << endl;
 	      f.close();
-	      PrintWord(word,n,power,file);
+	      PrintWord<ArtinPresentation>(word,n,power,file);
 	      f.open(file,ios::app);
 
 	      f << endl << endl << "and" << endl << endl;
 
 	      f.close();
-	      PrintWord(word2,n,power2,file);
+	      PrintWord<ArtinPresentation>(word2,n,power2,file);
 	      f.open(file,ios::app);
 
 
@@ -528,7 +528,7 @@ if(c=='c')
 		power=ReadPower();
 
 	      B1=ArtinBraid(n);
-	      B1=WordToBraid(word,n);
+	      B1=WordToBraid<ArtinPresentation>(word,n);
 	      if(p && power!=1)
 		B1=RaisePower(B1,power);
 
@@ -539,7 +539,7 @@ if(c=='c')
 		power2=ReadPower();
 
 	      B2=ArtinBraid(n);
-	      B2=WordToBraid(word2,n);
+	      B2=WordToBraid<ArtinPresentation>(word2,n);
 	      if(p && power2!=1)
 		B2=RaisePower(B2,power2);
 
@@ -567,13 +567,13 @@ if(c=='c')
 
 	      f << "The braids on " << n << " strands" << endl << endl;
 	      f.close();
-	      PrintWord(word,n,power,file);
+	      PrintWord<ArtinPresentation>(word,n,power,file);
 	      f.open(file,ios::app);
 
 	      f << endl << endl << "and" << endl << endl;
 
 	      f.close();
-	      PrintWord(word2,n,power2,file);
+	      PrintWord<ArtinPresentation>(word2,n,power2,file);
 	      f.open(file,ios::app);
 
 
@@ -608,7 +608,7 @@ if(c=='c')
 		power=ReadPower();
 
 	      B=ArtinBraid(n);
-	      B=WordToBraid(word,n);
+	      B=WordToBraid<ArtinPresentation>(word,n);
 
 	      if(p && power!=1)
 		B=RaisePower(B,power);
@@ -674,7 +674,7 @@ if(c=='c')
 	      n=ReadIndex();
 	      word=ReadWord(n);
 	      B=ArtinBraid(n);
-	      B=WordToBraid(word,n);
+	      B=WordToBraid<ArtinPresentation>(word,n);
 
 	      if(p)
 		{
@@ -696,7 +696,7 @@ if(c=='c')
 	      f << "This file contains the Super Summit Set of the braid: "
 		<< endl << endl;
 	      f.close();
-	      PrintWord(word,n,power,file);
+	      PrintWord<ArtinPresentation>(word,n,power,file);
 	      f.open(file,ios::app);
 
 
@@ -730,7 +730,7 @@ if(c=='c')
 	      file=ReadFileName();
 
 	      B=ArtinBraid(n);
-	      B=WordToBraid(word,n);
+	      B=WordToBraid<ArtinPresentation>(word,n);
 
 	      if(p && power!=1)
 		B=RaisePower(B,power);
@@ -761,7 +761,7 @@ if(c=='c')
 	      file=ReadFileName();
 
 	      B=ArtinBraid(n);
-	      B=WordToBraid(word,n);
+	      B=WordToBraid<ArtinPresentation>(word,n);
 
 	      if(p && power!=1)
 		B=RaisePower(B,power);
