@@ -164,7 +164,6 @@ ArtinBraid ToArtinBraid(const BandBraid& b)
     return a;
 }
 
-
 #ifdef USE_CLN
 
 void BallotSequence(sint16 n, cln::cl_I k, sint8* s)

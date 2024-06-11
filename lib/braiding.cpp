@@ -232,17 +232,8 @@ void PrintBraidWord(CBraid::Braid<P> B)
       if(it!=B.FactorList.begin())
 	cout << ". ";
 
-      F=*it;
-      for(i=2; i<=n; i++)
-	{
-	  for(j=i; j>1 && F[j]<F[j-1]; j--)
-	    {
-	      cout << j-1 << " ";
-	      k=F[j];
-	      F[j]=F[j-1];
-	      F[j-1]=k;
-	    }
-	}
+      (*it).Print(cout);
+
     }
 
   if(B.RightDelta==1)
@@ -297,17 +288,8 @@ void PrintBraidWord(CBraid::Braid<P> B, char * file)
       if(it!=B.FactorList.begin())
 	f << ". ";
 
-      F=*it;
-      for(i=2; i<=n; i++)
-	{
-	  for(j=i; j>1 && F[j]<F[j-1]; j--)
-	    {
-	      f << j-1 << " ";
-	      k=F[j];
-	      F[j]=F[j-1];
-	      F[j-1]=k;
-	    }
-	}
+    (*it).Print(f);
+
     }
 
   if(B.RightDelta==1)
@@ -333,7 +315,6 @@ void PrintBraidWord(CBraid::Braid<P> B, char * file)
 //
 /////////////////////////////////////////////////////////////
 
-template<class P>
 void PrintWord(list<sint16> & word, sint16 n, sint16 power)
 {
   list<sint16>::iterator itw;
@@ -363,7 +344,6 @@ void PrintWord(list<sint16> & word, sint16 n, sint16 power)
 //
 /////////////////////////////////////////////////////////////
 
-template<class P>
 void PrintWord(list<sint16> & word, sint16 n, sint16 power, char * file)
 {
   list<sint16>::iterator itw;
@@ -398,7 +378,6 @@ void PrintWord(list<sint16> & word, sint16 n, sint16 power, char * file)
 //
 /////////////////////////////////////////////////////////////
 
-template<class P>
 void Crossing(list<sint16> word, sint16 n, sint16 power, sint16 ** cross)
 {
   sint16 i,j,k,l,m;

@@ -224,7 +224,9 @@ void PrintBraidWord(CBraid::Braid<P> B)
       if (CL(B))
 	cout << " . ";
     }
-  sint16 i, j, k, n=B.Index();
+  
+  sint16 n = B.Index(); 
+
   CBraid::Factor<P> F=CBraid::Factor<P>(n);
 
   typename list<CBraid::Factor<P>>::iterator it;
@@ -234,17 +236,8 @@ void PrintBraidWord(CBraid::Braid<P> B)
       if(it!=B.FactorList.begin())
 	cout << ". ";
 
-      F=*it;
-      for(i=2; i<=n; i++)
-	{
-	  for(j=i; j>1 && F[j]<F[j-1]; j--)
-	    {
-	      cout << j-1 << " ";
-	      k=F[j];
-	      F[j]=F[j-1];
-	      F[j-1]=k;
-	    }
-	}
+      (*it).Print(cout);
+
     }
 
   if(B.RightDelta==1)
@@ -289,7 +282,7 @@ void PrintBraidWord(CBraid::Braid<P> B, char * file)
       if (CL(B))
 	f << " . ";
     }
-  sint16 i, j, k, n=B.Index();
+  sint16 n = B.Index();
   CBraid::Factor<P> F=CBraid::Factor<P>(n);
 
   typename list<CBraid::Factor<P>>::iterator it;
@@ -299,17 +292,8 @@ void PrintBraidWord(CBraid::Braid<P> B, char * file)
       if(it!=B.FactorList.begin())
 	f << ". ";
 
-      F=*it;
-      for(i=2; i<=n; i++)
-	{
-	  for(j=i; j>1 && F[j]<F[j-1]; j--)
-	    {
-	      f << j-1 << " ";
-	      k=F[j];
-	      F[j]=F[j-1];
-	      F[j-1]=k;
-	    }
-	}
+      (*it).Print(f);
+
     }
 
   if(B.RightDelta==1)
@@ -335,27 +319,7 @@ void PrintBraidWord(CBraid::Braid<P> B, char * file)
 //
 /////////////////////////////////////////////////////////////
 
-template<class P>
-void PrintWord(list<sint16> & word, sint16 n, sint16 power)
-{
-  list<sint16>::iterator itw;
-
-  if(power!=1)
-    cout << "( ";
-
-  for(itw=word.begin(); itw!=word.end(); itw++)
-    {
-      if(*itw==n)
-	cout << "D ";
-      else if (*itw==-n)
-	cout << "-D ";
-      else
-	cout << *itw << " ";
-    }
-
-  if(power!=1)
-    cout << ")^" << power;
-}
+void PrintWord(list<sint16> & word, sint16 n, sint16 power);
 
 
 /////////////////////////////////////////////////////////////
@@ -365,31 +329,7 @@ void PrintWord(list<sint16> & word, sint16 n, sint16 power)
 //
 /////////////////////////////////////////////////////////////
 
-template<class P>
-void PrintWord(list<sint16> & word, sint16 n, sint16 power, char * file)
-{
-  list<sint16>::iterator itw;
-  std::ofstream f(file,std::ios::app);
-
-  if(power!=1)
-    f << "( ";
-
-  for(itw=word.begin(); itw!=word.end(); itw++)
-    {
-      if(*itw==n)
-	f << "D ";
-      else if (*itw==-n)
-	f << "-D ";
-      else
-	f << *itw << " ";
-    }
-
-  if(power!=1)
-    f << ")^" << power;
-
-  f.close();
-}
-
+void PrintWord(list<sint16> & word, sint16 n, sint16 power, char * file);
 
 
 /////////////////////////////////////////////////////////////
@@ -400,74 +340,7 @@ void PrintWord(list<sint16> & word, sint16 n, sint16 power, char * file)
 //
 /////////////////////////////////////////////////////////////
 
-template<class P>
-void Crossing(list<sint16> word, sint16 n, sint16 power, sint16 ** cross)
-{
-  sint16 i,j,k,l,m;
-  list<sint16>::iterator itw;
-  sint16 *perm= new sint16[n];
-  for(i=1; i<=n; i++)
-    perm[i]=i;
-
-
-  for(i=1; i<n; i++)
-    {
-      for(j=i+1; j<=n; j++)
-	cross[i][j]=0;
-    }
-
-  for(m=1; m<=power; m++)
-    {
-      for(itw=word.begin(); itw!=word.end(); itw++)
-	{
-	  if(*itw==n || *itw==-n)
-	    {
-	      if(*itw==n)
-		l=1;
-	      else
-		l=-1;
-	      for(i=1; i<n; i++)
-		{
-		  for(j=i+1; j<=n; j++)
-		    cross[i][j]+= l;
-		}
-	      for(i=1; 2*i<=n; i++)
-		{
-		  k=perm[i];
-		  perm[i]=perm[n+1-i];
-		  perm[n+1-i]=k;
-		}
-	    }
-	  else
-	    {
-	      if(*itw>0)
-		l=*itw;
-	      else
-		l=-(*itw);
-	      if(perm[l]<perm[l+1])
-		{
-		  i=perm[l];
-		  j=perm[l+1];
-		}
-	      else
-		{
-		  i=perm[l+1];
-		  j=perm[l];
-		}
-	      if(*itw>0)
-		cross[i][j]++;
-	      else
-		cross[i][j]--;
-	      k=perm[l];
-	      perm[l]=perm[l+1];
-	      perm[l+1]=k;
-	    }
-	}
-    }
-  delete[] perm;
-}
-
-
+void Crossing(list<sint16> word, sint16 n, sint16 power, sint16 ** cross);
 
 /////////////////////////////////////////////////////////////
 //
@@ -842,6 +715,8 @@ CBraid::Factor<P> MinSSS(CBraid::Braid<P> B, CBraid::Factor<P> F)
 //             B^R is in the Super Summit Set.
 //
 /////////////////////////////////////////////////////////////
+
+// TOUCHES TO FACTORS
 
 template<class P>
 list<CBraid::Factor<P>> MinSSS(CBraid::Braid<P> B)
@@ -1987,14 +1862,7 @@ sint16 Rigidity(list<list<CBraid::Braid<P>> > & uss)
 //
 /////////////////////////////////////////////////////////////
 
-sint16 ReadIndex()
-{
-  sint16 n;
-  cout << endl << "Set the number of strands: ";
-  std::cin >> n;
-  std::cin.ignore();
-  return n;
-}
+sint16 ReadIndex();
 
 
 /////////////////////////////////////////////////////////////
@@ -2004,24 +1872,7 @@ sint16 ReadIndex()
 //
 /////////////////////////////////////////////////////////////
 
-list<sint16> ReadWord(sint16 n)
-{
-  list<sint16> word;
-  sint16 a;
-
-  cout << endl << "Type a braid with " << n << " strands: "
-       << "('" << n << "' = Delta)"
-       << endl << endl;
-  while(std::cin.peek()!='\n')
-    {
-      std::cin >> std::ws >> a;
-      word.push_back(a);
-    }
-  std::cin.ignore();
-
-  return word;
-
-}
+list<sint16> ReadWord(sint16 n);
 
 
 /////////////////////////////////////////////////////////////
@@ -2031,14 +1882,7 @@ list<sint16> ReadWord(sint16 n)
 //
 /////////////////////////////////////////////////////////////
 
-sint16 ReadPower()
-{
-  sint16 power;
-  cout << endl << "Raise it to power... ";
-  std::cin >> power;
-  std::cin.ignore();
-  return power;
-}
+sint16 ReadPower();
 
 
 /////////////////////////////////////////////////////////////
@@ -2078,15 +1922,7 @@ CBraid::Braid<P> RaisePower(CBraid::Braid<P> B, sint16 k)
 //
 /////////////////////////////////////////////////////////////
 
-char* ReadFileName()
-{
-  char *f=new char[30];
-  cout << endl << "Type the name of the output file: ";
-  std::cin.getline(f,30);
-  cout << endl;
-
-  return f;
-}
+char* ReadFileName();
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -2243,76 +2079,7 @@ void PrintUSS(list<list<CBraid::Braid<P>> > &  uss, list<sint16> word, sint16 n,
 //
 /////////////////////////////////////////////////////////////
 
-char * FileName(sint16 iteration, sint16 max_iteration, sint16 type, sint16 orbit, sint16 rigidity, sint16 cl)
-{
-  char * file=new char[30];
-  sint16 i,j;
-
-  if (type==1)
-    {  file[0]='p';
-      file[1]='e';
-    }
-  else if (type==2)
-    {
-      file[0]='r';
-      file[1]='e';
-    }
-  else
-    {
-      file[0]='p';
-      file[1]='a';
-    }
-
-  file[2]='_';
-
-
-  if (rigidity==cl)
-    file[3]='R';
-  else if (rigidity==cl-1 && cl!=1)
-    file[3]='S';
-  else
-    file[3]='0'+rigidity;
-
-
-  file[4]='_';
-
-  if(orbit>9)
-    file[5]='M';
-  else
-    file[5]='0'+orbit;
-
-  file[6]='_';
-
-
-  sint16 digits=1;
-  j=10;
-  while(max_iteration/j>=1)
-    {
-      j=j*10;
-      digits++;
-    }
-
-
-  i=1;
-  for(j=1;j<digits;j++)
-    i=i*10;
-
-  sint16 partial_iteration=iteration;
-  for(j=7;j<=digits+6;j++)
-    {
-      file[j]='0'+(partial_iteration/i);
-      partial_iteration-=(partial_iteration/i)*i;
-      i=i/10;
-    }
-
-  file[digits+7]='.';
-  file[digits+8]='t';
-  file[digits+9]='x';
-  file[digits+10]='t';
-  file[digits+11]=0;
-
-  return file;
-}
+char * FileName(sint16 iteration, sint16 max_iteration, sint16 type, sint16 orbit, sint16 rigidity, sint16 cl);
 
 //////////////////---------------
 

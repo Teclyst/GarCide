@@ -1,14 +1,14 @@
 /*
-    Copyright (C) 2004 Juan Gonzalez-Meneses.
+    Copyright (AC) 2004 Juan Gonzalez-Meneses.
 
     This file is part of Braiding.
 
-    Braiding is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
+    Braiding is free software; you can redistribute Ait and/or modify
+    Ait under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
     any later version.
 
-    Braiding is distributed in the hope that it will be useful,
+    Braiding is distributed in the hope that Ait will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -32,6 +32,11 @@
 #include <cstdlib>
 #include <stdio.h>
 
+enum Presentation {
+	Artin,
+	Band
+}
+
 int main()
 {
   using namespace CBraid;
@@ -39,22 +44,23 @@ int main()
   using namespace Braiding;
   using namespace std;
 
- char  c, *file;
+	Presentation pres = Artin;
+ 	char  c, *file;
   sint16 p=0, power=1, power2=1, i, j, n, repeat=0,
     size, type, rigidity, iteration;
   list<sint16> word, word2, graph, graphinv;
   list<sint16>::iterator itw, itg;
 
-  ArtinBraid B=ArtinBraid(1), B1=ArtinBraid(1),
-    B2=ArtinBraid(1), B3=ArtinBraid(1), C=ArtinBraid(1);
-  list<ArtinBraid> sss, traj, Cent, vertices, barrows;
-  list<ArtinBraid>::iterator it, itb, itb2;
+  ArtinBraid AB=ArtinBraid(1), AB1=ArtinBraid(1),
+    AB2=ArtinBraid(1), AB3=ArtinBraid(1), AC=ArtinBraid(1);
+  list<ArtinBraid> Asss, Atraj, ACent, Avertices, Abarrows;
+  list<ArtinBraid>::iterator Ait, Aitb, Aitb;
 
-  list<list<ArtinBraid> > uss, sc;
-  list<list<ArtinBraid> >::iterator ituss, ituss2;
+  list<list<ArtinBraid> > Auss, Asc;
+  list<list<ArtinBraid> >::iterator Aituss, Aituss2;
 
-  list<ArtinFactor> Min, arrows;
-  list<ArtinFactor>::iterator itf, itf2;
+  list<ArtinFactor> AMin, Aarrows;
+  list<ArtinFactor>::iterator Aitf, Aitf2;
 
   bool conj;
   ofstream f;
@@ -65,7 +71,7 @@ int main()
 	   << "--------------------------------------------------------" << endl
 	   << "----------------  This is Braiding 1.0  ----------------" << endl
 	   << "--------------------------------------------------------" << endl
-	   << "-----|  Copyright (C) 2004 Juan Gonzalez-Meneses  |-----" << endl
+	   << "-----|  Copyright (AC) 2004 Juan Gonzalez-Meneses  |-----" << endl
 	   << "-----| Braiding comes with ABSOLUTELY NO WARRANTY |-----" << endl
 	   << "-----|           This is free software            |-----" << endl
 	   << "-----| See GNU General Public License in GPL.txt  |-----" << endl
@@ -81,9 +87,9 @@ int main()
 	   << endl
 	   << "e: Conjugacy Test            u: Ultra Summit Set        " << endl
 	   << endl
-       << "t: Set of Sliding Circuits   a: Ask for Powers (On/Off)   " << endl
-       << endl
-       << "q: Quit             " << endl;
+     << "t: Set of Sliding Circuits   a: Ask for Powers (On/Off) " << endl
+     << endl
+     << "d: Dual Mode (On/Off)        q: Quit                    " << endl;
 
       while(1)
 	{
@@ -101,13 +107,13 @@ int main()
 	    {
 	      n=ReadIndex();
 	      word=ReadWord(n);
-	      B=ArtinBraid(n);
-	      B=WordToBraid<CBraid::ArtinPresentation>(word,n);
+	      AB=ArtinBraid(n);
+	      AB=WordToBraid<CBraid::ArtinPresentation>(word,n);
 
 	      if(p)
 		{
 		  power=ReadPower();
-		  B=RaisePower(B,power);
+		  AB=RaisePower(AB,power);
 		}
 
 	      file=ReadFileName();
@@ -115,42 +121,42 @@ int main()
 	      if(c=='l')
 		{
 		  cout << endl << "The Left Normal Form is: " << endl << endl;
-		  PrintBraidWord(B.MakeLCF());
+		  PrintBraidWord(AB.MakeLCF());
 		  cout << endl;
 
 		  f.open(file);
 		  f << endl << "The Left Normal Form of the braid on "
 		    << n << " strands" << endl << endl;
 		  f.close();
-		  PrintWord<ArtinPresentation>(word,n,power,file);
+		  PrintWord(word,n,power,file);
 		  f.open(file,ios::app);
 
 		  f << endl << endl;
 
 		  f << "is: " << endl << endl;
 		  f.close();
-		  PrintBraidWord(B.MakeLCF(),file);
+		  PrintBraidWord(AB.MakeLCF(),file);
 		}
 
 	      if(c=='r')
 		{
 		  cout << endl << "The Right Normal Form is: "
 		       << endl << endl;
-		  PrintBraidWord(B.MakeRCF());
+		  PrintBraidWord(AB.MakeRCF());
 		  cout << endl;
 
 		  f.open(file);
 		  f << endl << "The Right Normal Form of the braid on "
 		    << n << " strands" << endl << endl;
 		  f.close();
-		  PrintWord<ArtinPresentation>(word,n,power,file);
+		  PrintWord(word,n,power,file);
 		  f.open(file,ios::app);
 
 		  f << endl << endl;
 
 		  f << "is: " << endl << endl;
 		  f.close();
-		  PrintBraidWord(B.MakeRCF(),file);
+		  PrintBraidWord(AB.MakeRCF(),file);
 		}
 
 	      word.clear();
@@ -165,22 +171,22 @@ int main()
 	      if(p)
 		power=ReadPower();
 
-	      B=ArtinBraid(n);
-	      B=WordToBraid<ArtinPresentation>(word,n);
+	      AB=ArtinBraid(n);
+	      AB=WordToBraid<ArtinPresentation>(word,n);
 
 	      if(p && power!=1)
-		B=RaisePower(B,power);
+		AB=RaisePower(AB,power);
 
-	      B.MakeLCF();
+	      AB.MakeLCF();
 
 	      file=ReadFileName();
 	      f.open(file);
 
-	      ArtinFactor F=ArtinFactor(n, B.LeftDelta);
+	      ArtinFactor F=ArtinFactor(n, AB.LeftDelta);
 
-	      list<ArtinFactor>::iterator itf = B.FactorList.begin();
-	      while (itf != B.FactorList.end())
-		F *= *(itf++);
+	      list<ArtinFactor>::iterator Aitf = AB.FactorList.begin();
+	      while (Aitf != AB.FactorList.end())
+		F *= *(Aitf++);
 
 	      sint16 *table=new sint16[n+1];
 	      for(i=1; i<=n; i++)
@@ -192,7 +198,7 @@ int main()
 	      f << "The permutation associated to the braid on "
 		<< n << " strands" << endl << endl;
 	      f.close();
-	      PrintWord<ArtinPresentation>(word,n,power,file);
+	      PrintWord(word,n,power,file);
 	      f.open(file,ios::app);
 	      f << endl << endl << " is:" << endl << endl;
 
@@ -242,7 +248,7 @@ int main()
 	      for(i=1; i<n; i++)
 		cross[i]=new sint16[n+1];
 
-	      Crossing<ArtinPresentation>(word,n,power,cross);
+	      Crossing(word,n,power,cross);
 
 	      f.open(file);
 
@@ -251,7 +257,7 @@ int main()
 	      f << "The crossing numbers of the braid on " << n
 		<< " strands" << endl << endl;
 	      f.close();
-	      PrintWord<ArtinPresentation>(word,n,power,file);
+	      PrintWord(word,n,power,file);
 	      f.open(file,ios::app);
 	      f << endl << endl << "are: " << endl << endl << "    ";
 
@@ -303,38 +309,38 @@ int main()
 	      if(p)
 		power=ReadPower();
 
-	      B1=ArtinBraid(n);
-	      B1=WordToBraid<ArtinPresentation>(word,n);
+	      AB1=ArtinBraid(n);
+	      AB1=WordToBraid<ArtinPresentation>(word,n);
 	      if(p && power!=1)
-		B1=RaisePower(B1,power);
+		AB1=RaisePower(AB1,power);
 
-	      B1.MakeLCF();
+	      AB1.MakeLCF();
 
 	      word2=ReadWord(n);
 	      if(p)
 		power2=ReadPower();
 
-	      B2=ArtinBraid(n);
-	      B2=WordToBraid<ArtinPresentation>(word2,n);
+	      AB2=ArtinBraid(n);
+	      AB2=WordToBraid<ArtinPresentation>(word2,n);
 	      if(p && power2!=1)
-		B2=RaisePower(B2,power2);
+		AB2=RaisePower(AB2,power2);
 
-	      B2.MakeLCF();
+	      AB2.MakeLCF();
 
 	      file=ReadFileName();
 
-	      B=ArtinBraid(n);
+	      AB=ArtinBraid(n);
 
 	      if(c=='v')
-		B=LeftWedge(B1,B2);
+		AB=LeftWedge(AB1,AB2);
 	      else
-		B=LeftMeet(B1,B2);
+		AB=LeftMeet(AB1,AB2);
 
 	      if(c=='v')
 		cout << "The lcm of these braids is:" << endl << endl;
 	      else
 		cout << "The gcd of these braids is:" << endl << endl;
-	      PrintBraidWord(B);
+	      PrintBraidWord(AB);
 	      cout << endl << endl;
 
 	      f.open(file);
@@ -346,18 +352,18 @@ int main()
 		f << "The gcd of the braids on " << n << " strands"
 		  << endl << endl;
 	      f.close();
-	      PrintWord<ArtinPresentation>(word,n,power,file);
+	      PrintWord(word,n,power,file);
 	      f.open(file,ios::app);
 
 	      f << endl << endl << "and" << endl << endl;
 
 	      f.close();
-	      PrintWord<ArtinPresentation>(word2,n,power2,file);
+	      PrintWord(word2,n,power2,file);
 	      f.open(file,ios::app);
 
 	      f << endl << endl << "is:" << endl << endl;
 
-	      PrintBraidWord(B,file);
+	      PrintBraidWord(AB,file);
 
 	      f.close();
 	      word.clear();
@@ -372,35 +378,35 @@ int main()
 	      if(p)
 		power=ReadPower();
 
-	      B1=ArtinBraid(n);
-	      B1=WordToBraid<ArtinPresentation>(word,n);
+	      AB1=ArtinBraid(n);
+	      AB1=WordToBraid<ArtinPresentation>(word,n);
 	      if(p && power!=1)
-		B1=RaisePower(B1,power);
+		AB1=RaisePower(AB1,power);
 
-	      B1.MakeLCF();
+	      AB1.MakeLCF();
 
 	      word2=ReadWord(n);
 	      if(p)
 		power2=ReadPower();
 
-	      B2=ArtinBraid(n);
-	      B2=WordToBraid<ArtinPresentation>(word2,n);
+	      AB2=ArtinBraid(n);
+	      AB2=WordToBraid<ArtinPresentation>(word2,n);
 	      if(p && power2!=1)
-		B2=RaisePower(B2,power2);
+		AB2=RaisePower(AB2,power2);
 
-	      B2.MakeLCF();
+	      AB2.MakeLCF();
 
 	      file=ReadFileName();
 
-	      C=ArtinBraid(n);
+	      AC=ArtinBraid(n);
 
-	      conj=AreConjugate(B1,B2,C);
+	      conj=AreConjugate(AB1,AB2,AC);
 
 	      if(conj)
 		{
 		  cout << endl << "These braids are conjugate." << endl << endl
 		       << "A conjugating braid is: ";
-		  PrintBraidWord(C);
+		  PrintBraidWord(AC);
 		  cout << endl;
 		}
 	      else
@@ -412,13 +418,13 @@ int main()
 
 	      f << "The braids on " << n << " strands" << endl << endl;
 	      f.close();
-	      PrintWord<ArtinPresentation>(word,n,power,file);
+	      PrintWord(word,n,power,file);
 	      f.open(file,ios::app);
 
 	      f << endl << endl << "and" << endl << endl;
 
 	      f.close();
-	      PrintWord<ArtinPresentation>(word2,n,power2,file);
+	      PrintWord(word2,n,power2,file);
 	      f.open(file,ios::app);
 
 
@@ -430,7 +436,7 @@ int main()
 		  f << "are conjugate." << endl << endl
 		    << "A conjugating braid is" << endl << endl;
 		  f.close();
-		  PrintBraidWord(C,file);
+		  PrintBraidWord(AC,file);
 		}
 	      else
 		{
@@ -450,35 +456,35 @@ if(c=='d')
 	      if(p)
 		power=ReadPower();
 
-	      B1=ArtinBraid(n);
-	      B1=WordToBraid<ArtinPresentation>(word,n);
+	      AB1=ArtinBraid(n);
+	      AB1=WordToBraid<ArtinPresentation>(word,n);
 	      if(p && power!=1)
-		B1=RaisePower(B1,power);
+		AB1=RaisePower(AB1,power);
 
-	      B1.MakeLCF();
+	      AB1.MakeLCF();
 
 	      word2=ReadWord(n);
 	      if(p)
 		power2=ReadPower();
 
-	      B2=ArtinBraid(n);
-	      B2=WordToBraid<ArtinPresentation>(word2,n);
+	      AB2=ArtinBraid(n);
+	      AB2=WordToBraid<ArtinPresentation>(word2,n);
 	      if(p && power2!=1)
-		B2=RaisePower(B2,power2);
+		AB2=RaisePower(AB2,power2);
 
-	      B2.MakeLCF();
+	      AB2.MakeLCF();
 
 	      file=ReadFileName();
 
-	      C=ArtinBraid(n);
+	      AC=ArtinBraid(n);
 
-	      conj=AreConjugateSC(B1,B2,C);
+	      conj=AreConjugateSC(AB1,AB2,AC);
 
 	      if(conj)
 		{
 		  cout << endl << "These braids are conjugate." << endl << endl
 		       << "A conjugating braid is: ";
-		  PrintBraidWord(C);
+		  PrintBraidWord(AC);
 		  cout << endl;
 		}
 	      else
@@ -490,13 +496,13 @@ if(c=='d')
 
 	      f << "The braids on " << n << " strands" << endl << endl;
 	      f.close();
-	      PrintWord<ArtinPresentation>(word,n,power,file);
+	      PrintWord(word,n,power,file);
 	      f.open(file,ios::app);
 
 	      f << endl << endl << "and" << endl << endl;
 
 	      f.close();
-	      PrintWord<ArtinPresentation>(word2,n,power2,file);
+	      PrintWord(word2,n,power2,file);
 	      f.open(file,ios::app);
 
 
@@ -508,7 +514,7 @@ if(c=='d')
 		  f << "are conjugate." << endl << endl
 		    << "A conjugating braid is" << endl << endl;
 		  f.close();
-		  PrintBraidWord(C,file);
+		  PrintBraidWord(AC,file);
 		}
 	      else
 		{
@@ -527,35 +533,35 @@ if(c=='c')
 	      if(p)
 		power=ReadPower();
 
-	      B1=ArtinBraid(n);
-	      B1=WordToBraid<ArtinPresentation>(word,n);
+	      AB1=ArtinBraid(n);
+	      AB1=WordToBraid<ArtinPresentation>(word,n);
 	      if(p && power!=1)
-		B1=RaisePower(B1,power);
+		AB1=RaisePower(AB1,power);
 
-	      B1.MakeLCF();
+	      AB1.MakeLCF();
 
 	      word2=ReadWord(n);
 	      if(p)
 		power2=ReadPower();
 
-	      B2=ArtinBraid(n);
-	      B2=WordToBraid<ArtinPresentation>(word2,n);
+	      AB2=ArtinBraid(n);
+	      AB2=WordToBraid<ArtinPresentation>(word2,n);
 	      if(p && power2!=1)
-		B2=RaisePower(B2,power2);
+		AB2=RaisePower(AB2,power2);
 
-	      B2.MakeLCF();
+	      AB2.MakeLCF();
 
 	      file=ReadFileName();
 
-	      C=ArtinBraid(n);
+	      AC=ArtinBraid(n);
 
-	      conj=AreConjugateSC2(B1,B2,C);
+	      conj=AreConjugateSC2(AB1,AB2,AC);
 
 	      if(conj)
 		{
 		  cout << endl << "These braids are conjugate." << endl << endl
 		       << "A conjugating braid is: ";
-		  PrintBraidWord(C);
+		  PrintBraidWord(AC);
 		  cout << endl;
 		}
 	      else
@@ -567,13 +573,13 @@ if(c=='c')
 
 	      f << "The braids on " << n << " strands" << endl << endl;
 	      f.close();
-	      PrintWord<ArtinPresentation>(word,n,power,file);
+	      PrintWord(word,n,power,file);
 	      f.open(file,ios::app);
 
 	      f << endl << endl << "and" << endl << endl;
 
 	      f.close();
-	      PrintWord<ArtinPresentation>(word2,n,power2,file);
+	      PrintWord(word2,n,power2,file);
 	      f.open(file,ios::app);
 
 
@@ -585,7 +591,7 @@ if(c=='c')
 		  f << "are conjugate." << endl << endl
 		    << "A conjugating braid is" << endl << endl;
 		  f.close();
-		  PrintBraidWord(C,file);
+		  PrintBraidWord(AC,file);
 		}
 	      else
 		{
@@ -607,27 +613,27 @@ if(c=='c')
 	      if(p)
 		power=ReadPower();
 
-	      B=ArtinBraid(n);
-	      B=WordToBraid<ArtinPresentation>(word,n);
+	      AB=ArtinBraid(n);
+	      AB=WordToBraid<ArtinPresentation>(word,n);
 
 	      if(p && power!=1)
-		B=RaisePower(B,power);
+		AB=RaisePower(AB,power);
 
-	      B.MakeLCF();
+	      AB.MakeLCF();
 
 	      file=ReadFileName();
 
-	      Cent=Centralizer(B);
+	      ACent=Centralizer(AB);
 
 	      cout << endl << "The centralizer of this braid is generated by: "
 		   << endl;
 
 	      iteration=0;
 
-	      for(it=Cent.begin(); it!=Cent.end(); it++)
+	      for(Ait=ACent.begin(); Ait!=ACent.end(); Ait++)
 		{
 		  cout << endl << setw(3) << ++iteration << ":  ";
-		  PrintBraidWord(*it);
+		  PrintBraidWord(*Ait);
 		  cout << endl;
 		}
 
@@ -655,16 +661,16 @@ if(c=='c')
 	      f.close();
 
 	      iteration=0;
-	      for(it=Cent.begin(); it!=Cent.end(); it++)
+	      for(Ait=ACent.begin(); Ait!=ACent.end(); Ait++)
 		{
 		  f.open(file,ios::app);
 		  f << endl << endl << setw(3) << ++iteration << ":  ";
 		  f.close();
-		  PrintBraidWord(*it,file);
+		  PrintBraidWord(*Ait,file);
 		}
 
 	      word.clear();
-	      Cent.clear();
+	      ACent.clear();
 	    }
 
 	  ////////////////////////////////////////////////////////
@@ -673,30 +679,30 @@ if(c=='c')
 	    {
 	      n=ReadIndex();
 	      word=ReadWord(n);
-	      B=ArtinBraid(n);
-	      B=WordToBraid<ArtinPresentation>(word,n);
+	      AB=ArtinBraid(n);
+	      AB=WordToBraid<ArtinPresentation>(word,n);
 
 	      if(p)
 		{
 		  power=ReadPower();
-		  B=RaisePower(B,power);
+		  AB=RaisePower(AB,power);
 		}
 
 	      file=ReadFileName();
 
 	      f.open(file);
 
-	      sss=SSS(B);
+	      Asss=SSS(AB);
 
 	      size=0;
 
-	      for(it=sss.begin(); it!=sss.end(); it++)
+	      for(Ait=Asss.begin(); Ait!=Asss.end(); Ait++)
 		size++;
 
 	      f << "This file contains the Super Summit Set of the braid: "
 		<< endl << endl;
 	      f.close();
-	      PrintWord<ArtinPresentation>(word,n,power,file);
+	      PrintWord(word,n,power,file);
 	      f.open(file,ios::app);
 
 
@@ -705,17 +711,17 @@ if(c=='c')
 
 	      size=1;
 
-	      for(it=sss.begin(); it!=sss.end(); it++)
+	      for(Ait=Asss.begin(); Ait!=Asss.end(); Ait++)
 		{
 		  f << endl << setw(5) << size++;
 		  f << ":   ";
 		  f.close();
-		  PrintBraidWord(*it,file);
+		  PrintBraidWord(*Ait,file);
 		  f.open(file,ios::app);
 		}
 	      f.close();
 	      word.clear();
-	      sss.clear();
+	      Asss.clear();
 	      delete[] file;
 	    }
 
@@ -729,24 +735,24 @@ if(c=='c')
 		power=ReadPower();
 	      file=ReadFileName();
 
-	      B=ArtinBraid(n);
-	      B=WordToBraid<ArtinPresentation>(word,n);
+	      AB=ArtinBraid(n);
+	      AB=WordToBraid<ArtinPresentation>(word,n);
 
 	      if(p && power!=1)
-		B=RaisePower(B,power);
+		AB=RaisePower(AB,power);
 
-	      B.MakeLCF();
+	      AB.MakeLCF();
 
-	      uss=USS(B);
+	      Auss=USS(AB);
 
-	      type=ThurstonType(uss);
+	      type=ThurstonType(Auss);
 
-	      rigidity=Rigidity(uss);
+	      rigidity=Rigidity(Auss);
 
-	      PrintUSS(uss,word,n,power,file,type,rigidity);
+	      PrintUSS(Auss,word,n,power,file,type,rigidity);
 
 	      word.clear();
-	      uss.clear();
+	      Auss.clear();
 	      delete[] file;
 	    }
 
@@ -760,22 +766,22 @@ if(c=='c')
 		power=ReadPower();
 	      file=ReadFileName();
 
-	      B=ArtinBraid(n);
-	      B=WordToBraid<ArtinPresentation>(word,n);
+	      AB=ArtinBraid(n);
+	      AB=WordToBraid<ArtinPresentation>(word,n);
 
 	      if(p && power!=1)
-		B=RaisePower(B,power);
+		AB=RaisePower(AB,power);
 
-	      B.MakeLCF();
+	      AB.MakeLCF();
 
-	      sc=SC(B);
+	      Asc=SC(AB);
 
-	      type=ThurstonType(sc);
+	      type=ThurstonType(Asc);
 
-	      PrintSC(sc,word,n,power,file,type);
+	      PrintSC(Asc,word,n,power,file,type);
 
 	      word.clear();
-	      sc.clear();
+	      Asc.clear();
 	      delete[] file;
 	    }
 
@@ -802,6 +808,15 @@ if(c=='c')
 
 	  if(c=='q')
 	    break;
+
+		////////////////////////////////////////////////////////////
+
+		if(c == 'd'){
+			switch(pres){
+				case Artin: pres = Band;
+				case Band: pres = Artin;
+			}
+		}
 
 	  ////////////////////////////////////////////////////////////
 

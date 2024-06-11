@@ -110,6 +110,13 @@ protected:
 
 public:
     ArtinPresentation(sint16 n);
+
+    // Print factor f to os. Be wary, as it side-effects!
+    void Print(std::ostream& os, sint16* f);
+
+    // Generators, as an array of arrays.
+    sint16** Atoms(sint16 n);
+
     sint16 Index() const;
 
     // Return the i-th entry of the permutation table of delta^k.
@@ -149,6 +156,11 @@ protected:
 public:
     BandPresentation(sint16 n);
     sint16 Index() const;
+
+    void Print(std::ostream& os, sint16* f);
+
+    // Generators, as an array of arrays.
+    sint16** Atoms(sint16 n);
 
     // Return the i-th entry of the permutation table of delta^k.
     sint16 DeltaTable(sint16 i, sint32 k = 1) const;
@@ -287,6 +299,12 @@ public:
 
     // Generate a random factor.
     Factor& Randomize();
+
+    // Computes a factor from a given string.
+    Factor OfString(char* str);
+
+    // Print factor to os. Be wary, as it may side-effect!
+    void Print(std::ostream& os);
 };
 
 // Binary function form of the meet operators.

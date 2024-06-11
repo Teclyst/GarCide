@@ -26,7 +26,6 @@
     Implementation of cbraid library.
 */
 
-
 template<class ForItr, class BinFunc>
 inline ForItr apply_binfun(ForItr first, ForItr last, BinFunc f)
 {
@@ -181,6 +180,20 @@ inline void ArtinPresentation::RightMeet(
     MeetSub(u, v, r, 1, Index());
 }
 
+inline void ArtinPresentation::Print(std::ostream& os, sint16* f) {
+    sint16 i, j, k, n = Index();
+
+    for(i=2; i<=n; i++)
+	{
+	  for(j = i; j > 1 && f[j] < f[j-1]; j--)
+	    {
+	      os << j-1 << " ";
+	      k = f[j];
+	      f[j] = f[j - 1];
+	      f[j - 1] = k;
+	    }
+	}
+}
 
 inline BandPresentation::BandPresentation(sint16 n)
 {
@@ -370,6 +383,33 @@ inline void BandPresentation::RightMeet(
     LeftMeet(a, b, r);
 }
 
+inline void BandPresentation::Print(std::ostream& os, sint16* f) {
+    // Recall that f is represented by decreasing cycles.
+    sint16 i, j, k, n = Index();
+    sint16 curr_cycle[n];
+    bool seen[n + 1]; 
+    for(i = 1; i <= n; i++){
+        seen[i] = false;
+    }
+    for(i = 1; i <= n; ++i) {
+        if(not seen[i]){
+            k = 0;
+            j = i;
+            while(j < f[j]){
+                curr_cycle[k] = j;
+                k++;
+                seen[j] = true;
+                j = f[j];
+            }
+            curr_cycle[k] = j;
+            seen[j] = true;
+            for(j = k; j >= 1; --j){
+                os << "(" << curr_cycle[j] << ", " << curr_cycle[j - 1]<< ")" << " ";
+            }
+        }
+    }
+
+}
 
 template<class P>
 inline Factor<P>::Factor(sint16 n, sint32 k)
@@ -1231,4 +1271,9 @@ std::ostream& operator<<(std::ostream& os, const Braid<P>& b)
     }
     os << b.RightDelta << ")";
     return os;
+}
+
+template <class P>
+inline void Factor<P>::Print(std::ostream& os) {
+    Pres.Print(os, *this);
 }
