@@ -97,6 +97,7 @@ typename Seq::difference_type erase_back_if(Seq& s, UnaPre f);
 // Exception class.
 struct OddIndexError {};
 struct NegativeBraidError {};
+struct InvalidStringError {};
 
 
 // Class describing the Artin presentation and the band generator
@@ -111,11 +112,13 @@ protected:
 public:
     ArtinPresentation(sint16 n);
 
+    void OfString(std::string str, sint16* t) const;
+
     // Print factor f to os. Be wary, as it side-effects!
     void Print(std::ostream& os, sint16* f);
 
     // Generators, as an array of arrays.
-    sint16** Atoms(sint16 n);
+    std::list<sint16*> Atoms(sint16 n) const;
 
     sint16 Index() const;
 
@@ -159,8 +162,10 @@ public:
 
     void Print(std::ostream& os, sint16* f);
 
+    void OfString(std::string str, sint16* t) const;
+
     // Generators, as an array of arrays.
-    sint16** Atoms(sint16 n);
+    std::list<sint16*> Atoms(sint16 n) const;
 
     // Return the i-th entry of the permutation table of delta^k.
     sint16 DeltaTable(sint16 i, sint32 k = 1) const;
@@ -206,44 +211,44 @@ public:
     // Constructor.  The permutation table is initialized as
     // delta^k. If k == Uninitialize, the table is left uninitialized.
     enum { Uninitialize = 0x80000000 };
-    Factor(sint16 n, sint32 k = Uninitialize);
+    Factor(sint16 n, sint32 k = Uninitialize); // Ok (parameter n will have to change type, for something more abstract).
 
     // Copy constructor.
-    Factor(const Factor& f);
+    Factor(const Factor& f); // Ok.
 
     // Conversion operator to the sint16* type.  The address of the
     // permutation table is returned.  Recall that the index range is
     // [1..n], not [0,n[; when the return value is r, r[1], ... , r[n]
     // contains the permutation table.  r[0] may be an invalid memory
     // and must not be accessed.
-    operator sint16*();
-    operator const sint16*() const;
+    operator sint16*(); // Won't work for general groups.
+    operator const sint16*() const; // Maybe replace it with relevant conversion functions? 
 
     // Destructor.
-    ~Factor();
+    ~Factor(); // Ok
 
     // Initialize as a power of delta.
-    Factor& Delta(sint32 k = 1);
-    Factor& Identity();
+    Factor& Delta(sint32 k = 1); // Ok
+    Factor& Identity(); // Ok
 
     // Initialize as a power of lower/upper delta.
-    Factor& LowerDelta(sint32 k = 1);
-    Factor& UpperDelta(sint32 k = 1);
+    Factor& LowerDelta(sint32 k = 1); // Meaningless for generic Garside groups.
+    Factor& UpperDelta(sint32 k = 1); //
 
     // Get the index.
-    sint16 Index() const;
+    sint16 Index() const; // Ok (but not sint16).
 
     // Access to the n-th element of the permutation table. We follow
     // the standard mathematical convention; the argument should be
     // between 1 and Index.
-    sint16& At(sint16 n);
+    sint16& At(sint16 n); // Meaningless for generic Garside groups.
     sint16 At(sint16 n) const;
     sint16& operator[](sint16 n);
-    sint16 operator[](sint16 n) const;
+    sint16 operator[](sint16 n) const; 
 
     // Assignment operator.
     Factor& Assign(const Factor& f);
-    Factor& operator=(const Factor& f);
+    Factor& operator=(const Factor& f); 
 
     // Comparison operator.
     bool Compare(const Factor& f) const;
@@ -261,19 +266,19 @@ public:
     // b.AssignComposition(a)  assign to b the composition of b and a.
     // a*b                     the operator form of b.Composition(a).
     // b *= a                  the operator form of b.AssignComposition(a).
-    Factor Composition(const Factor& a) const;
-    Factor& AssignComposition(const Factor& a);
-    Factor& operator*=(const Factor& a);
-    Factor operator*(const Factor& a) const;
+    Factor Composition(const Factor& a) const;  // Will probably have to move up. 
+    Factor& AssignComposition(const Factor& a); // 
+    Factor& operator*=(const Factor& a);        // 
+    Factor operator*(const Factor& a) const;    // 
 
     // Inversion operators.  We also have variants:
 
     // a.Inverse()        return the inverse of a.
     // a.AssignInverse()  invert a.
     // !a                 the operator form of a.Inverse().
-    Factor Inverse() const;
-    Factor& AssignInverse();
-    Factor operator!() const;
+    Factor Inverse() const;   // Will have to be taken out for generic Garside groups.
+    Factor& AssignInverse();  // As in general canonical factors do not have a group structure.
+    Factor operator!() const; // Won't matter too much for braids as complement will move up.
 
     // Complement operations.  For a factor a, ~a=a^(-1) delta is
     // called the complement (i.e. a(~a) = delta).  We provide
@@ -283,28 +288,28 @@ public:
        Gonzales-Menenes had noticed the same thing in his "braiding"
        code; he had used !(*this) rather than this->Inverse(). */
     /* Factor Complement() const { return ~a*Factor(Index(), -1); } */
-    Factor Complement() const { return this->Inverse()*Factor(Index(), 1); }
-    Factor& AssignComplement() { return *this = Complement(); }
-    Factor operator~() const { return Complement(); }
+    Factor Complement() const { return this->Inverse()*Factor(Index(), 1); } // Needs to move
+    Factor& AssignComplement() { return *this = Complement(); } // Ok with complement
+    Factor operator~() const { return Complement(); } // Ok
 
     // Flip operations (conjugation by delta^k, i,e. delta^(-k) a
     // delta^k).
-    Factor Flip(sint32 k = 1) const;
-    Factor& AssignFlip(sint32 k = 1);
+    Factor Flip(sint32 k = 1) const; // Needs to be rewritten as something that uses complements.
+    Factor& AssignFlip(sint32 k = 1); // Won't be as efficient however.
 
     // Meet operations.  b.LeftMeet(a) (resp. b.RightMeet(a)) returns
     // the left (resp. right) meet of b and a.
-    Factor LeftMeet(const Factor& a) const;
-    Factor RightMeet(const Factor& a) const;
+    Factor LeftMeet(const Factor& a) const; // Ok
+    Factor RightMeet(const Factor& a) const; // Ok
 
     // Generate a random factor.
     Factor& Randomize();
 
     // Computes a factor from a given string.
-    Factor OfString(char* str);
+    Factor OfString(std::string str) const; // Ok
 
     // Print factor to os. Be wary, as it may side-effect!
-    void Print(std::ostream& os);
+    void Print(std::ostream& os); // Ok
 };
 
 // Binary function form of the meet operators.

@@ -9,3 +9,6 @@ speedtest
 speedtest.o
 test
 test.o
+programs/*
+!programs/Makefile
+!programs/*.cpp

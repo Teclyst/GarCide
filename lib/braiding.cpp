@@ -1981,20 +1981,26 @@ sint16 ReadIndex()
 //
 /////////////////////////////////////////////////////////////
 
-list<sint16> ReadWord(sint16 n)
+list<std::string> ReadWord(sint16 n)
 {
-  list<sint16> word;
-  sint16 a;
+  list<std::string> word;
+  std::string str;
 
   cout << endl << "Type a braid with " << n << " strands: "
        << "('" << n << "' = Delta)"
        << endl << endl;
-  while(std::cin.peek()!='\n')
-    {
-      std::cin >> std::ws >> a;
-      word.push_back(a);
-    }
-  std::cin.ignore();
+  
+  getline(std::cin, str);
+
+  //while(std::cin.peek()!='\n')
+  //  {
+  //    std::cin >> std::ws >> a;
+  //
+  //    word.push_back(a);
+//
+  //    cout << a;
+  //  }
+  //std::cin.ignore();
 
   return word;
 

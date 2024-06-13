@@ -738,18 +738,16 @@ list<CBraid::Factor<P>> MinSSS(CBraid::Braid<P> B)
       F[i]=F[i+1];
       F[i+1]=k;
       F=MinSSS(B,F);
-      for(j=1; j<i; j++)
-	{
-	  if(table[j-1] && F[j]>F[j+1])
-	    test=0;
-	}
-      for(j=i+1; j<n; j++)
-	{
-	  if(F[j]>F[j+1])
-	    test=0;
-	}
+      for(j=1; j<i; j++){
+	      if(table[j-1] && F[j]>F[j+1])
+	      test=0;
+	    }
+      for(j=i+1; j<n; j++){
+	      if(F[j]>F[j+1])
+	        test=0;
+	    }
       if(test)
-	Min.push_back(F);
+	      Min.push_back(F);
     }
   return Min;
 }
@@ -2915,7 +2913,7 @@ list<list<CBraid::Braid<P>> > SC(CBraid::Braid<P> B, list<CBraid::Factor<P>> & m
   mins.push_back(CBraid::Factor<P>(B.Index(),0));
   prev.push_back(1);
 
-  typename list<list<CBraid::Braid<P>> >::iterator it=sc.begin(), it2;
+  typename list<list<CBraid::Braid<P>>>::iterator it=sc.begin(), it2;
   while(it!=sc.end())
     {
       current++;
