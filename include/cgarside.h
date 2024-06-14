@@ -534,13 +534,13 @@ namespace CGarside
   {
 
   public:
-    // LeftDelta is the Number of Deltas on the left end of the word.
+    // `LeftDelta` is the number of Deltas on the left end of the word.
     sint32 LeftDelta;
 
-    // RightDelta is the Number of Deltas on the right end of the word.
+    // `RightDelta` is the number of Deltas on the right end of the word.
     sint32 RightDelta;
 
-    // FactorList is a list a canonical factors.
+    // `FactorList` is a list a canonical factors.
     std::list<F> FactorList;
 
   public:
@@ -581,7 +581,7 @@ namespace CGarside
     // Destructor.
     ~Braid() {}
 
-    // w.Neutral() sets w to the empty word.
+    // `w.Neutral()` sets w to the empty word.
     void Neutral()
     {
       LeftDelta = 0;
@@ -589,7 +589,7 @@ namespace CGarside
       FactorList.clear();
     }
 
-    // u.Compare(v) returns whether u and v have the same internal representation.
+    // `u.Compare(v)` returns whether u and v have the same internal representation.
     // Should hence only be used on words in normal form.
     bool Compare(Braid &v) const
     {
@@ -598,22 +598,22 @@ namespace CGarside
               FactorList == v.FactorList);
     }
 
-    // u == v returns whether u and v have the same internal representation.
+    // `u == v` returns whether u and v have the same internal representation.
     // Should hence only be used on words in normal form.
-    // Syntactic sugar for u.Compare(v).
+    // Syntactic sugar for `u.Compare(v)`.
     bool operator==(const Braid &v) const
     {
       return Compare(v);
     }
 
-    // u != v returns whether u and v do not have the same internal representation.
+    // `u != v` returns whether u and v do not have the same internal representation.
     // Should hence only be used on words in normal form.
     bool operator!=(const Braid &v) const
     {
       return !Compare(v);
     }
 
-    // u.IsNeutral represents whether u represents the neutral element.
+    // `u.IsNeutral` returns whether u represents the neutral element.
     bool IsNeutral() const
     {
       Braid e;
@@ -621,7 +621,7 @@ namespace CGarside
       return Compare(e)
     }
 
-    // u.Inverse() returns the inverse of u, not necessarily in a canonical form.
+    // `u.Inverse()` returns the inverse of u, not necessarily in a canonical form.
     Braid Inverse() const
     {
       Braid b;
@@ -640,24 +640,24 @@ namespace CGarside
       return b;
     }
 
-    // !u returns the inverse of u, not necessarily in a canonical form.
-    // Syntactic sugar for u.Inverse().
+    // `!u` returns the inverse of u, not necessarily in a canonical form.
+    // Syntactic sugar for `u.Inverse()`.
     Braid operator!() const
     {
       return Inverse();
     }
 
-    // u.LeftProduct(f) assigns fu, not necessarily in a canonical form, to u.
+    // `u.LeftProduct(f)` assigns fu, not necessarily in a canonical form, to u.
     void LeftProduct(const F &f) {
       FactorList.push_front(f.DeltaConjugate(LeftDelta));
     }
 
-    // u.RightProduct(f) assigns uf, not necessarily in a canonical form, to u.
+    // `u.RightProduct(f)` assigns uf, not necessarily in a canonical form, to u.
     void RightProduct(const F &f) {
       FactorList.push_back(f.DeltaConjugate(- RightDelta));
     }
 
-    // u.Product(v) returns uv, not necessarily in a canonical form.
+    // `u.Product(v)` returns uv, not necessarily in a canonical form.
     Braid Product(const Braid &v) const {
       Braid w(this);
       w.RightDelta += v.LeftDelta;
@@ -671,8 +671,8 @@ namespace CGarside
       return w;
     }
 
-    // u * v returns uv, not necessarily in a canonical form.
-    // Syntactic sugar for u.Product(v).
+    // `u * v` returns uv, not necessarily in a canonical form.
+    // Syntactic sugar for `u.Product(v)`.
     Braid operator*(const Braid &v) const {
       return Product(v);
     }
