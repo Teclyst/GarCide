@@ -21,6 +21,8 @@ namespace CGarside
   // Maximum braid index.
   const sint16 MaxBraidIndex = 300;
 
+  static sint16 MadeLeftWeighted = 0;
+
   // Exceptions.
   struct InvalidStringError
   {
@@ -29,257 +31,38 @@ namespace CGarside
   {
   };
 
-  // A class for the underlying objects for canonical factors
-  // in the Artin presentation braid group case.
-  // In this case, permutations.
-  class ArtinBraidUnderlying
+  template <class ForItr, class BinFunc>
+  inline ForItr apply_binfun(ForItr first, ForItr last, BinFunc f)
   {
+    ForItr i, j;
+    if ((i = j = first) == last)
+      return first;
+    while (++j != last && f(*(i++), *j))
+      ;
+    return j;
+  }
 
-  protected:
-    sint16 PresentationIndex;
+  template <class BiItr, class BinFunc>
+  inline BiItr reverse_apply_binfun(BiItr first, BiItr last, BinFunc f)
+  {
+    BiItr i, j;
+    if (first == (i = j = last))
+      return first;
+    --i;
+    while ((j = i) != first && f(*--i, *j))
+      ;
+    return --j;
+  }
 
-    sint16 *PermutationTable;
-
-  public:
-    sint16 Index() const
-    {
-      return PresentationIndex;
-    };
-
-    // Constructor
-    ArtinBraidUnderlying(sint16 n)
-    {
-      PresentationIndex = n;
-      PermutationTable = new sint16[n + 1];
-    }
-
-    ArtinBraidUnderlying(ArtinBraidUnderlying &a)
-    {
-      PresentationIndex = a.Index();
-      sint16 i;
-      for (i = 1; i <= a.Index(); i++)
-      {
-        PermutationTable[i] = a.PermutationTable[i];
-      }
-    }
-
-    void OfString(const std::string &str) const
-    {
-      sint16 n = Index();
-      sint16 i;
-      sint16 j;
-      try
-      {
-        i = std::stoi(str);
-      }
-      catch (std::invalid_argument)
-      {
-        throw InvalidStringError();
-      }
-      if (i == n)
-      {
-        for (j = 1; j <= n; j++)
-        {
-          PermutationTable[j] = n + 1 - j;
-        }
-      }
-      else if (i < n)
-      {
-        for (j = 1; j <= n; j++)
-        {
-          PermutationTable[j] = j;
-        }
-        PermutationTable[i] = i + 1;
-        PermutationTable[i + 1] = i;
-      }
-      else
-      {
-        throw InvalidStringError();
-      }
-    };
-
-    // Print to os. Be wary, as it side-effects!
-    void Print(std::ostream &os)
-    {
-      sint16 i, j, k, n = Index();
-
-      for (i = 2; i <= n; i++)
-      {
-        for (j = i; j > 1 && PermutationTable[j] < PermutationTable[j - 1]; j--)
-        {
-          os << j - 1 << " ";
-          k = PermutationTable[j];
-          PermutationTable[j] = PermutationTable[j - 1];
-          PermutationTable[j - 1] = k;
-        }
-      }
-    };
-
-    // Set to the neutral element (here the identity).
-    void Neutral()
-    {
-      sint16 i, n = Index();
-      for (i = 1; i <= n; i++)
-      {
-        PermutationTable[i] = i;
-      }
-    };
-
-    // Set to delta.
-    void Delta()
-    {
-      sint16 i, n = Index();
-      for (i = 1; i <= n; i++)
-      {
-        PermutationTable[i] = n + 1 - i;
-      }
-    };
-
-    // Compute the meet r of the two factors a and b.  A factor is
-    // given as the associated permutation, which is viewed as a
-    // bijection on the set {1,...n} and represented as an array whose
-    // i-th entry is the image of i under the inverse of the
-    // permutation (this convention is different from that in the
-    // AsiaCrypt 2001 paper of the author).  The range of indices is
-    // [1,n], not [0,n[.  We use a C style array of size (n+1) to
-    // represent an n-permutation (the first entry is not used).
-
-    // We define the left meet of two factors a and b to be the
-    // longest factor r such that a=ra' and b=rb' for some factors a'
-    // and b'.  This coincides with the convention of the paper of
-    // Birman, Ko, and Lee, but different from that of the article of
-    // Thurston (in Epstein's book).  Indeed, Thurston's is the
-    // "right" meet in our sense.
-    ArtinBraidUnderlying LeftMeet(const ArtinBraidUnderlying &b) const
-    {
-      static sint16 s[MaxBraidIndex];
-
-      if (Index() != b.Index())
-      {
-        throw NonMatchingIndexes();
-      }
-
-      ArtinBraidUnderlying f = ArtinBraidUnderlying(Index());
-
-      for (sint16 i = 1; i <= Index(); ++i)
-        s[i] = i;
-      MeetSub(PermutationTable, b.PermutationTable, s, 1, Index());
-      for (sint16 i = 1; i <= Index(); ++i)
-        f.PermutationTable[s[i]] = i;
-    };
-
-    ArtinBraidUnderlying RightMeet(const ArtinBraidUnderlying &b) const
-    {
-      static sint16 u[MaxBraidIndex], v[MaxBraidIndex];
-
-      if (Index() != b.Index())
-      {
-        throw NonMatchingIndexes();
-      }
-
-      ArtinBraidUnderlying f = ArtinBraidUnderlying(Index());
-
-      for (sint16 i = 1; i <= Index(); ++i)
-      {
-        u[PermutationTable[i]] = i;
-        v[b.PermutationTable[i]] = i;
-      }
-      for (sint16 i = 1; i <= Index(); ++i)
-        f.PermutationTable[i] = i;
-      MeetSub(u, v, f.PermutationTable, 1, Index());
-    };
-
-    // Equality check.
-    // We check wether the underlying permutation table are (pointwise) equal.
-    bool Compare(const ArtinBraidUnderlying &b) const
-    {
-      sint16 i;
-      if (Index() != b.Index())
-      {
-        throw NonMatchingIndexes();
-      }
-      for (i = 1; i <= Index(); i++)
-      {
-        if (PermutationTable[i] != b.PermutationTable[i])
-        {
-          return false;
-        }
-      }
-      return true;
-    };
-
-    // Computes the factor corresponding to the inverse permutation.
-    // Used to simplify complement operation.
-    ArtinBraidUnderlying Inverse() const
-    {
-      ArtinBraidUnderlying f = ArtinBraidUnderlying(Index());
-      sint16 i;
-      for (i = 1; i <= Index(); i++)
-      {
-        f.PermutationTable[PermutationTable[i]] = i;
-      }
-      return f;
-    };
-
-    // Product under the hypothesis that it is still simple.
-    ArtinBraidUnderlying Product(const ArtinBraidUnderlying &b) const
-    {
-      ArtinBraidUnderlying f = ArtinBraidUnderlying(Index());
-      if (Index() != b.Index())
-      {
-        throw NonMatchingIndexes();
-      }
-      sint16 i;
-      for (i = 1; i <= Index(); i++)
-      {
-        f.PermutationTable[i] = b.PermutationTable[PermutationTable[i]];
-      }
-    };
-
-    // Under the assumption a <= b, a.LeftComplement(b) computes
-    // The factor c such that ac = b.
-    ArtinBraidUnderlying LeftComplement(const ArtinBraidUnderlying &b) const
-    {
-      return Inverse().Product(b);
-    };
-
-    ArtinBraidUnderlying RightComplement(const ArtinBraidUnderlying &b) const
-    {
-      return b.Product(Inverse());
-    };
-
-    // Generate a random factor.
-    void Randomize()
-    {
-      for (sint16 i = 1; i <= Index(); ++i)
-        PermutationTable[i] = i;
-      for (sint16 i = 1; i < Index(); ++i)
-      {
-        sint16 j = i + sint16(std::rand() / (RAND_MAX + 1.0) * (Index() - i + 1));
-        sint16 z = PermutationTable[i];
-        PermutationTable[i] = PermutationTable[j];
-        PermutationTable[j] = z;
-      }
-    };
-
-    // List of atoms.
-    std::list<ArtinBraidUnderlying> Atoms() const
-    {
-      sint16 i, n = Index();
-      std::list<ArtinBraidUnderlying> atoms;
-      for (i = 1; i <= n - 1; i++)
-      {
-        ArtinBraidUnderlying atom = ArtinBraidUnderlying(n);
-        atom.OfString(std::to_string(i));
-        atoms.push_front(atom);
-      }
-      return atoms;
-    };
-
-  private:
-    // Subroutine called by LeftMeet() and RightMeet()
-    static void MeetSub(const sint16 *a, const sint16 *b, sint16 *r, sint16 s, sint16 t);
-  };
+  template <class ForItr, class BinFun>
+  inline void bubble_sort(ForItr first, ForItr last, BinFun f)
+  {
+    ForItr i;
+    if (first == (i = last))
+      return;
+    while (i != first)
+      apply_binfun(--i, last, f);
+  }
 
   template <class U>
   class Factor
@@ -295,7 +78,7 @@ namespace CGarside
         : Underlying(under) {}
 
     // Copy constructor.
-    Factor(const Factor &a) const
+    Factor(const Factor &a)
         : Underlying(a.Underlying) {}
 
     ~Factor() {}
@@ -312,10 +95,10 @@ namespace CGarside
       Underlying.Print(os);
     }
 
-    // a.Neutral sets a to Neutral.
-    void Neutral()
+    // a.Identity sets a to Identity.
+    void Identity()
     {
-      Underlying.Neutral();
+      Underlying.Identity();
     }
 
     // a.Delta() sets a to Delta.
@@ -328,6 +111,17 @@ namespace CGarside
     bool Compare(const Factor &b) const
     {
       return Underlying.Compare(b.Underlying);
+    }
+
+    Factor &Assign(const Factor &b)
+    {
+      Underlying.Assign(b.Underlying);
+      return *this;
+    }
+
+    Factor &operator=(const Factor &b)
+    {
+      return Assign(b);
     }
 
     // a == b returns true if a and b are equal, false otherwise.
@@ -343,18 +137,18 @@ namespace CGarside
       return !Compare(b);
     }
 
-    // a.IsDelta() returns whether a = e.
-    bool IsNeutral() const
+    // a.IsDelta() returns whether a == e.
+    bool IsIdentity() const
     {
-      Factor e = Factor(this);
-      e.Neutral();
+      Factor e = Factor(*this);
+      e.Identity();
       return Compare(e);
     }
 
     // a.IsDelta() returns whether a = Delta.
     bool IsDelta() const
     {
-      Factor delta = Factor(this);
+      Factor delta = Factor(*this);
       delta.Delta();
       return Compare(delta);
     }
@@ -368,7 +162,7 @@ namespace CGarside
     // a.LeftComplement() return a's left complement.
     Factor LeftComplement() const
     {
-      Factor delta = Factor(this);
+      Factor delta = Factor(*this);
       delta.Delta();
       return LeftComplement(delta);
     }
@@ -382,7 +176,7 @@ namespace CGarside
     // a.RightComplement() return a's right complement.
     Factor RightComplement() const
     {
-      Factor delta = Factor(this);
+      Factor delta = Factor(*this);
       delta.Delta();
       return RightComplement(delta);
     }
@@ -394,7 +188,6 @@ namespace CGarside
       return RightComplement();
     }
 
-    // a / b returns (assuming that b left-divides a) the right complement of a under b, b^{-1}a.
     // Syntactic sugar for b.RightComplement(a).
     Factor operator/(const Factor &b) const
     {
@@ -405,7 +198,7 @@ namespace CGarside
     // Makes 2 |k| complement calculations.
     Factor DeltaConjugate(const sint16 k) const
     {
-      Factor conjugate = Factor(this);
+      Factor conjugate = Factor(*this);
       sint16 i;
       if (k >= 0)
       {
@@ -452,25 +245,27 @@ namespace CGarside
     }
 
     // a.LeftJoin(b) returns the left join of a and b.
-    Factor LeftJoin(const Factor &b) const {
-        return RightComplement().RightMeet(b.RightComplement()).LeftComplement()}
+    Factor LeftJoin(const Factor &b) const
+    {
+      return RightComplement().RightMeet(b.RightComplement()).LeftComplement();
+    }
 
     // a.RightJoin(b) returns the right join of a and b.
     Factor RightJoin(const Factor &b) const
     {
-      return LeftComplement().LeftMeet(b.LeftComplement()).RightComplement()
+      return LeftComplement().LeftMeet(b.LeftComplement()).RightComplement();
     }
 
     // a.IsLeftWeighted(b) returns true if a | b is left weighted, or false otherwise.
     bool IsLeftWeighted(const Factor &b) const
     {
-      RightComplement().LeftMeet(b).IsTrivial();
+      return RightComplement().LeftMeet(b).IsTrivial();
     }
 
     // a.IsRightWeighted(b) returns true if a | b is right weighted, or false otherwise.
     bool IsRightWeighted(const Factor &b) const
     {
-      LeftMeet(b.LeftComplement()).IsTrivial();
+      return LeftMeet(b.LeftComplement()).IsTrivial();
     }
 
     // a.Product(b) returns the product of two factors, under the assumption that it lies below Delta.
@@ -501,7 +296,7 @@ namespace CGarside
       std::list<Factor> factor_atoms;
       for (auto const &atoms_it : atoms)
       {
-        Factor f = Factor(this);
+        Factor f = Factor(*this);
         f.Set(atoms_it);
         factor_atoms.push_back(f);
       }
@@ -510,35 +305,32 @@ namespace CGarside
   };
 
   // MakeLeftWeighted(u, v) computes the left-weighted decomposition u' | v' = u | v, and sets u = u' and v = v'.
-  template <class U>
-  void MakeLeftWeighted(Factor<U> &u, Factor<U> &v)
+  // It then returns true if something was done (so that it may be used with `apply_binfun`).
+  template <class F>
+  bool MakeLeftWeighted(F &u, F &v)
   {
-    Factor<U> t = ~u ^ v;
-    v = v / t;
-    u = u * t;
+    MadeLeftWeighted++;
+    F t = (~u) ^ v;
+    if (t.IsIdentity())
+    {
+      return false;
+    }
+    else
+    {
+      v = v / t;
+      u = u * t;
+      return true;
+    }
   }
 
-  // MakeRightWeighted(u, v) computes the right-weighted decomposition u' | v' = u | v, and sets u = u' and v = v'.
-  template <class U>
-  void MakeRightWeighted(Factor<U> &u, Factor<U> &v)
-  {
-    Factor<U> t = u.RightMeet(v.LeftComplement());
-    u = t.LeftComplement(u);
-    v = t * v;
-  }
-
-  typedef Factor<ArtinBraidUnderlying> ArtinBraidFactor;
-
+  // We maintain braids in LCF at all time.
   template <class F>
   class Braid
   {
 
   public:
-    // `LeftDelta` is the number of Deltas on the left end of the word.
-    sint32 LeftDelta;
-
-    // `RightDelta` is the number of Deltas on the right end of the word.
-    sint32 RightDelta;
+    // `Delta` is the number of Deltas on the left end of the word.
+    sint32 Delta;
 
     // `FactorList` is a list a canonical factors.
     std::list<F> FactorList;
@@ -551,27 +343,30 @@ namespace CGarside
     typedef typename std::list<F>::const_reverse_iterator ConstRevFactorItr;
 
   public:
-    // Constructor that creates an empy word.
+    // Constructor that creates an empty word.
     Braid()
-        : LeftDelta(0),
-          RightDelta(0),
+        : Delta(0),
           FactorList() {}
+
+    // Constructor, with expected canonical length.
+    Braid(const sint16 expected_length)
+        : Delta(0),
+          FactorList(expected_length) {}
 
     // Copy constructor.
     Braid(const Braid &w)
-        : LeftDelta(w.LeftDelta),
-          RightDelta(w.RightDelta),
+        : Delta(w.Delta),
           FactorList(w.FactorList) {}
 
     // Constructor that transforms a factor into a word.
-    // If the factor is Delta, LeftDelta is incremented.
+    // If the factor is Delta, `Delta` is incremented.
     Braid(const F &f)
     {
-      if f
-        .IsDelta()
-        {
-          LeftDelta = 1;
-        }
+      if (f
+              .IsDelta())
+      {
+        Delta = 1;
+      }
       else
       {
         FactorList.push_back(f);
@@ -581,25 +376,21 @@ namespace CGarside
     // Destructor.
     ~Braid() {}
 
-    // `w.Neutral()` sets w to the empty word.
-    void Neutral()
+    // `w.Identity()` sets w to the empty word.
+    void Identity()
     {
-      LeftDelta = 0;
-      RightDelta = 0;
+      Delta = 0;
       FactorList.clear();
     }
 
     // `u.Compare(v)` returns whether u and v have the same internal representation.
-    // Should hence only be used on words in normal form.
     bool Compare(Braid &v) const
     {
-      return (LeftDelta == v.LeftDelta &&
-              RightDelta == v.RightDelta &&
+      return (Delta == v.Delta &&
               FactorList == v.FactorList);
     }
 
     // `u == v` returns whether u and v have the same internal representation.
-    // Should hence only be used on words in normal form.
     // Syntactic sugar for `u.Compare(v)`.
     bool operator==(const Braid &v) const
     {
@@ -607,36 +398,31 @@ namespace CGarside
     }
 
     // `u != v` returns whether u and v do not have the same internal representation.
-    // Should hence only be used on words in normal form.
     bool operator!=(const Braid &v) const
     {
       return !Compare(v);
     }
 
-    // `u.IsNeutral` returns whether u represents the neutral element.
-    bool IsNeutral() const
+    // `u.IsIdentity` returns whether u represents the Identity element.
+    bool IsIdentity() const
     {
-      Braid e;
-      e.Neutral();
-      return Compare(e)
+      return Compare(Delta == 0 && FactorList.empty());
     }
 
     // `u.Inverse()` returns the inverse of u, not necessarily in a canonical form.
     Braid Inverse() const
     {
       Braid b;
-      b.LeftDelta = - RightDelta;
-      b.RightDelta = 0;
-      for (ConstRevFactorItr it = FactorList.rbegin();
-           it != FactorList.rend();
-           ++it)
+      b.Delta = Delta;
+      for (ConstFactorItr it = FactorList.begin();
+           it != FactorList.end();
+           it++)
       {
-        // Rewrite a_1...a_k Delta^r (*it)^(-1) as
-        // a_1...a_k (Delta^r f Delta^(-r)) Delta^(r-1).
-        b.FactorList.push_back((*it).RightComplement().DeltaConjugate(-b.RightDelta));
-        --b.RightDelta;
+        // Rewrite a_1...a_k (f)^(- 1) Delta^r as
+        // a_1...a_k Delta ^ (r - 1) (Delta^(- r) d_L(f) Delta^r).
+        b.FactorList.push_front((*it).RightComplement().DeltaConjugate(b.Delta));
+        --b.Delta;
       }
-      b.RightDelta -= LeftDelta;
       return b;
     }
 
@@ -647,20 +433,47 @@ namespace CGarside
       return Inverse();
     }
 
-    // `u.LeftProduct(f)` assigns fu, not necessarily in a canonical form, to u.
-    void LeftProduct(const F &f) {
-      FactorList.push_front(f.DeltaConjugate(LeftDelta));
+    // Clean gets rid of (factor) Deltas at the start, and identity elements at the end pf `FactorList`.
+    void Clean()
+    {
+      for (FactorItr it = FactorList.begin();
+           it != FactorList.end();
+           it++)
+      {
+        if ((*it).IsDelta())
+        {
+          ++Delta;
+          FactorList.pop_front();
+        }
+        else if ((*it).IsIdentity())
+        {
+          FactorList.erase(it, FactorList.end());
+          return;
+        }
+      }
+    }
+
+    // `u.LeftProduct(f)` assigns fu to u.
+    void LeftProduct(F &f)
+    {
+      FactorList.push_front(f.DeltaConjugate(Delta));
+      apply_binfun(FactorList.begin(), FactorList.end(), MakeLeftWeighted<F>);
+      Clean();
     }
 
     // `u.RightProduct(f)` assigns uf, not necessarily in a canonical form, to u.
-    void RightProduct(const F &f) {
-      FactorList.push_back(f.DeltaConjugate(- RightDelta));
+    void RightProduct(F &f)
+    {
+      FactorList.push_back(f);
+      reverse_apply_binfun(FactorList.begin(), FactorList.end(), MakeLeftWeighted<F>);
+      Clean();
     }
 
     // `u.Product(v)` returns uv, not necessarily in a canonical form.
-    Braid Product(const Braid &v) const {
+    Braid Product(const Braid &v) const
+    {
       Braid w(this);
-      w.RightDelta += v.LeftDelta;
+      w.Delta += v.Delta;
       for (ConstFactorItr it = v.FactorList.begin();
            it != v.FactorList.end();
            ++it)
@@ -673,10 +486,39 @@ namespace CGarside
 
     // `u * v` returns uv, not necessarily in a canonical form.
     // Syntactic sugar for `u.Product(v)`.
-    Braid operator*(const Braid &v) const {
+    Braid operator*(const Braid &v) const
+    {
       return Product(v);
     }
 
+    void Normalize()
+    {
+      bubble_sort(FactorList.begin(), FactorList.end(), MakeLeftWeighted<F>);
+      Clean();
+    }
+
+    // Randomizes the braid, setting it at a given length, using parameters extracted from Factor f.
+    // The result isn't in LCF.
+    void Randomize(const F &f, sint16 canonical_length)
+    {
+      FactorList.clear(); // Potential memory leak? To be checked.
+      Delta = 0;
+      for (sint16 i = 0; i < canonical_length; i++)
+      {
+        F f(f);
+        f.Randomize();
+        FactorList.push_back(f);
+      }
+    }
+
+    Braid Print(std::ostream& os) {
+      os << "D^" << Delta << " . ";
+      for (FactorItr it = FactorList.begin(); it != FactorList.end(); it++) {
+        (*it).Print(os);
+        os << " . ";
+      }
+      os << std::endl;
+    }
   };
 
 }

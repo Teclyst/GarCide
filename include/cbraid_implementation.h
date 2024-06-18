@@ -25,6 +25,8 @@
     Implementation of cbraid library.
 */
 
+static sint16 MadeLeftWeighted = 0;
+
 template <class ForItr, class BinFunc>
 inline ForItr apply_binfun(ForItr first, ForItr last, BinFunc f)
 {
@@ -879,7 +881,7 @@ Factor<P> RightMeet(const Factor<P> &a, const Factor<P> &b)
 template <class P>
 inline bool MakeLeftWeighted(Factor<P> &a, Factor<P> &b)
 {
-
+  MadeLeftWeighted++;
 #ifdef DEBUG
     if (a.Index() != b.Index())
     {

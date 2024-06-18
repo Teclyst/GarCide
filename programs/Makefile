@@ -1,5 +1,5 @@
 # File names and directories
-SOURCES       = test.cpp speedtest.cpp braiding_main.cpp
+SOURCES       = test.cpp speedtest.cpp braiding_main.cpp compare_test.cpp
 PROGRAMS      = $(SOURCES:.cpp=)
 OBJS	      = $(SOURCES:.cpp=.o)
 CBRAID_LIBDIR = ../lib
