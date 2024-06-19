@@ -1,5 +1,4 @@
 #include "artin_braid.h"
-#include <iostream>
 
 namespace CGarside
 {
@@ -44,6 +43,11 @@ namespace CGarside
       r[i] = w[i];
   }
 
+  sint16 ArtinBraidUnderlying::Index() const
+  {
+    return PresentationIndex;
+  };
+
   ArtinBraidUnderlying &ArtinBraidUnderlying::Assign(const ArtinBraidUnderlying &a)
   {
     if (&a != this)
@@ -78,7 +82,7 @@ namespace CGarside
     }
   }
 
-  void ArtinBraidUnderlying::OfString(const std::string &str) const
+  void ArtinBraidUnderlying::OfString(const std::string &str)
   {
     sint16 n = Index();
     sint16 i;
@@ -235,12 +239,12 @@ namespace CGarside
 
   ArtinBraidUnderlying ArtinBraidUnderlying::LeftComplement(const ArtinBraidUnderlying &b) const
   {
-    return Inverse().Product(b);
+    return b.Product(Inverse());
   };
 
   ArtinBraidUnderlying ArtinBraidUnderlying::RightComplement(const ArtinBraidUnderlying &b) const
   {
-    return b.Product(Inverse());
+    return Inverse().Product(b);
   };
 
   void ArtinBraidUnderlying::Randomize()

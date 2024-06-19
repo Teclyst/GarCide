@@ -15,10 +15,7 @@ namespace CGarside
     sint16 *PermutationTable;
 
   public:
-    sint16 Index() const
-    {
-      return PresentationIndex;
-    };
+    sint16 Index() const;
 
     // Constructor
     ArtinBraidUnderlying(sint16 n);
@@ -30,11 +27,19 @@ namespace CGarside
       delete[] PermutationTable;
     }
 
-    void OfString(const std::string &str) const;
+    void OfString(const std::string &str);
 
     ArtinBraidUnderlying &Assign(const ArtinBraidUnderlying &a);
 
     ArtinBraidUnderlying &operator=(const ArtinBraidUnderlying &a);
+
+    void Debug(std::ostream &os) {
+      os << "[";
+      for (sint16 i = 1; i <= Index(); i++) {
+        os << PermutationTable[i] << " ";
+      }
+      os << "]";
+    }
 
     // Print to os. Be wary, as it side-effects!
     void Print(std::ostream &os);
@@ -97,12 +102,6 @@ namespace CGarside
   };
 
   typedef Factor<ArtinBraidUnderlying> ArtinBraidFactor;
-
-  // template <>
-  // ArtinBraidFactor ArtinBraidFactor::DeltaConjugate(const sint16 k) const
-  // {
-  //   return ArtinBraidFactor(Underlying.DeltaConjugate(k));
-  // }
 
   typedef Braid<ArtinBraidFactor> ArtinBraid;
 

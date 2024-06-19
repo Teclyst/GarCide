@@ -1,6 +1,9 @@
+#ifndef CGARSIDE
+#define CGARSIDE 
+
 #include <list>
 #include <string>
-#include <ostream>
+#include <iostream>
 #include <stdexcept>
 
 namespace CGarside
@@ -87,6 +90,12 @@ namespace CGarside
     void OfString(std::string &str)
     {
       Underlying.OfString(str);
+    }
+
+    // a.Debug(os) prints a's internal representation to os.
+    void Debug(std::ostream &os)
+    {
+      Underlying.Debug(os);
     }
 
     // a.Print(os) prints a to os.
@@ -376,6 +385,14 @@ namespace CGarside
     // Destructor.
     ~Braid() {}
 
+    void Debug(std::ostream &os) {
+      os << Delta;
+      for(FactorItr it = FactorList.begin(); it != FactorList.end(); it++){
+        (*it).Debug(os);
+        os << " ";
+      }
+    }
+
     // `w.Identity()` sets w to the empty word.
     void Identity()
     {
@@ -436,21 +453,19 @@ namespace CGarside
     // Clean gets rid of (factor) Deltas at the start, and identity elements at the end pf `FactorList`.
     void Clean()
     {
-      for (FactorItr it = FactorList.begin();
-           it != FactorList.end();
-           it++)
+      FactorItr it = FactorList.begin();
+      while (it != FactorList.end() && (*it).IsDelta())
       {
-        if ((*it).IsDelta())
-        {
-          ++Delta;
-          FactorList.pop_front();
-        }
-        else if ((*it).IsIdentity())
-        {
-          FactorList.erase(it, FactorList.end());
-          return;
-        }
+        ++it;
+        ++Delta;
       }
+      FactorList.erase(FactorList.begin(), it);
+      RevFactorItr revit = FactorList.rbegin();
+      while (revit != FactorList.rend() && (*revit).IsIdentity())
+      {
+        ++revit;
+      }
+      FactorList.erase(revit.base(), FactorList.end());
     }
 
     // `u.LeftProduct(f)` assigns fu to u.
@@ -505,15 +520,17 @@ namespace CGarside
       Delta = 0;
       for (sint16 i = 0; i < canonical_length; i++)
       {
-        F f(f);
-        f.Randomize();
-        FactorList.push_back(f);
+        F g = F(f);
+        g.Randomize();
+        FactorList.push_back(g);
       }
     }
 
-    Braid Print(std::ostream& os) {
+    void Print(std::ostream &os)
+    {
       os << "D^" << Delta << " . ";
-      for (FactorItr it = FactorList.begin(); it != FactorList.end(); it++) {
+      for (FactorItr it = FactorList.begin(); it != FactorList.end(); it++)
+      {
         (*it).Print(os);
         os << " . ";
       }
@@ -522,3 +539,5 @@ namespace CGarside
   };
 
 }
+
+#endif
