@@ -10,19 +10,42 @@
 #include "optarg.h"
 #include "timecounter.h"
 
-int Index = 150;
-int CLength = 1000;
+int Index = 4;
+int CLength = 8;
 int Count = 1;
 int RandomSeed;
 
+void PrintArray(int* array, int len) {
+  for(int i = 1; i <= len; i++) {
+    std::cout << array[i];
+  } 
+}
+
 int main()
 {
+
+  char ballot[Index + 1];
+  int revarray[Index + 1];
+  int array[Index + 1];
+
+  CBraid::BandPresentation pres(Index);
+
+  cln::cl_I k;
+
+  for (k = 1; k <= CBraid::GetCatalanNumber(Index); k++) {
+    CBraid::BallotSequence(Index, k, ballot);
+    pres.BStoPT(ballot, revarray);
+    for (int i = 1; i <= Index; ++i)
+      array[revarray[i]] = i;
+    PrintArray(array, Index);
+    std::cout << std::endl;
+  }
 
   TimeCounter t;
 
   CBraid::BandBraid cb(Index);
 
-  CGarside::BandBraid cg;
+  CGarside::BandBraid cg(Index);
 
   CGarside::ArtinBraidFactor s1 = CGarside::ArtinBraidFactor(CGarside::ArtinBraidUnderlying(Index));
   CGarside::ArtinBraidFactor s2 = CGarside::ArtinBraidFactor(CGarside::ArtinBraidUnderlying(Index));
@@ -34,7 +57,7 @@ int main()
 
   CGarside::BandBraidUnderlying ua13 = CGarside::BandBraidUnderlying(Index);
 
-  CGarside::ArtinBraid cag;
+  CGarside::ArtinBraid cag(Index);
 
   //std::string str13 = std::string("(3, 1)");
   //std::string str12 = std::string("(2, 1)");
@@ -73,12 +96,17 @@ int main()
 
   t.Stop();
 
-    cag.Randomize(s1, CLength);
+    cag.Randomize(CLength);
+
+    cag.Print(std::cout);
+
     t.Start();
 
     cag.Normalize();
 
   t.Stop();
+
+  cag.Print(std::cout);
 
   std::cout << "CGarside (Artin structure): Execution time: " << 1000 *  t.IntervalSec() / Count << " ms." << std::endl;
 
@@ -98,15 +126,17 @@ int main()
 
   t.Stop();
 
-    cg.FactorList.clear(); // Potential memory leak? To be checked.
-    cg.Delta = 0;
-    cg.Randomize(a12, CLength);
+    cg.Randomize(CLength);
+
+    cg.Print(std::cout);
 
     t.Start();
     
     cg.Normalize();
 
     t.Stop();
+
+    cg.Print(std::cout);
 
   std::cout << "CGarside (dual structure): Execution time: " << 1000 *  t.IntervalSec() / Count << " ms." << std::endl;
 

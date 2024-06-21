@@ -10,15 +10,18 @@ namespace CGarside
   {
 
   protected:
-    sint16 PresentationIndex;
+    sint16 PresentationParameter;
 
     sint16 *PermutationTable;
 
   public:
-    sint16 Index() const;
+
+    typedef sint16 ParameterType;
+
+    ParameterType GetParameter() const;
 
     // Constructor
-    ArtinBraidUnderlying(sint16 n);
+    ArtinBraidUnderlying(ParameterType n);
 
     ArtinBraidUnderlying(const ArtinBraidUnderlying &a);
 
@@ -33,16 +36,16 @@ namespace CGarside
 
     ArtinBraidUnderlying &operator=(const ArtinBraidUnderlying &a);
 
-    void Debug(std::ostream &os) {
+    void Debug(std::ostream &os) const {
       os << "[";
-      for (sint16 i = 1; i <= Index(); i++) {
+      for (sint16 i = 1; i <= GetParameter(); i++) {
         os << PermutationTable[i] << " ";
       }
       os << "]";
     }
 
     // Print to os. Be wary, as it side-effects!
-    void Print(std::ostream &os);
+    void Print(std::ostream &os) const;
 
     // Set to the Identity element (here the identity).
     void Identity();

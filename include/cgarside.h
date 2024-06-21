@@ -1,5 +1,5 @@
 #ifndef CGARSIDE
-#define CGARSIDE 
+#define CGARSIDE
 
 #include <list>
 #include <string>
@@ -71,6 +71,9 @@ namespace CGarside
   class Factor
   {
 
+  public:
+    typedef typename U::ParameterType ParameterType;
+
   private:
     // Underlying is the data structure that actually represents the factor (e.g., a permutation table for a braid canonical factor).
     U Underlying;
@@ -80,11 +83,19 @@ namespace CGarside
     Factor(const U &under)
         : Underlying(under) {}
 
+    Factor(ParameterType parameter)
+        : Underlying(parameter) {}
+
     // Copy constructor.
     Factor(const Factor &a)
         : Underlying(a.Underlying) {}
 
     ~Factor() {}
+
+    ParameterType GetParameter()
+    {
+      Underlying.GetParameter();
+    }
 
     // a.OfString sets a to the factor specified by str.
     void OfString(std::string &str)
@@ -93,13 +104,13 @@ namespace CGarside
     }
 
     // a.Debug(os) prints a's internal representation to os.
-    void Debug(std::ostream &os)
+    void Debug(std::ostream &os) const
     {
       Underlying.Debug(os);
     }
 
     // a.Print(os) prints a to os.
-    void Print(std::ostream &os)
+    void Print(std::ostream &os) const
     {
       Underlying.Print(os);
     }
@@ -315,6 +326,7 @@ namespace CGarside
 
   // MakeLeftWeighted(u, v) computes the left-weighted decomposition u' | v' = u | v, and sets u = u' and v = v'.
   // It then returns true if something was done (so that it may be used with `apply_binfun`).
+  // SHOULD NEVER BE CALLED UPON u, v IF `&u == &v`!
   template <class F>
   bool MakeLeftWeighted(F &u, F &v)
   {
@@ -332,12 +344,37 @@ namespace CGarside
     }
   }
 
-  // We maintain braids in LCF at all time.
+  // MakeRightWeighted(u, v) computes the right-weighted decomposition u' | v' = u | v, and sets u = u' and v = v'.
+  // It then returns true if something was done (so that it may be used with `apply_binfun`).
+  // SHOULD NEVER BE CALLED UPON u, v IF `&u == &v`!
+  template <class F>
+  bool MakeRightWeighted(F &u, F &v)
+  {
+    F t = u.RightMeet(v.LeftComplement());
+    if (t.IsIdentity())
+    {
+      return false;
+    }
+    else
+    {
+      v = t * v;
+      u = t.LeftComplement(u);
+      return true;
+    }
+  }
+
+  // We maintain braids in LCF at all time, except in exceptionnal cases.
+  // Functions that manipulate RCF will be flagged as such.
+  // If a function does not specify its laterality, assume it to be left by default.
   template <class F>
   class Braid
   {
 
   public:
+    typedef typename F::ParameterType ParameterType;
+
+    ParameterType Parameter;
+
     // `Delta` is the number of Deltas on the left end of the word.
     sint32 Delta;
 
@@ -353,26 +390,31 @@ namespace CGarside
 
   public:
     // Constructor that creates an empty word.
-    Braid()
+    Braid(ParameterType parameter)
         : Delta(0),
+          Parameter(parameter),
           FactorList() {}
 
     // Constructor, with expected canonical length.
-    Braid(const sint16 expected_length)
+    Braid(const sint16 expected_length, ParameterType parameter)
         : Delta(0),
+          Parameter(parameter),
           FactorList(expected_length) {}
 
     // Copy constructor.
     Braid(const Braid &w)
         : Delta(w.Delta),
+          Parameter(w.Parameter),
           FactorList(w.FactorList) {}
 
     // Constructor that transforms a factor into a word.
     // If the factor is Delta, `Delta` is incremented.
     Braid(const F &f)
+        : Delta(0),
+          Parameter(f.GetParameter()),
+          FactorList()
     {
-      if (f
-              .IsDelta())
+      if (f.IsDelta())
       {
         Delta = 1;
       }
@@ -385,23 +427,54 @@ namespace CGarside
     // Destructor.
     ~Braid() {}
 
-    void Debug(std::ostream &os) {
+    ParameterType GetParameter() const
+    {
+      return Parameter;
+    }
+
+    void Debug(std::ostream &os) const
+    {
       os << Delta;
-      for(FactorItr it = FactorList.begin(); it != FactorList.end(); it++){
+      for (FactorItr it = FactorList.begin(); it != FactorList.end(); it++)
+      {
         (*it).Debug(os);
         os << " ";
       }
     }
 
+    void Print(std::ostream &os) const
+    {
+      if (Delta != 0 && Delta != 1)
+      {
+        os << "D^" << Delta << ". ";
+      }
+      else if (Delta == 1)
+      {
+        os << "D" << ". ";
+      }
+      for (FactorItr it = FactorList.begin(); it != FactorList.end(); it++)
+      {
+        (*it).Print(os);
+        os << ". ";
+      }
+    }
+
     // `w.Identity()` sets w to the empty word.
-    void Identity()
+    inline void Identity()
     {
       Delta = 0;
       FactorList.clear();
     }
 
+    // `u.CanonicalLength` returns u's canonical length.
+
+    inline sint16 CanonicalLength() const
+    {
+      return FactorList.size();
+    }
+
     // `u.Compare(v)` returns whether u and v have the same internal representation.
-    bool Compare(Braid &v) const
+    inline bool Compare(Braid &v) const
     {
       return (Delta == v.Delta &&
               FactorList == v.FactorList);
@@ -426,11 +499,12 @@ namespace CGarside
       return Compare(Delta == 0 && FactorList.empty());
     }
 
-    // `u.Inverse()` returns the inverse of u, not necessarily in a canonical form.
+    // `u.Inverse()` returns the inverse of u.
+    //  See the ElRifai and Morton 1994 article for correction.
     Braid Inverse() const
     {
-      Braid b;
-      b.Delta = Delta;
+      Braid b(CanonicalLength(), GetParameter());
+      b.Delta = -Delta;
       for (ConstFactorItr it = FactorList.begin();
            it != FactorList.end();
            it++)
@@ -476,7 +550,7 @@ namespace CGarside
       Clean();
     }
 
-    // `u.RightProduct(f)` assigns uf, not necessarily in a canonical form, to u.
+    // `u.RightProduct(f)` assigns uf to u.
     void RightProduct(F &f)
     {
       FactorList.push_back(f);
@@ -484,18 +558,139 @@ namespace CGarside
       Clean();
     }
 
-    // `u.Product(v)` returns uv, not necessarily in a canonical form.
+    // `u.LeftProduct(v)` assigns v u to u.
+    void LeftProduct(Braid &v) {
+      RevFactorItr it;
+      for (it = v.FactorList.rbegin(); it != v.FactorList.rend(); it++) {
+        LeftProduct((*it).DeltaConjugate(Delta));
+      }
+      Delta += v.Delta;
+    }
+
+    // `u.RightProduct(v)` assigns u v to u.
+    // v's factors move directly to u - be careful.
+    void RightProduct(Braid &v) {
+      FactorItr it;
+      for (it = FactorList.begin(); it != FactorList.end(); it++) {
+        (*it) = (*it).DeltaConjugate(v.Delta);
+      }
+      Delta += v.Delta;
+      for (it = v.FactorList.begin(); it != v.FactorList.end(); it++) {
+        RightProduct((*it));
+      }
+    }
+
+    // `u.LeftDivide(v)` assigns v ^ (- 1) u to u.
+    inline void LeftDivide(Braid &v) {
+      LeftProduct(!v);
+    }
+
+    // `u.RightDivide(v)` assigns u v ^ (- 1) to u.
+    inline void RightDivide(Braid &v) {
+      RightProduct(!v);
+    }
+
+    // `u.Initial()` returns the initial factor of u, that is, if u = Delta ^ r u_1 ... u_k, Delta ^ r u_1 Delta ^ (- r).
+    // If u has canonical length zero, returns the identity factor instead.
+    inline F Initial() const
+    {
+      if (CanonicalLength() == 0)
+      {
+        F id = F(GetParameter());
+        id.Identity();
+        return id;
+      }
+      else
+      {
+        return FactorList.front().DeltaConjugate(-Delta);
+      }
+    }
+
+    // `u.Final()` returns the final factor of u, that is, if u = Delta ^ r u_1 ... u_k, u_k.
+    // If u has canonical length zero, returns the identity factor instead.
+    inline F Final() const
+    {
+      if (CanonicalLength() == 0)
+      {
+        F id = F(GetParameter());
+        id.Identity();
+        return id;
+      }
+      else
+      {
+        return FactorList.back();
+      }
+    }
+
+    // `u.PreferredPrefix()` returns the preferred prefix of u, that is, if u = Delta ^ r u_1 ... u_k, p(u) = d_R(u_k) ^_L Delta ^ r u_1 Delta ^ (- r)
+    // If u has canonical length zero, returns the identity factor instead.
+    inline F PreferredPrefix() const
+    {
+      Initial() ^ ~Final();
+    }
+
+    inline F PreferredSuffixRCF() const
+    {
+      if (CanonicalLength() == 0)
+      {
+        F id = F(GetParameter());
+        id.Identity();
+        return id;
+      }
+      else
+      {
+        return FactorList.back().DeltaConjugate(Delta).RightMeet(FactorList.front().LeftComplement());
+      }
+    };
+
+    inline F PreferredSuffix() const
+    {
+      Braid right = Braid(*this);
+      right.MakeRCFFromLCF();
+      return right.PreferredSuffixRCF();
+    };
+
+    // `u.Cycling()` cycles u: if u = Delta ^ r u_1 ... u_k, then after applying cycling u will contain (the LNF of) Delta ^ r u_2 ... u_k (Delta ^ r u_1 Delta ^ (-r)).
+    inline void Cycling()
+    {
+      F i = Initial();
+      FactorList.pop_front();
+      RightProduct(i);
+    }
+
+    // `u.Decycling()` decycles u: if u = Delta ^ r u_1 ... u_k, then after applying cycling u will contain (the LNF of) Delta ^ r u_2 ... u_k (Delta ^ r u_1 Delta ^ (-r)).
+    inline void Decycling()
+    {
+      F f = Final();
+      FactorList.pop_front();
+      LeftProduct(f);
+    }
+
+    // `u.Sliding()` cyclically slides u: if u = Delta ^ r u_1 ... u_k, and Delta ^ r u_1 Delta ^ (-r) = p(u) u'_1, then after applying cycling u will contain (the LNF of) Delta ^ r (Delta ^ r u'_1 Delta ^ (-r)) u_2 ... u_k p(u).
+    inline void Sliding()
+    {
+      F p = PreferredPrefix();
+      FactorList.front() = FactorList.front() / p.DeltaConjugate(Delta);
+      RightProduct(p);
+    }
+
+    // `u.Product(v)` returns uv.
     Braid Product(const Braid &v) const
     {
       Braid w(this);
       w.Delta += v.Delta;
+      for (ConstFactorItr it = w.FactorList.begin();
+           it != w.FactorList.end();
+           ++it)
+      {
+        (*it).DeltaConjugate(v.Delta);
+      }
       for (ConstFactorItr it = v.FactorList.begin();
            it != v.FactorList.end();
            ++it)
       {
         w.RightMultiply(*it);
       }
-      w.RightDelta += v.RightDelta;
       return w;
     }
 
@@ -506,23 +701,69 @@ namespace CGarside
       return Product(v);
     }
 
-    void Normalize()
+    // `u.Normalize()` turns u into LCF.
+    inline void Normalize()
     {
       bubble_sort(FactorList.begin(), FactorList.end(), MakeLeftWeighted<F>);
       Clean();
     }
 
+    // `u.LCFToRCF()` turns u, assumed to be in LCF, into RCF (so that we may avoid having to clean up).
+    // The result (r, [u_1, ..., u_k]) represents u_1 ... u_k Delta ^ r.
+    inline void MakeRCFFromLCF()
+    {
+      for (FactorItr it = FactorList.begin();
+           it != FactorList.end();
+           ++it)
+      {
+        (*it).DeltaConjugate(-Delta);
+      };
+      bubble_sort(FactorList.begin(), FactorList.end(), MakeRightWeighted<F>);
+    }
+
+    // `u.LCFToRCF()` turns u, assumed to be in LCF, into RCF (so that we may avoid having to clean up).
+    // The result (r, [u_1, ..., u_k]) represents u_1 ... u_k Delta ^ r.
+    inline void MakeLCFFromRCF()
+    {
+      for (FactorItr it = FactorList.begin();
+           it != FactorList.end();
+           ++it)
+      {
+        (*it).DeltaConjugate(Delta);
+      };
+      bubble_sort(FactorList.begin(), FactorList.end(), MakeLeftWeighted<F>);
+    }
+
+    // `b.Remainder(f)` computes, if b is positive, the simple factor s such that bs is the left lcm of b and b and f.
+    F Remainder(F f) const
+    {
+      F fi(f);
+      if (Delta != 0)
+      {
+        fi.Identity()
+      }
+      else
+      {
+        ConstFactorItr it;
+        for (it = FactorList.begin(); it != FactorList.end(); it++)
+        {
+          fi = (*it).LeftJoin(fi) / *it;
+        }
+      }
+      return fi;
+    }
+
     // Randomizes the braid, setting it at a given length, using parameters extracted from Factor f.
     // The result isn't in LCF.
-    void Randomize(const F &f, sint16 canonical_length)
+    void Randomize(sint16 canonical_length)
     {
       FactorList.clear(); // Potential memory leak? To be checked.
       Delta = 0;
       for (sint16 i = 0; i < canonical_length; i++)
       {
-        F g = F(f);
-        g.Randomize();
-        FactorList.push_back(g);
+        F f = F(GetParameter());
+        f.Randomize();
+        FactorList.push_back(f);
       }
     }
 

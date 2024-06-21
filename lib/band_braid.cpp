@@ -6,16 +6,16 @@
 namespace CGarside
 {
 
-  sint16 BandBraidUnderlying::Index() const
+  sint16 BandBraidUnderlying::GetParameter() const
   {
-    return PresentationIndex;
+    return PresentationParameter;
   }
 
   BandBraidUnderlying &BandBraidUnderlying::Assign(const BandBraidUnderlying &a)
   {
     if (&a != this)
     {
-      for (sint16 i = 1; i <= Index(); ++i)
+      for (sint16 i = 1; i <= GetParameter(); ++i)
       {
         PermutationTable[i] = a.PermutationTable[i];
       }
@@ -29,26 +29,26 @@ namespace CGarside
   }
 
   BandBraidUnderlying::BandBraidUnderlying(sint16 n)
-      : PresentationIndex(n)
+      : PresentationParameter(n)
   {
     PermutationTable = new sint16[n + 1];
   }
 
   BandBraidUnderlying::BandBraidUnderlying(const BandBraidUnderlying &a)
-      : PresentationIndex(a.Index())
+      : PresentationParameter(a.GetParameter())
   {
-    PermutationTable = new sint16[a.Index() + 1];
+    PermutationTable = new sint16[a.GetParameter() + 1];
     sint16 i;
-    for (i = 1; i <= a.Index(); i++)
+    for (i = 1; i <= a.GetParameter(); i++)
     {
       PermutationTable[i] = a.PermutationTable[i];
     }
   }
 
-  void BandBraidUnderlying::Print(std::ostream &os)
+  void BandBraidUnderlying::Print(std::ostream &os) const
   {
     // Recall that a band braid is represented by decreasing cycles.
-    sint16 i, j, k, n = Index();
+    sint16 i, j, k, n = GetParameter();
     sint16 curr_cycle[n];
     bool seen[n + 1];
     for (i = 1; i <= n; i++)
@@ -80,7 +80,7 @@ namespace CGarside
 
   void BandBraidUnderlying::OfString(std::string &str)
   {
-    sint16 n = Index();
+    sint16 n = GetParameter();
     sint16 i, j, k;
     size_t pos;
     if (str[0] != '(')
@@ -114,9 +114,9 @@ namespace CGarside
 
   void BandBraidUnderlying::AssignDCDT(sint16 *x) const
   {
-    for (sint16 i = 1; i <= Index(); ++i)
+    for (sint16 i = 1; i <= GetParameter(); ++i)
       x[i] = 0;
-    for (sint16 i = 1; i <= Index(); ++i)
+    for (sint16 i = 1; i <= GetParameter(); ++i)
     {
       if (x[i] == 0)
         x[i] = i;
@@ -129,9 +129,9 @@ namespace CGarside
   {
     static sint16 z[MaxBraidIndex];
 
-    for (sint16 i = 1; i <= Index(); ++i)
+    for (sint16 i = 1; i <= GetParameter(); ++i)
       z[i] = 0;
-    for (sint16 i = Index(); i >= 1; --i)
+    for (sint16 i = GetParameter(); i >= 1; --i)
     {
       PermutationTable[i] = (z[x[i]] == 0) ? x[i] : z[x[i]];
       z[x[i]] = i;
@@ -147,12 +147,12 @@ namespace CGarside
 
     static sint16 P[MaxBraidIndex][MaxBraidIndex];
 
-    for (sint16 i = Index(); i >= 1; i--)
+    for (sint16 i = GetParameter(); i >= 1; i--)
     {
       P[x[i]][y[i]] = i;
     }
 
-    for (sint16 i = 1; i <= Index(); i++)
+    for (sint16 i = 1; i <= GetParameter(); i++)
     {
       z[i] = P[x[i]][y[i]];
     }
@@ -171,7 +171,7 @@ namespace CGarside
 
   void BandBraidUnderlying::Identity()
   {
-    sint16 i, n = Index();
+    sint16 i, n = GetParameter();
     for (i = 1; i <= n; i++)
     {
       PermutationTable[i] = i;
@@ -180,7 +180,7 @@ namespace CGarside
 
   void BandBraidUnderlying::Delta()
   {
-    sint16 i, n = Index();
+    sint16 i, n = GetParameter();
     for (i = 1; i < n; i++)
     {
       PermutationTable[i] = i + 1;
@@ -191,11 +191,11 @@ namespace CGarside
   bool BandBraidUnderlying::Compare(const BandBraidUnderlying &b) const
   {
     sint16 i;
-    if (Index() != b.Index())
+    if (GetParameter() != b.GetParameter())
     {
       throw NonMatchingIndexes();
     }
-    for (i = 1; i <= Index(); i++)
+    for (i = 1; i <= GetParameter(); i++)
     {
       if (PermutationTable[i] != b.PermutationTable[i])
       {
@@ -207,9 +207,9 @@ namespace CGarside
 
   BandBraidUnderlying BandBraidUnderlying::Inverse() const
   {
-    BandBraidUnderlying f = BandBraidUnderlying(Index());
+    BandBraidUnderlying f = BandBraidUnderlying(GetParameter());
     sint16 i;
-    for (i = 1; i <= Index(); i++)
+    for (i = 1; i <= GetParameter(); i++)
     {
       f.PermutationTable[PermutationTable[i]] = i;
     }
@@ -218,13 +218,13 @@ namespace CGarside
 
   BandBraidUnderlying BandBraidUnderlying::Product(const BandBraidUnderlying &b) const
   {
-    BandBraidUnderlying f = BandBraidUnderlying(Index());
-    if (Index() != b.Index())
+    BandBraidUnderlying f = BandBraidUnderlying(GetParameter());
+    if (GetParameter() != b.GetParameter())
     {
       throw NonMatchingIndexes();
     }
     sint16 i;
-    for (i = 1; i <= Index(); i++)
+    for (i = 1; i <= GetParameter(); i++)
     {
       f.PermutationTable[i] = b.PermutationTable[PermutationTable[i]];
     }
@@ -244,7 +244,7 @@ namespace CGarside
   BandBraidUnderlying BandBraidUnderlying::DeltaConjugate(sint16 k) const
   {
     BandBraidUnderlying under = BandBraidUnderlying(*this);
-    sint16 i, n = Index();
+    sint16 i, n = GetParameter();
 
     if (k < 0)
     {
@@ -259,7 +259,7 @@ namespace CGarside
   }
 
   void BandBraidUnderlying::Randomize() {
-    CBraid::BandPresentation pres = CBraid::BandPresentation(Index());
+    CBraid::BandPresentation pres = CBraid::BandPresentation(GetParameter());
     pres.Randomize(PermutationTable);
   }
 

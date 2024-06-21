@@ -43,16 +43,16 @@ namespace CGarside
       r[i] = w[i];
   }
 
-  sint16 ArtinBraidUnderlying::Index() const
+  sint16 ArtinBraidUnderlying::GetParameter() const
   {
-    return PresentationIndex;
+    return PresentationParameter;
   };
 
   ArtinBraidUnderlying &ArtinBraidUnderlying::Assign(const ArtinBraidUnderlying &a)
   {
     if (&a != this)
     {
-      for (sint16 i = 1; i <= Index(); ++i)
+      for (sint16 i = 1; i <= GetParameter(); ++i)
       {
         PermutationTable[i] = a.PermutationTable[i];
       }
@@ -66,17 +66,17 @@ namespace CGarside
   }
 
   ArtinBraidUnderlying::ArtinBraidUnderlying(sint16 n)
-      : PresentationIndex(n)
+      : PresentationParameter(n)
   {
     PermutationTable = new sint16[n + 1];
   }
 
   ArtinBraidUnderlying::ArtinBraidUnderlying(const ArtinBraidUnderlying &a)
-      : PresentationIndex(a.Index())
+      : PresentationParameter(a.GetParameter())
   {
-    PermutationTable = new sint16[a.Index() + 1];
+    PermutationTable = new sint16[a.GetParameter() + 1];
     sint16 i;
-    for (i = 1; i <= a.Index(); i++)
+    for (i = 1; i <= a.GetParameter(); i++)
     {
       PermutationTable[i] = a.PermutationTable[i];
     }
@@ -84,7 +84,7 @@ namespace CGarside
 
   void ArtinBraidUnderlying::OfString(const std::string &str)
   {
-    sint16 n = Index();
+    sint16 n = GetParameter();
     sint16 i;
     sint16 j;
     try
@@ -117,25 +117,27 @@ namespace CGarside
     }
   };
 
-  void ArtinBraidUnderlying::Print(std::ostream &os)
+  void ArtinBraidUnderlying::Print(std::ostream &os) const
   {
-    sint16 i, j, k, n = Index();
+    sint16 i, j, k, n = GetParameter();
+
+    ArtinBraidUnderlying c = ArtinBraidUnderlying(*this); 
 
     for (i = 2; i <= n; i++)
     {
-      for (j = i; j > 1 && PermutationTable[j] < PermutationTable[j - 1]; j--)
+      for (j = i; j > 1 && c.PermutationTable[j] < c.PermutationTable[j - 1]; j--)
       {
         os << j - 1 << " ";
-        k = PermutationTable[j];
-        PermutationTable[j] = PermutationTable[j - 1];
-        PermutationTable[j - 1] = k;
+        k = c.PermutationTable[j];
+        c.PermutationTable[j] = c.PermutationTable[j - 1];
+        c.PermutationTable[j - 1] = k;
       }
     }
   };
 
   void ArtinBraidUnderlying::Identity()
   {
-    sint16 i, n = Index();
+    sint16 i, n = GetParameter();
     for (i = 1; i <= n; i++)
     {
       PermutationTable[i] = i;
@@ -144,7 +146,7 @@ namespace CGarside
 
   void ArtinBraidUnderlying::Delta()
   {
-    sint16 i, n = Index();
+    sint16 i, n = GetParameter();
     for (i = 1; i <= n; i++)
     {
       PermutationTable[i] = n + 1 - i;
@@ -155,17 +157,17 @@ namespace CGarside
   {
     static sint16 s[MaxBraidIndex];
 
-    if (Index() != b.Index())
+    if (GetParameter() != b.GetParameter())
     {
       throw NonMatchingIndexes();
     }
 
-    ArtinBraidUnderlying f = ArtinBraidUnderlying(Index());
+    ArtinBraidUnderlying f = ArtinBraidUnderlying(GetParameter());
 
-    for (sint16 i = 1; i <= Index(); ++i)
+    for (sint16 i = 1; i <= GetParameter(); ++i)
       s[i] = i;
-    MeetSub(PermutationTable, b.PermutationTable, s, 1, Index());
-    for (sint16 i = 1; i <= Index(); ++i)
+    MeetSub(PermutationTable, b.PermutationTable, s, 1, GetParameter());
+    for (sint16 i = 1; i <= GetParameter(); ++i)
       f.PermutationTable[s[i]] = i;
 
     return f;
@@ -175,21 +177,21 @@ namespace CGarside
   {
     static sint16 u[MaxBraidIndex], v[MaxBraidIndex];
 
-    if (Index() != b.Index())
+    if (GetParameter() != b.GetParameter())
     {
       throw NonMatchingIndexes();
     }
 
-    ArtinBraidUnderlying f = ArtinBraidUnderlying(Index());
+    ArtinBraidUnderlying f = ArtinBraidUnderlying(GetParameter());
 
-    for (sint16 i = 1; i <= Index(); ++i)
+    for (sint16 i = 1; i <= GetParameter(); ++i)
     {
       u[PermutationTable[i]] = i;
       v[b.PermutationTable[i]] = i;
     }
-    for (sint16 i = 1; i <= Index(); ++i)
+    for (sint16 i = 1; i <= GetParameter(); ++i)
       f.PermutationTable[i] = i;
-    MeetSub(u, v, f.PermutationTable, 1, Index());
+    MeetSub(u, v, f.PermutationTable, 1, GetParameter());
 
     return f;
   };
@@ -197,11 +199,11 @@ namespace CGarside
   bool ArtinBraidUnderlying::Compare(const ArtinBraidUnderlying &b) const
   {
     sint16 i;
-    if (Index() != b.Index())
+    if (GetParameter() != b.GetParameter())
     {
       throw NonMatchingIndexes();
     }
-    for (i = 1; i <= Index(); i++)
+    for (i = 1; i <= GetParameter(); i++)
     {
       if (PermutationTable[i] != b.PermutationTable[i])
       {
@@ -213,9 +215,9 @@ namespace CGarside
 
   ArtinBraidUnderlying ArtinBraidUnderlying::Inverse() const
   {
-    ArtinBraidUnderlying f = ArtinBraidUnderlying(Index());
+    ArtinBraidUnderlying f = ArtinBraidUnderlying(GetParameter());
     sint16 i;
-    for (i = 1; i <= Index(); i++)
+    for (i = 1; i <= GetParameter(); i++)
     {
       f.PermutationTable[PermutationTable[i]] = i;
     }
@@ -224,13 +226,13 @@ namespace CGarside
 
   ArtinBraidUnderlying ArtinBraidUnderlying::Product(const ArtinBraidUnderlying &b) const
   {
-    ArtinBraidUnderlying f = ArtinBraidUnderlying(Index());
-    if (Index() != b.Index())
+    ArtinBraidUnderlying f = ArtinBraidUnderlying(GetParameter());
+    if (GetParameter() != b.GetParameter())
     {
       throw NonMatchingIndexes();
     }
     sint16 i;
-    for (i = 1; i <= Index(); i++)
+    for (i = 1; i <= GetParameter(); i++)
     {
       f.PermutationTable[i] = b.PermutationTable[PermutationTable[i]];
     }
@@ -249,11 +251,11 @@ namespace CGarside
 
   void ArtinBraidUnderlying::Randomize()
   {
-    for (sint16 i = 1; i <= Index(); ++i)
+    for (sint16 i = 1; i <= GetParameter(); ++i)
       PermutationTable[i] = i;
-    for (sint16 i = 1; i < Index(); ++i)
+    for (sint16 i = 1; i < GetParameter(); ++i)
     {
-      sint16 j = i + sint16(std::rand() / (RAND_MAX + 1.0) * (Index() - i + 1));
+      sint16 j = i + sint16(std::rand() / (RAND_MAX + 1.0) * (GetParameter() - i + 1));
       sint16 z = PermutationTable[i];
       PermutationTable[i] = PermutationTable[j];
       PermutationTable[j] = z;
@@ -262,7 +264,7 @@ namespace CGarside
 
   std::list<ArtinBraidUnderlying> ArtinBraidUnderlying::Atoms() const
   {
-    sint16 i, n = Index();
+    sint16 i, n = GetParameter();
     std::list<ArtinBraidUnderlying> atoms;
     for (i = 1; i <= n - 1; i++)
     {
@@ -275,7 +277,7 @@ namespace CGarside
 
   ArtinBraidUnderlying ArtinBraidUnderlying::DeltaConjugate(sint16 k) const
   {
-    sint16 i, n = Index();
+    sint16 i, n = GetParameter();
     if (k % 2 == 0)
     {
       return ArtinBraidUnderlying(*this);
