@@ -1,5 +1,4 @@
 #include "cgarside.h"
-#include <unordered_set>
 
 namespace SSS
 {

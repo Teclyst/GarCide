@@ -1,21 +1,16 @@
 #include "cgarside.h"
-#include <vector>
-#include <unordered_set>
-#include <unordered_map>
 
 namespace USS
 {
   using namespace CGarside;
 
   template <class F>
-  std::vector<Braid<F>> Trajectory(const Braid<F> &b)
+  std::vector<Braid<F>> Trajectory(Braid<F> b)
   {
     std::vector<Braid<F>> t;
     std::unordered_set<Braid<F>> t_set;
 
-    Braid<F> b2 = Braid(b);
-
-    while (t_set.find(b2) == t_set.end())
+    while (t_set.find(b) == t_set.end())
     {
       t.push_back(b);
       t_set.insert(b);
@@ -283,23 +278,19 @@ namespace USS
     F f = F(b.GetParameter());
 
     Braid<F> b2 = SendToUSS(b);
-    std::list<Braid<F>> t = Trajectory(b2);
 
-    Braid<F> t_last = Braid(t.back());
-    t_last.Cycling();
-    uss.Insert(Trajectory(t_last));
-    queue.push_back(Braid(t_last));
+    uss.Insert(Trajectory(b2));
+    queue.push_back(b2);
 
     F delta = F(b.GetParameter());
     delta.Delta();
 
-    t_last.Conjugate(delta);
-    b2 = t_last;
+    b2.Conjugate(delta);
 
     if (!uss.Mem(b2))
     {
       uss.Insert(Trajectory(b2));
-      queue.push_back(Braid(b2));
+      queue.push_back(b2);
     }
 
     while (!queue.empty())
@@ -308,18 +299,18 @@ namespace USS
 
       for (typename std::unordered_set<F>::iterator itf = Min.begin(); itf != Min.end(); itf++)
       {
-        b2 = Braid(queue.front());
+        b2 = queue.front();
         b2.Conjugate(*itf);
 
         if (!uss.Mem(b2))
         {
           uss.Insert(Trajectory(b2));
-          queue.push_back(Braid(b2));
+          queue.push_back(b2);
           b2.conjugate(delta);
           if (!uss.Mem(b2))
           {
             uss.Insert(Trajectory(b2));
-            queue.push_back(Braid(b2));
+            queue.push_back(b2);
           }
         }
       }
@@ -340,15 +331,9 @@ namespace USS
     prev.clear();
 
     Braid<F> b2 = SendToUSS(b);
-    std::vector<Braid<F>> t = Trajectory(b2);
-
-    Braid<F> t_last = Braid(t.back());
-    t_last.Cycling();
-    uss.Insert(Trajectory(t_last));
-    queue.push_back(t_last);
-
-    F delta = F(b.GetParameter());
-    delta.Delta();
+    
+    uss.Insert(Trajectory(b2));
+    queue.push_back(b2);
 
     while (!queue.empty())
     {
@@ -356,7 +341,7 @@ namespace USS
 
       for (typename std::unordered_set<F>::iterator itf = Min.begin(); itf != Min.end(); itf++)
       {
-        b2 = Braid(queue.front());
+        b2 = queue.front();
         b2.Conjugate(*itf);
 
         if (!uss.Mem(b2))

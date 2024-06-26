@@ -2,6 +2,9 @@
 #define CGARSIDE
 
 #include <list>
+#include <vector>
+#include <unordered_set>
+#include <unordered_map>
 #include <string>
 #include <iostream>
 #include <stdexcept>
@@ -588,7 +591,7 @@ namespace CGarside
     }
 
     // `u.LeftProduct(f)` assigns fu to u.
-    void LeftProduct(F &f)
+    void LeftProduct(const F &f)
     {
       FactorList.push_front(f.DeltaConjugate(Delta));
       apply_binfun(FactorList.begin(), FactorList.end(), MakeLeftWeighted<F>);
@@ -596,7 +599,7 @@ namespace CGarside
     }
 
     // `u.RightProduct(f)` assigns uf to u.
-    void RightProduct(F &f)
+    void RightProduct(const F &f)
     {
       FactorList.push_back(f);
       reverse_apply_binfun(FactorList.begin(), FactorList.end(), MakeLeftWeighted<F>);
@@ -604,7 +607,7 @@ namespace CGarside
     }
 
     // `u.LeftProduct(v)` assigns v u to u.
-    void LeftProduct(Braid &v)
+    void LeftProduct(const Braid &v)
     {
       RevFactorItr it;
       for (it = v.FactorList.rbegin(); it != v.FactorList.rend(); it++)
@@ -616,7 +619,7 @@ namespace CGarside
 
     // `u.RightProduct(v)` assigns u v to u.
     // v's factors move directly to u - be careful.
-    void RightProduct(Braid &v)
+    void RightProduct(const Braid &v)
     {
       FactorItr it;
       for (it = FactorList.begin(); it != FactorList.end(); it++)
@@ -631,31 +634,31 @@ namespace CGarside
     }
 
     // `u.LeftDivide(v)` assigns v ^ (- 1) u to u.
-    inline void LeftDivide(Braid &v)
+    inline void LeftDivide(const Braid &v)
     {
       LeftProduct(!v);
     }
 
     // `u.RightDivide(v)` assigns u v ^ (- 1) to u.
-    inline void RightDivide(Braid &v)
+    inline void RightDivide(const Braid &v)
     {
       RightProduct(!v);
     }
 
     // `u.LeftDivide(f)` assigns f ^ (- 1) u to u.
-    inline void LeftDivide(F &f)
+    inline void LeftDivide(const F &f)
     {
       LeftProduct(!Braid(f));
     }
 
     // `u.RightDivide(v)` assigns u v ^ (- 1) to u.
-    inline void RightDivide(F &f)
+    inline void RightDivide(const F &f)
     {
       RightProduct(!Braid((f)));
     }
 
     // `u.LeftProduct(f)` assigns fu to u.
-    void LeftProductRCF(F &f)
+    void LeftProductRCF(const F &f)
     {
       FactorList.push_front(f);
       apply_binfun(FactorList.begin(), FactorList.end(), MakeRightWeighted<F>);
@@ -663,7 +666,7 @@ namespace CGarside
     }
 
     // `u.RightProduct(f)` assigns uf to u.
-    void RightProductRCF(F &f)
+    void RightProductRCF(const F &f)
     {
       FactorList.push_back(f.DeltaConjugate(-Delta));
       reverse_apply_binfun(FactorList.begin(), FactorList.end(), MakeRightWeighted<F>);
@@ -671,7 +674,7 @@ namespace CGarside
     }
 
     // `u.LeftProduct(v)` assigns v u to u.
-    void LeftProductRCF(Braid &v)
+    void LeftProductRCF(const Braid &v)
     {
       RevFactorItr it;
       for (it = FactorList.rbegin(); it != FactorList.rend(); it++)
@@ -686,8 +689,7 @@ namespace CGarside
     }
 
     // `u.RightProduct(v)` assigns u v to u.
-    // v's factors move directly to u - be careful.
-    void RightProductRCF(Braid &v)
+    void RightProductRCF(const Braid &v)
     {
       FactorItr it;
       Delta += v.Delta;
@@ -698,46 +700,197 @@ namespace CGarside
       Delta += v.Delta;
     }
 
+    Braid LeftMeet(const Braid &v) const
+    {
+      sint16 shift = 0;
+      Braid b = Braid(GetParameter());
+      F f1 = F(GetParameter()), f2 = F(GetParameter()), f = F(GetParameter());
+      f.Delta();
+
+      Braid b1 = *this, b2 = v;
+
+      shift -= b1.Delta;
+      b2.Delta -= b1.Delta;
+      b1.Delta = 0;
+
+      if (b2.Delta < 0)
+      {
+        shift -= b2.Delta;
+        b1.Delta -= b2.Delta;
+        b2.Delta = 0;
+      }
+
+      while (!f.IsIdentity())
+      {
+        if (b1.Delta > 0)
+        {
+          f1.Delta();
+        }
+        else if (b1.CanonicalLength() == 0)
+        {
+          f1.Identity();
+        }
+        else
+        {
+          f1 = b1.FactorList.front();
+        }
+
+        if (b2.Delta > 0)
+        {
+          f2.Delta();
+        }
+        else if (b2.CanonicalLength() == 0)
+        {
+          f2.Identity();
+        }
+        else
+        {
+          f2 = b1.FactorList.front();
+        }
+
+        f = f1 ^ f2;
+
+        b.RightProduct(f);
+        b1.LeftDivide(f);
+        b2.LeftDivide(f);
+      }
+
+      b.Delta -= shift;
+      return b;
+    }
+
+    inline Braid LeftMeet(const F &f)
+    {
+      return LeftMeet(Braid(f));
+    }
+
+    inline Braid operator^(const Braid &v)
+    {
+      return LeftMeet(v);
+    }
+
+    inline Braid operator^(const F &f)
+    {
+      return LeftMeet(f);
+    }
+
+    Braid LeftJoin(const Braid &v) const
+    {
+      sint16 shift = 0;
+      Braid b = Braid(GetParameter());
+      F f2 = F(GetParameter()), f = F(GetParameter());
+      f.Delta();
+
+      Braid b1 = *this, b2 = v;
+
+      shift -= b1.Delta;
+      b2.Delta -= b1.Delta;
+      b1.Delta = 0;
+
+      if (b2.Delta < 0)
+      {
+        shift -= b2.Delta;
+        b1.Delta -= b2.Delta;
+        b2.Delta = 0;
+      }
+
+      Braid b = b1;
+
+      while (!b2.IsIdentity())
+      {
+        if (b2.Delta > 0)
+        {
+          f2.Delta();
+        }
+        else if (b2.CanonicalLength() == 0)
+        {
+          f2.Identity();
+        }
+        else
+        {
+          f2 = b1.FactorList.front();
+        }
+
+        f = b1.Remainder(f2);
+
+        b.RightProduct(f);
+        b1.LeftDivide(f);
+        b2.LeftDivide(f);
+      }
+
+      b.Delta -= shift;
+      return b;
+    }
+
+    inline Braid LeftJoin(const F &f)
+    {
+      return LeftJoin(Braid(f));
+    }
+
+    inline Braid RightMeet(const Braid &v)
+    {
+      return !((!(*this)).LeftJoin(!v));
+    }
+
+    inline Braid RightMeet(const F &f)
+    {
+      return !((!(*this)).LeftJoin(!Braid(f)));
+    }
+
+    inline Braid RightJoin(const Braid &v)
+    {
+      return !((!(*this)).LeftMeet(!v));
+    }
+
+    inline Braid RightJoin(const F &f)
+    {
+      return !((!(*this)).LeftMeet(!Braid(f)));
+    }
+
     // `u.LeftDivide(v)` assigns v ^ (- 1) u to u.
-    inline void LeftDivideRCF(Braid &v)
+    inline void LeftDivideRCF(const Braid &v)
     {
       LeftProductRCF(v.InverseRCF());
     }
 
     // `u.RightDivide(v)` assigns u v ^ (- 1) to u.
-    inline void RightDivideRCF(Braid &v)
+    inline void RightDivideRCF(const Braid &v)
     {
       RightProductRCF(v.InverseRCF());
     }
 
     // `u.LeftDivide(f)` assigns f ^ (- 1) u to u.
-    inline void LeftDivideRCF(F &f)
+    inline void LeftDivideRCF(const F &f)
     {
       LeftProductRCF(Braid(f).InverseRCF());
     }
 
     // `u.RightDivide(v)` assigns u v ^ (- 1) to u.
-    inline void RightDivideRCF(F &f)
+    inline void RightDivideRCF(const F &f)
     {
       RightProductRCF(Braid((f)).InverseRCF());
     }
 
-    inline void Conjugate(F &f) {
+    inline void Conjugate(const F &f)
+    {
       LeftDivide(f);
       RightProduct(f);
     }
 
-    inline void Conjugate(Braid &v) {
+    inline void Conjugate(const Braid &v)
+    {
       LeftDivide(v);
       RightProduct(v);
     }
 
-    inline void ConjugateRCF(F &f) {
+    inline void ConjugateRCF(const F &f)
+    {
       LeftDivideRCF(f);
       RightProductRCF(f);
     }
 
-    inline void ConjugateRCF(Braid &v) {
+    inline void ConjugateRCF(const Braid &v)
+    {
       LeftDivideRCF(v);
       RightProductRCF(v);
     }
@@ -848,16 +1001,24 @@ namespace CGarside
 
     // `u.Power(k)` returns u raised to the power k.
     // Uses a fast exponentiation algorithm; the number of multiplications is logarithmic in k.
-    Braid Power(const sint16 k) const {
-      if (k == 0) {
+    Braid Power(const sint16 k) const
+    {
+      if (k == 0)
+      {
         return Braid(GetParameter());
-      } else if (k % 2 == 0) {
+      }
+      else if (k % 2 == 0)
+      {
         Braid root = Power(k / 2);
         return root * root;
-      } else if (k > 0) {
+      }
+      else if (k > 0)
+      {
         Braid root = Power(k / 2);
         return *this * root * root;
-      } else {
+      }
+      else
+      {
         Braid root = Power(k / 2);
         return !*this * root * root;
       }
@@ -904,7 +1065,7 @@ namespace CGarside
     }
 
     // `b.Remainder(f)` computes, if b is positive, the simple factor s such that bs is the left lcm of b and b and f.
-    F Remainder(F f) const
+    F Remainder(const F &f) const
     {
       F fi(f);
       if (Delta != 0)
