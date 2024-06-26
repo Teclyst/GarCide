@@ -92,10 +92,15 @@ namespace CGarside
 
     ~Factor() {}
 
-    ParameterType GetParameter()
+    ParameterType GetParameter() const
     {
       Underlying.GetParameter();
     }
+
+    sint16 LatticeHeight() const
+    {
+      Underlying.LatticeHeight;
+    };
 
     // a.OfString sets a to the factor specified by str.
     void OfString(std::string &str)
@@ -466,11 +471,33 @@ namespace CGarside
       FactorList.clear();
     }
 
-    // `u.CanonicalLength` returns u's canonical length.
+    inline Braid &Assign(const Braid &b)
+    {
+      Parameter = b.Parameter;
+      Delta = b.Delta;
+      FactorList = b.FactorList;
+      return *this;
+    }
 
+    inline Braid &operator=(const Braid &b)
+    {
+      return Assign(b);
+    }
+
+    // `u.CanonicalLength` returns u's canonical length.
     inline sint16 CanonicalLength() const
     {
       return FactorList.size();
+    }
+
+    inline sint16 Inf() const
+    {
+      return Delta;
+    }
+
+    inline sint16 Sup() const
+    {
+      return Inf() + CanonicalLength();
     }
 
     // `u.Compare(v)` returns whether u and v have the same internal representation.
@@ -509,15 +536,33 @@ namespace CGarside
            it != FactorList.end();
            it++)
       {
-        // Rewrite a_1...a_k (f)^(- 1) Delta^r as
-        // a_1...a_k Delta ^ (r - 1) (Delta^(- r) d_L(f) Delta^r).
-        b.FactorList.push_front((*it).RightComplement().DeltaConjugate(b.Delta));
+        // Rewrite a_1 ... a_k (f)^(- 1) Delta^r as
+        // a_1 ... a_k Delta ^ (r - 1) (Delta^(- r) d_L(f) Delta^r).
+        b.FactorList.push_front((*it).LeftComplement().DeltaConjugate(b.Delta));
         --b.Delta;
       }
       return b;
     }
 
-    // `!u` returns the inverse of u, not necessarily in a canonical form.
+    // `u.Inverse()` returns the inverse of u.
+    //  See the ElRifai and Morton 1994 article for correction.
+    Braid InverseRCF() const
+    {
+      Braid b(CanonicalLength(), GetParameter());
+      b.Delta = -Delta;
+      for (ConstRevFactorItr revit = FactorList.rbegin();
+           revit != FactorList.rend();
+           revit++)
+      {
+        // Rewrite Delta^r (f)^(- 1) a_1 ... a_k as
+        // (Delta^r d_R(f) Delta^(- r)) Delta ^ (r - 1) a_1 ... a_k.
+        b.FactorList.push_front((*revit).RightComplement().DeltaConjugate(-b.Delta));
+        --b.Delta;
+      }
+      return b;
+    }
+
+    // `!u` returns the inverse of u.
     // Syntactic sugar for `u.Inverse()`.
     Braid operator!() const
     {
@@ -559,9 +604,11 @@ namespace CGarside
     }
 
     // `u.LeftProduct(v)` assigns v u to u.
-    void LeftProduct(Braid &v) {
+    void LeftProduct(Braid &v)
+    {
       RevFactorItr it;
-      for (it = v.FactorList.rbegin(); it != v.FactorList.rend(); it++) {
+      for (it = v.FactorList.rbegin(); it != v.FactorList.rend(); it++)
+      {
         LeftProduct((*it).DeltaConjugate(Delta));
       }
       Delta += v.Delta;
@@ -569,25 +616,130 @@ namespace CGarside
 
     // `u.RightProduct(v)` assigns u v to u.
     // v's factors move directly to u - be careful.
-    void RightProduct(Braid &v) {
+    void RightProduct(Braid &v)
+    {
       FactorItr it;
-      for (it = FactorList.begin(); it != FactorList.end(); it++) {
+      for (it = FactorList.begin(); it != FactorList.end(); it++)
+      {
         (*it) = (*it).DeltaConjugate(v.Delta);
       }
       Delta += v.Delta;
-      for (it = v.FactorList.begin(); it != v.FactorList.end(); it++) {
+      for (it = v.FactorList.begin(); it != v.FactorList.end(); it++)
+      {
         RightProduct((*it));
       }
     }
 
     // `u.LeftDivide(v)` assigns v ^ (- 1) u to u.
-    inline void LeftDivide(Braid &v) {
+    inline void LeftDivide(Braid &v)
+    {
       LeftProduct(!v);
     }
 
     // `u.RightDivide(v)` assigns u v ^ (- 1) to u.
-    inline void RightDivide(Braid &v) {
+    inline void RightDivide(Braid &v)
+    {
       RightProduct(!v);
+    }
+
+    // `u.LeftDivide(f)` assigns f ^ (- 1) u to u.
+    inline void LeftDivide(F &f)
+    {
+      LeftProduct(!Braid(f));
+    }
+
+    // `u.RightDivide(v)` assigns u v ^ (- 1) to u.
+    inline void RightDivide(F &f)
+    {
+      RightProduct(!Braid((f)));
+    }
+
+    // `u.LeftProduct(f)` assigns fu to u.
+    void LeftProductRCF(F &f)
+    {
+      FactorList.push_front(f);
+      apply_binfun(FactorList.begin(), FactorList.end(), MakeRightWeighted<F>);
+      Clean();
+    }
+
+    // `u.RightProduct(f)` assigns uf to u.
+    void RightProductRCF(F &f)
+    {
+      FactorList.push_back(f.DeltaConjugate(-Delta));
+      reverse_apply_binfun(FactorList.begin(), FactorList.end(), MakeRightWeighted<F>);
+      Clean();
+    }
+
+    // `u.LeftProduct(v)` assigns v u to u.
+    void LeftProductRCF(Braid &v)
+    {
+      RevFactorItr it;
+      for (it = FactorList.rbegin(); it != FactorList.rend(); it++)
+      {
+        (*it) = (*it).DeltaConjugate(-v.Delta);
+      }
+      Delta += v.Delta;
+      for (it = v.FactorList.rbegin(); it != v.FactorList.rend(); it++)
+      {
+        LeftProduct(*it);
+      }
+    }
+
+    // `u.RightProduct(v)` assigns u v to u.
+    // v's factors move directly to u - be careful.
+    void RightProductRCF(Braid &v)
+    {
+      FactorItr it;
+      Delta += v.Delta;
+      for (it = v.FactorList.begin(); it != v.FactorList.end(); it++)
+      {
+        RightProduct((*it).DeltaConjugate(-Delta));
+      }
+      Delta += v.Delta;
+    }
+
+    // `u.LeftDivide(v)` assigns v ^ (- 1) u to u.
+    inline void LeftDivideRCF(Braid &v)
+    {
+      LeftProductRCF(v.InverseRCF());
+    }
+
+    // `u.RightDivide(v)` assigns u v ^ (- 1) to u.
+    inline void RightDivideRCF(Braid &v)
+    {
+      RightProductRCF(v.InverseRCF());
+    }
+
+    // `u.LeftDivide(f)` assigns f ^ (- 1) u to u.
+    inline void LeftDivideRCF(F &f)
+    {
+      LeftProductRCF(Braid(f).InverseRCF());
+    }
+
+    // `u.RightDivide(v)` assigns u v ^ (- 1) to u.
+    inline void RightDivideRCF(F &f)
+    {
+      RightProductRCF(Braid((f)).InverseRCF());
+    }
+
+    inline void Conjugate(F &f) {
+      LeftDivide(f);
+      RightProduct(f);
+    }
+
+    inline void Conjugate(Braid &v) {
+      LeftDivide(v);
+      RightProduct(v);
+    }
+
+    inline void ConjugateRCF(F &f) {
+      LeftDivideRCF(f);
+      RightProductRCF(f);
+    }
+
+    inline void ConjugateRCF(Braid &v) {
+      LeftDivideRCF(v);
+      RightProductRCF(v);
     }
 
     // `u.Initial()` returns the initial factor of u, that is, if u = Delta ^ r u_1 ... u_k, Delta ^ r u_1 Delta ^ (- r).
@@ -694,7 +846,24 @@ namespace CGarside
       return w;
     }
 
-    // `u * v` returns uv, not necessarily in a canonical form.
+    // `u.Power(k)` returns u raised to the power k.
+    // Uses a fast exponentiation algorithm; the number of multiplications is logarithmic in k.
+    Braid Power(const sint16 k) const {
+      if (k == 0) {
+        return Braid(GetParameter());
+      } else if (k % 2 == 0) {
+        Braid root = Power(k / 2);
+        return root * root;
+      } else if (k > 0) {
+        Braid root = Power(k / 2);
+        return *this * root * root;
+      } else {
+        Braid root = Power(k / 2);
+        return !*this * root * root;
+      }
+    }
+
+    // `u * v` returns uv.
     // Syntactic sugar for `u.Product(v)`.
     Braid operator*(const Braid &v) const
     {
@@ -740,7 +909,7 @@ namespace CGarside
       F fi(f);
       if (Delta != 0)
       {
-        fi.Identity()
+        fi.Identity();
       }
       else
       {

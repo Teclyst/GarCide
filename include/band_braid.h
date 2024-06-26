@@ -16,6 +16,8 @@ namespace CGarside
 
     ParameterType GetParameter() const;
 
+    sint16 LatticeHeight() const;
+
     // Constructor
     BandBraidUnderlying(sint16 n);
 

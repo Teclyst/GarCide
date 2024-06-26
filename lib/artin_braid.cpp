@@ -135,6 +135,11 @@ namespace CGarside
     }
   };
 
+  sint16 ArtinBraidUnderlying::LatticeHeight() const {
+    sint16 n = GetParameter();
+    return n * (n - 1) / 2;
+  }
+
   void ArtinBraidUnderlying::Identity()
   {
     sint16 i, n = GetParameter();

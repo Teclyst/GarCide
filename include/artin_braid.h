@@ -32,6 +32,8 @@ namespace CGarside
 
     void OfString(const std::string &str);
 
+    sint16 LatticeHeight() const;
+
     ArtinBraidUnderlying &Assign(const ArtinBraidUnderlying &a);
 
     ArtinBraidUnderlying &operator=(const ArtinBraidUnderlying &a);

@@ -10,8 +10,8 @@
 #include "optarg.h"
 #include "timecounter.h"
 
-int Index = 4;
-int CLength = 8;
+int Index = 50;
+int CLength = 200;
 int Count = 1;
 int RandomSeed;
 
@@ -22,24 +22,13 @@ void PrintArray(int* array, int len) {
 }
 
 int main()
-{
+{ 
 
   char ballot[Index + 1];
   int revarray[Index + 1];
   int array[Index + 1];
 
   CBraid::BandPresentation pres(Index);
-
-  cln::cl_I k;
-
-  for (k = 1; k <= CBraid::GetCatalanNumber(Index); k++) {
-    CBraid::BallotSequence(Index, k, ballot);
-    pres.BStoPT(ballot, revarray);
-    for (int i = 1; i <= Index; ++i)
-      array[revarray[i]] = i;
-    PrintArray(array, Index);
-    std::cout << std::endl;
-  }
 
   TimeCounter t;
 
@@ -50,6 +39,18 @@ int main()
   CGarside::ArtinBraidFactor s1 = CGarside::ArtinBraidFactor(CGarside::ArtinBraidUnderlying(Index));
   CGarside::ArtinBraidFactor s2 = CGarside::ArtinBraidFactor(CGarside::ArtinBraidUnderlying(Index));
   CGarside::ArtinBraidFactor s3 = CGarside::ArtinBraidFactor(CGarside::ArtinBraidUnderlying(Index));
+
+  CGarside::ArtinBraidFactor foo = s1, bar = s1;
+
+  std::string str1 = std::string("1");
+
+  foo.OfString(str1);
+
+  foo.Print(std::cout);
+  bar.Print(std::cout);
+  std::cout << std::endl;
+
+  while (true) {};
 
   CGarside::BandBraidFactor a13 = CGarside::BandBraidFactor(CGarside::BandBraidUnderlying(Index));
   CGarside::BandBraidFactor a12 = CGarside::BandBraidFactor(CGarside::BandBraidUnderlying(Index));

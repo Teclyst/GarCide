@@ -11,6 +11,10 @@ namespace CGarside
     return PresentationParameter;
   }
 
+  sint16 BandBraidUnderlying::LatticeHeight() const {
+    return GetParameter();
+  }
+
   BandBraidUnderlying &BandBraidUnderlying::Assign(const BandBraidUnderlying &a)
   {
     if (&a != this)
