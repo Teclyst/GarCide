@@ -21,8 +21,26 @@ void PrintArray(int* array, int len) {
   } 
 }
 
+void DebugBallotSequence(char* array, int len) {
+  for(int i = 1; i <= len; i++) {
+    std::cout << ((array[i] == 1)? "(": ")");
+  }
+  std::cout << std::endl;
+}
+
+void TestBallotSequence(int n) {
+  char ballot[2 * n + 1];
+  cln::cl_I i;
+  for (i = 1; i <= CBraid::GetCatalanNumber(n); i++) {
+    CBraid::BallotSequence(n, i, ballot);
+    DebugBallotSequence(ballot, 2 * n);
+  }
+}
+
 int main()
 { 
+  TestBallotSequence(4);
+  while (true) {}
 
   char ballot[Index + 1];
   int revarray[Index + 1];

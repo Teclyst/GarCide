@@ -794,7 +794,7 @@ namespace CGarside
         b2.Delta = 0;
       }
 
-      Braid b = b1;
+      b = b1;
 
       while (!b2.IsIdentity())
       {
