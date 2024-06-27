@@ -95,7 +95,7 @@ namespace CGarside
     void Randomize();
 
     // List of atoms.
-    std::list<ArtinBraidUnderlying> Atoms() const;
+    std::vector<ArtinBraidUnderlying> Atoms() const;
 
     // Conjugate by Delta^k.
     // Used to speed up calculations compared to the default implementation.

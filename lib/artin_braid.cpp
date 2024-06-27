@@ -267,15 +267,15 @@ namespace CGarside
     }
   };
 
-  std::list<ArtinBraidUnderlying> ArtinBraidUnderlying::Atoms() const
+  std::vector<ArtinBraidUnderlying> ArtinBraidUnderlying::Atoms() const
   {
     sint16 i, n = GetParameter();
-    std::list<ArtinBraidUnderlying> atoms;
+    std::vector<ArtinBraidUnderlying> atoms;
     for (i = 1; i <= n - 1; i++)
     {
       ArtinBraidUnderlying atom = ArtinBraidUnderlying(n);
       atom.OfString(std::to_string(i));
-      atoms.push_front(atom);
+      atoms.push_back(atom);
     }
     return atoms;
   };

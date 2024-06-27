@@ -317,14 +317,14 @@ namespace CGarside
 
     // a.Atoms() returns the list of the atoms.
     // Specific information about the group (e.g. the number of strands for braids) is recovered by the corresponding U method.
-    std::list<Factor> Atoms() const
+    std::vector<Factor> Atoms() const
     {
-      std::list<U> atoms = Underlying.Atoms();
-      typename std::list<U>::iterator atoms_it;
-      std::list<Factor> factor_atoms;
+      std::vector<U> atoms = Underlying.Atoms();
+      typename std::vector<U>::iterator atoms_it;
+      std::vector<Factor> factor_atoms;
       for (auto const &atoms_it : atoms)
       {
-        Factor f = Factor(*this);
+        Factor f = Factor(GetParameter());
         f.Set(atoms_it);
         factor_atoms.push_back(f);
       }

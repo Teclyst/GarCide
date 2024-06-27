@@ -11,7 +11,8 @@ namespace CGarside
     return PresentationParameter;
   }
 
-  sint16 BandBraidUnderlying::LatticeHeight() const {
+  sint16 BandBraidUnderlying::LatticeHeight() const
+  {
     return GetParameter();
   }
 
@@ -262,9 +263,27 @@ namespace CGarside
     return under;
   }
 
-  void BandBraidUnderlying::Randomize() {
+  void BandBraidUnderlying::Randomize()
+  {
     CBraid::BandPresentation pres = CBraid::BandPresentation(GetParameter());
     pres.Randomize(PermutationTable);
+  }
+
+  std::vector<BandBraidUnderlying> BandBraidUnderlying::Atoms() const
+  {
+    sint16 n = GetParameter();
+    std::vector<BandBraidUnderlying> atoms;
+    for (sint16 i = 1; i <= n; i++)
+    {
+      for (sint16 j = 1; j < i; j++)
+      {
+        BandBraidUnderlying atom = BandBraidUnderlying(n);
+        atom.Identity();
+        atom.PermutationTable[i] = j;
+        atom.PermutationTable[j] = i;
+        atoms.push_back(atom);
+      }
+    }
   }
 
 }
