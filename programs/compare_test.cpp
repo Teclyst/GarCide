@@ -3,15 +3,17 @@
 #include <ctime>
 #include <cmath>
 
-#include "cbraid.h"
 #include "artin_braid.h"
 #include "band_braid.h"
+#include "garsidesc.h"
+#include "cbraid.h"
+#include "braiding.h"
 
 #include "optarg.h"
 #include "timecounter.h"
 
-int Index = 50;
-int CLength = 200;
+int Index = 8;
+int CLength = 2;
 int Count = 1;
 int RandomSeed;
 
@@ -22,8 +24,10 @@ void PrintArray(int* array, int len) {
 }
 
 void DebugBallotSequence(char* array, int len) {
+  int s = 0;
   for(int i = 1; i <= len; i++) {
-    std::cout << ((array[i] == 1)? "(": ")");
+    s += int(array[i]);
+    std::cout << int(array[i]) << ", " << s << "; ";
   }
   std::cout << std::endl;
 }
@@ -37,11 +41,15 @@ void TestBallotSequence(int n) {
   }
 }
 
+void TestRandomBallotSequence(int n) {
+  char ballot[2 * n + 1];
+  cln::cl_I i = cln::random_I(cln::default_random_state, CBraid::GetCatalanNumber(Index)) + 1;
+  CBraid::BallotSequence(n, i, ballot);
+  DebugBallotSequence(ballot, 2 * n);
+}
+
 int main()
 { 
-  TestBallotSequence(4);
-  while (true) {}
-
   char ballot[Index + 1];
   int revarray[Index + 1];
   int array[Index + 1];
@@ -58,17 +66,28 @@ int main()
   CGarside::ArtinBraidFactor s2 = CGarside::ArtinBraidFactor(CGarside::ArtinBraidUnderlying(Index));
   CGarside::ArtinBraidFactor s3 = CGarside::ArtinBraidFactor(CGarside::ArtinBraidUnderlying(Index));
 
+  CBraid::ArtinFactor cs1 = CBraid::ArtinFactor(Index, 0);
+  CBraid::ArtinFactor cs2 = CBraid::ArtinFactor(Index, 0);
+  CBraid::ArtinFactor cs3 = CBraid::ArtinFactor(Index, 0);
+
   CGarside::ArtinBraidFactor foo = s1, bar = s1;
 
   std::string str1 = std::string("1");
+  s1.OfString(str1);
+  std::string str2 = std::string("2");
+  s2.OfString(str2);
+  std::string str3 = std::string("3");
+  s3.OfString(str3);
 
-  foo.OfString(str1);
+  str1 = std::string("1");
+  str2 = std::string("2");
+  str3 = std::string("3");
+  cs1.OfString(str1);
+  cs2.OfString(str2);
+  cs3.OfString(str3);
 
-  foo.Print(std::cout);
-  bar.Print(std::cout);
-  std::cout << std::endl;
-
-  while (true) {};
+  foo.Randomize();
+  bar.Randomize();
 
   CGarside::BandBraidFactor a13 = CGarside::BandBraidFactor(CGarside::BandBraidUnderlying(Index));
   CGarside::BandBraidFactor a12 = CGarside::BandBraidFactor(CGarside::BandBraidUnderlying(Index));
@@ -77,6 +96,21 @@ int main()
   CGarside::BandBraidUnderlying ua13 = CGarside::BandBraidUnderlying(Index);
 
   CGarside::ArtinBraid cag(Index);
+
+  CGarside::ArtinBraid scb1(s1);
+  CGarside::ArtinBraid scb2(s2);
+  CGarside::ArtinBraid scb3(s3);
+
+  CBraid::ArtinBraid cscb1(cs1);
+  CBraid::ArtinBraid cscb2(cs2);
+  CBraid::ArtinBraid cscb3(cs3);
+  CGarside::ArtinBraid scb = scb1 * scb2 * scb3 * scb1 * scb1 * scb2;
+  scb.Normalize();
+  CBraid::ArtinBraid cscb = cscb1 * cscb2 * cscb3 * cscb1 * cscb1 * cscb2;
+  cscb.MakeLCF();
+
+  SC::SlidingCircuitSet<CGarside::ArtinBraid> sc = SC::SCS(scb);
+  sc.Print(std::cout);
 
   //std::string str13 = std::string("(3, 1)");
   //std::string str12 = std::string("(2, 1)");
@@ -94,16 +128,11 @@ int main()
 
   t.Start();
 
-  for (int i = 0; i < Count; i++)
-  {
-    cb.MakeLCF();
-  }
+  Braiding::SC(cscb);
 
   t.Stop();
 
   std::cout << "Cbraid: Execution time: " << 1000 * t.IntervalSec() / Count << " ms." << std::endl;
-
-  std::cout << "Cbraid: " << CBraid::MadeLeftWeighted / Count << " calls to MakeLeftWeighted in average." << std::endl;
 
   t.Start();
 
@@ -115,21 +144,15 @@ int main()
 
   t.Stop();
 
-    cag.Randomize(CLength);
+  cag.Randomize(CLength);
 
-    cag.Print(std::cout);
+  t.Start();
 
-    t.Start();
-
-    cag.Normalize();
+  SC::SCS(scb);
 
   t.Stop();
 
-  cag.Print(std::cout);
-
-  std::cout << "CGarside (Artin structure): Execution time: " << 1000 *  t.IntervalSec() / Count << " ms." << std::endl;
-
-  std::cout << "CGarside (Artin structure): " << CGarside::MadeLeftWeighted / Count << " calls to MakeLeftWeighted in average." << std::endl;
+  std::cout << "CGarside (Artin structure): Execution time: " << 1000 * t.IntervalSec() / Count << " ms." << std::endl;
 
   CGarside::MadeLeftWeighted = 0;
 
@@ -147,15 +170,13 @@ int main()
 
     cg.Randomize(CLength);
 
-    cg.Print(std::cout);
+    cg.Debug(std::cout);
 
     t.Start();
     
     cg.Normalize();
 
     t.Stop();
-
-    cg.Print(std::cout);
 
   std::cout << "CGarside (dual structure): Execution time: " << 1000 *  t.IntervalSec() / Count << " ms." << std::endl;
 

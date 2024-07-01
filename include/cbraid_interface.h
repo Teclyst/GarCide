@@ -306,7 +306,7 @@ public:
     Factor& Randomize();
 
     // Computes a factor from a given string.
-    Factor OfString(std::string str) const; // Ok
+    Factor OfString(std::string str); // Ok
 
     // Print factor to os. Be wary, as it may side-effect!
     void Print(std::ostream& os); // Ok

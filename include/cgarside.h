@@ -11,7 +11,6 @@
 
 namespace CGarside
 {
-
   typedef char sint8;
   typedef unsigned char uint8;
   /* JLT: Don't use short ints... */
@@ -35,6 +34,11 @@ namespace CGarside
   };
   struct NonMatchingIndexes
   {
+    sint16 index1;
+    sint16 index2;
+
+    NonMatchingIndexes(sint16 index1, sint16 index2):
+      index1(index1), index2(index2) {}
   };
 
   template <class ForItr, class BinFunc>
@@ -97,12 +101,12 @@ namespace CGarside
 
     ParameterType GetParameter() const
     {
-      Underlying.GetParameter();
+      return Underlying.GetParameter();
     }
 
     sint16 LatticeHeight() const
     {
-      Underlying.LatticeHeight;
+      return Underlying.LatticeHeight();
     };
 
     // a.OfString sets a to the factor specified by str.
@@ -302,6 +306,15 @@ namespace CGarside
       return Factor(Underlying.Product(b.Underlying));
     }
 
+    void RightProduct(const Factor &b)
+    {
+      Assign(*this * b);
+    }
+
+    std::size_t Hash() const {
+      return std::hash<U>{}(Underlying);
+    }
+
     // a * b is the product of a and b, under the assumption that it lies below Delta.
     // Syntactic sugar for a.Product(b).
     Factor operator*(const Factor &b) const
@@ -316,7 +329,6 @@ namespace CGarside
     }
 
     // a.Atoms() returns the list of the atoms.
-    // Specific information about the group (e.g. the number of strands for braids) is recovered by the corresponding U method.
     std::vector<Factor> Atoms() const
     {
       std::vector<U> atoms = Underlying.Atoms();
@@ -325,7 +337,7 @@ namespace CGarside
       for (auto const &atoms_it : atoms)
       {
         Factor f = Factor(GetParameter());
-        f.Set(atoms_it);
+        f = atoms_it;
         factor_atoms.push_back(f);
       }
       return factor_atoms;
@@ -403,12 +415,6 @@ namespace CGarside
           Parameter(parameter),
           FactorList() {}
 
-    // Constructor, with expected canonical length.
-    Braid(const sint16 expected_length, ParameterType parameter)
-        : Delta(0),
-          Parameter(parameter),
-          FactorList(expected_length) {}
-
     // Copy constructor.
     Braid(const Braid &w)
         : Delta(w.Delta),
@@ -426,7 +432,7 @@ namespace CGarside
       {
         Delta = 1;
       }
-      else
+      else if (!f.IsIdentity())
       {
         FactorList.push_back(f);
       }
@@ -440,16 +446,6 @@ namespace CGarside
       return Parameter;
     }
 
-    void Debug(std::ostream &os) const
-    {
-      os << Delta;
-      for (FactorItr it = FactorList.begin(); it != FactorList.end(); it++)
-      {
-        (*it).Debug(os);
-        os << " ";
-      }
-    }
-
     void Print(std::ostream &os) const
     {
       if (Delta != 0 && Delta != 1)
@@ -460,7 +456,7 @@ namespace CGarside
       {
         os << "D" << ". ";
       }
-      for (FactorItr it = FactorList.begin(); it != FactorList.end(); it++)
+      for (ConstFactorItr it = FactorList.begin(); it != FactorList.end(); it++)
       {
         (*it).Print(os);
         os << ". ";
@@ -504,7 +500,7 @@ namespace CGarside
     }
 
     // `u.Compare(v)` returns whether u and v have the same internal representation.
-    inline bool Compare(Braid &v) const
+    inline bool Compare(const Braid &v) const
     {
       return (Delta == v.Delta &&
               FactorList == v.FactorList);
@@ -533,7 +529,7 @@ namespace CGarside
     //  See the ElRifai and Morton 1994 article for correction.
     Braid Inverse() const
     {
-      Braid b(CanonicalLength(), GetParameter());
+      Braid b(GetParameter());
       b.Delta = -Delta;
       for (ConstFactorItr it = FactorList.begin();
            it != FactorList.end();
@@ -551,7 +547,7 @@ namespace CGarside
     //  See the ElRifai and Morton 1994 article for correction.
     Braid InverseRCF() const
     {
-      Braid b(CanonicalLength(), GetParameter());
+      Braid b(GetParameter());
       b.Delta = -Delta;
       for (ConstRevFactorItr revit = FactorList.rbegin();
            revit != FactorList.rend();
@@ -590,6 +586,23 @@ namespace CGarside
       FactorList.erase(revit.base(), FactorList.end());
     }
 
+    void CleanRCF()
+    {
+      FactorItr it = FactorList.begin();
+      while (it != FactorList.end() && (*it).IsIdentity())
+      {
+        ++it;
+      }
+      FactorList.erase(FactorList.begin(), it);
+      RevFactorItr revit = FactorList.rbegin();
+      while (revit != FactorList.rend() && (*revit).IsDelta())
+      {
+        ++revit;
+        ++Delta;
+      }
+      FactorList.erase(revit.base(), FactorList.end());
+    }
+
     // `u.LeftProduct(f)` assigns fu to u.
     void LeftProduct(const F &f)
     {
@@ -609,8 +622,7 @@ namespace CGarside
     // `u.LeftProduct(v)` assigns v u to u.
     void LeftProduct(const Braid &v)
     {
-      RevFactorItr it;
-      for (it = v.FactorList.rbegin(); it != v.FactorList.rend(); it++)
+      for (ConstRevFactorItr it = v.FactorList.rbegin(); it != v.FactorList.rend(); it++)
       {
         LeftProduct((*it).DeltaConjugate(Delta));
       }
@@ -621,13 +633,12 @@ namespace CGarside
     // v's factors move directly to u - be careful.
     void RightProduct(const Braid &v)
     {
-      FactorItr it;
-      for (it = FactorList.begin(); it != FactorList.end(); it++)
+      for (FactorItr it = FactorList.begin(); it != FactorList.end(); it++)
       {
         (*it) = (*it).DeltaConjugate(v.Delta);
       }
       Delta += v.Delta;
-      for (it = v.FactorList.begin(); it != v.FactorList.end(); it++)
+      for (ConstFactorItr it = v.FactorList.begin(); it != v.FactorList.end(); it++)
       {
         RightProduct((*it));
       }
@@ -654,7 +665,7 @@ namespace CGarside
     // `u.RightDivide(v)` assigns u v ^ (- 1) to u.
     inline void RightDivide(const F &f)
     {
-      RightProduct(!Braid((f)));
+      RightProduct(!Braid(f));
     }
 
     // `u.LeftProduct(f)` assigns fu to u.
@@ -662,7 +673,7 @@ namespace CGarside
     {
       FactorList.push_front(f);
       apply_binfun(FactorList.begin(), FactorList.end(), MakeRightWeighted<F>);
-      Clean();
+      CleanRCF();
     }
 
     // `u.RightProduct(f)` assigns uf to u.
@@ -670,32 +681,30 @@ namespace CGarside
     {
       FactorList.push_back(f.DeltaConjugate(-Delta));
       reverse_apply_binfun(FactorList.begin(), FactorList.end(), MakeRightWeighted<F>);
-      Clean();
+      CleanRCF();
     }
 
     // `u.LeftProduct(v)` assigns v u to u.
     void LeftProductRCF(const Braid &v)
     {
-      RevFactorItr it;
-      for (it = FactorList.rbegin(); it != FactorList.rend(); it++)
+      for (RevFactorItr it = FactorList.rbegin(); it != FactorList.rend(); it++)
       {
         (*it) = (*it).DeltaConjugate(-v.Delta);
       }
       Delta += v.Delta;
-      for (it = v.FactorList.rbegin(); it != v.FactorList.rend(); it++)
+      for (ConstRevFactorItr it = v.FactorList.rbegin(); it != v.FactorList.rend(); it++)
       {
-        LeftProduct(*it);
+        LeftProductRCF(*it);
       }
     }
 
     // `u.RightProduct(v)` assigns u v to u.
     void RightProductRCF(const Braid &v)
     {
-      FactorItr it;
       Delta += v.Delta;
-      for (it = v.FactorList.begin(); it != v.FactorList.end(); it++)
+      for (ConstRevFactorItr it = v.FactorList.begin(); it != v.FactorList.end(); it++)
       {
-        RightProduct((*it).DeltaConjugate(-Delta));
+        RightProductRCF((*it).DeltaConjugate(-Delta));
       }
       Delta += v.Delta;
     }
@@ -808,41 +817,43 @@ namespace CGarside
         }
         else
         {
-          f2 = b1.FactorList.front();
+          f2 = b2.FactorList.front();
         }
 
         f = b1.Remainder(f2);
 
         b.RightProduct(f);
-        b1.LeftDivide(f);
-        b2.LeftDivide(f);
+        b1.LeftDivide(f2);
+        b2.LeftDivide(f2);
+        for (sint16 i = 0; i < 30000000; i++) {
+        }
       }
 
       b.Delta -= shift;
       return b;
     }
 
-    inline Braid LeftJoin(const F &f)
+    inline Braid LeftJoin(const F &f) const
     {
       return LeftJoin(Braid(f));
     }
 
-    inline Braid RightMeet(const Braid &v)
+    inline Braid RightMeet(const Braid &v) const
     {
       return !((!(*this)).LeftJoin(!v));
     }
 
-    inline Braid RightMeet(const F &f)
+    inline Braid RightMeet(const F &f) const
     {
       return !((!(*this)).LeftJoin(!Braid(f)));
     }
 
-    inline Braid RightJoin(const Braid &v)
+    inline Braid RightJoin(const Braid &v) const
     {
       return !((!(*this)).LeftMeet(!v));
     }
 
-    inline Braid RightJoin(const F &f)
+    inline Braid RightJoin(const F &f) const
     {
       return !((!(*this)).LeftMeet(!Braid(f)));
     }
@@ -868,7 +879,7 @@ namespace CGarside
     // `u.RightDivide(v)` assigns u v ^ (- 1) to u.
     inline void RightDivideRCF(const F &f)
     {
-      RightProductRCF(Braid((f)).InverseRCF());
+      RightProductRCF(Braid(f).InverseRCF());
     }
 
     inline void Conjugate(const F &f)
@@ -931,10 +942,10 @@ namespace CGarside
     // If u has canonical length zero, returns the identity factor instead.
     inline F PreferredPrefix() const
     {
-      Initial() ^ ~Final();
+      return Initial() ^ ~Final();
     }
 
-    inline F PreferredSuffixRCF() const
+    F PreferredSuffixRCF() const
     {
       if (CanonicalLength() == 0)
       {
@@ -948,7 +959,7 @@ namespace CGarside
       }
     };
 
-    inline F PreferredSuffix() const
+    F PreferredSuffix() const
     {
       Braid right = Braid(*this);
       right.MakeRCFFromLCF();
@@ -958,6 +969,9 @@ namespace CGarside
     // `u.Cycling()` cycles u: if u = Delta ^ r u_1 ... u_k, then after applying cycling u will contain (the LNF of) Delta ^ r u_2 ... u_k (Delta ^ r u_1 Delta ^ (-r)).
     inline void Cycling()
     {
+      if (CanonicalLength() == 0) {
+        return;
+      }
       F i = Initial();
       FactorList.pop_front();
       RightProduct(i);
@@ -966,23 +980,27 @@ namespace CGarside
     // `u.Decycling()` decycles u: if u = Delta ^ r u_1 ... u_k, then after applying cycling u will contain (the LNF of) Delta ^ r u_2 ... u_k (Delta ^ r u_1 Delta ^ (-r)).
     inline void Decycling()
     {
+      if (CanonicalLength() == 0) {
+        return;
+      }
       F f = Final();
-      FactorList.pop_front();
+      FactorList.pop_back();
       LeftProduct(f);
     }
 
     // `u.Sliding()` cyclically slides u: if u = Delta ^ r u_1 ... u_k, and Delta ^ r u_1 Delta ^ (-r) = p(u) u'_1, then after applying cycling u will contain (the LNF of) Delta ^ r (Delta ^ r u'_1 Delta ^ (-r)) u_2 ... u_k p(u).
     inline void Sliding()
-    {
-      F p = PreferredPrefix();
-      FactorList.front() = FactorList.front() / p.DeltaConjugate(Delta);
-      RightProduct(p);
+    { 
+      if (CanonicalLength() == 0) {
+        return;
+      }
+      Conjugate(PreferredPrefix());
     }
 
     // `u.Product(v)` returns uv.
     Braid Product(const Braid &v) const
     {
-      Braid w(this);
+      Braid w(*this);
       w.Delta += v.Delta;
       for (ConstFactorItr it = w.FactorList.begin();
            it != w.FactorList.end();
@@ -994,7 +1012,7 @@ namespace CGarside
            it != v.FactorList.end();
            ++it)
       {
-        w.RightMultiply(*it);
+        w.RightProduct(*it);
       }
       return w;
     }
@@ -1067,15 +1085,14 @@ namespace CGarside
     // `b.Remainder(f)` computes, if b is positive, the simple factor s such that bs is the left lcm of b and b and f.
     F Remainder(const F &f) const
     {
-      F fi(f);
+      F fi = f;
       if (Delta != 0)
       {
         fi.Identity();
       }
       else
       {
-        ConstFactorItr it;
-        for (it = FactorList.begin(); it != FactorList.end(); it++)
+        for (ConstFactorItr it = FactorList.begin(); it != FactorList.end(); it++)
         {
           fi = (*it).LeftJoin(fi) / *it;
         }
@@ -1097,18 +1114,46 @@ namespace CGarside
       }
     }
 
-    void Print(std::ostream &os)
+    void Debug(std::ostream &os) const
     {
       os << "D^" << Delta << " . ";
-      for (FactorItr it = FactorList.begin(); it != FactorList.end(); it++)
+      for (ConstFactorItr it = FactorList.begin(); it != FactorList.end(); it++)
       {
-        (*it).Print(os);
+        (*it).Debug(os);
         os << " . ";
       }
       os << std::endl;
     }
+
+    std::size_t Hash() const {
+      std::size_t h = Delta;
+      for (ConstFactorItr it = FactorList.begin(); it != FactorList.end(); it++)
+      {
+        h = h * 31 + (*it).Hash();
+      }
+      return h;
+    }
   };
 
 }
+
+template <class U>
+struct std::hash<CGarside::Factor<U>>
+{
+  std::size_t operator()(CGarside::Factor<U> const &f) const noexcept
+  {
+    return f.Hash();
+  }
+};
+
+template <class F>
+struct std::hash<CGarside::Braid<F>>
+{
+  std::size_t operator()(CGarside::Braid<F> const &u) const noexcept
+  {
+    return u.Hash();
+  }
+};
+
 
 #endif

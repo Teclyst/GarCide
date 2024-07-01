@@ -1,4 +1,6 @@
+#include <functional>
 #include "cgarside.h"
+
 
 namespace CGarside
 {
@@ -15,10 +17,14 @@ namespace CGarside
     sint16 *PermutationTable;
 
   public:
-
     typedef sint16 ParameterType;
 
     ParameterType GetParameter() const;
+
+    sint16 At(sint16 i) const
+    {
+      return PermutationTable[i];
+    }
 
     // Constructor
     ArtinBraidUnderlying(ParameterType n);
@@ -38,9 +44,11 @@ namespace CGarside
 
     ArtinBraidUnderlying &operator=(const ArtinBraidUnderlying &a);
 
-    void Debug(std::ostream &os) const {
+    void Debug(std::ostream &os) const
+    {
       os << "[";
-      for (sint16 i = 1; i <= GetParameter(); i++) {
+      for (sint16 i = 1; i <= GetParameter(); i++)
+      {
         os << PermutationTable[i] << " ";
       }
       os << "]";
@@ -111,3 +119,18 @@ namespace CGarside
   typedef Braid<ArtinBraidFactor> ArtinBraid;
 
 }
+
+template <>
+  struct std::hash<CGarside::ArtinBraidUnderlying>
+  {
+    std::size_t operator()(CGarside::ArtinBraidUnderlying const &a) const noexcept
+    {
+      std::size_t h = 0;
+      std::size_t g;
+      for (CGarside::sint16 i = 1; i <= a.GetParameter(); i++)
+      {
+        h = h * 31 + a.At(i);
+      }
+      return h;
+    }
+  };

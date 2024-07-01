@@ -313,7 +313,7 @@ inline void BandPresentation::BStoPT(const sint8 *s, sint16 *a) const
     //    cout << " -> ";
 
     for (sint16 i = 1; i <= 2 * Index(); ++i)
-    {
+    {   
         if (s[i] == 1)
         {
             stack[sp++] = i;
@@ -337,8 +337,8 @@ inline void BandPresentation::BStoPT(const sint8 *s, sint16 *a) const
 inline void BandPresentation::Randomize(sint16 *r) const
 {
 
-    static sint8 s[MaxBraidIndex];
-    static sint16 a[MaxBraidIndex];
+    static sint8 s[2 * MaxBraidIndex + 1];
+    static sint16 a[MaxBraidIndex + 1];
     cln::cl_I k =
         cln::random_I(cln::default_random_state, GetCatalanNumber(Index())) + 1;
     BallotSequence(Index(), k, s);
@@ -925,7 +925,7 @@ inline bool MakeRightWeighted(Factor<P> &a, Factor<P> &b)
 }
 
 template <class P>
-inline Factor<P> Factor<P>::OfString(std::string str) const
+inline Factor<P> Factor<P>::OfString(std::string str)
 {
     Pres.OfString(str, pTable);
 }

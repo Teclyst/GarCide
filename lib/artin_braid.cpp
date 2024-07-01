@@ -164,7 +164,7 @@ namespace CGarside
 
     if (GetParameter() != b.GetParameter())
     {
-      throw NonMatchingIndexes();
+      throw NonMatchingIndexes(GetParameter(), b.GetParameter());
     }
 
     ArtinBraidUnderlying f = ArtinBraidUnderlying(GetParameter());
@@ -184,7 +184,7 @@ namespace CGarside
 
     if (GetParameter() != b.GetParameter())
     {
-      throw NonMatchingIndexes();
+      throw NonMatchingIndexes(GetParameter(), b.GetParameter());
     }
 
     ArtinBraidUnderlying f = ArtinBraidUnderlying(GetParameter());
@@ -206,7 +206,7 @@ namespace CGarside
     sint16 i;
     if (GetParameter() != b.GetParameter())
     {
-      throw NonMatchingIndexes();
+      throw NonMatchingIndexes(GetParameter(), b.GetParameter());
     }
     for (i = 1; i <= GetParameter(); i++)
     {
@@ -234,7 +234,7 @@ namespace CGarside
     ArtinBraidUnderlying f = ArtinBraidUnderlying(GetParameter());
     if (GetParameter() != b.GetParameter())
     {
-      throw NonMatchingIndexes();
+      throw NonMatchingIndexes(GetParameter(), b.GetParameter());
     }
     sint16 i;
     for (i = 1; i <= GetParameter(); i++)
