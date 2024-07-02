@@ -281,7 +281,6 @@ namespace SC
     // Linear in the trajectory's length.
     inline void Insert(std::vector<B> t)
     {
-
       Orbits.push_back(t);
       for (typename std::vector<B>::iterator it = t.begin(); it != t.end(); it++)
       {

@@ -254,7 +254,7 @@ namespace CGarside
     // This is done by taking complements twice.
     Factor DeltaConjugate() const
     {
-      DeltaConjugate(0);
+      return DeltaConjugate(0);
     }
 
     // a.LeftMeet(b) returns the left meet of a and b.

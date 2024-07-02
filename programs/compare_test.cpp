@@ -6,14 +6,16 @@
 #include "artin_braid.h"
 #include "band_braid.h"
 #include "octaedral_braid.h"
+#include "dihedral_braid.h"
 #include "garsidesc.h"
+#include "garsideuss.h"
 #include "cbraid.h"
 #include "braiding.h"
 
 #include "optarg.h"
 #include "timecounter.h"
 
-int Index = 4;
+int Index = 5;
 int CLength = 1;
 int Count = 1;
 int RandomSeed;
@@ -157,11 +159,23 @@ int main()
   CGarside::BDualBraidFactor s2 = CGarside::BDualBraidFactor(Index);
   std::string str1 = std::string("1");
   s1.OfString(str1);
-  std::cout << "ok" << std::endl;
   std::string str2 = std::string("(2, 1)");
   s2.OfString(str2);
-  s2.Debug(std::cout);
+  (s2 * s1).Debug(std::cout);
+  (s2 * s1).Print(std::cout);
   SSS::SSS(CGarside::Braid(s1)).Debug(std::cout);
+  USS::USS(CGarside::Braid(s1)).Debug(std::cout);
+
+  CGarside::IDualBraidFactor is1 = CGarside::IDualBraidFactor(Index);
+  CGarside::IDualBraidFactor is2 = CGarside::IDualBraidFactor(Index);
+  std::string istr1 = std::string("0");
+  is1.OfString(istr1);
+  std::string istr2 = std::string("1");
+  is2.OfString(istr2);
+  (is2).Debug(std::cout);
+  (is1).Debug(std::cout);
+  std::cout << std::endl;
+  SSS::SSS(CGarside::Braid(is1)).Debug(std::cout);
 
   return 0;
 }
