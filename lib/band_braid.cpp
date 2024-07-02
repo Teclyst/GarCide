@@ -62,7 +62,7 @@ namespace CGarside
     }
     for (i = 1; i <= n; ++i)
     {
-      if (not seen[i])
+      if (!seen[i])
       {
         k = 0;
         j = i;

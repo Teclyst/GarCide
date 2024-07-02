@@ -37,9 +37,9 @@ namespace CGarside
     sint16 index1;
     sint16 index2;
 
-    NonMatchingIndexes(sint16 index1, sint16 index2):
-      index1(index1), index2(index2) {}
+    NonMatchingIndexes(sint16 index1, sint16 index2) : index1(index1), index2(index2) {}
   };
+  struct NonRandomizable{};
 
   template <class ForItr, class BinFunc>
   inline ForItr apply_binfun(ForItr first, ForItr last, BinFunc f)
@@ -311,8 +311,9 @@ namespace CGarside
       Assign(*this * b);
     }
 
-    std::size_t Hash() const {
-      return std::hash<U>{}(Underlying);
+    std::size_t Hash() const
+    {
+      return Underlying.Hash();
     }
 
     // a * b is the product of a and b, under the assumption that it lies below Delta.
@@ -411,21 +412,22 @@ namespace CGarside
   public:
     // Constructor that creates an empty word.
     Braid(ParameterType parameter)
-        : Delta(0),
-          Parameter(parameter),
+        : Parameter(parameter),
+          Delta(0),
           FactorList() {}
 
     // Copy constructor.
     Braid(const Braid &w)
-        : Delta(w.Delta),
-          Parameter(w.Parameter),
+        : Parameter(w.Parameter),
+          Delta(w.Delta),
           FactorList(w.FactorList) {}
 
     // Constructor that transforms a factor into a word.
     // If the factor is Delta, `Delta` is incremented.
     Braid(const F &f)
-        : Delta(0),
+        : 
           Parameter(f.GetParameter()),
+          Delta(0),
           FactorList()
     {
       if (f.IsDelta())
@@ -825,8 +827,6 @@ namespace CGarside
         b.RightProduct(f);
         b1.LeftDivide(f2);
         b2.LeftDivide(f2);
-        for (sint16 i = 0; i < 30000000; i++) {
-        }
       }
 
       b.Delta -= shift;
@@ -969,7 +969,8 @@ namespace CGarside
     // `u.Cycling()` cycles u: if u = Delta ^ r u_1 ... u_k, then after applying cycling u will contain (the LNF of) Delta ^ r u_2 ... u_k (Delta ^ r u_1 Delta ^ (-r)).
     inline void Cycling()
     {
-      if (CanonicalLength() == 0) {
+      if (CanonicalLength() == 0)
+      {
         return;
       }
       F i = Initial();
@@ -980,7 +981,8 @@ namespace CGarside
     // `u.Decycling()` decycles u: if u = Delta ^ r u_1 ... u_k, then after applying cycling u will contain (the LNF of) Delta ^ r u_2 ... u_k (Delta ^ r u_1 Delta ^ (-r)).
     inline void Decycling()
     {
-      if (CanonicalLength() == 0) {
+      if (CanonicalLength() == 0)
+      {
         return;
       }
       F f = Final();
@@ -990,8 +992,9 @@ namespace CGarside
 
     // `u.Sliding()` cyclically slides u: if u = Delta ^ r u_1 ... u_k, and Delta ^ r u_1 Delta ^ (-r) = p(u) u'_1, then after applying cycling u will contain (the LNF of) Delta ^ r (Delta ^ r u'_1 Delta ^ (-r)) u_2 ... u_k p(u).
     inline void Sliding()
-    { 
-      if (CanonicalLength() == 0) {
+    {
+      if (CanonicalLength() == 0)
+      {
         return;
       }
       Conjugate(PreferredPrefix());
@@ -1125,7 +1128,8 @@ namespace CGarside
       os << std::endl;
     }
 
-    std::size_t Hash() const {
+    std::size_t Hash() const
+    {
       std::size_t h = Delta;
       for (ConstFactorItr it = FactorList.begin(); it != FactorList.end(); it++)
       {
@@ -1154,6 +1158,5 @@ struct std::hash<CGarside::Braid<F>>
     return u.Hash();
   }
 };
-
 
 #endif

@@ -24,7 +24,7 @@
 #   cbraid.o and braiding.o.
 
 # File Names.
-LIBCBRAID_SRC = cbraid.cpp braiding.cpp cgarside.cpp artin_braid.cpp band_braid.cpp
+LIBCBRAID_SRC = cbraid.cpp braiding.cpp cgarside.cpp artin_braid.cpp band_braid.cpp octaedral_braid.cpp
 LIBCBRAID_INCLUDEDIR = ../include
 LIBCBRAID_OBJ = $(LIBCBRAID_SRC:.cpp=.o)
 LIBCBRAID_A = libcbraid.a

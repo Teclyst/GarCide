@@ -925,9 +925,9 @@ inline bool MakeRightWeighted(Factor<P> &a, Factor<P> &b)
 }
 
 template <class P>
-inline Factor<P> Factor<P>::OfString(std::string str)
+inline void Factor<P>::OfString(std::string str)
 {
-    Pres.OfString(str, pTable);
+    Pres.OfString(str, *this);
 }
 
 template <class P>

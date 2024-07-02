@@ -3,7 +3,7 @@
 namespace CGarside
 {
 
-  class BandBraidUnderlying
+  class BDualBraidUnderlying
   {
 
   protected:
@@ -19,11 +19,11 @@ namespace CGarside
     sint16 LatticeHeight() const;
 
     // Constructor
-    BandBraidUnderlying(sint16 n);
+    BDualBraidUnderlying(sint16 n);
 
-    BandBraidUnderlying(const BandBraidUnderlying &a);
+    BDualBraidUnderlying(const BDualBraidUnderlying &a);
 
-    ~BandBraidUnderlying()
+    ~BDualBraidUnderlying()
     {
       delete[] PermutationTable;
     }
@@ -33,7 +33,7 @@ namespace CGarside
     void Debug(std::ostream &os) const
     {
       os << "[";
-      for (sint16 i = 1; i <= GetParameter(); i++)
+      for (sint16 i = 1; i <= 2 * GetParameter(); i++)
       {
         os << PermutationTable[i] << " ";
       }
@@ -44,9 +44,9 @@ namespace CGarside
 
     void OfDCDT(const sint16 *x);
 
-    BandBraidUnderlying &Assign(const BandBraidUnderlying &a);
+    BDualBraidUnderlying &Assign(const BDualBraidUnderlying &a);
 
-    BandBraidUnderlying &operator=(const BandBraidUnderlying &a);
+    BDualBraidUnderlying &operator=(const BDualBraidUnderlying &a);
 
     // Print to os. Be wary, as it side-effects!
     void Print(std::ostream &os) const;
@@ -57,40 +57,40 @@ namespace CGarside
     // Set to delta.
     void Delta();
 
-    BandBraidUnderlying LeftMeet(const BandBraidUnderlying &b) const;
+    BDualBraidUnderlying LeftMeet(const BDualBraidUnderlying &b) const;
 
-    BandBraidUnderlying RightMeet(const BandBraidUnderlying &b) const;
+    BDualBraidUnderlying RightMeet(const BDualBraidUnderlying &b) const;
 
     // Equality check.
     // We check wether the underlying permutation table are (pointwise) equal.
-    bool Compare(const BandBraidUnderlying &b) const;
+    bool Compare(const BDualBraidUnderlying &b) const;
 
     // Computes the factor corresponding to the inverse permutation.
     // Used to simplify complement operation.
-    BandBraidUnderlying Inverse() const;
+    BDualBraidUnderlying Inverse() const;
 
     // Product under the hypothesis that it is still simple.
-    BandBraidUnderlying Product(const BandBraidUnderlying &b) const;
+    BDualBraidUnderlying Product(const BDualBraidUnderlying &b) const;
 
     // Under the assumption a <= b, a.LeftComplement(b) computes
     // The factor c such that ac = b.
-    BandBraidUnderlying LeftComplement(const BandBraidUnderlying &b) const;
+    BDualBraidUnderlying LeftComplement(const BDualBraidUnderlying &b) const;
 
-    BandBraidUnderlying RightComplement(const BandBraidUnderlying &b) const;
+    BDualBraidUnderlying RightComplement(const BDualBraidUnderlying &b) const;
 
     // Generate a random factor.
     void Randomize();
 
     // List of atoms.
-    std::vector<BandBraidUnderlying> Atoms() const;
+    std::vector<BDualBraidUnderlying> Atoms() const;
 
     // Conjugate by Delta^k.
     // Used to speed up calculations compared to the default implementation.
-    BandBraidUnderlying DeltaConjugate(sint16 k) const;
+    BDualBraidUnderlying DeltaConjugate(sint16 k) const;
 
     std::size_t Hash() const {
       std::size_t h = 0;
-      for (CGarside::sint16 i = 1; i <= GetParameter(); i++)
+      for (CGarside::sint16 i = 1; i <= 2 * GetParameter(); i++)
       {
         h = h * 31 + PermutationTable[i];
       }
@@ -98,8 +98,8 @@ namespace CGarside
     }
   };
 
-  typedef Factor<BandBraidUnderlying> BandBraidFactor;
+  typedef Factor<BDualBraidUnderlying> BDualBraidFactor;
 
-  typedef Braid<BandBraidFactor> BandBraid;
+  typedef Braid<BDualBraidFactor> BDualBraid;
 
 }

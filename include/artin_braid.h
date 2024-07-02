@@ -109,6 +109,15 @@ namespace CGarside
     // Used to speed up calculations compared to the default implementation.
     ArtinBraidUnderlying DeltaConjugate(sint16 k) const;
 
+    std::size_t Hash() const {
+      std::size_t h = 0;
+      for (CGarside::sint16 i = 1; i <= GetParameter(); i++)
+      {
+        h = h * 31 + PermutationTable[i];
+      }
+      return h;
+    }
+
   private:
     // Subroutine called by LeftMeet() and RightMeet().
     static void MeetSub(const sint16 *a, const sint16 *b, sint16 *r, sint16 s, sint16 t);
@@ -119,18 +128,3 @@ namespace CGarside
   typedef Braid<ArtinBraidFactor> ArtinBraid;
 
 }
-
-template <>
-  struct std::hash<CGarside::ArtinBraidUnderlying>
-  {
-    std::size_t operator()(CGarside::ArtinBraidUnderlying const &a) const noexcept
-    {
-      std::size_t h = 0;
-      std::size_t g;
-      for (CGarside::sint16 i = 1; i <= a.GetParameter(); i++)
-      {
-        h = h * 31 + a.At(i);
-      }
-      return h;
-    }
-  };
