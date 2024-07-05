@@ -107,7 +107,7 @@ namespace CGarside
 
     // Conjugate by Delta^k.
     // Used to speed up calculations compared to the default implementation.
-    ArtinBraidUnderlying DeltaConjugate(sint16 k) const;
+    void DeltaConjugate(sint16 k) const;
 
     std::size_t Hash() const {
       std::size_t h = 0;

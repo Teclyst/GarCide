@@ -197,9 +197,9 @@ namespace SC
   }
 
   template <class F>
-  F MinSC(const Braid<F> &b, const F &f)
+  F MinSC(const Braid<F> &b, const Braid<F> &b_rcf, const F &f)
   {
-    F f2 = SSS::MinSSS(b, f);
+    F f2 = SSS::MinSSS(b, b_rcf, f);
 
     std::list<F> ret = Return(b, f2);
     for (typename std::list<F>::iterator it = ret.begin(); it != ret.end(); it++)
@@ -231,16 +231,25 @@ namespace SC
   std::vector<F> MinSC(const Braid<F> &b)
   {
     F f = F(b.GetParameter());
+    Braid<F> b_rcf = b;
+    b_rcf.MakeRCFFromLCF();
     std::vector<F> atoms = f.Atoms();
+    std::vector<F> factors = f.Atoms();
+
+    std::transform(std::execution::par,
+                   atoms.begin(),
+                   atoms.end(),
+                   factors.begin(),
+                   [&b, &b_rcf](F &atom) {return MinSC(b, b_rcf, atom);});
 
     std::vector<F> min;
 
-    static bool table[CGarside::MaxBraidIndex];
+    bool table[atoms.size()] = {false};
     bool should_be_added;
 
     for (sint16 i = 0; i < int(atoms.size()); i++)
     {
-      f = MinSC(b, atoms[i]);
+      f = factors[i];
       should_be_added = true;
 
       // We check, before adding f, that a divisor of it wasn't added already with some other atom dividing it.

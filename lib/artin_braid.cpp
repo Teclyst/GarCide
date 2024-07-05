@@ -6,7 +6,7 @@ namespace CGarside
   void ArtinBraidUnderlying::MeetSub(const sint16 *a, const sint16 *b, sint16 *r,
                                      sint16 s, sint16 t)
   {
-    static sint16 u[MaxBraidIndex], v[MaxBraidIndex], w[MaxBraidIndex];
+    thread_local sint16 u[MaxBraidIndex], v[MaxBraidIndex], w[MaxBraidIndex];
 
     if (s >= t)
       return;
@@ -160,7 +160,7 @@ namespace CGarside
 
   ArtinBraidUnderlying ArtinBraidUnderlying::LeftMeet(const ArtinBraidUnderlying &b) const
   {
-    static sint16 s[MaxBraidIndex];
+    thread_local sint16 s[MaxBraidIndex];
 
     if (GetParameter() != b.GetParameter())
     {
@@ -180,7 +180,7 @@ namespace CGarside
 
   ArtinBraidUnderlying ArtinBraidUnderlying::RightMeet(const ArtinBraidUnderlying &b) const
   {
-    static sint16 u[MaxBraidIndex], v[MaxBraidIndex];
+    thread_local sint16 u[MaxBraidIndex], v[MaxBraidIndex];
 
     if (GetParameter() != b.GetParameter())
     {
@@ -280,23 +280,17 @@ namespace CGarside
     return atoms;
   };
 
-  ArtinBraidUnderlying ArtinBraidUnderlying::DeltaConjugate(sint16 k) const
+  void ArtinBraidUnderlying::DeltaConjugate(sint16 k) const
   {
     sint16 i, n = GetParameter();
-    if (k % 2 == 0)
+    if (k % 2 != 0)
     {
-      return ArtinBraidUnderlying(*this);
-    }
-    else
-    {
-      ArtinBraidUnderlying under = ArtinBraidUnderlying(*this);
       for (i = 1; i <= n / 2; i++)
       {
-        sint16 u = under.PermutationTable[i];
-        under.PermutationTable[i] = under.PermutationTable[n - i + 1];
-        under.PermutationTable[n - i + 1] = u;
+        sint16 u = PermutationTable[i];
+        PermutationTable[i] = n - PermutationTable[n - i + 1] + 1;
+        PermutationTable[n - i + 1] = n - u + 1;
       }
-      return under;
     }
   }
 

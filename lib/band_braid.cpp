@@ -132,7 +132,7 @@ namespace CGarside
 
   void BandBraidUnderlying::OfDCDT(const sint16 *x)
   {
-    static sint16 z[MaxBraidIndex];
+    thread_local sint16 z[MaxBraidIndex];
 
     for (sint16 i = 1; i <= GetParameter(); ++i)
       z[i] = 0;
@@ -145,12 +145,12 @@ namespace CGarside
 
   BandBraidUnderlying BandBraidUnderlying::LeftMeet(const BandBraidUnderlying &b) const
   {
-    static sint16 x[MaxBraidIndex], y[MaxBraidIndex], z[MaxBraidIndex];
+    thread_local sint16 x[MaxBraidIndex], y[MaxBraidIndex], z[MaxBraidIndex];
 
     AssignDCDT(x);
     b.AssignDCDT(y);
 
-    static sint16 P[MaxBraidIndex][MaxBraidIndex];
+    thread_local sint16 P[MaxBraidIndex][MaxBraidIndex];
 
     for (sint16 i = GetParameter(); i >= 1; i--)
     {

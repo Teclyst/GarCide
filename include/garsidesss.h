@@ -101,7 +101,7 @@ namespace SSS
 
     while (j <= k)
     {
-      c2.LeftProduct(b3.FactorList.back());
+      c2.LeftProduct(b3.Final());
       b3.Decycling();
 
       if (b3.Sup() == l)
@@ -140,19 +140,17 @@ namespace SSS
   }
 
   template <class F>
-  F MinSSS(const Braid<F> &b, const F &f)
+  F MinSSS(const Braid<F> &b, const Braid<F> &b_rcf, const F &f)
   {
     F r = MinSS(b, f);
-    Braid<F> b2 = b;
-    b2.MakeRCFFromLCF();
-    Braid<F> b3 = b2;
-    b3.ConjugateRCF(r);
+    Braid<F> b2 = b_rcf;
+    b2.ConjugateRCF(r);
 
-    while (b3.CanonicalLength() > b.CanonicalLength())
+    while (b2.CanonicalLength() > b.CanonicalLength())
     {
-      r.RightProduct(b3.FactorList.front());
-      b3 = b2;
-      b3.ConjugateRCF(r);
+      r.RightProduct(b2.FactorList.front());
+      b2 = b_rcf;
+      b2.ConjugateRCF(r);
     }
     return r;
   }
@@ -160,6 +158,8 @@ namespace SSS
   template <class F>
   std::vector<F> MinSSS(const Braid<F> &b)
   {
+    Braid<F> b_rcf = b;
+    b_rcf.MakeRCFFromLCF();
     F f = F(b.GetParameter());
     std::vector<F> atoms = f.Atoms();
 
@@ -170,7 +170,7 @@ namespace SSS
 
     for (sint16 i = 0; i < int(atoms.size()); i++)
     {
-      f = MinSSS(b, atoms[i]);
+      f = MinSSS(b, b_rcf, atoms[i]);
       should_be_added = true;
 
       // We check, before adding f, that a divisor of it wasn't added already with some other atom dividing it.
@@ -213,6 +213,11 @@ namespace SSS
     inline bool Mem(const B &b) const
     {
       return Set.find(b) != Set.end();
+    }
+
+    inline sint16 Card() const
+    {
+      return Set.size();
     }
 
     void Print(std::ostream &os) const

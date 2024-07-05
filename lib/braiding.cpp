@@ -933,7 +933,7 @@ namespace Braiding
   //
   //  Returns(B,F)   Given a braid B (in its USS and in LCF), and a simple factor
   //                 F such that B^F is in its SSS, computes the iterated transports
-  //                 of F that send B to an element in the trayectory of B^F, until
+  //                 of F that send B to an element in the trajectory of B^F, until
   //                 the first repetition.
   //
   /////////////////////////////////////////////////////////////

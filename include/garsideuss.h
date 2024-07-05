@@ -159,7 +159,7 @@ namespace USS
   F MainPullback(const Braid<F> &b, const F &f)
   {
     std::vector<F> ret;
-    std::unordered_set<F> ret_set;
+    std::unordered_map<F, sint16> ret_set;
 
     Braid<F> b2 = Braid(b);
 
@@ -171,13 +171,14 @@ namespace USS
     while (ret_set.find(f2) == ret_set.end())
     {
       ret.push_back(f2);
-      ret_set.insert(f2);
+      ret_set.insert(std::pair(f2, index));
       for (typename std::vector<Braid<F>>::reverse_iterator revit = t.rbegin(); revit != t.rend(); revit++)
       {
         f2 = Pullback(*revit, f2);
       }
       index++;
     }
+    index = ret_set.at(f2);
 
     sint16 l = ret.size() - index;
     if (index % l == 0)
@@ -191,9 +192,9 @@ namespace USS
   }
 
   template <class F>
-  F MinUSS(const Braid<F> &b, const F &f)
+  F MinUSS(const Braid<F> &b, const Braid<F> &b_rcf, const F &f)
   {
-    F f2 = SSS::MinSSS(b, f);
+    F f2 = SSS::MinSSS(b, b_rcf, f);
 
     std::list<F> ret = Return(b, f2);
 
@@ -227,15 +228,17 @@ namespace USS
   {
     F f = F(b.GetParameter());
     std::vector<F> atoms = f.Atoms();
+    Braid<F> b_rcf = b;
+    b_rcf.MakeRCFFromLCF();
 
     std::vector<F> min;
 
-    static bool table[CGarside::MaxBraidIndex];
+    bool table[atoms.size()] = {false};
     bool should_be_added;
 
     for (sint16 i = 0; i < int(atoms.size()); i++)
     {
-      f = MinUSS(b, atoms[i]);
+      f = MinUSS(b, b_rcf, atoms[i]);
       should_be_added = true;
 
       // We check, before adding f, that a divisor of it wasn't added already with some other atom dividing it.

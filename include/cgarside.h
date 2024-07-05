@@ -8,6 +8,7 @@
 #include <string>
 #include <iostream>
 #include <stdexcept>
+#include <execution>
 
 namespace CGarside
 {
@@ -26,8 +27,6 @@ namespace CGarside
   // Maximum braid index.
   const sint16 MaxBraidIndex = 300;
 
-  static sint16 MadeLeftWeighted = 0;
-
   // Exceptions.
   struct InvalidStringError
   {
@@ -39,7 +38,9 @@ namespace CGarside
 
     NonMatchingIndexes(sint16 index1, sint16 index2) : index1(index1), index2(index2) {}
   };
-  struct NonRandomizable{};
+  struct NonRandomizable
+  {
+  };
 
   template <class ForItr, class BinFunc>
   inline ForItr apply_binfun(ForItr first, ForItr last, BinFunc f)
@@ -226,28 +227,17 @@ namespace CGarside
       return b.RightComplement(*this);
     }
 
+    void DeltaConjugateMut(sint16 k) {
+      Underlying.DeltaConjugate(k);
+    }
+
     // a.DeltaConjugate(k) returns a, conjugated by Delta ^ k.
     // Makes 2 |k| complement calculations.
-    Factor DeltaConjugate(const sint16 k) const
+    Factor DeltaConjugate(sint16 k) const
     {
-      Factor conjugate = Factor(*this);
-      sint16 i;
-      if (k >= 0)
-      {
-        for (i = 0; i < k; i++)
-        {
-          conjugate = conjugate.RightComplement().RightComplement();
-        }
-        return conjugate;
-      }
-      else
-      {
-        for (i = 0; i > k; i--)
-        {
-          conjugate = conjugate.LeftComplement().LeftComplement();
-        }
-        return conjugate;
-      }
+      Factor conjugate = *this;
+      conjugate.DeltaConjugateMut(k);
+      return conjugate;
     }
 
     // a.DeltaConjugate() returns a conjugated by Delta.
@@ -351,7 +341,6 @@ namespace CGarside
   template <class F>
   bool MakeLeftWeighted(F &u, F &v)
   {
-    MadeLeftWeighted++;
     F t = (~u) ^ v;
     if (t.IsIdentity())
     {
@@ -425,8 +414,7 @@ namespace CGarside
     // Constructor that transforms a factor into a word.
     // If the factor is Delta, `Delta` is incremented.
     Braid(const F &f)
-        : 
-          Parameter(f.GetParameter()),
+        : Parameter(f.GetParameter()),
           Delta(0),
           FactorList()
     {
@@ -557,7 +545,7 @@ namespace CGarside
       {
         // Rewrite Delta^r (f)^(- 1) a_1 ... a_k as
         // (Delta^r d_R(f) Delta^(- r)) Delta ^ (r - 1) a_1 ... a_k.
-        b.FactorList.push_front((*revit).RightComplement().DeltaConjugate(-b.Delta));
+        b.FactorList.push_back((*revit).RightComplement().DeltaConjugate(-b.Delta));
         --b.Delta;
       }
       return b;
@@ -626,7 +614,7 @@ namespace CGarside
     {
       for (ConstRevFactorItr it = v.FactorList.rbegin(); it != v.FactorList.rend(); it++)
       {
-        LeftProduct((*it).DeltaConjugate(Delta));
+        LeftProduct(*it);
       }
       Delta += v.Delta;
     }
@@ -670,7 +658,7 @@ namespace CGarside
       RightProduct(!Braid(f));
     }
 
-    // `u.LeftProduct(f)` assigns fu to u.
+    // `u.LeftProductRCF(f)` assigns fu to u.
     void LeftProductRCF(const F &f)
     {
       FactorList.push_front(f);
@@ -703,10 +691,9 @@ namespace CGarside
     // `u.RightProduct(v)` assigns u v to u.
     void RightProductRCF(const Braid &v)
     {
-      Delta += v.Delta;
-      for (ConstRevFactorItr it = v.FactorList.begin(); it != v.FactorList.end(); it++)
+      for (ConstFactorItr it = v.FactorList.begin(); it != v.FactorList.end(); it++)
       {
-        RightProductRCF((*it).DeltaConjugate(-Delta));
+        RightProductRCF(*it);
       }
       Delta += v.Delta;
     }
@@ -1004,19 +991,7 @@ namespace CGarside
     Braid Product(const Braid &v) const
     {
       Braid w(*this);
-      w.Delta += v.Delta;
-      for (ConstFactorItr it = w.FactorList.begin();
-           it != w.FactorList.end();
-           ++it)
-      {
-        (*it).DeltaConjugate(v.Delta);
-      }
-      for (ConstFactorItr it = v.FactorList.begin();
-           it != v.FactorList.end();
-           ++it)
-      {
-        w.RightProduct(*it);
-      }
+      w.RightProduct(v);
       return w;
     }
 
@@ -1059,7 +1034,7 @@ namespace CGarside
       Clean();
     }
 
-    // `u.LCFToRCF()` turns u, assumed to be in LCF, into RCF (so that we may avoid having to clean up).
+    // `u.LCFToRCF()` turns u, assumed to be in LCF (so that we may avoid having to clean up), into RCF.
     // The result (r, [u_1, ..., u_k]) represents u_1 ... u_k Delta ^ r.
     inline void MakeRCFFromLCF()
     {
@@ -1067,7 +1042,7 @@ namespace CGarside
            it != FactorList.end();
            ++it)
       {
-        (*it).DeltaConjugate(-Delta);
+        *it = (*it).DeltaConjugate(-Delta);
       };
       bubble_sort(FactorList.begin(), FactorList.end(), MakeRightWeighted<F>);
     }
@@ -1080,7 +1055,7 @@ namespace CGarside
            it != FactorList.end();
            ++it)
       {
-        (*it).DeltaConjugate(Delta);
+        *it = (*it).DeltaConjugate(Delta);
       };
       bubble_sort(FactorList.begin(), FactorList.end(), MakeLeftWeighted<F>);
     }
@@ -1101,6 +1076,27 @@ namespace CGarside
         }
       }
       return fi;
+    }
+
+    sint16 Rigidity() const
+    {
+      Braid b2 = *this;
+      sint16 rigidity = 0;
+
+      if (CanonicalLength() == 0)
+        return rigidity;
+
+      b2.RightProduct(b2.Initial());
+
+      ConstFactorItr it2 = b2.FactorList.begin();
+
+      for (ConstFactorItr it = FactorList.begin(); it != FactorList.end(); it++, it2++, rigidity++) {
+        if (*it != *it2) {
+          break;
+        }
+      }
+
+      return rigidity;
     }
 
     // Randomizes the braid, setting it at a given length, using parameters extracted from Factor f.
