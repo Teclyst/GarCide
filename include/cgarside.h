@@ -100,6 +100,10 @@ namespace CGarside
 
     ~Factor() {}
 
+    U GetUnderlying() const {
+      return Underlying;
+    }
+
     ParameterType GetParameter() const
     {
       return Underlying.GetParameter();

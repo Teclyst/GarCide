@@ -306,7 +306,17 @@ namespace SC
     // Finds b's orbit.
     inline sint16 Orbit(const B &b) const
     {
-      return *Set.find(b);
+      return Set.at(b);
+    }
+
+    inline sint16 NumberOfOrbits() const
+    {
+      return Orbits.size();
+    }
+
+    inline sint16 Card() const
+    {
+      return Set.size();
     }
 
     void Print(std::ostream &os) const

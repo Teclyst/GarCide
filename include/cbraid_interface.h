@@ -236,12 +236,12 @@ public:
     Factor& UpperDelta(sint32 k = 1); //
 
     // Get the index.
-    sint16 Index() const; // Ok (but not sint16).
-
+    sint16 Index() const;
+    
     // Access to the n-th element of the permutation table. We follow
     // the standard mathematical convention; the argument should be
     // between 1 and Index.
-    sint16& At(sint16 n); // Meaningless for generic Garside groups.
+    sint16& At(sint16 n);
     sint16 At(sint16 n) const;
     sint16& operator[](sint16 n);
     sint16 operator[](sint16 n) const; 
