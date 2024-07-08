@@ -291,6 +291,9 @@ namespace CGarside
         PermutationTable[i] = n - PermutationTable[n - i + 1] + 1;
         PermutationTable[n - i + 1] = n - u + 1;
       }
+      if (n % 2 != 0) {
+        PermutationTable[n / 2 + 1] = n - PermutationTable[n / 2 + 1] + 1;
+      }
     }
   }
 

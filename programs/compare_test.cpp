@@ -11,14 +11,14 @@
 #include "garsideuss.h"
 #include "cbraid.h"
 #include "braiding.h"
-
+#include <omp.h>
 #include "optarg.h"
 #include "timecounter.h"
 
 int Index = 24;
-int CLength = 1;
+int CLength = 256;
 int Count = 1;
-int RandomSeed;
+int RandomSeed = 0;
 
 CBraid::ArtinFactor ToCBraidFactor(const CGarside::ArtinBraidFactor &f) {
   CBraid::ArtinFactor cf(f.GetParameter());
@@ -47,18 +47,20 @@ int main()
   b.Randomize(CLength);
   b.Normalize();
 
-  CBraid::ArtinBraid cb = ToCBraid(b);
+  //CBraid::ArtinBraid cb = ToCBraid(b);
+//
+  double itime, ftime, exec_time;
+//
+  //itime = omp_get_wtime();
+//
+  //std::list<std::list<CBraid::ArtinBraid>> cscs = Braiding::SC(cb);
+  
+  //ftime = omp_get_wtime();
 
-  TimeCounter t;
-
-  t.Start();
-
-  std::list<std::list<CBraid::ArtinBraid>> cscs = Braiding::SC(cb);
-
-  t.Stop();
-
-  std::cout << "Computing (Braiding) the SCS took " << t.IntervalSec() * 1000 << " ms." << std::endl;
-  std::cout << "It has " << cscs.size() << " orbits, and " << cscs.front().size() * cscs.size()  << " elements." << std::endl;
+  //exec_time = ftime - itime;
+//
+  //std::cout << "Computing (Braiding) the SCS took " << exec_time * 1000 << " ms." << std::endl;
+  //std::cout << "It has " << cscs.size() << " orbits, and " << cscs.front().size() * cscs.size()  << " elements." << std::endl;
 
   //t.Start();
 
@@ -68,15 +70,17 @@ int main()
 
   //std::cout << "Computing the SSS, of size " << sss.Card() << ", took " << t.IntervalSec() * 1000 << " ms." << std::endl;
 
-  t.Start();
-
+  itime = omp_get_wtime();
+  
   SC::SlidingCircuitSet<CGarside::ArtinBraid> scs = SC::SCS(b);
 
-  t.Stop();
+  ftime = omp_get_wtime();
+
+  exec_time = ftime - itime;
 
   //scs.Print(std::cout);
 
-  std::cout << "Computing the SCS took " << t.IntervalSec() * 1000 << " ms." << std::endl;
+  std::cout << "Computing the SCS took " << exec_time * 1000 << " ms." << std::endl;
   std::cout << "It has " << scs.NumberOfOrbits() << " orbits, and " << scs.Card()  << " elements." << std::endl;
 
   return 0; 

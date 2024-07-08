@@ -18,7 +18,7 @@ ifeq ($(USE_CLN),1)
 	LIBFLAGS_CLN = -lcln
 endif
 CPPFLAGS = -Wall -O3 -O -I$(CBRAID_INCDIR) -L$(CBRAID_LIBDIR) $(CPPFLAGS_CLN)
-LIBFLAGS = -lcbraid $(LIBFLAGS_CLN)
+LIBFLAGS = -lcbraid $(LIBFLAGS_CLN) -ltbb -fopenmp
 MAKEDEPFLAGS = -M
 
 # Default arguments for test programs.
