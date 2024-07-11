@@ -91,7 +91,7 @@ namespace CGarside
     {
       i = std::stoi(str);
     }
-    catch (std::invalid_argument)
+    catch (std::invalid_argument const&)
     {
       throw InvalidStringError();
     }

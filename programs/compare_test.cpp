@@ -7,6 +7,7 @@
 #include "band_braid.h"
 #include "octaedral_braid.h"
 #include "dihedral_braid.h"
+#include "dual_complex_reflection.h"
 #include "garsidesc.h"
 #include "garsideuss.h"
 #include "cbraid.h"
@@ -15,7 +16,7 @@
 #include "optarg.h"
 #include "timecounter.h"
 
-int Index = 24;
+int Index = 4;
 int CLength = 256;
 int Count = 1;
 int RandomSeed = 0;
@@ -47,6 +48,40 @@ int main()
   b.Randomize(CLength);
   b.Normalize();
 
+  std::string str1 = std::string("(3, 2)");
+  std::string str2 = std::string("(2, 1)");
+  std::string str3 = std::string("(4, 3)");
+  std::string str4 = std::string("1");
+  std::string str5 = std::string("9");
+
+  CGarside::ComplexDualBraidParameter en(3, Index);
+  CGarside::ComplexDualBraidUnderlying cf1(CGarside::ComplexDualBraidParameter(3, Index));
+  CGarside::ComplexDualBraidUnderlying cf2(CGarside::ComplexDualBraidParameter(3, Index));
+  cf1.OfString(str1);
+  cf2.OfString(str2);
+  CGarside::ComplexDualBraidUnderlying cf3 = cf1.Product(cf2);
+  std::cout << "cf1: ";
+  cf1.Debug(std::cout);
+  std::cout << std::endl;
+  std::cout << "cf2: ";
+  cf2.Debug(std::cout);
+  std::cout << std::endl;
+  std::cout << "cf3: ";
+  cf3.Debug(std::cout);
+  std::cout << std::endl;
+  int cfpart[3 * Index];
+  cf3.AssignPartition(cfpart);
+  std::cout << "cfpart: ";
+  for (int i = 0; i <= 3 * Index; i++) {
+    std::cout << cfpart[i] << " ";
+  }
+  std::cout << std::endl;
+  cf3.OfPartition(cfpart);
+  std::cout << "cf3: ";
+  cf3.Debug(std::cout);
+  std::cout << std::endl;
+  std::string("");
+
   //CBraid::ArtinBraid cb = ToCBraid(b);
 //
   double itime, ftime, exec_time;
@@ -71,7 +106,7 @@ int main()
   //std::cout << "Computing the SSS, of size " << sss.Card() << ", took " << t.IntervalSec() * 1000 << " ms." << std::endl;
 
   itime = omp_get_wtime();
-  
+
   SC::SlidingCircuitSet<CGarside::ArtinBraid> scs = SC::SCS(b);
 
   ftime = omp_get_wtime();

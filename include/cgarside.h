@@ -25,7 +25,20 @@ namespace CGarside
   typedef unsigned long long uint64;
 
   // Maximum braid index.
-  const sint16 MaxBraidIndex = 300;
+  const sint16 MaxBraidIndex = 256;
+
+  inline sint16 Quot(sint16 a, sint16 b)
+  {
+    sint16 r = a % b;
+    sint16 q = a / b;
+    return r >= 0 ? q : q + (b >= 0 ? -1 : 1);
+  };
+
+  inline sint16 Rem(sint16 a, sint16 b)
+  {
+    sint16 r = a % b;
+    return r >= 0 ? r : r + (b >= 0 ? b : -b);
+  };
 
   // Exceptions.
   struct InvalidStringError
@@ -100,7 +113,8 @@ namespace CGarside
 
     ~Factor() {}
 
-    U GetUnderlying() const {
+    U GetUnderlying() const
+    {
       return Underlying;
     }
 
@@ -231,7 +245,8 @@ namespace CGarside
       return b.RightComplement(*this);
     }
 
-    void DeltaConjugateMut(sint16 k) {
+    void DeltaConjugateMut(sint16 k)
+    {
       Underlying.DeltaConjugate(k);
     }
 
@@ -377,6 +392,14 @@ namespace CGarside
     }
   }
 
+  // Overloading << for factor classes.
+  template <class U>
+  std::ostream &operator<<(std::ostream &os, const Factor<U> &f)
+  {
+    f.Print(os);
+    return os;
+  }
+
   // We maintain braids in LCF at all time, except in exceptionnal cases.
   // Functions that manipulate RCF will be flagged as such.
   // If a function does not specify its laterality, assume it to be left by default.
@@ -516,7 +539,7 @@ namespace CGarside
     // `u.IsIdentity` returns whether u represents the Identity element.
     bool IsIdentity() const
     {
-      return Compare(Delta == 0 && FactorList.empty());
+      return Delta == 0 && FactorList.empty();
     }
 
     // `u.Inverse()` returns the inverse of u.
@@ -1094,8 +1117,10 @@ namespace CGarside
 
       ConstFactorItr it2 = b2.FactorList.begin();
 
-      for (ConstFactorItr it = FactorList.begin(); it != FactorList.end(); it++, it2++, rigidity++) {
-        if (*it != *it2) {
+      for (ConstFactorItr it = FactorList.begin(); it != FactorList.end(); it++, it2++, rigidity++)
+      {
+        if (*it != *it2)
+        {
           break;
         }
       }
@@ -1138,6 +1163,14 @@ namespace CGarside
       return h;
     }
   };
+
+  // Overloading << for braid classes.
+  template <class F>
+  std::ostream &operator<<(std::ostream &os, const Braid<F> &b)
+  {
+    b.Print(os);
+    return os;
+  }
 
 }
 

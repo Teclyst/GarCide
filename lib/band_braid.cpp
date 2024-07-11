@@ -258,7 +258,7 @@ namespace CGarside
 
     for (i = 1; i < n; i++)
     {
-      under.PermutationTable[i] = (PermutationTable[(i + k - 1) % n + 1] - k - 1) % n + 1;
+      under.PermutationTable[i] = Rem(PermutationTable[Rem(i + k - 1, n) + 1] - k - 1, n) + 1;
     }
     return under;
   }
