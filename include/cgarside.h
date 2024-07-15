@@ -107,12 +107,6 @@ namespace CGarside
     Factor(ParameterType parameter)
         : Underlying(parameter) {}
 
-    // Copy constructor.
-    Factor(const Factor &a)
-        : Underlying(a.Underlying) {}
-
-    ~Factor() {}
-
     U GetUnderlying() const
     {
       return Underlying;
@@ -162,17 +156,6 @@ namespace CGarside
     bool Compare(const Factor &b) const
     {
       return Underlying.Compare(b.Underlying);
-    }
-
-    Factor &Assign(const Factor &b)
-    {
-      Underlying.Assign(b.Underlying);
-      return *this;
-    }
-
-    Factor &operator=(const Factor &b)
-    {
-      return Assign(b);
     }
 
     // a == b returns true if a and b are equal, false otherwise.
@@ -317,7 +300,7 @@ namespace CGarside
 
     void RightProduct(const Factor &b)
     {
-      Assign(*this * b);
+      *this = *this * b;
     }
 
     std::size_t Hash() const
@@ -346,9 +329,7 @@ namespace CGarside
       std::vector<Factor> factor_atoms;
       for (auto const &atoms_it : atoms)
       {
-        Factor f = Factor(GetParameter());
-        f = atoms_it;
-        factor_atoms.push_back(f);
+        factor_atoms.push_back(atoms_it);
       }
       return factor_atoms;
     }
@@ -360,7 +341,14 @@ namespace CGarside
   template <class F>
   bool MakeLeftWeighted(F &u, F &v)
   {
+    // std::cout << "MLW" << std::endl;
+        // u.Debug(std::cout);
+    // std::cout << "\n" << u << std::endl;
+        // v.Debug(std::cout);
+    // std::cout << "\n" << v << std::endl;
     F t = (~u) ^ v;
+    // t.Debug(std::cout);
+    // std::cout << "\n" << t << std::endl;
     if (t.IsIdentity())
     {
       return false;
@@ -369,6 +357,10 @@ namespace CGarside
     {
       v = v / t;
       u = u * t;
+              // u.Debug(std::cout);
+    // std::cout << "\n" << u << std::endl;
+        // v.Debug(std::cout);
+    // std::cout << "\n" << v << std::endl;
       return true;
     }
   }
@@ -432,12 +424,6 @@ namespace CGarside
           Delta(0),
           FactorList() {}
 
-    // Copy constructor.
-    Braid(const Braid &w)
-        : Parameter(w.Parameter),
-          Delta(w.Delta),
-          FactorList(w.FactorList) {}
-
     // Constructor that transforms a factor into a word.
     // If the factor is Delta, `Delta` is incremented.
     Braid(const F &f)
@@ -454,9 +440,6 @@ namespace CGarside
         FactorList.push_back(f);
       }
     }
-
-    // Destructor.
-    ~Braid() {}
 
     ParameterType GetParameter() const
     {
@@ -485,19 +468,6 @@ namespace CGarside
     {
       Delta = 0;
       FactorList.clear();
-    }
-
-    inline Braid &Assign(const Braid &b)
-    {
-      Parameter = b.Parameter;
-      Delta = b.Delta;
-      FactorList = b.FactorList;
-      return *this;
-    }
-
-    inline Braid &operator=(const Braid &b)
-    {
-      return Assign(b);
     }
 
     // `u.CanonicalLength` returns u's canonical length.
@@ -1144,13 +1114,15 @@ namespace CGarside
 
     void Debug(std::ostream &os) const
     {
-      os << "D^" << Delta << " . ";
+      os << "{ Parameter: " << Parameter << ",\n"; 
+      os << "  Delta: " << Delta << ",\n";
+      os << "  FactorList: [";
       for (ConstFactorItr it = FactorList.begin(); it != FactorList.end(); it++)
       {
         (*it).Debug(os);
-        os << " . ";
+        os << ", ";
       }
-      os << std::endl;
+      os << "]\n}" << std::endl;
     }
 
     std::size_t Hash() const

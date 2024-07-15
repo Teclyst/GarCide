@@ -4,6 +4,11 @@
 
 namespace CGarside
 {
+  std::ostream &operator<<(std::ostream &os, const ComplexDualBraidParameter &p)
+  {
+    p.Debug(os);
+    return os;
+  };
 
   ComplexDualBraidParameter ComplexDualBraidUnderlying::GetParameter() const
   {
@@ -15,68 +20,116 @@ namespace CGarside
     return GetParameter().n + 1;
   }
 
-  ComplexDualBraidUnderlying &ComplexDualBraidUnderlying::Assign(const ComplexDualBraidUnderlying &a)
-  {
-    if (&a != this)
-    {
-      for (sint16 i = 0; i <= GetParameter().n; ++i)
-      {
-        PermutationTable[i] = a.PermutationTable[i];
-        CoefficientTable[i] = a.CoefficientTable[i];
-      }
-    }
-    return *this;
-  };
-
-  ComplexDualBraidUnderlying &ComplexDualBraidUnderlying::operator=(const ComplexDualBraidUnderlying &a)
-  {
-    return Assign(a);
-  }
-
   ComplexDualBraidUnderlying::ComplexDualBraidUnderlying(ComplexDualBraidParameter p)
       : PresentationParameter(p), PermutationTable(p.n + 1), CoefficientTable(p.n + 1) {}
 
   void ComplexDualBraidUnderlying::Print(std::ostream &os) const
   {
-    // Recall that a band braid is represented by decreasing cycles.
-    sint16 i, j, k, n = GetParameter().n;
-    sint16 curr_cycle[2 * n];
-    bool seen[2 * n + 1];
-    for (i = 1; i <= n; i++)
+    sint16 n = GetParameter().n, e = GetParameter().e;
+    std::vector<bool> seen(n + 1, false);
+    std::vector<sint16> curr_cycle;
+    sint16 other_smallest = 0, cycle_type, curr, c = 0;
+    seen[0] = true;
+
+    curr = PermutationTable[0];
+    // Short assymetric case.
+    if (curr != 0)
     {
-      seen[i] = false;
+      while (curr != 0)
+      {
+        curr_cycle.push_back(curr);
+        seen[curr] = true;
+        other_smallest = ((curr < curr_cycle[other_smallest]) && (curr != 0)) ? c : other_smallest;
+        curr = PermutationTable[curr];
+        c++;
+      }
+      other_smallest = ((other_smallest == 0) ? int(curr_cycle.size()) : other_smallest);
+      for (sint16 i = int(curr_cycle.size()) - 1; i >= 1; i--)
+      {
+        os << "("
+           << ((i >= other_smallest)
+                   ? curr_cycle[i] + Rem(CoefficientTable[0] + 1, e) * n
+                   : curr_cycle[i] + CoefficientTable[0] * n)
+           << ", "
+           << ((i >= other_smallest + 1)
+                   ? curr_cycle[i - 1] + Rem(CoefficientTable[0] + 1, e) * n
+                   : curr_cycle[i - 1] + CoefficientTable[0] * n)
+           << ") ";
+      }
+      os << curr_cycle[0] + CoefficientTable[0] * n << " ";
     }
-    for (i = 1; i <= n; ++i)
+
+    for (sint16 i = 1; i <= n; ++i)
     {
       if (!seen[i])
       {
-        k = 0;
-        j = i;
-        while (j < PermutationTable[j])
+        seen[i] = true;
+        c = 0;
+        other_smallest = 0;
+        cycle_type = CoefficientTable[i];
+        if (CoefficientTable[i] == e - 1)
         {
-          curr_cycle[k] = j;
-          k++;
-          seen[j] = true;
-          seen[((j + n - 1) % (2 * n)) + 1] = true;
-          j = PermutationTable[j];
+          other_smallest = c + 1;
         }
-        curr_cycle[k] = j;
-        seen[j] = true;
-        seen[((j + n - 1) % (2 * n)) + 1] = true;
-        for (sint16 l = k; l >= 1; --l)
+        curr = PermutationTable[i];
+        curr_cycle.clear();
+        curr_cycle.push_back(i);
+        while (curr != i)
         {
-          if (l == ((j + n - 1) % (2 * n)) + 1)
+          curr_cycle.push_back(curr);
+          seen[curr] = true;
+          c++;
+          if (CoefficientTable[curr] == e - 1)
           {
-            os << j << " ";
-            break;
+            other_smallest = c + 1;
           }
-          os << "(" << curr_cycle[l] << ", " << curr_cycle[l - 1] << ") ";
+          cycle_type += CoefficientTable[curr];
+          curr = PermutationTable[curr];
+        }
+        if (cycle_type == 2)
+        {
+          exit(1);
+        };
+        // If cycle_type == 0, then the cycle is short.
+        if (Rem(cycle_type, e) == 0)
+        {
+          for (sint16 i = int(curr_cycle.size()) - 1; i >= 1; i--)
+          {
+            os << "("
+               << ((other_smallest + i >= int(curr_cycle.size()))
+                       ? curr_cycle[other_smallest + i - int(curr_cycle.size())] + n
+                       : curr_cycle[other_smallest + i])
+               << ", "
+               << ((other_smallest + i - 1 >= int(curr_cycle.size()))
+                       ? curr_cycle[other_smallest + i - 1 - int(curr_cycle.size())] + n
+                       : curr_cycle[other_smallest + i - 1])
+               << ") ";
+          }
+        }
+        // Otherwise, it is long.
+        else
+        {
+          other_smallest = ((other_smallest == 0) ? int(curr_cycle.size()) : other_smallest);
+          for (sint16 i = int(curr_cycle.size()) - 1; i >= 1; i--)
+          {
+            os << "("
+               << ((i >= other_smallest)
+                       ? curr_cycle[i] + n
+                       : curr_cycle[i])
+               << ", "
+               << ((i >= other_smallest + 1)
+                       ? curr_cycle[i - 1] + n
+                       : curr_cycle[i - 1])
+               << ") ";
+          }
+          os << curr_cycle[0] << " "
+             << curr_cycle[0] + n << " ";
         }
       }
     }
   }
 
-  void ComplexDualBraidUnderlying::OfString(std::string &str)
+  void ComplexDualBraidUnderlying::OfString(std::string str)
   {
     sint16 n = GetParameter().n, e = GetParameter().e;
     sint16 i, j, q, r;
@@ -84,7 +137,7 @@ namespace CGarside
     if (str[0] != '(')
     {
       i = Rem(std::stoi(str) - 1, e * n) + 1;
-      q = Rem(-Quot(i - 1, n), e);
+      q = Rem(Quot(i - 1, n), e);
       r = Rem(i - 1, n) + 1;
       Identity();
       PermutationTable[0] = r;
@@ -108,14 +161,14 @@ namespace CGarside
       sint16 m = std::min(i, j);
       j = std::max(i, j);
       i = m;
-      i = Rem(i, n);
-      j = Rem(j, n);
+      i = Rem(i - 1, n) + 1;
+      j = Rem(j - 1, n) + 1;
       j = (j <= i) ? j + n : j;
       Identity();
-      PermutationTable[i] = j;
-      PermutationTable[j] = i;
-      CoefficientTable[i] = (j >= n) ? 1 : 0;
-      CoefficientTable[j] = (j >= n) ? e - 1 : 0;
+      PermutationTable[i] = (j > n) ? j - n : j;
+      PermutationTable[(j > n) ? j - n : j] = i;
+      CoefficientTable[i] = (j > n) ? 1 : 0;
+      CoefficientTable[(j > n) ? j - n : j] = (j > n) ? e - 1 : 0;
     }
     else
     {
@@ -142,28 +195,41 @@ namespace CGarside
       while (curr != 0)
       {
         curr_cycle.push_back(curr);
-        curr = PermutationTable[curr];
         other_smallest = ((curr < curr_cycle[other_smallest]) && (curr != 0)) ? c : other_smallest;
+        curr = PermutationTable[curr];
         c++;
       }
-      other_smallest = Rem(other_smallest - 1, int(curr_cycle.size())) + 1;
-      for (sint16 k = 0; k < other_smallest; k++)
+      if (other_smallest != 0)
       {
-        for (sint16 l = 1; l < e; l++)
+        for (sint16 k = 0; k < other_smallest; k++)
         {
-          x[curr_cycle[k] + l * n] = curr_cycle[0] + l * n;
+          for (sint16 l = 0; l < e - 1; l++)
+          {
+            x[curr_cycle[k] + l * n] = curr_cycle[0] + l * n;
+          }
+          x[curr_cycle[k] + (e - 1) * n] = curr_cycle[other_smallest];
+          x[curr_cycle[k] + Rem(CoefficientTable[0], e) * n] = 0;
         }
-        x[curr_cycle[k]] = curr_cycle[Rem(other_smallest, int(curr_cycle.size()))];
-        x[curr_cycle[k] + Rem(e - CoefficientTable[0], e) * n] = 0;
+        for (sint16 k = other_smallest; k < int(curr_cycle.size()); k++)
+        {
+          for (sint16 l = 0; l < e - 1; l++)
+          {
+            x[curr_cycle[k] + (l + 1) * n] = curr_cycle[0] + l * n;
+          }
+          x[curr_cycle[k]] = curr_cycle[other_smallest];
+          x[curr_cycle[k] + Rem(CoefficientTable[0] + 1, e) * n] = 0;
+        }
       }
-      for (sint16 k = other_smallest; k < int(curr_cycle.size()); k++)
+      else
       {
-        for (sint16 l = 0; l < e - 1; l++)
+        for (sint16 k = 0; k < int(curr_cycle.size()); k++)
         {
-          x[curr_cycle[k] + (l + 1) * n] = curr_cycle[0] + l * n;
+          for (sint16 l = 0; l < e; l++)
+          {
+            x[curr_cycle[k] + l * n] = curr_cycle[0] + l * n;
+          }
+          x[curr_cycle[k] + Rem(CoefficientTable[0], e) * n] = 0;
         }
-        x[curr_cycle[k] + (e - 1) * n] = curr_cycle[other_smallest];
-        x[curr_cycle[k] + Rem(e - CoefficientTable[0] + 1, e) * n] = 0;
       }
     }
 
@@ -172,39 +238,56 @@ namespace CGarside
       if (x[i] < 0)
       {
         c = 0;
-        cycle_type = CoefficientTable[i];
         other_smallest = 0;
+        cycle_type = CoefficientTable[i];
+        if (CoefficientTable[i] == e - 1)
+        {
+          other_smallest = 1;
+        }
         curr = PermutationTable[i];
         curr_cycle.clear();
         curr_cycle.push_back(i);
         while (curr != i)
         {
           curr_cycle.push_back(curr);
+          c++;
           if (CoefficientTable[curr] == e - 1)
           {
             other_smallest = c + 1;
           }
           cycle_type += CoefficientTable[curr];
-          c++;
           curr = PermutationTable[curr];
         }
         // If cycle_type == 0, then the cycle is short.
-        if (cycle_type == 0)
+        if (Rem(cycle_type, e) == 0)
         {
-          for (sint16 k = 0; k < other_smallest; k++)
+          if (other_smallest != 0)
           {
-            x[(e - 1) * n + curr_cycle[k]] = i;
-            for (sint16 l = 0; l < e - 1; l++)
+            for (sint16 k = 0; k < other_smallest; k++)
             {
-              x[curr_cycle[k] + (l + 1) * n] = curr_cycle[other_smallest] + l * n;
+              x[curr_cycle[k]] = i;
+              for (sint16 l = 0; l < e - 1; l++)
+              {
+                x[curr_cycle[k] + (l + 1) * n] = curr_cycle[other_smallest] + l * n;
+              }
+            }
+            for (sint16 k = other_smallest; k < int(curr_cycle.size()); k++)
+            {
+              x[curr_cycle[k] + (e - 1) * n] = i;
+              for (sint16 l = 0; l < e - 1; l++)
+              {
+                x[curr_cycle[k] + l * n] = curr_cycle[other_smallest] + l * n;
+              }
             }
           }
-          for (sint16 k = other_smallest; k < int(curr_cycle.size()); k++)
+          else
           {
-            x[curr_cycle[k]] = i;
-            for (sint16 l = 1; l < e; l++)
+            for (sint16 k = 0; k < int(curr_cycle.size()); k++)
             {
-              x[curr_cycle[k] + l * n] = curr_cycle[other_smallest] + l * n;
+              for (sint16 l = 0; l < e; l++)
+              {
+                x[curr_cycle[k] + l * n] = curr_cycle[0] + l * n;
+              }
             }
           }
         }
@@ -221,9 +304,11 @@ namespace CGarside
         }
       }
     }
+
+    GetParameter().check_non_crossing(x);
   }
 
-  // We assume e > 1 (use the braid group implement for e = 1).
+  // We assume e > 1 (use the braid group implementation for e = 1).
   void ComplexDualBraidUnderlying::OfPartition(const sint16 *x)
   {
     thread_local sint16 z[MaxBraidIndex + 1];
@@ -233,6 +318,8 @@ namespace CGarside
     for (sint16 i = 0; i <= n; ++i)
     {
       z[i] = -1;
+      PermutationTable[i] = -1;
+      CoefficientTable[i] = -1;
     }
     // First find short symmetrical cycles.
     for (sint16 i = 2 * n - 1; i >= n + 1; --i)
@@ -256,9 +343,9 @@ namespace CGarside
     }
     for (sint16 i = n; i >= 1; --i)
     {
-      if ((x[i] <= n) && (x[i] >= 1))
+      if ((x[i] <= n) && (x[i] >= 1) && (x[i + n] > n))
       {
-        if (z[x[i]] == -1)
+        if ((z[x[i]] == -1))
         {
           PermutationTable[i] = x[i];
           CoefficientTable[i] = 0;
@@ -284,23 +371,26 @@ namespace CGarside
     if (min_cycle_0 != 0)
     {
       // Determine if it is long symmetric.
-      if (x[Rem(min_cycle_0 + n, e * n)] == 0)
+      if (x[Rem(min_cycle_0 + n - 1, e * n) + 1] == 0)
       {
         CoefficientTable[0] = e - 1;
         PermutationTable[0] = 0;
         for (sint16 i = n; i >= 1; i--)
         {
-          if (z[x[i]] == -1)
+          if (x[i] == 0)
           {
-            PermutationTable[i] = min_cycle_0;
-            CoefficientTable[i] = 1;
+            if (z[x[i]] == -1)
+            {
+              PermutationTable[i] = min_cycle_0;
+              CoefficientTable[i] = 1;
+            }
+            else
+            {
+              PermutationTable[i] = z[x[i]];
+              CoefficientTable[i] = 0;
+            }
+            z[x[i]] = i;
           }
-          else
-          {
-            PermutationTable[i] = z[x[i]];
-            CoefficientTable[i] = 0;
-          }
-          z[x[i]] = i;
         }
       }
       // Assymetric case.
@@ -316,14 +406,27 @@ namespace CGarside
         }
         if ((min_cycle_0 <= n) && (max_cycle_0 > (e - 1) * n))
         {
-          sint16 temp = max_cycle_0;
-          max_cycle_0 = min_cycle_0;
-          min_cycle_0 = temp;
+          for (sint16 i = (e - 1) * n + 1; i <= e * n; i++)
+          {
+            if (x[i] == 0)
+            {
+              min_cycle_0 = i;
+              break;
+            }
+          }
+          for (sint16 i = n; i >= 1; i--)
+          {
+            if (x[i] == 0)
+            {
+              max_cycle_0 = i;
+              break;
+            }
+          }
         }
         sint16 q_min = Quot(min_cycle_0 - 1, n), q_max = Quot(max_cycle_0 - 1, n);
         sint16 r_min = Rem(min_cycle_0 - 1, n) + 1;
         z[0] = 0;
-        CoefficientTable[0] = Rem(e - q_min, e);
+        CoefficientTable[0] = q_min;
         PermutationTable[0] = r_min;
 
         for (sint16 i = n - 1; i >= n - r_min + 1; --i)
@@ -346,11 +449,11 @@ namespace CGarside
             if (z[0] == 0)
             {
               PermutationTable[r] = z[0];
-              CoefficientTable[r] = q_max;
+              CoefficientTable[r] = Rem(e - q_min, e);
             }
             else
             {
-              CoefficientTable[r] = (z[0] < i) ? 1 : 0;
+              CoefficientTable[r] = (z[0] < r) ? 1 : 0;
               PermutationTable[r] = z[0];
             }
             z[0] = r;
@@ -423,9 +526,9 @@ namespace CGarside
     {
       throw NonMatchingIndexes(GetParameter().n, b.GetParameter().n);
     }
-    for (i = 1; 0 <= GetParameter().n; i++)
+    for (i = 0; i <= GetParameter().n; i++)
     {
-      if (PermutationTable[i] != b.PermutationTable[i] || CoefficientTable[i] != b.CoefficientTable[i])
+      if ((PermutationTable[i] != b.PermutationTable[i]) || (CoefficientTable[i] != b.CoefficientTable[i]))
       {
         return false;
       }
@@ -436,9 +539,16 @@ namespace CGarside
   ComplexDualBraidUnderlying ComplexDualBraidUnderlying::Inverse() const
   {
     ComplexDualBraidUnderlying f = ComplexDualBraidUnderlying(GetParameter());
+    Debug(std::cout);
+    std::cout << std::endl;
     sint16 i, n = GetParameter().n;
     for (i = 0; i <= n; i++)
     {
+      if ((PermutationTable[i] > n) || (PermutationTable[i] < 0))
+      {
+        std::cout << PermutationTable[i] << std::endl;
+        exit(1);
+      }
       f.PermutationTable[PermutationTable[i]] = i;
       f.CoefficientTable[PermutationTable[i]] = CoefficientTable[i] == 0 ? 0 : n - CoefficientTable[i] - 1;
     }
@@ -456,7 +566,7 @@ namespace CGarside
     for (i = 0; i <= n; i++)
     {
       f.PermutationTable[i] = b.PermutationTable[PermutationTable[i]];
-      f.CoefficientTable[i] = (b.CoefficientTable[PermutationTable[i]] + CoefficientTable[i]) % e;
+      f.CoefficientTable[i] = Rem(b.CoefficientTable[PermutationTable[i]] + CoefficientTable[i], e);
     }
     return f;
   };
@@ -493,7 +603,7 @@ namespace CGarside
       delta_k.CoefficientTable[i] = q_e;
     }
 
-    Assign(delta_k.Inverse().Product((*this).Product(delta_k)));
+    *this = delta_k.Inverse().Product((*this).Product(delta_k));
   }
 
   void ComplexDualBraidUnderlying::Randomize()

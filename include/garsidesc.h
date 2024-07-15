@@ -232,9 +232,9 @@ namespace SC
   {
     F f = F(b.GetParameter());
     std::vector<F> atoms = f.Atoms();
-    std::vector<F> factors = f.Atoms();
+    std::vector<F> factors = atoms;
 
-    std::transform(std::execution::par,
+    std::transform(std::execution::seq,
                    atoms.begin(),
                    atoms.end(),
                    factors.begin(),
@@ -242,7 +242,7 @@ namespace SC
 
     std::vector<F> min;
 
-    bool table[atoms.size()] = {false};
+    std::vector<bool> table(atoms.size(), false);
     bool should_be_added;
 
     for (sint16 i = 0; i < int(atoms.size()); i++)

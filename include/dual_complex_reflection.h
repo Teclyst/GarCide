@@ -28,7 +28,28 @@ namespace CGarside
     {
       return !Compare(p);
     }
+
+    void Debug(std::ostream &os) const {
+      os << "{ e: " << e << ", n: " << n << "}"; 
+    }
+
+    void check_non_crossing(sint16 *x) {
+      for (sint16 i = 1; i < e * n; i++) {
+        for (sint16 j = i + 1; j <= e * n; j++) {
+          for (sint16 k = i + 1; k <= j; k++) {
+            for (sint16 l = j + 1; l <= e * n; l++) {
+              if ((x[i] == x[j]) && (x[k] == x[l]) && (x[i] != x[k])) {
+                exit(1);
+              }
+            }
+          }
+        }
+      }
+    }
+
   };
+
+  std::ostream& operator<<(std::ostream &os, const ComplexDualBraidParameter &p);
 
   // You may use Braids with parameter e, n such that e * n <= `MaxE` * `MaxBraidIndex`.
   // Note that `MaxE` IS NOT a strict bound; rather, it is the greatest possible e such that it is possible to have braids with parameter n as great as `MaxBraidIndex`.
@@ -57,14 +78,14 @@ namespace CGarside
     // Constructor
     ComplexDualBraidUnderlying(ComplexDualBraidParameter p);
 
-    void OfString(std::string &str);
+    void OfString(std::string str);
 
     void Debug(std::ostream &os) const
     {
       os << "[";
       for (sint16 i = 0; i <= GetParameter().n; i++)
       {
-        os << "(" << PermutationTable[i] << ", " << CoefficientTable[i] << ") ";
+        os << "(" << PermutationTable[i] << ", " << CoefficientTable[i] << "), ";
       }
       os << "]";
     }
@@ -72,10 +93,6 @@ namespace CGarside
     void AssignPartition(sint16 *x) const;
 
     void OfPartition(const sint16 *x);
-
-    ComplexDualBraidUnderlying &Assign(const ComplexDualBraidUnderlying &a);
-
-    ComplexDualBraidUnderlying &operator=(const ComplexDualBraidUnderlying &a);
 
     // Print to os. Be wary, as it side-effects!
     void Print(std::ostream &os) const;

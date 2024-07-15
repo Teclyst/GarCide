@@ -14,7 +14,7 @@ namespace CGarside
   protected:
     sint16 PresentationParameter;
 
-    sint16 *PermutationTable;
+    std::vector<sint16> PermutationTable;
 
   public:
     typedef sint16 ParameterType;
@@ -29,20 +29,9 @@ namespace CGarside
     // Constructor
     ArtinBraidUnderlying(ParameterType n);
 
-    ArtinBraidUnderlying(const ArtinBraidUnderlying &a);
-
-    ~ArtinBraidUnderlying()
-    {
-      delete[] PermutationTable;
-    }
-
     void OfString(const std::string &str);
 
     sint16 LatticeHeight() const;
-
-    ArtinBraidUnderlying &Assign(const ArtinBraidUnderlying &a);
-
-    ArtinBraidUnderlying &operator=(const ArtinBraidUnderlying &a);
 
     void Debug(std::ostream &os) const
     {
@@ -107,7 +96,7 @@ namespace CGarside
 
     // Conjugate by Delta^k.
     // Used to speed up calculations compared to the default implementation.
-    void DeltaConjugate(sint16 k) const;
+    void DeltaConjugate(sint16 k);
 
     std::size_t Hash() const {
       std::size_t h = 0;

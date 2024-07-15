@@ -48,39 +48,9 @@ namespace CGarside
     return PresentationParameter;
   };
 
-  ArtinBraidUnderlying &ArtinBraidUnderlying::Assign(const ArtinBraidUnderlying &a)
-  {
-    if (&a != this)
-    {
-      for (sint16 i = 1; i <= GetParameter(); ++i)
-      {
-        PermutationTable[i] = a.PermutationTable[i];
-      }
-    }
-    return *this;
-  };
-
-  ArtinBraidUnderlying &ArtinBraidUnderlying::operator=(const ArtinBraidUnderlying &a)
-  {
-    return Assign(a);
-  }
-
   ArtinBraidUnderlying::ArtinBraidUnderlying(sint16 n)
-      : PresentationParameter(n)
-  {
-    PermutationTable = new sint16[n + 1];
-  }
-
-  ArtinBraidUnderlying::ArtinBraidUnderlying(const ArtinBraidUnderlying &a)
-      : PresentationParameter(a.GetParameter())
-  {
-    PermutationTable = new sint16[a.GetParameter() + 1];
-    sint16 i;
-    for (i = 1; i <= a.GetParameter(); i++)
-    {
-      PermutationTable[i] = a.PermutationTable[i];
-    }
-  }
+      : PresentationParameter(n),
+      PermutationTable(n + 1) {}
 
   void ArtinBraidUnderlying::OfString(const std::string &str)
   {
@@ -171,7 +141,7 @@ namespace CGarside
 
     for (sint16 i = 1; i <= GetParameter(); ++i)
       s[i] = i;
-    MeetSub(PermutationTable, b.PermutationTable, s, 1, GetParameter());
+    MeetSub(PermutationTable.data(), b.PermutationTable.data(), s, 1, GetParameter());
     for (sint16 i = 1; i <= GetParameter(); ++i)
       f.PermutationTable[s[i]] = i;
 
@@ -196,7 +166,7 @@ namespace CGarside
     }
     for (sint16 i = 1; i <= GetParameter(); ++i)
       f.PermutationTable[i] = i;
-    MeetSub(u, v, f.PermutationTable, 1, GetParameter());
+    MeetSub(u, v, f.PermutationTable.data(), 1, GetParameter());
 
     return f;
   };
@@ -273,19 +243,19 @@ namespace CGarside
     std::vector<ArtinBraidUnderlying> atoms;
     for (i = 1; i <= n - 1; i++)
     {
-      ArtinBraidUnderlying atom = ArtinBraidUnderlying(n);
+      ArtinBraidUnderlying atom(n);
       atom.OfString(std::to_string(i));
       atoms.push_back(atom);
     }
     return atoms;
   };
 
-  void ArtinBraidUnderlying::DeltaConjugate(sint16 k) const
+  void ArtinBraidUnderlying::DeltaConjugate(sint16 k)
   {
-    sint16 i, n = GetParameter();
+    sint16 n = GetParameter();
     if (k % 2 != 0)
     {
-      for (i = 1; i <= n / 2; i++)
+      for (sint16 i = 1; i <= n / 2; i++)
       {
         sint16 u = PermutationTable[i];
         PermutationTable[i] = n - PermutationTable[n - i + 1] + 1;

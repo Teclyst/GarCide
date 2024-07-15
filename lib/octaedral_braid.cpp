@@ -52,9 +52,9 @@ namespace CGarside
   void BDualBraidUnderlying::Print(std::ostream &os) const
   {
     // Recall that a band braid is represented by decreasing cycles.
-    sint16 i, j, k, n = GetParameter();
-    sint16 curr_cycle[2 * n];
-    bool seen[2 * n + 1];
+    sint16 i, j, n = GetParameter();
+    std::vector<sint16> curr_cycle;
+    std::vector<bool> seen(n + 1, false);
     for (i = 1; i <= n; i++)
     {
       seen[i] = false;
@@ -63,20 +63,19 @@ namespace CGarside
     {
       if (!seen[i])
       {
-        k = 0;
+        curr_cycle.clear();
         j = i;
         while (j < PermutationTable[j])
         {
-          curr_cycle[k] = j;
-          k++;
+          curr_cycle.push_back(j);
           seen[j] = true;
           seen[((j + n - 1) % (2 * n)) + 1] = true;
           j = PermutationTable[j];
         }
-        curr_cycle[k] = j;
+        curr_cycle.push_back(j);
         seen[j] = true;
         seen[((j + n - 1) % (2 * n)) + 1] = true;
-        for (sint16 l = k; l >= 1; --l)
+        for (sint16 l = int(curr_cycle.size()); l >= 1; --l)
         {
           if (l == ((j + n - 1) % (2 * n)) + 1)
           {
