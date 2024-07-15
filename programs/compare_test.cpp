@@ -16,8 +16,8 @@
 #include "optarg.h"
 #include "timecounter.h"
 
-int Index = 24;
-int CLength = 12;
+int Index = 8;
+int CLength = 16;
 int Count = 1;
 int RandomSeed = 0;
 
@@ -50,7 +50,7 @@ int main()
   CGarside::ArtinBraid b(Index);
 
   b.Randomize(CLength);
-  //b.Normalize();
+  // b.Normalize();
 
   std::string str1 = std::string("(5, 2)");
   std::string str2 = std::string("(6, 5)");
@@ -89,14 +89,14 @@ int main()
   // std::cout << std::endl;
   // cf3.RightComplement(cf1).AssignPartition(cfpart);
   // cf3.OfString(str5);
-    // cf3.Debug(std::cout);
+  // cf3.Debug(std::cout);
   // std::cout << std::endl;
   // cf3.AssignPartition(cfpart);
   // std::cout << "cfpart: ";
-  
+
   // for (int i = 0; i <= 3 * Index; i++)
   // {
-    // std::cout << cfpart[i] << " ";
+  // std::cout << cfpart[i] << " ";
   // }
   // std::cout << std::endl;
   // cf3.OfPartition(cfpart);
@@ -104,7 +104,7 @@ int main()
   // cf3.Debug(std::cout);
   // std::cout << std::endl;
   // std::cout << cf3 << std::endl;
-// 
+  //
   // cf1.OfString(str1);
   // cf2.OfString(str2);
   // cf3 = cf1.Product(cf2);
@@ -116,10 +116,10 @@ int main()
   // std::cout << std::endl;
   // cf3.AssignPartition(cfpart);
   // std::cout << "cfpart: ";
-  
+
   // for (int i = 0; i <= 3 * Index; i++)
   // {
-    // std::cout << cfpart[i] << " ";
+  // std::cout << cfpart[i] << " ";
   // }
   // cf1.Delta();
   // cf2.OfString(str3);
@@ -129,24 +129,20 @@ int main()
   // std::cout << std::endl;
   // cf3.DeltaConjugate(13);
   // cf3.Debug(std::cout);
-// 
+  //
   // std::cout << std::endl;
   CGarside::ComplexDualBraidFactor cof(en);
-// 
+  //
+
+  std::vector<CGarside::ComplexDualBraidFactor> atoms = cof.Atoms();
   CGarside::ComplexDualBraid cob(en);
 
-  cof.OfString(str1);
-  cob.RightProduct(cof);
-  cof.OfString(str2);
-  cob.RightProduct(cof);
-  cof.OfString(str5);
-  cob.RightProduct(cof);
-  cof.OfString(str3);
-  cob.RightProduct(cof);
-  cof.OfString(str4);
-  cob.RightProduct(cof);
-  cof.OfString(str1);
-  cob.RightProduct(cof);
+  for (int j = 0; j < Count; j++)
+  {  for (int i = 0; i < CLength; i++)
+  {
+    cof = atoms[rand() % atoms.size()];
+    cob.RightProduct(cof);
+  }
 
   std::cout << cob << std::endl;
   cob.Debug(std::cout);
@@ -154,6 +150,7 @@ int main()
 
   SC::SCS(cob).Print(std::cout);
 
+  }
   // delete[] cfpart;
 
   // CBraid::ArtinBraid cb = ToCBraid(b);
@@ -185,7 +182,7 @@ int main()
 
   itime = omp_get_wtime();
 
-  SC::SlidingCircuitSet<CGarside::ArtinBraid> scs = SC::SCS(b);
+  //SC::SlidingCircuitSet<CGarside::ArtinBraid> scs = SC::SCS(b);
 
   ftime = omp_get_wtime();
 
@@ -193,8 +190,8 @@ int main()
 
   // scs.Print(std::cout);
 
-  std::cout << "Computing the SCS took " << exec_time * 1000 << " ms." << std::endl;
-  std::cout << "It has " << scs.NumberOfOrbits() << " orbits, and " << scs.Card() << " elements." << std::endl;
+  // std::cout << "Computing the SCS took " << exec_time * 1000 << " ms." << std::endl;
+  // std::cout << "It has " << scs.NumberOfOrbits() << " orbits, and " << scs.Card() << " elements." << std::endl;
 
   return 0;
 }

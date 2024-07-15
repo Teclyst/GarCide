@@ -143,7 +143,7 @@ namespace CGarside
       PermutationTable[0] = r;
       PermutationTable[r] = 0;
       CoefficientTable[0] = q;
-      CoefficientTable[r] = Rem(-q, e);
+      CoefficientTable[r] = e - q;
       return;
     }
     str.erase(0, 1);
@@ -308,7 +308,7 @@ namespace CGarside
     GetParameter().check_non_crossing(x);
   }
 
-  // We assume e > 1 (use the braid group implementation for e = 1).
+  // We assume e > 1.
   void ComplexDualBraidUnderlying::OfPartition(const sint16 *x)
   {
     thread_local sint16 z[MaxBraidIndex + 1];
@@ -539,18 +539,15 @@ namespace CGarside
   ComplexDualBraidUnderlying ComplexDualBraidUnderlying::Inverse() const
   {
     ComplexDualBraidUnderlying f = ComplexDualBraidUnderlying(GetParameter());
-    Debug(std::cout);
-    std::cout << std::endl;
-    sint16 i, n = GetParameter().n;
+    sint16 i, n = GetParameter().n, e = GetParameter().e;
     for (i = 0; i <= n; i++)
     {
       if ((PermutationTable[i] > n) || (PermutationTable[i] < 0))
       {
-        std::cout << PermutationTable[i] << std::endl;
-        exit(1);
+        while (true) {};
       }
       f.PermutationTable[PermutationTable[i]] = i;
-      f.CoefficientTable[PermutationTable[i]] = CoefficientTable[i] == 0 ? 0 : n - CoefficientTable[i] - 1;
+      f.CoefficientTable[PermutationTable[i]] = CoefficientTable[i] == 0 ? 0 : e - CoefficientTable[i];
     }
     return f;
   };
@@ -596,7 +593,7 @@ namespace CGarside
       delta_k.CoefficientTable[i] = q_e;
     }
     q_e += 1;
-    q_e = q_e == e ? 0 : q_e;
+    q_e = ((q_e == e) ? 0 : q_e);
     for (i = n - r + 1; i <= n; i++)
     {
       delta_k.PermutationTable[i] = Rem(i + k - 1, n) + 1;
@@ -632,11 +629,20 @@ namespace CGarside
         atom.PermutationTable[i] = j;
         atom.PermutationTable[j] = i;
         atom.CoefficientTable[i] = 1;
-        atom.CoefficientTable[j] = -1 + e;
+        atom.CoefficientTable[j] = e - 1;
         atoms.push_back(atom);
       }
     }
-    for (sint16 k = 0; k < e; k++)
+    for (sint16 i = 1; i <= n; i++)
+      {
+        atom.Identity();
+        atom.PermutationTable[0] = i;
+        atom.PermutationTable[i] = 0;
+        atom.CoefficientTable[0] = 0;
+        atom.CoefficientTable[i] = 0;
+        atoms.push_back(atom);
+      }
+    for (sint16 k = 1; k < e; k++)
     {
       for (sint16 i = 1; i <= n; i++)
       {
@@ -644,7 +650,7 @@ namespace CGarside
         atom.PermutationTable[0] = i;
         atom.PermutationTable[i] = 0;
         atom.CoefficientTable[0] = k;
-        atom.CoefficientTable[i] = -k + e;
+        atom.CoefficientTable[i] = e - k;
         atoms.push_back(atom);
       }
     }

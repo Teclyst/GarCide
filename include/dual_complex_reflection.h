@@ -30,7 +30,7 @@ namespace CGarside
     }
 
     void Debug(std::ostream &os) const {
-      os << "{ e: " << e << ", n: " << n << "}"; 
+      os << "{ e: " << e << ", n: " << n << " }"; 
     }
 
     void check_non_crossing(sint16 *x) {
