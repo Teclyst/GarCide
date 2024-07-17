@@ -8,6 +8,7 @@
 #include "octaedral_braid.h"
 #include "dihedral_braid.h"
 #include "dual_complex_reflection.h"
+#include "standard_complex_reflection.h"
 #include "garsidesc.h"
 #include "garsideuss.h"
 #include "cbraid.h"
@@ -17,7 +18,7 @@
 #include "timecounter.h"
 
 int Index = 8;
-int CLength = 16;
+int CLength = 8;
 int Count = 1;
 int RandomSeed = 0;
 
@@ -52,8 +53,6 @@ int main()
   b.Randomize(CLength);
   b.Normalize();
 
-  std::cout << "foo" << std::endl;
-
   std::string str1 = std::string("(5, 2)");
   std::string str2 = std::string("(6, 5)");
   std::string str3 = std::string("(4, 3)");
@@ -61,9 +60,9 @@ int main()
   std::string str5 = std::string("5");
 
   // int *cfpart = new int[3 * Index + 1];
-  CGarside::ComplexDualBraidParameter en(3, Index);
+  CGarside::ComplexStandardBraidParameter en(3, Index);
   // CGarside::BandBraidFactor foo(Index);
-  CGarside::ComplexDualBraid cfoo(en);
+  // CGarside::ComplexDualBraid cfoo(en);
   // cfoo.Randomize(CLength);
   // CGarside::ComplexDualBraidUnderlying cf1(CGarside::ComplexDualBraidParameter(3, Index));
   // CGarside::ComplexDualBraidUnderlying cf2(CGarside::ComplexDualBraidParameter(3, Index));
@@ -133,26 +132,37 @@ int main()
   // cf3.Debug(std::cout);
   //
   // std::cout << std::endl;
-  CGarside::ComplexDualBraidFactor cof(en);
-    double itime, ftime, exec_time;
+  CGarside::ComplexStandardBraidFactor cof(en);
+  double itime, ftime, exec_time;
 
-  std::vector<CGarside::ComplexDualBraidFactor> atoms = cof.Atoms();
-  CGarside::ComplexDualBraid cob(en);
+  std::vector<CGarside::ComplexStandardBraidFactor> atoms = cof.Atoms();
+  CGarside::ComplexStandardBraid cob(en);
 
-  for (int j = 0; j < Count; j++)
-  {  for (int i = 0; i < CLength; i++)
-  {
-    cof = atoms[rand() % atoms.size()];
-    cob.RightProduct(cof);
+  for (int i = 0; i < int(atoms.size()); i++) {
+    atoms[i].Debug(std::cout);
+    std::cout << atoms[i] << std::endl;
   }
 
-  std::cout << cob << std::endl;
-  cob.Debug(std::cout);
-  std::cout << std::endl;
-    itime = omp_get_wtime();
-  SC::SCS(cob);
-    ftime = omp_get_wtime();
+  for (int j = 0; j < Count; j++)
+  {
+    for (int i = 0; i < CLength; i++)
+    {
+      cof = atoms[rand() % atoms.size()];
+      cof.Print(std::cout);
+      std::cout << std::endl;
+      cob.RightProduct(cof);
+    }
 
+    cof.Delta();
+    cob.RightProduct(cof);
+    std::cout << cob << std::endl;
+    cob.Debug(std::cout);
+    std::cout << std::endl;
+    std::cout << cob * cob.Inverse() << std::endl;
+    cob.Inverse().Debug(std::cout);
+    itime = omp_get_wtime();
+    SC::SCS(cob).Print(std::cout);
+    ftime = omp_get_wtime();
   }
   // delete[] cfpart;
 
@@ -182,11 +192,11 @@ int main()
   // b.Debug(std::cout);
   // std::cout << std::endl;
 
-  //itime = omp_get_wtime();
+  // itime = omp_get_wtime();
 
-  //SC::SlidingCircuitSet<CGarside::ArtinBraid> scs = SC::SCS(b);
+  // SC::SlidingCircuitSet<CGarside::ArtinBraid> scs = SC::SCS(b);
 
-  //ftime = omp_get_wtime();
+  // ftime = omp_get_wtime();
 
   exec_time = ftime - itime;
 

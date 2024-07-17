@@ -9,6 +9,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <execution>
+#include <regex>
 
 namespace CGarside
 {
@@ -23,6 +24,9 @@ namespace CGarside
   typedef unsigned int uint32;
   typedef long long sint64;
   typedef unsigned long long uint64;
+
+  // String representing a regex that captures numbers.
+  const std::string number_regex{"[1-9][0-9]*|0"};
 
   // Maximum braid index.
   const sint16 MaxBraidIndex = 256;
@@ -342,9 +346,9 @@ namespace CGarside
   bool MakeLeftWeighted(F &u, F &v)
   {
     // std::cout << "MLW" << std::endl;
-        // u.Debug(std::cout);
+    // u.Debug(std::cout);
     // std::cout << "\n" << u << std::endl;
-        // v.Debug(std::cout);
+    // v.Debug(std::cout);
     // std::cout << "\n" << v << std::endl;
     F t = (~u) ^ v;
     // t.Debug(std::cout);
@@ -357,10 +361,10 @@ namespace CGarside
     {
       v = v / t;
       u = u * t;
-              // u.Debug(std::cout);
-    // std::cout << "\n" << u << std::endl;
-        // v.Debug(std::cout);
-    // std::cout << "\n" << v << std::endl;
+      // u.Debug(std::cout);
+      // std::cout << "\n" << u << std::endl;
+      // v.Debug(std::cout);
+      // std::cout << "\n" << v << std::endl;
       return true;
     }
   }
@@ -1114,7 +1118,7 @@ namespace CGarside
 
     void Debug(std::ostream &os) const
     {
-      os << "{ Parameter: " << Parameter << ",\n"; 
+      os << "{ Parameter: " << Parameter << ",\n";
       os << "  Delta: " << Delta << ",\n";
       os << "  FactorList: [";
       for (ConstFactorItr it = FactorList.begin(); it != FactorList.end(); it++)

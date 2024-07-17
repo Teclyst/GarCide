@@ -304,8 +304,6 @@ namespace CGarside
         }
       }
     }
-
-    GetParameter().check_non_crossing(x);
   }
 
   // We assume e > 1.
