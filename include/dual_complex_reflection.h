@@ -4,7 +4,7 @@ namespace CGarside
 {
   // The greates possible value for e such that it is possible to have braids with parameter n as great as `MaxBraidIndex`
   // It is possible to use objects with e > MaxE, but then the other parameter will have to be smaller than `MaxBraidIndex` / e.
-  const sint16 MaxE = 4;
+  const sint16 MaxE = 1;
 
   // We represent B(e, e, n + 1).
   struct ComplexDualBraidParameter

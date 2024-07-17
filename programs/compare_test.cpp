@@ -50,7 +50,9 @@ int main()
   CGarside::ArtinBraid b(Index);
 
   b.Randomize(CLength);
-  // b.Normalize();
+  b.Normalize();
+
+  std::cout << "foo" << std::endl;
 
   std::string str1 = std::string("(5, 2)");
   std::string str2 = std::string("(6, 5)");
@@ -132,7 +134,7 @@ int main()
   //
   // std::cout << std::endl;
   CGarside::ComplexDualBraidFactor cof(en);
-  //
+    double itime, ftime, exec_time;
 
   std::vector<CGarside::ComplexDualBraidFactor> atoms = cof.Atoms();
   CGarside::ComplexDualBraid cob(en);
@@ -147,15 +149,15 @@ int main()
   std::cout << cob << std::endl;
   cob.Debug(std::cout);
   std::cout << std::endl;
-
-  SC::SCS(cob).Print(std::cout);
+    itime = omp_get_wtime();
+  SC::SCS(cob);
+    ftime = omp_get_wtime();
 
   }
   // delete[] cfpart;
 
   // CBraid::ArtinBraid cb = ToCBraid(b);
   //
-  double itime, ftime, exec_time;
   //
   // itime = omp_get_wtime();
   //
@@ -180,17 +182,17 @@ int main()
   // b.Debug(std::cout);
   // std::cout << std::endl;
 
-  itime = omp_get_wtime();
+  //itime = omp_get_wtime();
 
   //SC::SlidingCircuitSet<CGarside::ArtinBraid> scs = SC::SCS(b);
 
-  ftime = omp_get_wtime();
+  //ftime = omp_get_wtime();
 
   exec_time = ftime - itime;
 
   // scs.Print(std::cout);
 
-  // std::cout << "Computing the SCS took " << exec_time * 1000 << " ms." << std::endl;
+  std::cout << "Computing the SCS took " << exec_time * 1000 << " ms." << std::endl;
   // std::cout << "It has " << scs.NumberOfOrbits() << " orbits, and " << scs.Card() << " elements." << std::endl;
 
   return 0;
