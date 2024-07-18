@@ -1,209 +1,55 @@
-#include <string>
-#include <iostream>
-#include <ctime>
 #include <cmath>
+#include <ctime>
+#include <iostream>
+#include <string>
 
 #include "artin_braid.h"
 #include "band_braid.h"
-#include "octaedral_braid.h"
-#include "dihedral_braid.h"
-#include "dual_complex_reflection.h"
-#include "standard_complex_reflection.h"
-#include "garsidesc.h"
-#include "garsideuss.h"
 #include "cbraid.h"
-#include "braiding.h"
-#include <omp.h>
-#include "optarg.h"
-#include "timecounter.h"
 
 int Index = 8;
 int CLength = 8;
 int Count = 1;
 int RandomSeed = 0;
 
-CBraid::ArtinFactor ToCBraidFactor(const CGarside::ArtinBraidFactor &f)
-{
-  CBraid::ArtinFactor cf(f.GetParameter());
-  CGarside::ArtinBraidUnderlying u = f.GetUnderlying();
-  for (int i = 1; i <= f.GetParameter(); i++)
-  {
-    cf.At(i) = u.At(i);
-  }
-  return cf;
-}
+Utility::IndentedOStream ind_cout(std::cout);
 
-CBraid::ArtinBraid ToCBraid(const CGarside::ArtinBraid &b)
-{
-  CBraid::ArtinBraid cb(b.GetParameter());
-  cb.LeftDelta = b.Inf();
-  for (CGarside::ArtinBraid::ConstFactorItr it = b.FactorList.begin(); it != b.FactorList.end(); it++)
-  {
-    cb.FactorList.push_back(ToCBraidFactor(*it));
-  }
-  return cb;
-}
+// CBraid::ArtinFactor ToCBraidFactor(const CGarside::ArtinBraidFactor &f)
+//{
+//   CBraid::ArtinFactor cf(f.GetParameter());
+//   CGarside::ArtinBraidUnderlying u = f.GetUnderlying();
+//   for (int i = 1; i <= f.GetParameter(); i++)
+//   {
+//     cf.At(i) = u.At(i);
+//   }
+//   return cf;
+// }
+//
+// CBraid::ArtinBraid ToCBraid(const CGarside::ArtinBraid &b)
+//{
+//   CBraid::ArtinBraid cb(b.GetParameter());
+//   cb.LeftDelta = b.Inf();
+//   for (CGarside::ArtinBraid::ConstFactorItr it = b.FactorList.begin(); it !=
+//   b.FactorList.end(); it++)
+//   {
+//     cb.FactorList.push_back(ToCBraidFactor(*it));
+//   }
+//   return cb;
+// }
 
-int main()
-{
-  srand(RandomSeed);
+int main() {
+    std::string str = std::string("D ^ 5 . 2 4 3 2 1 2  3 2 1 2 1  2 2 1  2 2 "
+                                  "1 2 1 7 5 7 5 4 3 4 5 6 6 5 4 6");
 
-  CGarside::ArtinBraid b(Index);
+    CGarside::ArtinBraid b(Index);
 
-  b.Randomize(CLength);
-  b.Normalize();
-
-  std::string str1 = std::string("(5, 2)");
-  std::string str2 = std::string("(6, 5)");
-  std::string str3 = std::string("(4, 3)");
-  std::string str4 = std::string("1");
-  std::string str5 = std::string("5");
-
-  // int *cfpart = new int[3 * Index + 1];
-  CGarside::ComplexStandardBraidParameter en(3, Index);
-  // CGarside::BandBraidFactor foo(Index);
-  // CGarside::ComplexDualBraid cfoo(en);
-  // cfoo.Randomize(CLength);
-  // CGarside::ComplexDualBraidUnderlying cf1(CGarside::ComplexDualBraidParameter(3, Index));
-  // CGarside::ComplexDualBraidUnderlying cf2(CGarside::ComplexDualBraidParameter(3, Index));
-  // cf1.OfString(str4);
-  // cf1.AssignPartition(cfpart);
-  // cf2.OfString(str5);
-  // CGarside::ComplexDualBraidUnderlying cf3 = cf1.Product(cf2);
-  // cf1.Delta();
-  // cf3.OfString(str5);
-  // std::cout << "cf1: ";
-  // cf1.Debug(std::cout);
-  // std::cout << std::endl;
-  // std::cout << "cf1: " << cf1 << std::endl;
-  // std::cout << "cf2: ";
-  // cf2.Debug(std::cout);
-  // std::cout << std::endl;
-  // std::cout << "cf2: " << cf2 << std::endl;
-  // std::cout << "cf3: ";
-  // cf3.RightComplement(cf1).Debug(std::cout);
-  // std::cout << std::endl;
-  // std::cout << "cf3.RighComplement: ";
-  // cf1.Delta();
-  // cf2.OfString(str3);
-  // cf3.RightComplement(cf1).LeftMeet(cf2).Debug(std::cout);
-  // std::cout << std::endl;
-  // cf3.RightComplement(cf1).AssignPartition(cfpart);
-  // cf3.OfString(str5);
-  // cf3.Debug(std::cout);
-  // std::cout << std::endl;
-  // cf3.AssignPartition(cfpart);
-  // std::cout << "cfpart: ";
-
-  // for (int i = 0; i <= 3 * Index; i++)
-  // {
-  // std::cout << cfpart[i] << " ";
-  // }
-  // std::cout << std::endl;
-  // cf3.OfPartition(cfpart);
-  // std::cout << "cf3 (of part): ";
-  // cf3.Debug(std::cout);
-  // std::cout << std::endl;
-  // std::cout << cf3 << std::endl;
-  //
-  // cf1.OfString(str1);
-  // cf2.OfString(str2);
-  // cf3 = cf1.Product(cf2);
-  // cf2.OfString(str5);
-  // cf3 = cf3.Product(cf2);
-  // cf3.Print(std::cout);
-  // std::cout << std::endl;
-  // cf3.Debug(std::cout);
-  // std::cout << std::endl;
-  // cf3.AssignPartition(cfpart);
-  // std::cout << "cfpart: ";
-
-  // for (int i = 0; i <= 3 * Index; i++)
-  // {
-  // std::cout << cfpart[i] << " ";
-  // }
-  // cf1.Delta();
-  // cf2.OfString(str3);
-  // cf2.Debug(std::cout);
-  // std::cout << std::endl;
-  // cf3.RightComplement(cf1).Debug(std::cout);
-  // std::cout << std::endl;
-  // cf3.DeltaConjugate(13);
-  // cf3.Debug(std::cout);
-  //
-  // std::cout << std::endl;
-  CGarside::ComplexStandardBraidFactor cof(en);
-  double itime, ftime, exec_time;
-
-  std::vector<CGarside::ComplexStandardBraidFactor> atoms = cof.Atoms();
-  CGarside::ComplexStandardBraid cob(en);
-
-  for (int i = 0; i < int(atoms.size()); i++) {
-    atoms[i].Debug(std::cout);
-    std::cout << atoms[i] << std::endl;
-  }
-
-  for (int j = 0; j < Count; j++)
-  {
-    for (int i = 0; i < CLength; i++)
-    {
-      cof = atoms[rand() % atoms.size()];
-      cof.Print(std::cout);
-      std::cout << std::endl;
-      cob.RightProduct(cof);
+    try {
+        b.OfString(str);
+    } catch (Utility::InvalidStringError inval) {
+        std::cout << inval.error_source << std::endl;
     }
 
-    cof.Delta();
-    cob.RightProduct(cof);
-    std::cout << cob << std::endl;
-    cob.Debug(std::cout);
-    std::cout << std::endl;
-    std::cout << cob * cob.Inverse() << std::endl;
-    cob.Inverse().Debug(std::cout);
-    itime = omp_get_wtime();
-    SC::SCS(cob).Print(std::cout);
-    ftime = omp_get_wtime();
-  }
-  // delete[] cfpart;
-
-  // CBraid::ArtinBraid cb = ToCBraid(b);
-  //
-  //
-  // itime = omp_get_wtime();
-  //
-  // std::list<std::list<CBraid::ArtinBraid>> cscs = Braiding::SC(cb);
-
-  // ftime = omp_get_wtime();
-
-  // exec_time = ftime - itime;
-  //
-  // std::cout << "Computing (Braiding) the SCS took " << exec_time * 1000 << " ms." << std::endl;
-  // std::cout << "It has " << cscs.size() << " orbits, and " << cscs.front().size() * cscs.size()  << " elements." << std::endl;
-
-  // t.Start();
-
-  // SSS::SuperSummitSet<CGarside::ArtinBraid> sss = SSS::SSS(b);
-
-  // t.Stop();
-
-  // std::cout << "Computing the SSS, of size " << sss.Card() << ", took " << t.IntervalSec() * 1000 << " ms." << std::endl;
-
-  // std::cout << b << std::endl;
-  // b.Debug(std::cout);
-  // std::cout << std::endl;
-
-  // itime = omp_get_wtime();
-
-  // SC::SlidingCircuitSet<CGarside::ArtinBraid> scs = SC::SCS(b);
-
-  // ftime = omp_get_wtime();
-
-  exec_time = ftime - itime;
-
-  // scs.Print(std::cout);
-
-  std::cout << "Computing the SCS took " << exec_time * 1000 << " ms." << std::endl;
-  // std::cout << "It has " << scs.NumberOfOrbits() << " orbits, and " << scs.Card() << " elements." << std::endl;
-
-  return 0;
+    b.Debug(ind_cout);
+    ind_cout << Utility::NewLine();
+    return 0;
 }

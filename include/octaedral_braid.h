@@ -1,10 +1,8 @@
 #include "cgarside.h"
 
-namespace CGarside
-{
+namespace CGarside {
 
-  class BDualBraidUnderlying
-  {
+class BDualBraidUnderlying {
 
   protected:
     sint16 PresentationParameter;
@@ -23,21 +21,16 @@ namespace CGarside
 
     BDualBraidUnderlying(const BDualBraidUnderlying &a);
 
-    ~BDualBraidUnderlying()
-    {
-      delete[] PermutationTable;
-    }
+    ~BDualBraidUnderlying() { delete[] PermutationTable; }
 
     void OfString(std::string &str);
 
-    void Debug(std::ostream &os) const
-    {
-      os << "[";
-      for (sint16 i = 1; i <= 2 * GetParameter(); i++)
-      {
-        os << PermutationTable[i] << " ";
-      }
-      os << "]";
+    void Debug(std::ostream &os) const {
+        os << "[";
+        for (sint16 i = 1; i <= 2 * GetParameter(); i++) {
+            os << PermutationTable[i] << " ";
+        }
+        os << "]";
     }
 
     void AssignDCDT(sint16 *x) const;
@@ -89,17 +82,16 @@ namespace CGarside
     BDualBraidUnderlying DeltaConjugate(sint16 k) const;
 
     std::size_t Hash() const {
-      std::size_t h = 0;
-      for (CGarside::sint16 i = 1; i <= 2 * GetParameter(); i++)
-      {
-        h = h * 31 + PermutationTable[i];
-      }
-      return h;
+        std::size_t h = 0;
+        for (CGarside::sint16 i = 1; i <= 2 * GetParameter(); i++) {
+            h = h * 31 + PermutationTable[i];
+        }
+        return h;
     }
-  };
+};
 
-  typedef Factor<BDualBraidUnderlying> BDualBraidFactor;
+typedef Factor<BDualBraidUnderlying> BDualBraidFactor;
 
-  typedef Braid<BDualBraidFactor> BDualBraid;
+typedef Braid<BDualBraidFactor> BDualBraid;
 
-}
+} // namespace CGarside

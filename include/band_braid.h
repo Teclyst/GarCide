@@ -1,10 +1,8 @@
 #include "cgarside.h"
 
-namespace CGarside
-{
+namespace CGarside {
 
-  class BandBraidUnderlying
-  {
+class BandBraidUnderlying {
 
   protected:
     sint16 PresentationParameter;
@@ -23,22 +21,37 @@ namespace CGarside
 
     BandBraidUnderlying(const BandBraidUnderlying &a);
 
-    ~BandBraidUnderlying()
-    {
-      delete[] PermutationTable;
-    }
+    ~BandBraidUnderlying() { delete[] PermutationTable; }
 
-    void OfString(std::string &str);
+    /**
+     * @brief Extraction from string.
+     *
+     * Reads the string `str`, starting at position `pos`, and sets `this` to
+     * the corresponding atom.
+     *
+     * Letting `W = (\s | \t)*` be the language of whitespaces and `Z = -? ([1 -
+     * 9] [0 - 9]* | 0)` be the language of integers, accepted strings are those
+     * represented by regular expression `\(W Z W,? W Z W\)`, under the
+     * additional hypothesis that the two integers lie in [`1`, `Parameter`] and
+     * are not equal.
+     *
+     * @param str The string to extract from.
+     * @param pos The position to start from.
+     * @exception `InvalidStringError`: Thrown when there is no subword starting
+     * from `pos` that matches `\(W Z W,? W Z W\)`, or if there is one, if
+     * either integer does not belong to [`1`, `Parameter`], or both are equal.
+     */
+    void OfString(const std::string &str, size_t &pos);
 
-    void Debug(std::ostream &os) const
-    {
-      os << "[";
-      for (sint16 i = 1; i <= GetParameter(); i++)
-      {
-        os << PermutationTable[i] << " ";
-      }
-      os << "]";
-    }
+    /**
+     * @brief Prints internal representation to `os`.
+     *
+     * Prints the factor's `PermutationTable` to `os`, typically for debugging
+     * purposes.
+     *
+     * @param os The output stream it prints to.
+     */
+    void Debug(IndentedOStream &os) const;
 
     void AssignDCDT(sint16 *x) const;
 
@@ -48,7 +61,13 @@ namespace CGarside
 
     BandBraidUnderlying &operator=(const BandBraidUnderlying &a);
 
-    // Print to os. Be wary, as it side-effects!
+    /**
+     * @brief Prints the factor to `os`.
+     *
+     * Prints the factor to `os` as a product of atoms.
+     *
+     * @param os The output stream it prints to.
+     */
     void Print(std::ostream &os) const;
 
     // Set to the Identity element (here the identity).
@@ -89,17 +108,16 @@ namespace CGarside
     BandBraidUnderlying DeltaConjugate(sint16 k) const;
 
     std::size_t Hash() const {
-      std::size_t h = 0;
-      for (CGarside::sint16 i = 1; i <= GetParameter(); i++)
-      {
-        h = h * 31 + PermutationTable[i];
-      }
-      return h;
+        std::size_t h = 0;
+        for (CGarside::sint16 i = 1; i <= GetParameter(); i++) {
+            h = h * 31 + PermutationTable[i];
+        }
+        return h;
     }
-  };
+};
 
-  typedef Factor<BandBraidUnderlying> BandBraidFactor;
+typedef Factor<BandBraidUnderlying> BandBraidFactor;
 
-  typedef Braid<BandBraidFactor> BandBraid;
+typedef Braid<BandBraidFactor> BandBraid;
 
-}
+} // namespace CGarside

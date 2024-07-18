@@ -1,10 +1,8 @@
 #include "cgarside.h"
 
-namespace CGarside
-{
+namespace CGarside {
 
-  class IDualBraidUnderlying
-  {
+class IDualBraidUnderlying {
 
   protected:
     sint16 PresentationParameter;
@@ -29,9 +27,8 @@ namespace CGarside
 
     void OfString(std::string &str);
 
-    void Debug(std::ostream &os) const
-    {
-      os << "(" << Type << ", " << Axis << ") ";
+    void Debug(std::ostream &os) const {
+        os << "(" << Type << ", " << Axis << ") ";
     }
 
     IDualBraidUnderlying &Assign(const IDualBraidUnderlying &a);
@@ -75,13 +72,13 @@ namespace CGarside
     IDualBraidUnderlying DeltaConjugate(sint16 k) const;
 
     std::size_t Hash() const {
-      std::size_t h = Axis;
-      return h;
+        std::size_t h = Axis;
+        return h;
     }
-  };
+};
 
-  typedef Factor<IDualBraidUnderlying> IDualBraidFactor;
+typedef Factor<IDualBraidUnderlying> IDualBraidFactor;
 
-  typedef Braid<IDualBraidFactor> IDualBraid;
+typedef Braid<IDualBraidFactor> IDualBraid;
 
-}
+} // namespace CGarside

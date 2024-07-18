@@ -1,145 +1,152 @@
 #include "band_braid.h"
 #include "cbraid.h"
-#include <string>
 #include <iostream>
+#include <string>
 
-namespace CGarside
-{
+namespace CGarside {
 
-  sint16 BandBraidUnderlying::GetParameter() const
-  {
+sint16 BandBraidUnderlying::GetParameter() const {
     return PresentationParameter;
-  }
+}
 
-  sint16 BandBraidUnderlying::LatticeHeight() const
-  {
-    return GetParameter();
-  }
+sint16 BandBraidUnderlying::LatticeHeight() const { return GetParameter(); }
 
-  BandBraidUnderlying &BandBraidUnderlying::Assign(const BandBraidUnderlying &a)
-  {
-    if (&a != this)
-    {
-      for (sint16 i = 1; i <= GetParameter(); ++i)
-      {
-        PermutationTable[i] = a.PermutationTable[i];
-      }
+BandBraidUnderlying &BandBraidUnderlying::Assign(const BandBraidUnderlying &a) {
+    if (&a != this) {
+        for (sint16 i = 1; i <= GetParameter(); ++i) {
+            PermutationTable[i] = a.PermutationTable[i];
+        }
     }
     return *this;
-  };
+};
 
-  BandBraidUnderlying &BandBraidUnderlying::operator=(const BandBraidUnderlying &a)
-  {
+BandBraidUnderlying &
+BandBraidUnderlying::operator=(const BandBraidUnderlying &a) {
     return Assign(a);
-  }
+}
 
-  BandBraidUnderlying::BandBraidUnderlying(sint16 n)
-      : PresentationParameter(n)
-  {
+BandBraidUnderlying::BandBraidUnderlying(sint16 n) : PresentationParameter(n) {
     PermutationTable = new sint16[n + 1];
-  }
+}
 
-  BandBraidUnderlying::BandBraidUnderlying(const BandBraidUnderlying &a)
-      : PresentationParameter(a.GetParameter())
-  {
+BandBraidUnderlying::BandBraidUnderlying(const BandBraidUnderlying &a)
+    : PresentationParameter(a.GetParameter()) {
     PermutationTable = new sint16[a.GetParameter() + 1];
     sint16 i;
-    for (i = 1; i <= a.GetParameter(); i++)
-    {
-      PermutationTable[i] = a.PermutationTable[i];
+    for (i = 1; i <= a.GetParameter(); i++) {
+        PermutationTable[i] = a.PermutationTable[i];
     }
-  }
+}
 
-  void BandBraidUnderlying::Print(std::ostream &os) const
-  {
+void BandBraidUnderlying::Print(std::ostream &os) const {
     // Recall that a band braid is represented by decreasing cycles.
     sint16 i, j, n = GetParameter();
     std::vector<sint16> curr_cycle;
     std::vector<bool> seen(n + 1, false);
-    for (i = 1; i <= n; ++i)
-    {
-      if (!seen[i])
-      {
-        j = i;
-        curr_cycle.clear();
-        while (j < PermutationTable[j])
-        {
-          curr_cycle.push_back(j);
-          seen[j] = true;
-          j = PermutationTable[j];
+    for (i = 1; i <= n; ++i) {
+        if (!seen[i]) {
+            j = i;
+            curr_cycle.clear();
+            while (j < PermutationTable[j]) {
+                curr_cycle.push_back(j);
+                seen[j] = true;
+                j = PermutationTable[j];
+            }
+            curr_cycle.push_back(j);
+            seen[j] = true;
+            for (j = int(curr_cycle.size()) - 1; j >= 1; --j) {
+                os << "(" << curr_cycle[j] << ", " << curr_cycle[j - 1] << ")"
+                   << " ";
+            }
         }
-        curr_cycle.push_back(j);
-        seen[j] = true;
-        for (j = int(curr_cycle.size()) - 1; j >= 1; --j)
-        {
-          os << "(" << curr_cycle[j] << ", " << curr_cycle[j - 1] << ")" << " ";
-        }
-      }
     }
-  }
+}
 
-  void BandBraidUnderlying::OfString(std::string &str)
-  {
+void BandBraidUnderlying::OfString(const std::string &str, size_t &pos) {
     sint16 n = GetParameter();
-    sint16 i, j, k;
-    size_t pos;
-    if (str[0] != '(')
-    {
-      throw InvalidStringError();
-    }
-    str.erase(0, 1);
-    sint16 l = str.length();
-    if (str[l - 1] != ')')
-    {
-      throw InvalidStringError();
-    }
-    str.erase(l - 1);
-    pos = str.find(',');
-    i = std::stoi(str.substr(0, pos));
-    j = std::stoi(str.substr(pos + 1, str.length()));
-    if (i <= n && j < i)
-    {
-      for (k = 1; k <= n; k++)
-      {
-        PermutationTable[k] = k;
-      }
-      PermutationTable[i] = j;
-      PermutationTable[j] = i;
-    }
-    else
-    {
-      throw InvalidStringError();
-    }
-  }
 
-  void BandBraidUnderlying::AssignDCDT(sint16 *x) const
-  {
-    for (sint16 i = 1; i <= GetParameter(); ++i)
-      x[i] = 0;
-    for (sint16 i = 1; i <= GetParameter(); ++i)
-    {
-      if (x[i] == 0)
-        x[i] = i;
-      if (PermutationTable[i] > i)
-        x[PermutationTable[i]] = x[i];
-    }
-  }
+    std::smatch match;
 
-  void BandBraidUnderlying::OfDCDT(const sint16 *x)
-  {
+    if (std::regex_search(str.begin() + pos, str.end(), match,
+                          std::regex{"\\([\\s\\t]*(" + number_regex +
+                                     ")[\\s\\t]*,?[\\s\\t]*(" + number_regex +
+                                     ")[\\s\\t]*\\)"},
+                          std::regex_constants::match_continuous)) {
+        sint16 i = std::stoi(match[1]);
+        sint16 j = std::stoi(match[2]);
+        pos += match[0].length();
+        if ((i >= 1) && (i <= n) && (j >= 1) && (j <= n) && (i != j)) {
+            Identity();
+            PermutationTable[i] = j;
+            PermutationTable[j] = i;
+        } else if ((i < 1) || (i > n)) {
+            throw InvalidStringError("Invalid index for dual generator!\n" +
+                                     std::to_string(i) + " is not in [1, " +
+                                     std::to_string(n) + "].");
+        } else if ((j < 1) || (j > n)) {
+            throw InvalidStringError("Invalid index for dual generator!\n" +
+                                     std::to_string(j) + " is not in [1, " +
+                                     std::to_string(n) + "].");
+        } else {
+            throw InvalidStringError(
+                "Indexes for dual generators should not be equal!\n(" +
+                std::to_string(i) + ", " + std::to_string(j) +
+                ") is not a valid factor.");
+        }
+    } else {
+        throw InvalidStringError(
+            "Could not extract a factor from \"" + str.substr(pos) +
+            "\"!\nA factor should match regex \\([1 - 9] [0 - 9]*,? [1 - 9] [0 "
+            "- 9]*\\) (ignoring whitespaces).");
+    }
+}
+
+void BandBraidUnderlying::Debug(IndentedOStream &os) const {
+    os << "{   ";
+    os.Indent(4);
+    os << "PresentationParameter:";
+    os.Indent(4);
+    os << EndLine() << GetParameter();
+    os.Indent(-4);
+    os << EndLine();
+    os << "PermutationTable:";
+    os.Indent(4);
+    os << EndLine();
+    os << "[";
+    for (sint16 i = 1; i < GetParameter(); i++) {
+        os << PermutationTable[i] << ", ";
+    }
+    os << PermutationTable[GetParameter()];
+    os << "]";
+    os.Indent(-8);
+    os << EndLine();
+    os << "}";
+}
+
+void BandBraidUnderlying::AssignDCDT(sint16 *x) const {
+    for (sint16 i = 1; i <= GetParameter(); ++i)
+        x[i] = 0;
+    for (sint16 i = 1; i <= GetParameter(); ++i) {
+        if (x[i] == 0)
+            x[i] = i;
+        if (PermutationTable[i] > i)
+            x[PermutationTable[i]] = x[i];
+    }
+}
+
+void BandBraidUnderlying::OfDCDT(const sint16 *x) {
     thread_local sint16 z[MaxBraidIndex];
 
     for (sint16 i = 1; i <= GetParameter(); ++i)
-      z[i] = 0;
-    for (sint16 i = GetParameter(); i >= 1; --i)
-    {
-      PermutationTable[i] = (z[x[i]] == 0) ? x[i] : z[x[i]];
-      z[x[i]] = i;
+        z[i] = 0;
+    for (sint16 i = GetParameter(); i >= 1; --i) {
+        PermutationTable[i] = (z[x[i]] == 0) ? x[i] : z[x[i]];
+        z[x[i]] = i;
     }
-  }
+}
 
-  BandBraidUnderlying BandBraidUnderlying::LeftMeet(const BandBraidUnderlying &b) const
-  {
+BandBraidUnderlying
+BandBraidUnderlying::LeftMeet(const BandBraidUnderlying &b) const {
     thread_local sint16 x[MaxBraidIndex], y[MaxBraidIndex], z[MaxBraidIndex];
 
     AssignDCDT(x);
@@ -147,14 +154,12 @@ namespace CGarside
 
     thread_local sint16 P[MaxBraidIndex][MaxBraidIndex];
 
-    for (sint16 i = GetParameter(); i >= 1; i--)
-    {
-      P[x[i]][y[i]] = i;
+    for (sint16 i = GetParameter(); i >= 1; i--) {
+        P[x[i]][y[i]] = i;
     }
 
-    for (sint16 i = 1; i <= GetParameter(); i++)
-    {
-      z[i] = P[x[i]][y[i]];
+    for (sint16 i = 1; i <= GetParameter(); i++) {
+        z[i] = P[x[i]][y[i]];
     }
 
     BandBraidUnderlying c = BandBraidUnderlying(*this);
@@ -162,124 +167,100 @@ namespace CGarside
     c.OfDCDT(z);
 
     return c;
-  }
+}
 
-  BandBraidUnderlying BandBraidUnderlying::RightMeet(const BandBraidUnderlying &b) const
-  {
+BandBraidUnderlying
+BandBraidUnderlying::RightMeet(const BandBraidUnderlying &b) const {
     return LeftMeet(b);
-  }
+}
 
-  void BandBraidUnderlying::Identity()
-  {
+void BandBraidUnderlying::Identity() {
     sint16 i, n = GetParameter();
-    for (i = 1; i <= n; i++)
-    {
-      PermutationTable[i] = i;
+    for (i = 1; i <= n; i++) {
+        PermutationTable[i] = i;
     }
-  }
+}
 
-  void BandBraidUnderlying::Delta()
-  {
+void BandBraidUnderlying::Delta() {
     sint16 i, n = GetParameter();
-    for (i = 1; i < n; i++)
-    {
-      PermutationTable[i] = i + 1;
+    for (i = 1; i < n; i++) {
+        PermutationTable[i] = i + 1;
     }
     PermutationTable[n] = 1;
-  }
+}
 
-  bool BandBraidUnderlying::Compare(const BandBraidUnderlying &b) const
-  {
+bool BandBraidUnderlying::Compare(const BandBraidUnderlying &b) const {
     sint16 i;
-    if (GetParameter() != b.GetParameter())
-    {
-      throw NonMatchingIndexes(GetParameter(), b.GetParameter());
-    }
-    for (i = 1; i <= GetParameter(); i++)
-    {
-      if (PermutationTable[i] != b.PermutationTable[i])
-      {
-        return false;
-      }
+    for (i = 1; i <= GetParameter(); i++) {
+        if (PermutationTable[i] != b.PermutationTable[i]) {
+            return false;
+        }
     }
     return true;
-  };
+};
 
-  BandBraidUnderlying BandBraidUnderlying::Inverse() const
-  {
+BandBraidUnderlying BandBraidUnderlying::Inverse() const {
     BandBraidUnderlying f = BandBraidUnderlying(GetParameter());
     sint16 i;
-    for (i = 1; i <= GetParameter(); i++)
-    {
-      f.PermutationTable[PermutationTable[i]] = i;
+    for (i = 1; i <= GetParameter(); i++) {
+        f.PermutationTable[PermutationTable[i]] = i;
     }
     return f;
-  };
+};
 
-  BandBraidUnderlying BandBraidUnderlying::Product(const BandBraidUnderlying &b) const
-  {
+BandBraidUnderlying
+BandBraidUnderlying::Product(const BandBraidUnderlying &b) const {
     BandBraidUnderlying f = BandBraidUnderlying(GetParameter());
-    if (GetParameter() != b.GetParameter())
-    {
-      throw NonMatchingIndexes(GetParameter(), b.GetParameter());
-    }
     sint16 i;
-    for (i = 1; i <= GetParameter(); i++)
-    {
-      f.PermutationTable[i] = b.PermutationTable[PermutationTable[i]];
+    for (i = 1; i <= GetParameter(); i++) {
+        f.PermutationTable[i] = b.PermutationTable[PermutationTable[i]];
     }
     return f;
-  };
+};
 
-  BandBraidUnderlying BandBraidUnderlying::LeftComplement(const BandBraidUnderlying &b) const
-  {
+BandBraidUnderlying
+BandBraidUnderlying::LeftComplement(const BandBraidUnderlying &b) const {
     return b.Product(Inverse());
-  };
+};
 
-  BandBraidUnderlying BandBraidUnderlying::RightComplement(const BandBraidUnderlying &b) const
-  {
+BandBraidUnderlying
+BandBraidUnderlying::RightComplement(const BandBraidUnderlying &b) const {
     return Inverse().Product(b);
-  };
+};
 
-  BandBraidUnderlying BandBraidUnderlying::DeltaConjugate(sint16 k) const
-  {
+BandBraidUnderlying BandBraidUnderlying::DeltaConjugate(sint16 k) const {
     BandBraidUnderlying under = BandBraidUnderlying(*this);
     sint16 i, n = GetParameter();
 
-    if (k < 0)
-    {
-      k = k - n * k;
+    if (k < 0) {
+        k = k - n * k;
     }
 
-    for (i = 1; i < n; i++)
-    {
-      under.PermutationTable[i] = Rem(PermutationTable[Rem(i + k - 1, n) + 1] - k - 1, n) + 1;
+    for (i = 1; i < n; i++) {
+        under.PermutationTable[i] =
+            Rem(PermutationTable[Rem(i + k - 1, n) + 1] - k - 1, n) + 1;
     }
     return under;
-  }
+}
 
-  void BandBraidUnderlying::Randomize()
-  {
+void BandBraidUnderlying::Randomize() {
     CBraid::BandPresentation pres = CBraid::BandPresentation(GetParameter());
     pres.Randomize(PermutationTable);
-  }
+}
 
-  std::vector<BandBraidUnderlying> BandBraidUnderlying::Atoms() const
-  {
+std::vector<BandBraidUnderlying> BandBraidUnderlying::Atoms() const {
     sint16 n = GetParameter();
     std::vector<BandBraidUnderlying> atoms;
-    for (sint16 i = 1; i <= n; i++)
-    {
-      for (sint16 j = 1; j < i; j++)
-      {
-        BandBraidUnderlying atom = BandBraidUnderlying(n);
-        atom.Identity();
-        atom.PermutationTable[i] = j;
-        atom.PermutationTable[j] = i;
-        atoms.push_back(atom);
-      }
+    for (sint16 i = 1; i <= n; i++) {
+        for (sint16 j = 1; j < i; j++) {
+            BandBraidUnderlying atom = BandBraidUnderlying(n);
+            atom.Identity();
+            atom.PermutationTable[i] = j;
+            atom.PermutationTable[j] = i;
+            atoms.push_back(atom);
+        }
     }
     return atoms;
-  }
-
 }
+
+} // namespace CGarside

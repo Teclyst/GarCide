@@ -18,7 +18,6 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-
 /*
     $Id: timecounter.h,v 1.1 2001/12/07 10:12:15 jccha Exp $
     Jae Choon CHA <jccha@knot.kaist.ac.kr>
@@ -26,28 +25,24 @@
     TimeCounter is a simple time counter (stop watch) class.
 */
 
-
 #ifndef _TIMECOUNTER_H_
 #define _TIMECOUNTER_H_
 
-
 #include <ctime>
-
 
 class TimeCounter {
 
-private:
-	std::clock_t start, stop;
+  private:
+    std::clock_t start, stop;
 
-public:
+  public:
     static const std::clock_t ClocksPerSec = CLOCKS_PER_SEC;
 
     std::clock_t Start() { return (start = clock()); }
     std::clock_t Stop() { return (stop = clock()); }
 
-    std::clock_t IntervalClock() { return stop-start; }
-    double IntervalSec() { return double(IntervalClock())/CLOCKS_PER_SEC; }
+    std::clock_t IntervalClock() { return stop - start; }
+    double IntervalSec() { return double(IntervalClock()) / CLOCKS_PER_SEC; }
 };
-
 
 #endif // _TIMECOUNTER_H_

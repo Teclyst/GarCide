@@ -18,14 +18,12 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-
 /*
     $Id: cbraid_interface.h,v 1.11 2001/12/07 10:12:13 jccha Exp $
     Jae Choon CHA <jccha@knot.kaist.ac.kr>
 
     This is interface declarations of cbraid library.
 */
-
 
 // For portablity, we use our own primitive types. The following
 // definitions may need to be modified for your compiler.
@@ -42,12 +40,10 @@ typedef unsigned int uint32;
 typedef long long sint64;
 typedef unsigned long long uint64;
 
-
 // Implementation limits.
 
 // Maximum braid index.
 const sint16 MaxBraidIndex = 300;
-
 
 // Algorithms useful in managing standard containers of Factor objects.
 
@@ -63,13 +59,13 @@ const sint16 MaxBraidIndex = 300;
 // assumption that all adjancent pairs but the first one are weighted.
 // Obviously the execution time is linear in the length of the
 // sequence.
-template<class ForItr, class BinFunc>
+template <class ForItr, class BinFunc>
 ForItr apply_binfun(ForItr first, ForItr last, BinFunc f);
 
 // The reverse version of apply_binfun.  By reverse_apply_binfun, f is
 // applied on (last-2,last-1), (last-3,last-2), ... , sequentially.
 // It returns the first(leftmost) element that has been processed.
-template<class BiItr, class BinFunc>
+template <class BiItr, class BinFunc>
 BiItr reverse_apply_binfun(BiItr first, BiItr last, BinFunc f);
 
 // A bubble sort algorithm.  It executes apply_binfun for
@@ -86,19 +82,17 @@ void bubble_sort(ForItr first, ForItr last, BinFun f);
 // elements.  In order to remove elements from the sequence really,
 // the container must have erase() member function.
 template <class Seq, class UnaPre>
-typename Seq::difference_type erase_front_if(Seq& s, UnaPre f);
+typename Seq::difference_type erase_front_if(Seq &s, UnaPre f);
 
 // Reverse version of erase_front_if.  It erases consecutive elements
 // at the end of the sequence which satisfies a given predicate.
 template <class Seq, class UnaPre>
-typename Seq::difference_type erase_back_if(Seq& s, UnaPre f);
-
+typename Seq::difference_type erase_back_if(Seq &s, UnaPre f);
 
 // Exception class.
 struct OddIndexError {};
 struct NegativeBraidError {};
 struct InvalidStringError {};
-
 
 // Class describing the Artin presentation and the band generator
 // presentation.  Basically they consist of the description of delta
@@ -106,19 +100,19 @@ struct InvalidStringError {};
 
 class ArtinPresentation {
 
-protected:
+  protected:
     sint16 PresentationIndex;
 
-public:
+  public:
     ArtinPresentation(sint16 n);
 
-    void OfString(std::string str, sint16* t) const;
+    void OfString(std::string str, sint16 *t) const;
 
     // Print factor f to os. Be wary, as it side-effects!
-    void Print(std::ostream& os, sint16* f);
+    void Print(std::ostream &os, sint16 *f);
 
     // Generators, as an array of arrays.
-    std::list<sint16*> Atoms(sint16 n) const;
+    std::list<sint16 *> Atoms(sint16 n) const;
 
     sint16 Index() const;
 
@@ -140,32 +134,32 @@ public:
     // Birman, Ko, and Lee, but different from that of the article of
     // Thurston (in Epstein's book).  Indeed, Thurston's is the
     // "right" meet in our sense.
-    void LeftMeet(const sint16* a, const sint16* b, sint16* r) const;
-    void RightMeet(const sint16* a, const sint16* b, sint16* r) const;
+    void LeftMeet(const sint16 *a, const sint16 *b, sint16 *r) const;
+    void RightMeet(const sint16 *a, const sint16 *b, sint16 *r) const;
 
     // Generate a random factor.
-    void Randomize(sint16* r) const;
+    void Randomize(sint16 *r) const;
 
-private:
+  private:
     // Subroutine called by LeftMeet() and RightMeet()
-    static void MeetSub(const sint16* a, const sint16* b, sint16* r,
-                        sint16 s, sint16 t);
+    static void MeetSub(const sint16 *a, const sint16 *b, sint16 *r, sint16 s,
+                        sint16 t);
 };
 
 class BandPresentation {
-protected:
+  protected:
     sint16 PresentationIndex;
 
-public:
+  public:
     BandPresentation(sint16 n);
     sint16 Index() const;
 
-    void Print(std::ostream& os, sint16* f);
+    void Print(std::ostream &os, sint16 *f);
 
-    void OfString(std::string str, sint16* t) const;
+    void OfString(std::string str, sint16 *t) const;
 
     // Generators, as an array of arrays.
-    std::list<sint16*> Atoms(sint16 n) const;
+    std::list<sint16 *> Atoms(sint16 n) const;
 
     // Return the i-th entry of the permutation table of delta^k.
     sint16 DeltaTable(sint16 i, sint32 k = 1) const;
@@ -176,84 +170,85 @@ public:
     // permutation table.  (In other parts of this program, a[i] is
     // the inverse image of i, but in the paper and in these
     // conversion functions, a[i] is the image of i.)
-    void PTtoDCDT(const sint16* a, sint16* x) const;
-    void DCDTtoPT(const sint16* x, sint16* a) const;
+    void PTtoDCDT(const sint16 *a, sint16 *x) const;
+    void DCDTtoPT(const sint16 *x, sint16 *a) const;
 
     // Conversion of a ballot sequence into a permutation table.  The
     // convention of the AsiaCrypt 2001 paper is also used here (see
     // the above remark).
-    void BStoPT(const sint8* s, sint16* a) const;
+    void BStoPT(const sint8 *s, sint16 *a) const;
 
     // Generate a random factor.  It works properly only if USE_CLN
     // macro is defined at compile time.
-    void Randomize(sint16* r) const;
+    void Randomize(sint16 *r) const;
 
     // Compute the meet r of two factors a and b.
-    void LeftMeet(const sint16* a, const sint16* b, sint16* r) const;
-    void RightMeet(const sint16* a, const sint16* b, sint16* r) const;
+    void LeftMeet(const sint16 *a, const sint16 *b, sint16 *r) const;
+    void RightMeet(const sint16 *a, const sint16 *b, sint16 *r) const;
 };
-
 
 // Class for a canonical factor, which is represented as a
 // permutation.
 
-template<class P> class Factor {
+template <class P> class Factor {
 
-private:
+  private:
     // The presentation description.
     P Pres;
 
     // Permutation table.
-    sint16* pTable;
+    sint16 *pTable;
 
-public:
-
+  public:
     // Constructor.  The permutation table is initialized as
     // delta^k. If k == Uninitialize, the table is left uninitialized.
     enum { Uninitialize = 0x80000000 };
-    Factor(sint16 n, sint32 k = Uninitialize); // Ok (parameter n will have to change type, for something more abstract).
+    Factor(sint16 n,
+           sint32 k = Uninitialize); // Ok (parameter n will have to change
+                                     // type, for something more abstract).
 
     // Copy constructor.
-    Factor(const Factor& f); // Ok.
+    Factor(const Factor &f); // Ok.
 
     // Conversion operator to the sint16* type.  The address of the
     // permutation table is returned.  Recall that the index range is
     // [1..n], not [0,n[; when the return value is r, r[1], ... , r[n]
     // contains the permutation table.  r[0] may be an invalid memory
     // and must not be accessed.
-    operator sint16*(); // Won't work for general groups.
-    operator const sint16*() const; // Maybe replace it with relevant conversion functions? 
+    operator sint16 *(); // Won't work for general groups.
+    operator const sint16 *()
+        const; // Maybe replace it with relevant conversion functions?
 
     // Destructor.
     ~Factor(); // Ok
 
     // Initialize as a power of delta.
-    Factor& Delta(sint32 k = 1); // Ok
-    Factor& Identity(); // Ok
+    Factor &Delta(sint32 k = 1); // Ok
+    Factor &Identity();          // Ok
 
     // Initialize as a power of lower/upper delta.
-    Factor& LowerDelta(sint32 k = 1); // Meaningless for generic Garside groups.
-    Factor& UpperDelta(sint32 k = 1); //
+    Factor &LowerDelta(sint32 k = 1); // Meaningless for generic Garside groups.
+    Factor &UpperDelta(sint32 k = 1); //
 
     // Get the index.
     sint16 Index() const;
-    
+
     // Access to the n-th element of the permutation table. We follow
     // the standard mathematical convention; the argument should be
     // between 1 and Index.
-    sint16& At(sint16 n);
+    sint16 &At(sint16 n);
     sint16 At(sint16 n) const;
-    sint16& operator[](sint16 n);
-    sint16 operator[](sint16 n) const; 
+    sint16 &operator[](sint16 n);
+    sint16 operator[](sint16 n) const;
 
     // Assignment operator.
-    Factor& Assign(const Factor& f);
-    Factor& operator=(const Factor& f); 
+    Factor &Assign(const Factor &f);
+    Factor &operator=(const Factor &f);
 
     // Comparison operator.
-    bool Compare(const Factor& f) const;
-    bool operator==(const Factor& f) const;
-    bool operator!=(const Factor& f) const;
+    bool Compare(const Factor &f) const;
+    bool operator==(const Factor &f) const;
+    bool operator!=(const Factor &f) const;
 
     // Comparison with special elements.
     bool CompareWithDelta(sint32 k = 1) const;
@@ -266,19 +261,22 @@ public:
     // b.AssignComposition(a)  assign to b the composition of b and a.
     // a*b                     the operator form of b.Composition(a).
     // b *= a                  the operator form of b.AssignComposition(a).
-    Factor Composition(const Factor& a) const;  // Will probably have to move up. 
-    Factor& AssignComposition(const Factor& a); // 
-    Factor& operator*=(const Factor& a);        // 
-    Factor operator*(const Factor& a) const;    // 
+    Factor Composition(const Factor &a) const; // Will probably have to move up.
+    Factor &AssignComposition(const Factor &a); //
+    Factor &operator*=(const Factor &a);        //
+    Factor operator*(const Factor &a) const;    //
 
     // Inversion operators.  We also have variants:
 
     // a.Inverse()        return the inverse of a.
     // a.AssignInverse()  invert a.
     // !a                 the operator form of a.Inverse().
-    Factor Inverse() const;   // Will have to be taken out for generic Garside groups.
-    Factor& AssignInverse();  // As in general canonical factors do not have a group structure.
-    Factor operator!() const; // Won't matter too much for braids as complement will move up.
+    Factor
+    Inverse() const; // Will have to be taken out for generic Garside groups.
+    Factor &AssignInverse(); // As in general canonical factors do not have a
+                             // group structure.
+    Factor operator!()
+        const; // Won't matter too much for braids as complement will move up.
 
     // Complement operations.  For a factor a, ~a=a^(-1) delta is
     // called the complement (i.e. a(~a) = delta).  We provide
@@ -288,79 +286,81 @@ public:
        Gonzales-Menenes had noticed the same thing in his "braiding"
        code; he had used !(*this) rather than this->Inverse(). */
     /* Factor Complement() const { return ~a*Factor(Index(), -1); } */
-    Factor Complement() const { return this->Inverse()*Factor(Index(), 1); } // Needs to move
-    Factor& AssignComplement() { return *this = Complement(); } // Ok with complement
+    Factor Complement() const {
+        return this->Inverse() * Factor(Index(), 1);
+    } // Needs to move
+    Factor &AssignComplement() {
+        return *this = Complement();
+    }                                                 // Ok with complement
     Factor operator~() const { return Complement(); } // Ok
 
     // Flip operations (conjugation by delta^k, i,e. delta^(-k) a
     // delta^k).
-    Factor Flip(sint32 k = 1) const; // Needs to be rewritten as something that uses complements.
-    Factor& AssignFlip(sint32 k = 1); // Won't be as efficient however.
+    Factor Flip(sint32 k = 1)
+        const; // Needs to be rewritten as something that uses complements.
+    Factor &AssignFlip(sint32 k = 1); // Won't be as efficient however.
 
     // Meet operations.  b.LeftMeet(a) (resp. b.RightMeet(a)) returns
     // the left (resp. right) meet of b and a.
-    Factor LeftMeet(const Factor& a) const; // Ok
-    Factor RightMeet(const Factor& a) const; // Ok
+    Factor LeftMeet(const Factor &a) const;  // Ok
+    Factor RightMeet(const Factor &a) const; // Ok
 
     // Generate a random factor.
-    Factor& Randomize();
+    Factor &Randomize();
 
     // Computes a factor from a given string.
     void OfString(std::string str); // Ok
 
     // Print factor to os. Be wary, as it may side-effect!
-    void Print(std::ostream& os); // Ok
+    void Print(std::ostream &os); // Ok
 };
 
 // Binary function form of the meet operators.
-template<class P>
-Factor<P> LeftMeet(const Factor<P>& a, const Factor<P>& b);
-template<class P>
-Factor<P> RightMeet(const Factor<P>& a, const Factor<P>& b);
+template <class P> Factor<P> LeftMeet(const Factor<P> &a, const Factor<P> &b);
+template <class P> Factor<P> RightMeet(const Factor<P> &a, const Factor<P> &b);
 
 // Make two factors left (or right) weighted.  false is returned if
 // and only if they are already weighted.
-template<class P> bool MakeLeftWeighted(Factor<P>& a, Factor<P>& b);
-template<class P> bool MakeRightWeighted(Factor<P>& a, Factor<P>& b);
+template <class P> bool MakeLeftWeighted(Factor<P> &a, Factor<P> &b);
+template <class P> bool MakeRightWeighted(Factor<P> &a, Factor<P> &b);
 
 // Output (the permutation table of) a factor through ostream.
-template<class P>
-std::ostream& operator<<(std::ostream& os, const Factor<P>& f);
+template <class P>
+std::ostream &operator<<(std::ostream &os, const Factor<P> &f);
 
 // Short type names for canonical factors in Artin's and the band
 // generator presentation.
 typedef Factor<ArtinPresentation> ArtinFactor;
 typedef Factor<BandPresentation> BandFactor;
 
-
 // Class for a braid.  A braid is represented as a triple (l,
 // A_1...A_n, r), where l and r represent the powers of deltas at the
 // left and right ends, and A_1,...,A_n is a list of canonical
 // factors.
-template<class P> class Braid;
+template <class P> class Braid;
 
 // Friend functions.
-template<class P>
-std::ostream& operator<<(std::ostream& os, const Braid<P>& b);
+template <class P>
+std::ostream &operator<<(std::ostream &os, const Braid<P> &b);
 
 // Real declaration.
-template<class P> class Braid {
+template <class P> class Braid {
 
-public:
+  public:
     // Type for canonical factors.
     /* JLT: the old code was typedef Factor<P> Factor, which is no
        longer legal C++.  Hence, Factor had to be changed to Factor<P>
        or CanonicalFactor in many places. */
     typedef Factor<P> CanonicalFactor;
 
-private:
+  private:
     // Presentation description.
     P Pres;
 
     // We allow direct access to the internal data structure, because
     // their meanings are clear without any additional interfaces, and
     // this is efficient for time-critical jobs.
-public:
+  public:
     // Powers of deltas at ends.
     sint32 LeftDelta, RightDelta;
 
@@ -372,24 +372,25 @@ public:
     // (about twice) than corresponding operations on a list of
     // objects, especially in the case of STL lists.  Because of this,
     // the following type declaration will be changed later.
-    std::list<Factor<P> > FactorList;
+    std::list<Factor<P>> FactorList;
 
-public:
+  public:
     // Iterator types for canonical factors.
-    typedef typename std::list<Factor<P> >::iterator FactorItr;
-    typedef typename std::list<Factor<P> >::const_iterator ConstFactorItr;
-    typedef typename std::list<Factor<P> >::reverse_iterator RevFactorItr;
-    typedef typename std::list<Factor<P> >::const_reverse_iterator ConstRevFactorItr;
+    typedef typename std::list<Factor<P>>::iterator FactorItr;
+    typedef typename std::list<Factor<P>>::const_iterator ConstFactorItr;
+    typedef typename std::list<Factor<P>>::reverse_iterator RevFactorItr;
+    typedef
+        typename std::list<Factor<P>>::const_reverse_iterator ConstRevFactorItr;
 
-public:
+  public:
     // Constructor which creates a trivial braid.
     Braid(sint16 n);
 
     // Copy constructor.
-    Braid(const Braid& b);
+    Braid(const Braid &b);
 
     // Construct from a factor.
-    Braid(const Factor<P>& f);
+    Braid(const Factor<P> &f);
 
     // Destructor.
     ~Braid();
@@ -398,19 +399,19 @@ public:
     sint16 Index() const;
 
     // Initialize as a trivial braid.
-    Braid& Identity();
+    Braid &Identity();
 
     // Assignment operator.
-    Braid& Assign(const Braid& b);
-    Braid& operator=(const Braid& b);
+    Braid &Assign(const Braid &b);
+    Braid &operator=(const Braid &b);
 
     // Comparison operator. Two braids are viewed as the same ones if
     // and only if they have the same internal representation. Hence
     // braids are usually converted to canonical forms before
     // comparison.
-    bool Compare(const Braid& b) const;
-    bool operator==(const Braid& b) const;
-    bool operator!=(const Braid& b) const;
+    bool Compare(const Braid &b) const;
+    bool operator==(const Braid &b) const;
+    bool operator!=(const Braid &b) const;
 
     // Compare with the trivial representation of the identity braid.
     // true is returned iff both LeftDelta and RightDelta are zero and
@@ -427,20 +428,20 @@ public:
     // can be either a braid or a factor. More functions are
     // provided for braids. c.Multiply(a,b), c becomes a*b. a*b
     // returns the multiplication. By a*=b, a becomes a*b.
-    Braid& LeftMultiply(const Factor<P>& f);
-    Braid& RightMultiply(const Factor<P>& f);
-    Braid& LeftMultiply(const Braid& a);
-    Braid& RightMultiply(const Braid& a);
-    Braid& Multiply(const Braid& a, const Braid& b);
-    Braid operator*(const Braid& a) const;
-    Braid& operator*=(const Braid& a);
+    Braid &LeftMultiply(const Factor<P> &f);
+    Braid &RightMultiply(const Factor<P> &f);
+    Braid &LeftMultiply(const Braid &a);
+    Braid &RightMultiply(const Braid &a);
+    Braid &Multiply(const Braid &a, const Braid &b);
+    Braid operator*(const Braid &a) const;
+    Braid &operator*=(const Braid &a);
 
     // Get the permutation associated to the braid.
     Factor<P> GetPerm() const;
 
     // Convertion into canonical forms.
-    Braid& MakeLCF();
-    Braid& MakeRCF();
+    Braid &MakeLCF();
+    Braid &MakeRCF();
 
     // Reduce the maximal left/right lower/upper subbraid.  By
     // definition, a is the maximal left lower subbraid of a
@@ -452,43 +453,39 @@ public:
     Braid ReduceRightLower();
     Braid ReduceRightUpper();
 
-private:
+  private:
     // Subroutines used by Reduce{Left, Right}{Upper,Lower}().
-    Braid ReduceLeftSub(const Factor<P>& f);
-    Braid ReduceRightSub(const Factor<P>& f);
+    Braid ReduceLeftSub(const Factor<P> &f);
+    Braid ReduceRightSub(const Factor<P> &f);
 
-public:
+  public:
     // Generate a random braid. The result is a braid consisting
     // of cl randomly chosen canonical factors with RightDelta and
     // LeftDelta zero.
-    Braid& Randomize(sint32 cl = 1);
+    Braid &Randomize(sint32 cl = 1);
 
     // Friend functions.
 
     // Print a braid through ostream.
-    friend std::ostream& operator<< <>(std::ostream& os, const Braid& b);
+    friend std::ostream &operator<< <>(std::ostream &os, const Braid &b);
 };
-
 
 // Short names for braid types.
 typedef Braid<ArtinPresentation> ArtinBraid;
 typedef Braid<BandPresentation> BandBraid;
 
-
 // Conversion between ArtinBraid and BandBraid.
-BandBraid ToBandBraid(const ArtinBraid& a);
-ArtinBraid ToArtinBraid(const BandBraid& b);
-
+BandBraid ToBandBraid(const ArtinBraid &a);
+ArtinBraid ToArtinBraid(const BandBraid &b);
 
 #ifdef USE_CLN
 
 // Catalan number function.
-const cln::cl_I& GetCatalanNumber(sint16 n);
+const cln::cl_I &GetCatalanNumber(sint16 n);
 
 // Generate the k-th ballot sequence of length 2n and store it in
 // s[1..2n] (note that s[0] is not used).  It is internally used by
 // Randomize(), but is declared as public since it has its own worth.
-void BallotSequence(CBraid::sint16 n, const cln::cl_I k,
-                    CBraid::sint8* s);
+void BallotSequence(CBraid::sint16 n, const cln::cl_I k, CBraid::sint8 *s);
 
 #endif // USE_CLN

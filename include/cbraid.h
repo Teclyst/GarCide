@@ -18,7 +18,6 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-
 /*
     $Id: cbraid.h,v 1.17 2001/12/07 10:12:13 jccha Exp $
     Jae Choon Cha <jccha@knot.kaist.ac.kr>
@@ -26,22 +25,19 @@
     Main header file of cbraid library.
 */
 
-
 #ifndef _cbraid_h_
 #define _cbraid_h_
-
 
 #include <algorithm>
 #include <functional>
 #include <list>
 
-#include <iostream>
 #include <cstdlib>
+#include <iostream>
 
 #ifdef USE_CLN
 #include <cln/cln.h>
 #endif
-
 
 namespace CBraid {
 
@@ -53,6 +49,6 @@ namespace CBraid {
 // compilers can optimize inline functions better.)
 #include "cbraid_implementation.h"
 
-}
+} // namespace CBraid
 
 #endif // _cbraid_h_

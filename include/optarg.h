@@ -18,7 +18,6 @@
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-
 /*
     $Id: optarg.h,v 1.1 2001/12/07 10:12:14 jccha Exp $
     Jae Choon CHA <jccha@knot.kaist.ac.kr>
@@ -26,10 +25,8 @@
     This is optarg, a C++ subroutine for command line option processing.
 */
 
-
 #ifndef _OPTARG_H
 #define _OPTARG_H
-
 
 /*
     Optarg processes options, that are usually used to specify things
@@ -122,76 +119,65 @@
 
 */
 
-
 #include <algorithm>
 #include <list>
 #include <map>
 #include <string>
 
-
 namespace OptArg {
 
-    // Kinds of arguments.
-    enum argtype {
-        int_arg,
-        string_arg,
-        bool_true_arg,
-        bool_false_arg,
-        undefined_arg
-    };
+// Kinds of arguments.
+enum argtype {
+    int_arg,
+    string_arg,
+    bool_true_arg,
+    bool_false_arg,
+    undefined_arg
+};
 
+// Argument description type. It is just a pair of argument type
+// and a pointer to the memory where the value will be stored.
+typedef std::pair<enum argtype, void *> arg;
 
-    // Argument description type. It is just a pair of argument type
-    // and a pointer to the memory where the value will be stored.
-    typedef std::pair<enum argtype, void*> arg;
+// Argument list type.
+typedef std::list<arg> arglist;
 
+// operator<<() adds argument descriptions to an argument list.
+// It is better than push_back() in adding several argument
+// descriptions at once, like arglist() << arg(..,..) <<
+// arg(..,..);
+arglist &operator<<(arglist &al, const arg &ad);
 
-    // Argument list type.
-    typedef std::list<arg> arglist;
+// Option description type.  This is just a pair of a string and
+// an arglist, with constructors which are very convinient in
+// describing simple but frequent options.
+struct opt : public std::pair<std::string, arglist> {
+    opt(const std::string &n, const arglist &al);
+    opt(const std::string &n, const arg &a);
+    opt(const std::string &n, enum argtype t, void *p);
+};
 
+// Option mapping type.
+typedef std::map<std::string, arglist> optmap;
 
-    // operator<<() adds argument descriptions to an argument list.
-    // It is better than push_back() in adding several argument
-    // descriptions at once, like arglist() << arg(..,..) <<
-    // arg(..,..);
-    arglist& operator<<(arglist& al, const arg& ad);
+// operator<<() adds option descriptions to an option mapping,
+// similarly to the case of arglist type.
+optmap &operator<<(optmap &m, const opt &op);
 
+// Process options.
+template <class InItr>
+InItr process_option(InItr first, InItr last, const optmap &m);
 
-    // Option description type.  This is just a pair of a string and
-    // an arglist, with constructors which are very convinient in
-    // describing simple but frequent options.
-    struct opt : public std::pair<std::string, arglist> {
-        opt(const std::string& n, const arglist& al);
-        opt(const std::string& n, const arg& a);
-        opt(const std::string& n, enum argtype t, void* p);
-    };
+// Exceptions that are thrown by process_option().
 
+struct bad_optarg_seq {
+    bad_optarg_seq(const std::string &n = std::string()) : option_name(n) {}
+    std::string option_name;
+};
 
-    // Option mapping type.
-    typedef std::map<std::string, arglist> optmap;
+struct bad_optmap {};
 
-    // operator<<() adds option descriptions to an option mapping,
-    // similarly to the case of arglist type.
-    optmap& operator<<(optmap& m, const opt& op);
-
-
-    // Process options.
-    template<class InItr>
-        InItr process_option(InItr first, InItr last, const optmap& m);
-
-    // Exceptions that are thrown by process_option().
-
-    struct bad_optarg_seq {
-        bad_optarg_seq(const std::string& n = std::string()) : option_name(n) {}
-        std::string option_name;
-    };
-
-    struct bad_optmap {};
-
-
-} // namespace optarg
-
-
+} // namespace OptArg
 
 // Implementations.
 
@@ -199,43 +185,31 @@ namespace OptArg {
 // functions including fairly long one are implemented in this header
 // file.
 
-
-OptArg::arglist& OptArg::operator<<(arglist& al, const arg& ad)
-{
+OptArg::arglist &OptArg::operator<<(arglist &al, const arg &ad) {
     al.push_back(ad);
     return al;
 }
 
+OptArg::opt::opt(const std::string &n, const arglist &al)
+    : std::pair<std::string, arglist>(n, al) {}
 
-OptArg::opt::opt(const std::string& n, const arglist& al)
-    : std::pair<std::string, arglist>(n, al)
-{}
-
-
-OptArg::opt::opt(const std::string& n, const arg& a)
-{
+OptArg::opt::opt(const std::string &n, const arg &a) {
     first = n;
     second << a;
 }
 
-
-OptArg::opt::opt(const std::string& n, enum argtype t, void* p)
-{
+OptArg::opt::opt(const std::string &n, enum argtype t, void *p) {
     first = n;
     second << arg(t, p);
 }
 
-
-OptArg::optmap& OptArg::operator<<(optmap& m, const opt& op)
-{
+OptArg::optmap &OptArg::operator<<(optmap &m, const opt &op) {
     m[op.first] = op.second;
     return m;
 }
 
-
-template<class InItr>
-InItr OptArg::process_option(InItr first, InItr last, const optmap& m)
-{
+template <class InItr>
+InItr OptArg::process_option(InItr first, InItr last, const optmap &m) {
     while (first != last) {
 
         // Check whether *first is a valid option. It extracts the
@@ -248,7 +222,7 @@ InItr OptArg::process_option(InItr first, InItr last, const optmap& m)
         std::string::size_type p = OptName.find("=");
         if (p != std::string::npos) {
             bPreArg = true;
-            PreArg = OptName.substr(p+1);
+            PreArg = OptName.substr(p + 1);
             OptName = OptName.substr(0, p);
         }
 
@@ -261,14 +235,14 @@ InItr OptArg::process_option(InItr first, InItr last, const optmap& m)
 
         // Process arguments.
         ++first;
-        const arglist& al = i->second;
-        for(arglist::const_iterator j = al.begin(); j != al.end(); ++j) {
+        const arglist &al = i->second;
+        for (arglist::const_iterator j = al.begin(); j != al.end(); ++j) {
             if (j->first == bool_true_arg || j->first == bool_false_arg) {
                 if (++(al.begin()) != al.end()) {
                     // Error in m: There are other arguments.
                     throw bad_optmap();
                 }
-                *static_cast<bool*>(j->second) =
+                *static_cast<bool *>(j->second) =
                     (j->first == bool_true_arg) ? true : false;
             } else {
                 std::string Arg;
@@ -282,9 +256,9 @@ InItr OptArg::process_option(InItr first, InItr last, const optmap& m)
                     Arg = *(first++);
                 }
                 if (j->first == int_arg) {
-                    *(static_cast<int*>(j->second)) = std::atoi(Arg.c_str());
+                    *(static_cast<int *>(j->second)) = std::atoi(Arg.c_str());
                 } else if (j->first == string_arg) {
-                    *(static_cast<std::string*>(j->second)) = Arg;
+                    *(static_cast<std::string *>(j->second)) = Arg;
                 } else {
                     // Error in m: Invalid argument type.
                     throw bad_optmap();
@@ -300,7 +274,5 @@ InItr OptArg::process_option(InItr first, InItr last, const optmap& m)
     }
     return first;
 }
-
-
 
 #endif // _OPTARG_H
