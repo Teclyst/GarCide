@@ -21,25 +21,29 @@ void BDualBraidUnderlying::Print(IndentedOStream &os) const {
     for (i = 1; i <= n; i++) {
         seen[i] = false;
     }
+
+    bool is_first = true;
+
     for (i = 1; i <= n; ++i) {
         if (!seen[i]) {
             curr_cycle.clear();
             j = i;
-            while (j < PermutationTable[j]) {
+            while (!seen[Rem(j - 1, n) + 1]) {
                 curr_cycle.push_back(j);
-                seen[j] = true;
-                seen[((j + n - 1) % (2 * n)) + 1] = true;
+                seen[Rem(j - 1, n) + 1] = true;
                 j = PermutationTable[j];
             }
-            curr_cycle.push_back(j);
-            seen[j] = true;
-            seen[((j + n - 1) % (2 * n)) + 1] = true;
-            for (sint16 l = int(curr_cycle.size()); l >= 1; --l) {
-                if (l == ((j + n - 1) % (2 * n)) + 1) {
-                    os << j << " ";
-                    break;
-                }
-                os << "(" << curr_cycle[l] << ", " << curr_cycle[l - 1] << ") ";
+            if (!is_first && int(curr_cycle.size()) > 1) {
+                os << " ";
+            } else if (int(curr_cycle.size()) > 1) {
+                is_first = false;
+            }
+            for (sint16 l = int(curr_cycle.size()) - 1; l >= 1; --l) {
+                os << "(" << curr_cycle[l] << ", " << curr_cycle[l - 1] << ")" << ((l == 1) ? "" : " ");
+            }
+            // Long cycle.
+            if (j > n) {
+                os << (is_first ? "" : " ") << j - n;
             }
         }
     }
@@ -57,10 +61,10 @@ void BDualBraidUnderlying::Debug(IndentedOStream &os) const {
     os.Indent(4);
     os << EndLine();
     os << "[";
-    for (sint16 i = 1; i < GetParameter(); i++) {
+    for (sint16 i = 1; i < 2 * GetParameter(); i++) {
         os << PermutationTable[i] << ", ";
     }
-    os << PermutationTable[GetParameter()];
+    os << PermutationTable[2 * GetParameter()];
     os << "]";
     os.Indent(-8);
     os << EndLine();
@@ -90,15 +94,19 @@ void BDualBraidUnderlying::OfString(const std::string &str, size_t &pos) {
                 Rem(i + n - 1, 2 * n) + 1;
         } else {
             throw InvalidStringError(
-                "Indexes for a short generators should not be equal mod " +
-                std::to_string(n) + "!\n(" + std::to_string(i) + ", " +
-                std::to_string(j) + ") is not a valid factor.");
+                "Indexes for short generators should not be equal mod " +
+                std::to_string(n) + "!\n(" +
+                std::to_string(std::stoi(match[1])) + ", " +
+                std::to_string(std::stoi(match[2])) +
+                ") is not a valid factor.");
         }
     } else if (std::regex_search(str.begin() + pos, str.end(), match,
                                  std::regex{"(" + number_regex + ")"},
                                  std::regex_constants::match_continuous)) {
         sint16 i = std::stoi(match[1]);
+        i = Rem(i - 1, 2 * n) + 1;
         pos += match[0].length();
+        Identity();
         PermutationTable[i] = Rem(i + n - 1, 2 * n) + 1;
         PermutationTable[Rem(i + n - 1, 2 * n) + 1] = i;
     } else {
@@ -214,19 +222,15 @@ BDualBraidUnderlying::RightComplement(const BDualBraidUnderlying &b) const {
     return Inverse().Product(b);
 };
 
-BDualBraidUnderlying BDualBraidUnderlying::DeltaConjugate(sint16 k) const {
-    BDualBraidUnderlying under = BDualBraidUnderlying(*this);
+void BDualBraidUnderlying::DeltaConjugate(sint16 k) {
+    BDualBraidUnderlying under = *this;
     sint16 i, n = GetParameter();
 
-    if (k < 0) {
-        k = k - 2 * n * k;
-    }
-
-    for (i = 1; i < 2 * n; i++) {
+    for (i = 1; i <= 2 * n; i++) {
         under.PermutationTable[i] =
-            (PermutationTable[(i + k - 1) % (2 * n) + 1] - k - 1) % (2 * n) + 1;
+            Rem(PermutationTable[Rem(i - k - 1, 2 * n) + 1] + k - 1, 2 * n) + 1;
     }
-    return under;
+    *this = under;
 }
 
 void BDualBraidUnderlying::Randomize() { throw NonRandomizable(); }

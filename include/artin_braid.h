@@ -18,6 +18,7 @@ class ArtinBraidUnderlying {
     ParameterType GetParameter() const;
 
     sint16 At(sint16 i) const { return PermutationTable[i]; }
+    sint16 &At(sint16 i) { return PermutationTable[i]; }
 
     // Constructor
     ArtinBraidUnderlying(ParameterType n);

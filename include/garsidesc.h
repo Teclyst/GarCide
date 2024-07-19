@@ -3,6 +3,7 @@
 
 namespace SC {
 using namespace CGarside;
+using CGarside::sint16;
 
 template <class F> std::vector<Braid<F>> Trajectory(Braid<F> b) {
     std::vector<Braid<F>> t;

@@ -26,12 +26,12 @@ struct ComplexDualBraidParameter {
         return !Compare(p);
     }
 
-    void Debug(std::ostream &os) const {
-        os << "{ e: " << e << ", n: " << n << " }";
-    }
+    void Print(IndentedOStream &os) const;
 };
 
-std::ostream &operator<<(std::ostream &os, const ComplexDualBraidParameter &p);
+template <>
+IndentedOStream &IndentedOStream::operator<< <ComplexDualBraidParameter>(
+    const ComplexDualBraidParameter &p);
 
 // You may use Braids with parameter e, n such that e * n <= `MaxE` *
 // `MaxBraidIndex`. Note that `MaxE` IS NOT a strict bound; rather, it is the
@@ -66,23 +66,16 @@ class ComplexDualBraidUnderlying {
     // Constructor
     ComplexDualBraidUnderlying(ComplexDualBraidParameter p);
 
-    void OfString(std::string str);
+    void OfString(const std::string &str, size_t &pos);
 
-    void Debug(std::ostream &os) const {
-        os << "[";
-        for (sint16 i = 0; i <= GetParameter().n; i++) {
-            os << "(" << PermutationTable[i] << ", " << CoefficientTable[i]
-               << "), ";
-        }
-        os << "]";
-    }
+    void Debug(IndentedOStream &os) const;
 
     void AssignPartition(sint16 *x) const;
 
     void OfPartition(const sint16 *x);
 
     // Print to os. Be wary, as it side-effects!
-    void Print(std::ostream &os) const;
+    void Print(IndentedOStream &os) const;
 
     // Set to the Identity element (here the identity).
     void Identity();
@@ -139,8 +132,6 @@ class ComplexDualBraidUnderlying {
         return h;
     }
 };
-
-std::ostream &operator<<(std::ostream &os, const ComplexDualBraidUnderlying &u);
 
 typedef Factor<ComplexDualBraidUnderlying> ComplexDualBraidFactor;
 

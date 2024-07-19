@@ -19,6 +19,29 @@ class BDualBraidUnderlying {
     // Constructor
     BDualBraidUnderlying(sint16 n);
 
+    /**
+     * @brief Extraction from string.
+     *
+     * Reads the string `str`, starting at position `pos`, and sets `this` to
+     * the corresponding atom.
+     *
+     * Letting `W = (\s | \t)*` be the language of whitespaces and `Z = -? ([1 -
+     * 9] [0 - 9]* | 0)` be the language of integers, accepted strings are those
+     * represented by regular expression `\(W Z W,? W Z W\) | Z`, under the
+     * additional hypothesis that in the first case the two integers are not
+     * equal mod `PresentationParameter'.
+     *
+     * The first case stands for short generators (double, symmetric,
+     * transpositions), and the second one for long generators (transposition of
+     * antipodals points).
+     *
+     * @param str The string to extract from.
+     * @param pos The position to start from.
+     * @exception `InvalidStringError`: Thrown when there is no subword starting
+     * from `pos` that matches `\(W Z W,? W Z W\) | Z`, or if there is one, it
+     * matches `\(W Z W,? W Z W\)`, and both integers are equal mod
+     * `PresentationParameter'.
+     */
     void OfString(const std::string &str, size_t &pos);
 
     void Debug(IndentedOStream &os) const;
@@ -65,7 +88,7 @@ class BDualBraidUnderlying {
 
     // Conjugate by Delta^k.
     // Used to speed up calculations compared to the default implementation.
-    BDualBraidUnderlying DeltaConjugate(sint16 k) const;
+    void DeltaConjugate(sint16 k);
 
     std::size_t Hash() const {
         std::size_t h = 0;

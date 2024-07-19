@@ -7,7 +7,7 @@ class BandBraidUnderlying {
   protected:
     sint16 PresentationParameter;
 
-    sint16 *PermutationTable;
+    std::vector<sint16> PermutationTable;
 
   public:
     typedef sint16 ParameterType;
@@ -19,9 +19,8 @@ class BandBraidUnderlying {
     // Constructor
     BandBraidUnderlying(sint16 n);
 
-    BandBraidUnderlying(const BandBraidUnderlying &a);
-
-    ~BandBraidUnderlying() { delete[] PermutationTable; }
+    sint16 At(sint16 i) const { return PermutationTable[i]; }
+    sint16 &At(sint16 i) { return PermutationTable[i]; }
 
     /**
      * @brief Extraction from string.
@@ -56,10 +55,6 @@ class BandBraidUnderlying {
     void AssignDCDT(sint16 *x) const;
 
     void OfDCDT(const sint16 *x);
-
-    BandBraidUnderlying &Assign(const BandBraidUnderlying &a);
-
-    BandBraidUnderlying &operator=(const BandBraidUnderlying &a);
 
     /**
      * @brief Prints the factor to `os`.
@@ -105,7 +100,7 @@ class BandBraidUnderlying {
 
     // Conjugate by Delta^k.
     // Used to speed up calculations compared to the default implementation.
-    BandBraidUnderlying DeltaConjugate(sint16 k) const;
+    void DeltaConjugate(sint16 k);
 
     std::size_t Hash() const {
         std::size_t h = 0;

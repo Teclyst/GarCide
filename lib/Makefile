@@ -24,7 +24,7 @@
 #   cbraid.o and braiding.o.
 
 # File Names.
-LIBCBRAID_SRC = utility.cpp cbraid.cpp braiding.cpp artin_braid.cpp band_braid.cpp #octaedral_braid.cpp dihedral_braid.cpp dual_complex_reflection.cpp standard_complex_reflection.cpp
+LIBCBRAID_SRC = utility.cpp cbraid.cpp braiding.cpp artin_braid.cpp band_braid.cpp octaedral_braid.cpp dual_complex_reflection.cpp standard_complex_reflection.cpp dihedral_braid.cpp
 LIBCBRAID_INCLUDEDIR = ../include
 LIBCBRAID_OBJ = $(LIBCBRAID_SRC:.cpp=.o)
 LIBCBRAID_A = libcbraid.a

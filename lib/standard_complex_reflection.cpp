@@ -3,11 +3,50 @@
 #include <string>
 
 namespace CGarside {
-std::ostream &operator<<(std::ostream &os,
-                         const ComplexStandardBraidParameter &p) {
-    p.Debug(os);
-    return os;
+
+void ComplexStandardBraidParameter::Print(IndentedOStream &os) const {
+    os << "(e: " << e << ", n: " << n << ")";
+}
+
+template <>
+IndentedOStream &IndentedOStream::operator<< <ComplexStandardBraidParameter>(
+    const ComplexStandardBraidParameter &p) {
+    p.Print(*this);
+    return *this;
 };
+
+void ComplexStandardBraidUnderlying::Debug(IndentedOStream &os) const {
+    os << "{   ";
+    os.Indent(4);
+    os << "PresentationParameter:";
+    os.Indent(4);
+    os << EndLine() << GetParameter();
+    os.Indent(-4);
+    os << EndLine();
+    os << "PermutationTable:";
+    os.Indent(4);
+    os << EndLine();
+    os << "[";
+    for (sint16 i = 0; i < GetParameter().n; i++) {
+        os << PermutationTable[i] << ", ";
+    }
+    os << PermutationTable[GetParameter().n];
+    os << "]";
+    os.Indent(-4);
+    os << EndLine();
+    os << "CoefficientTable:";
+    os.Indent(4);
+    os << EndLine();
+    os << "[";
+    for (sint16 i = 0; i < GetParameter().n; i++) {
+        os << CoefficientTable[i] << ", ";
+    }
+    os << CoefficientTable[GetParameter().n];
+    os << "]";
+    os.Indent(-8);
+    os << EndLine();
+    os << "}";
+}
 
 ComplexStandardBraidParameter
 ComplexStandardBraidUnderlying::GetParameter() const {
@@ -23,33 +62,44 @@ ComplexStandardBraidUnderlying::ComplexStandardBraidUnderlying(
     ComplexStandardBraidParameter p)
     : PresentationParameter(p), PermutationTable(p.n), CoefficientTable(p.n) {}
 
-void ComplexStandardBraidUnderlying::Print(std::ostream &os) const {
+void ComplexStandardBraidUnderlying::Print(IndentedOStream &os) const {
     thread_local sint16 dir_perm[MaxBraidIndex];
     ComplexStandardBraidUnderlying copy = *this;
     copy.Direct(dir_perm);
     sint16 n = GetParameter().n, e = GetParameter().e;
+    bool is_first = true;
     for (sint16 i = 2; i <= n; i++) {
         for (sint16 j = i; j > 2; j--) {
             if (copy.IsSLeftDivisor(dir_perm, j)) {
+                if (is_first) {
+                    is_first = false;
+                } else {
+                    os << " ";
+                }
                 copy.SLeftMultiply(dir_perm, j);
-                os << "s" << j << " ";
+                os << "s" << j;
             } else {
                 goto end_subword;
             }
         }
 
         if (copy.IsTLeftDivisor(dir_perm, 1)) {
+            if (is_first) {
+                is_first = false;
+            } else {
+                os << " ";
+            }
             copy.TLeftMultiply(dir_perm, 1);
-            os << "t" << 1 << " ";
+            os << "t" << 1;
 
             if (copy.IsTLeftDivisor(dir_perm, 0)) {
                 copy.TLeftMultiply(dir_perm, 0);
-                os << "t" << 0 << " ";
+                os << " t" << 0;
 
                 for (sint16 j = 3; j < i + 1; j++) {
                     if (copy.IsSLeftDivisor(dir_perm, j)) {
                         copy.SLeftMultiply(dir_perm, j);
-                        os << "s" << j << " ";
+                        os << " s" << j;
                     } else {
                         goto end_subword;
                     }
@@ -60,8 +110,13 @@ void ComplexStandardBraidUnderlying::Print(std::ostream &os) const {
 
         for (sint16 k = 0; k < e; k++) {
             if (copy.IsTLeftDivisor(dir_perm, k)) {
+                if (is_first) {
+                    is_first = false;
+                } else {
+                    os << " ";
+                }
                 copy.TLeftMultiply(dir_perm, k);
-                os << "t" << k << " ";
+                os << "t" << k;
                 goto end_subword;
             }
         }
@@ -69,13 +124,16 @@ void ComplexStandardBraidUnderlying::Print(std::ostream &os) const {
     }
 }
 
-void ComplexStandardBraidUnderlying::OfString(std::string str) {
+void ComplexStandardBraidUnderlying::OfString(const std::string &str,
+                                              size_t &pos) {
     sint16 n = GetParameter().n, e = GetParameter().e;
-    std::regex factor{"(s|t)(" + number_regex + ")"};
     std::smatch match;
-    if (std::regex_search(str, match, factor,
-                          std::regex_constants::match_continuous)) {
+    if (std::regex_search(
+            str.begin() + pos, str.end(), match,
+            std::regex{"([st])[\\s\\t]*_?[\\s\\t]*(" + number_regex + ")"},
+            std::regex_constants::match_continuous)) {
         sint16 i = std::stoi(match[2]);
+        pos += match[0].length();
         if (match[1] == "s") {
             if ((3 <= i) && (i <= n)) {
                 // s_i.
@@ -83,21 +141,26 @@ void ComplexStandardBraidUnderlying::OfString(std::string str) {
                 PermutationTable[i - 2] = i - 1;
                 PermutationTable[i - 1] = i - 2;
             } else {
-                throw InvalidStringError();
+                throw InvalidStringError(
+                    "Invalid index for s type generator!\n" +
+                    std::to_string(i) + " is not in [3, " + std::to_string(n) +
+                    "].");
             }
         } else {
-            if ((3 <= i) && (i <= n)) {
-                // t_i.
-                i = Rem(i, e);
-                Identity();
-                PermutationTable[0] = 1;
-                PermutationTable[1] = 0;
-                CoefficientTable[1] = i;
-                CoefficientTable[0] = e - ((i == 0) ? e : i);
-            }
+            // t_i.
+            i = Rem(i, e);
+            Identity();
+            PermutationTable[0] = 1;
+            PermutationTable[1] = 0;
+            CoefficientTable[1] = i;
+            CoefficientTable[0] = e - ((i == 0) ? e : i);
         }
     } else {
-        throw InvalidStringError();
+        throw InvalidStringError("Could not extract a factor from \"" +
+                                 str.substr(pos) +
+                                 "\"!\nA factor should match regex (s | t) _? "
+                                 "-? [1 - 9] [0 - 9]* (ignoring whitespaces).");
+        ;
     }
 }
 
@@ -192,9 +255,6 @@ void ComplexStandardBraidUnderlying::Delta() {
 bool ComplexStandardBraidUnderlying::Compare(
     const ComplexStandardBraidUnderlying &b) const {
     sint16 i;
-    if (GetParameter() != b.GetParameter()) {
-        throw NonMatchingIndexes(GetParameter().n, b.GetParameter().n);
-    }
     for (i = 0; i < GetParameter().n; i++) {
         if ((PermutationTable[i] != b.PermutationTable[i]) ||
             (CoefficientTable[i] != b.CoefficientTable[i])) {
@@ -220,9 +280,6 @@ ComplexStandardBraidUnderlying ComplexStandardBraidUnderlying::Product(
     const ComplexStandardBraidUnderlying &b) const {
     ComplexStandardBraidUnderlying f =
         ComplexStandardBraidUnderlying(GetParameter());
-    if (GetParameter() != b.GetParameter()) {
-        throw NonMatchingIndexes(GetParameter().n, b.GetParameter().n);
-    }
     sint16 i, n = GetParameter().n, e = GetParameter().e;
     for (i = 0; i < n; i++) {
         f.PermutationTable[i] = b.PermutationTable[PermutationTable[i]];
@@ -291,9 +348,4 @@ ComplexStandardBraidUnderlying::Atoms() const {
     return atoms;
 }
 
-std::ostream &operator<<(std::ostream &os,
-                         const ComplexStandardBraidUnderlying &u) {
-    u.Print(os);
-    return os;
-}
 } // namespace CGarside

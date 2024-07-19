@@ -63,6 +63,8 @@
     "thread": "cpp",
     "cfenv": "cpp",
     "bitset": "cpp",
-    "regex": "cpp"
-  }
+    "regex": "cpp",
+    "execution": "cpp"
+  },
+  "terminal.integrated.scrollback": 10000
 }

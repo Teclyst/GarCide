@@ -3,11 +3,7 @@
 
 #include "utility.h"
 #include <execution>
-#include <iostream>
 #include <list>
-#include <regex>
-#include <stdexcept>
-#include <string>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
@@ -19,7 +15,6 @@
  * generic Garside groups.
  */
 namespace CGarside {
-using namespace Utility;
 
 template <class U> class Factor {
 
@@ -49,7 +44,14 @@ template <class U> class Factor {
     }
 
     // a.Debug(os) prints a's internal representation to os.
-    void Debug(IndentedOStream &os) const { Underlying.Debug(os); }
+    void Debug(IndentedOStream &os) const {
+        os << "{   Underlying:";
+        os.Indent(8);
+        os << EndLine();
+        Underlying.Debug(os);
+        os.Indent(-8);
+        os << EndLine() << "}";
+    }
 
     // a.Print(os) prints a to os.
     void Print(IndentedOStream &os) const { Underlying.Print(os); }
@@ -130,8 +132,7 @@ template <class U> class Factor {
     }
 
     // a.DeltaConjugate() returns a conjugated by Delta.
-    // This is done by taking complements twice.
-    Factor DeltaConjugate() const { return DeltaConjugate(0); }
+    Factor DeltaConjugate() const { return DeltaConjugate(1); }
 
     // a.LeftMeet(b) returns the left meet of a and b.
     Factor LeftMeet(const Factor &b) const {
@@ -232,7 +233,7 @@ template <class F> bool MakeRightWeighted(F &u, F &v) {
 
 // Overloading << for factor classes.
 template <class U>
-std::ostream &operator<<(std::ostream &os, const Factor<U> &f) {
+IndentedOStream& operator<<(IndentedOStream &os, const Factor<U> &f) {
     f.Print(os);
     return os;
 }
@@ -568,7 +569,7 @@ template <class F> class Braid {
             } else if (b2.CanonicalLength() == 0) {
                 f2.Identity();
             } else {
-                f2 = b1.FactorList.front();
+                f2 = b2.FactorList.front();
             }
 
             f = f1 ^ f2;
@@ -620,6 +621,7 @@ template <class F> class Braid {
             f = b1.Remainder(f2);
 
             b.RightProduct(f);
+            b1.RightProduct(f);
             b1.LeftDivide(f2);
             b2.LeftDivide(f2);
         }
@@ -993,7 +995,7 @@ template <class F> class Braid {
 
 // Overloading << for braid classes.
 template <class F>
-std::ostream &operator<<(std::ostream &os, const Braid<F> &b) {
+IndentedOStream &operator<<(IndentedOStream &os, const Braid<F> &b) {
     b.Print(os);
     return os;
 }

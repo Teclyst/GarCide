@@ -10,8 +10,8 @@ class IDualBraidUnderlying {
     // 0 for Identity, 1 for Delta, 2 for a reflection.
     sint16 Type;
 
-    // The reflection Axis.
-    sint16 Axis;
+    // The point the reflection sends 0 on.
+    sint16 Point;
 
   public:
     typedef sint16 ParameterType;
@@ -23,20 +23,14 @@ class IDualBraidUnderlying {
     // Constructor
     IDualBraidUnderlying(sint16 n);
 
-    IDualBraidUnderlying(const IDualBraidUnderlying &a);
+    void OfString(const std::string &str, size_t &pos);
 
-    void OfString(std::string &str);
-
-    void Debug(std::ostream &os) const {
-        os << "(" << Type << ", " << Axis << ") ";
+    void Debug(IndentedOStream &os) const {
+        os << "(" << Type << ", " << Point << ") ";
     }
 
-    IDualBraidUnderlying &Assign(const IDualBraidUnderlying &a);
-
-    IDualBraidUnderlying &operator=(const IDualBraidUnderlying &a);
-
-    // Print to os. Be wary, as it side-effects!
-    void Print(std::ostream &os) const;
+    // Print to os.
+    void Print(IndentedOStream &os) const;
 
     // Set to the Identity element (here the identity).
     void Identity();
@@ -68,11 +62,11 @@ class IDualBraidUnderlying {
     std::vector<IDualBraidUnderlying> Atoms() const;
 
     // Conjugate by Delta^k.
-    // Used to speed up calculations compared to the default implementation.
+    // Used to speed up calculations compared to default implementation.
     IDualBraidUnderlying DeltaConjugate(sint16 k) const;
 
-    std::size_t Hash() const {
-        std::size_t h = Axis;
+    inline std::size_t Hash() const {
+        std::size_t h = Point;
         return h;
     }
 };

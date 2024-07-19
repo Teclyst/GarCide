@@ -419,7 +419,7 @@ CBraid::Braid<P> SendToSSS(CBraid::Braid<P> B, CBraid::Braid<P> &C) {
 
 template <class P>
 CBraid::Factor<P> LeftWedge(CBraid::Factor<P> F1, CBraid::Factor<P> F2) {
-    return (~RightMeet(~F1, ~F2)).Flip();
+    return (~RightMeet(~F1, ~F2)).Flip(-1);
 }
 
 /////////////////////////////////////////////////////////////

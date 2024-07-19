@@ -291,8 +291,8 @@ template <class P> class Factor {
     } // Needs to move
     Factor &AssignComplement() {
         return *this = Complement();
-    }                                                 // Ok with complement
-    Factor operator~() const { return Complement(); } // Ok
+    }                                                 
+    Factor operator~() const { return Complement(); }
 
     // Flip operations (conjugation by delta^k, i,e. delta^(-k) a
     // delta^k).

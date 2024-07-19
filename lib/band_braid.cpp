@@ -11,38 +11,15 @@ sint16 BandBraidUnderlying::GetParameter() const {
 
 sint16 BandBraidUnderlying::LatticeHeight() const { return GetParameter(); }
 
-BandBraidUnderlying &BandBraidUnderlying::Assign(const BandBraidUnderlying &a) {
-    if (&a != this) {
-        for (sint16 i = 1; i <= GetParameter(); ++i) {
-            PermutationTable[i] = a.PermutationTable[i];
-        }
-    }
-    return *this;
-};
-
-BandBraidUnderlying &
-BandBraidUnderlying::operator=(const BandBraidUnderlying &a) {
-    return Assign(a);
-}
-
-BandBraidUnderlying::BandBraidUnderlying(sint16 n) : PresentationParameter(n) {
-    PermutationTable = new sint16[n + 1];
-}
-
-BandBraidUnderlying::BandBraidUnderlying(const BandBraidUnderlying &a)
-    : PresentationParameter(a.GetParameter()) {
-    PermutationTable = new sint16[a.GetParameter() + 1];
-    sint16 i;
-    for (i = 1; i <= a.GetParameter(); i++) {
-        PermutationTable[i] = a.PermutationTable[i];
-    }
-}
+BandBraidUnderlying::BandBraidUnderlying(sint16 n)
+    : PresentationParameter(n), PermutationTable(n + 1) {}
 
 void BandBraidUnderlying::Print(IndentedOStream &os) const {
     // Recall that a band braid is represented by decreasing cycles.
     sint16 i, j, n = GetParameter();
     std::vector<sint16> curr_cycle;
     std::vector<bool> seen(n + 1, false);
+    bool is_first = true;
     for (i = 1; i <= n; ++i) {
         if (!seen[i]) {
             j = i;
@@ -54,9 +31,14 @@ void BandBraidUnderlying::Print(IndentedOStream &os) const {
             }
             curr_cycle.push_back(j);
             seen[j] = true;
+            if (int(curr_cycle.size()) > 1 && !is_first) {
+                os << " ";
+            } else if (int(curr_cycle.size()) > 1) {
+                is_first = false;
+            }
             for (j = int(curr_cycle.size()) - 1; j >= 1; --j) {
                 os << "(" << curr_cycle[j] << ", " << curr_cycle[j - 1] << ")"
-                   << " ";
+                   << ((j == 1) ? "" : " ");
             }
         }
     }
@@ -228,24 +210,20 @@ BandBraidUnderlying::RightComplement(const BandBraidUnderlying &b) const {
     return Inverse().Product(b);
 };
 
-BandBraidUnderlying BandBraidUnderlying::DeltaConjugate(sint16 k) const {
-    BandBraidUnderlying under = BandBraidUnderlying(*this);
+void BandBraidUnderlying::DeltaConjugate(sint16 k) {
+    BandBraidUnderlying under = *this;
     sint16 i, n = GetParameter();
 
-    if (k < 0) {
-        k = k - n * k;
-    }
-
-    for (i = 1; i < n; i++) {
+    for (i = 1; i <= n; i++) {
         under.PermutationTable[i] =
-            Rem(PermutationTable[Rem(i + k - 1, n) + 1] - k - 1, n) + 1;
+            Rem(PermutationTable[Rem(i - k - 1, n) + 1] + k - 1, n) + 1;
     }
-    return under;
+    *this = under;
 }
 
 void BandBraidUnderlying::Randomize() {
     CBraid::BandPresentation pres = CBraid::BandPresentation(GetParameter());
-    pres.Randomize(PermutationTable);
+    pres.Randomize(PermutationTable.data());
 }
 
 std::vector<BandBraidUnderlying> BandBraidUnderlying::Atoms() const {

@@ -5,6 +5,7 @@
 
 namespace SSS {
 using namespace CGarside;
+using CGarside::sint16;
 
 template <class F> Braid<F> SendToSSS(const Braid<F> &b) {
     typename F::ParameterType n = b.GetParameter();
@@ -194,10 +195,10 @@ template <class B> class SuperSummitSet {
         }
     }
 
-    void Debug(std::ostream &os) const {
+    void Debug(IndentedOStream &os) const {
         bool is_first = true;
         os << "{   ";
-        os << Indent(4);
+        os.Indent(4);
         os << "Set:";
         os.Indent(4);
         os << EndLine();

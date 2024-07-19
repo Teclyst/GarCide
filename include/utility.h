@@ -1,16 +1,20 @@
+/**
+ * @brief Miscealanous, yet important, definitions.
+ *
+ * A file where we define miscealanous, yet important, functions, types and
+ * classes.
+ */
+
 #ifndef UTILITY
 #define UTILITY
 
 #include <ostream>
+#include <iostream>
+#include <regex>
+#include <stdexcept>
 #include <string>
 
-/**
- * @brief Miscealanous, yet important, definitions.
- *
- * A namespace where we define miscealanous, yet important, functions, types and
- * classes.
- */
-namespace Utility {
+namespace CGarside {
 
 /**
  * @brief Alias for `char`.
@@ -337,6 +341,13 @@ class IndentedOStream {
 template <>
 IndentedOStream &IndentedOStream::operator<< <EndLine>(const EndLine &el);
 
-} // namespace Utility
+/**
+ * @brief Indented version of `std::cout`
+ *
+ * An `IndentedOStream` that wraps around `std::cout`.
+ */
+static IndentedOStream ind_cout(std::cout);
+
+} // namespace CGarside
 
 #endif

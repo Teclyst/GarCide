@@ -1,6 +1,6 @@
 #include "utility.h"
 
-namespace Utility {
+namespace CGarside {
 
 IndentedOStream::IndentedOStream(std::ostream &os) : indent_level(0), os(os) {}
 

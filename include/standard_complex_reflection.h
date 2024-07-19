@@ -21,35 +21,44 @@ struct ComplexStandardBraidParameter {
         return !Compare(p);
     }
 
-    void Debug(std::ostream &os) const {
-        os << "{ e: " << e << ", n: " << n << " }";
-    }
+    void Print(IndentedOStream &os) const;
 };
 
-std::ostream &operator<<(std::ostream &os,
-                         const ComplexStandardBraidParameter &p);
+template <>
+IndentedOStream &IndentedOStream::operator<< <ComplexStandardBraidParameter>(
+    const ComplexStandardBraidParameter &p);
 
-// You may use Braids with parameter e, n such that e * n <= `MaxE` *
-// `MaxBraidIndex`. Note that `MaxE` IS NOT a strict bound; rather, it is the
-// greatest possible e such that it is possible to have braids with parameter n
-// as great as `MaxBraidIndex`. To understand what we are doing, it is advised
-// to look at `arXiv:math/0403400v2` (Bessis, Corran, 2004).
 class ComplexStandardBraidUnderlying {
 
   protected:
     ComplexStandardBraidParameter PresentationParameter;
 
-    // The induced permutation, where 0 is the 0-th coordinates, and then the
-    // next n coordinates represent the powers w ^ -i (with i ranging between 0
-    // and n - 1) of an ne-th root of unity w. We use the same conventions as
-    // before: letting sigma be the induced permutation, then
-    // PermutationTable[i] is sigma^(-1)(i).
+    /**
+     * @brief The induced permutation.
+     *
+     * The table of the permutation induced by the matrix on indexes (from 0
+     * to `PresentationParameter.n` - 1), through its action by left multiplication on
+     * vectors.
+     *
+     * This permutation sends i to the j such that the i-th coordinate is the
+     * j-th after multiplication. That is to say, j is the index such that the
+     * coefficient at (i, j) is non zero (c_i in George Neaime, Interval Garside
+     * Structures for the Complex Braid Groups,
+     * [arXiv:1707.06864](https://arxiv.org/abs/1707.06864)).
+     */
     std::vector<sint16> PermutationTable;
 
-    // The multiplicating coefficients. These are e-th roots of unity, with the
-    // added condition of their product's being one. They are represented by
-    // integer ranging between 0 and e - 1, with i standing for w^(ei) (with w
-    // the same root as for the PermutationTable).
+    /**
+     * @brief The multiplicating coefficients.
+     * 
+     * Let e = `PresentationParameter.e` and n = `PresentationParameter.n`.
+     * 
+     * The multiplicating coefficients. These are e-th roots of unity, with the
+     * added condition of their product's being one. They are represented by
+     * integer ranging between 0 and e - 1, with i standing for zeta^i (with zeta an e-th root of unity).
+     * 
+     * `CoefficientTable` is the diagonal coefficient matrix, when considering G(e, e, n) as the semi-direct product Delta(e, e, n) ⋊ S(n).
+     */
     std::vector<sint16> CoefficientTable;
 
   public:
@@ -62,22 +71,11 @@ class ComplexStandardBraidUnderlying {
     // Constructor
     ComplexStandardBraidUnderlying(ComplexStandardBraidParameter p);
 
-    void OfString(std::string str);
+    void OfString(const std::string &str, size_t &pos);
 
     // Prints to `os` the internal representation of the factor.
     // @param os The `std::ostream` we are printing to.
-    void Debug(std::ostream &os) const {
-        os << "[";
-        for (sint16 i = 0; i < GetParameter().n; i++) {
-            os << "(" << PermutationTable[i] << ", " << CoefficientTable[i]
-               << "), ";
-        }
-        os << "]";
-    }
-
-    void AssignPartition(sint16 *x) const;
-
-    void OfPartition(const sint16 *x);
+    void Debug(IndentedOStream &os) const;
 
     /**
      * @brief Prints the factor to `os`.
@@ -89,7 +87,7 @@ class ComplexStandardBraidUnderlying {
      *
      * @param os The output stream it prints to.
      */
-    void Print(std::ostream &os) const;
+    void Print(IndentedOStream &os) const;
 
     // Set to the Identity element (here the identity).
     void Identity();
@@ -109,7 +107,7 @@ class ComplexStandardBraidUnderlying {
     // @param dir_perm A table that holds the direct table of the permutation
     // induced by the factor.
     // @param i The integer i for which we check if s_i left divides the factor.
-    bool IsSLeftDivisor(const sint16 *dir_perm, sint16 i) const {
+    inline bool IsSLeftDivisor(const sint16 *dir_perm, sint16 i) const {
         return (PermutationTable[i - 1] > PermutationTable[i - 2])
                    ? (CoefficientTable[i - 1] != 0)
                    : (CoefficientTable[i - 2] == 0);
@@ -121,7 +119,7 @@ class ComplexStandardBraidUnderlying {
     // @param dir_perm A table that holds the direct table of the permutation
     // induced by the factor.
     // @param i The integer i for which we check if t_i left divides the factor.
-    bool IsTLeftDivisor(const sint16 *dir_perm, sint16 i) const {
+    inline bool IsTLeftDivisor(const sint16 *dir_perm, sint16 i) const {
         return (PermutationTable[1] > PermutationTable[0])
                    ? (CoefficientTable[1] != 0)
                    : (CoefficientTable[0] ==
@@ -133,7 +131,7 @@ class ComplexStandardBraidUnderlying {
     // induced by the factor. Modified by this function so that it remains up to
     // date.
     // @param i The integer i for which we multiply by s_i the factor.
-    void SLeftMultiply(sint16 *dir_perm, sint16 i) {
+    inline void SLeftMultiply(sint16 *dir_perm, sint16 i) {
         std::swap(CoefficientTable[i - 1], CoefficientTable[i - 2]);
         std::swap(PermutationTable[i - 1], PermutationTable[i - 2]);
         std::swap(dir_perm[PermutationTable[i - 1]],
@@ -145,7 +143,7 @@ class ComplexStandardBraidUnderlying {
     // induced by the factor. Modified by this function so that it remains up to
     // date.
     // @param i The integer i for which we multiply by t_i the factor.
-    void TLeftMultiply(sint16 *dir_perm, sint16 i) {
+    inline void TLeftMultiply(sint16 *dir_perm, sint16 i) {
         std::swap(CoefficientTable[0], CoefficientTable[1]);
         std::swap(PermutationTable[0], PermutationTable[1]);
         CoefficientTable[0] = Rem(CoefficientTable[0] - i, GetParameter().e);
@@ -159,7 +157,7 @@ class ComplexStandardBraidUnderlying {
     // induced by the factor. Modified by this function so that it remains up to
     // date.
     // @param i The integer i for which we multiply by s_i the factor.
-    void SRightMultiply(sint16 *dir_perm, sint16 i) {
+    inline void SRightMultiply(sint16 *dir_perm, sint16 i) {
         std::swap(PermutationTable[dir_perm[i - 1]],
                   PermutationTable[dir_perm[i - 2]]);
         std::swap(dir_perm[i - 1], dir_perm[i - 2]);
@@ -171,7 +169,7 @@ class ComplexStandardBraidUnderlying {
     // induced by the factor. Modified by this function so that it remains up to
     // date.
     // @param i The integer i for which we multiply by t_i the factor.
-    void TRightMultiply(sint16 *dir_perm, sint16 i) {
+    inline void TRightMultiply(sint16 *dir_perm, sint16 i) {
         std::swap(PermutationTable[dir_perm[0]], PermutationTable[dir_perm[1]]);
         CoefficientTable[dir_perm[0]] =
             Rem(CoefficientTable[dir_perm[0]] - i, GetParameter().e);
@@ -229,9 +227,6 @@ class ComplexStandardBraidUnderlying {
         return h;
     }
 };
-
-std::ostream &operator<<(std::ostream &os,
-                         const ComplexStandardBraidUnderlying &u);
 
 typedef Factor<ComplexStandardBraidUnderlying> ComplexStandardBraidFactor;
 
