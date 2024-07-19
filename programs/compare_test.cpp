@@ -5,7 +5,7 @@
 
 #include "artin_braid.h"
 #include "band_braid.h"
-#include "cbraid.h"
+#include "garsidesc.h"
 
 int Index = 8;
 int CLength = 8;
@@ -49,7 +49,7 @@ int main() {
         std::cout << inval.error_source << std::endl;
     }
 
-    b.Debug(ind_cout);
-    ind_cout << Utility::NewLine();
+    SC::SCS(b).Print(ind_cout);
+    ind_cout << Utility::EndLine();
     return 0;
 }

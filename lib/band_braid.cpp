@@ -38,7 +38,7 @@ BandBraidUnderlying::BandBraidUnderlying(const BandBraidUnderlying &a)
     }
 }
 
-void BandBraidUnderlying::Print(std::ostream &os) const {
+void BandBraidUnderlying::Print(IndentedOStream &os) const {
     // Recall that a band braid is represented by decreasing cycles.
     sint16 i, j, n = GetParameter();
     std::vector<sint16> curr_cycle;

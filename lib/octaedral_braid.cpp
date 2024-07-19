@@ -10,36 +10,10 @@ sint16 BDualBraidUnderlying::GetParameter() const {
 
 sint16 BDualBraidUnderlying::LatticeHeight() const { return GetParameter(); }
 
-BDualBraidUnderlying &
-BDualBraidUnderlying::Assign(const BDualBraidUnderlying &a) {
-    if (&a != this) {
-        for (sint16 i = 1; i <= 2 * GetParameter(); ++i) {
-            PermutationTable[i] = a.PermutationTable[i];
-        }
-    }
-    return *this;
-};
-
-BDualBraidUnderlying &
-BDualBraidUnderlying::operator=(const BDualBraidUnderlying &a) {
-    return Assign(a);
-}
-
 BDualBraidUnderlying::BDualBraidUnderlying(sint16 n)
-    : PresentationParameter(n) {
-    PermutationTable = new sint16[2 * n + 1];
-}
+    : PresentationParameter(n), PermutationTable(2 * n + 1) {}
 
-BDualBraidUnderlying::BDualBraidUnderlying(const BDualBraidUnderlying &a)
-    : PresentationParameter(a.GetParameter()) {
-    PermutationTable = new sint16[2 * a.GetParameter() + 1];
-    sint16 i;
-    for (i = 1; i <= 2 * a.GetParameter(); i++) {
-        PermutationTable[i] = a.PermutationTable[i];
-    }
-}
-
-void BDualBraidUnderlying::Print(std::ostream &os) const {
+void BDualBraidUnderlying::Print(IndentedOStream &os) const {
     // Recall that a band braid is represented by decreasing cycles.
     sint16 i, j, n = GetParameter();
     std::vector<sint16> curr_cycle;
@@ -71,45 +45,67 @@ void BDualBraidUnderlying::Print(std::ostream &os) const {
     }
 }
 
-void BDualBraidUnderlying::OfString(std::string &str) {
+void BDualBraidUnderlying::Debug(IndentedOStream &os) const {
+    os << "{   ";
+    os.Indent(4);
+    os << "PresentationParameter:";
+    os.Indent(4);
+    os << EndLine() << GetParameter();
+    os.Indent(-4);
+    os << EndLine();
+    os << "PermutationTable:";
+    os.Indent(4);
+    os << EndLine();
+    os << "[";
+    for (sint16 i = 1; i < GetParameter(); i++) {
+        os << PermutationTable[i] << ", ";
+    }
+    os << PermutationTable[GetParameter()];
+    os << "]";
+    os.Indent(-8);
+    os << EndLine();
+    os << "}";
+}
+
+void BDualBraidUnderlying::OfString(const std::string &str, size_t &pos) {
     sint16 n = GetParameter();
-    sint16 i, j, k;
-    size_t pos;
-    if (str[0] != '(') {
-        i = std::stoi(str);
-        if (i <= n) {
-            for (k = 1; k <= 2 * n; k++) {
-                PermutationTable[k] = k;
-            }
-            j = ((i + n - 1) % (2 * n)) + 1;
+    std::smatch match;
+    if (std::regex_search(str.begin() + pos, str.end(), match,
+                          std::regex{"\\([\\s\\t]*(" + number_regex +
+                                     ")[\\s\\t]*,?[\\s\\t]*(" + number_regex +
+                                     ")[\\s\\t]*\\)"},
+                          std::regex_constants::match_continuous)) {
+        sint16 i = std::stoi(match[1]);
+        sint16 j = std::stoi(match[2]);
+        i = Rem(i - 1, 2 * n) + 1;
+        j = Rem(j - 1, 2 * n) + 1;
+        pos += match[0].length();
+        if ((i != j) && (i != Rem(j + n - 1, 2 * n) + 1)) {
+            Identity();
             PermutationTable[i] = j;
             PermutationTable[j] = i;
-            return;
+            PermutationTable[Rem(i + n - 1, 2 * n) + 1] =
+                Rem(j + n - 1, 2 * n) + 1;
+            PermutationTable[Rem(j + n - 1, 2 * n) + 1] =
+                Rem(i + n - 1, 2 * n) + 1;
         } else {
-            throw InvalidStringError();
+            throw InvalidStringError(
+                "Indexes for a short generators should not be equal mod " +
+                std::to_string(n) + "!\n(" + std::to_string(i) + ", " +
+                std::to_string(j) + ") is not a valid factor.");
         }
-    }
-    str.erase(0, 1);
-    sint16 l = str.length();
-    if (str[l - 1] != ')') {
-        throw InvalidStringError();
-    }
-    str.erase(l - 1);
-    pos = str.find(',');
-    i = std::stoi(str.substr(0, pos));
-    j = std::stoi(str.substr(pos + 1, str.length()));
-    if (i <= 2 * n && j <= 2 * n) {
-        for (k = 1; k <= 2 * n; k++) {
-            PermutationTable[k] = k;
-        }
-        PermutationTable[i] = j;
-        PermutationTable[j] = i;
-        PermutationTable[((i + n - 1) % (2 * n)) + 1] =
-            ((j + n - 1) % (2 * n)) + 1;
-        PermutationTable[((j + n - 1) % (2 * n)) + 1] =
-            ((i + n - 1) % (2 * n)) + 1;
+    } else if (std::regex_search(str.begin() + pos, str.end(), match,
+                                 std::regex{"(" + number_regex + ")"},
+                                 std::regex_constants::match_continuous)) {
+        sint16 i = std::stoi(match[1]);
+        pos += match[0].length();
+        PermutationTable[i] = Rem(i + n - 1, 2 * n) + 1;
+        PermutationTable[Rem(i + n - 1, 2 * n) + 1] = i;
     } else {
-        throw InvalidStringError();
+        throw InvalidStringError(
+            "Could not extract a factor from \"" + str.substr(pos) +
+            "\"!\nA factor should match regex \\([1 - 9] [0 - 9]*,? [1 - 9] [0 "
+            "- 9]*\\) | [1 - 9] [0 - 9]* (ignoring whitespaces).");
     }
 }
 
@@ -181,9 +177,6 @@ void BDualBraidUnderlying::Delta() {
 
 bool BDualBraidUnderlying::Compare(const BDualBraidUnderlying &b) const {
     sint16 i;
-    if (GetParameter() != b.GetParameter()) {
-        throw NonMatchingIndexes(GetParameter(), b.GetParameter());
-    }
     for (i = 1; i <= GetParameter(); i++) {
         if (PermutationTable[i] != b.PermutationTable[i]) {
             return false;
@@ -204,9 +197,6 @@ BDualBraidUnderlying BDualBraidUnderlying::Inverse() const {
 BDualBraidUnderlying
 BDualBraidUnderlying::Product(const BDualBraidUnderlying &b) const {
     BDualBraidUnderlying f = BDualBraidUnderlying(GetParameter());
-    if (GetParameter() != b.GetParameter()) {
-        throw NonMatchingIndexes(GetParameter(), b.GetParameter());
-    }
     sint16 i;
     for (i = 1; i <= 2 * GetParameter(); i++) {
         f.PermutationTable[i] = b.PermutationTable[PermutationTable[i]];

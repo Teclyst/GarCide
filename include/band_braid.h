@@ -68,7 +68,7 @@ class BandBraidUnderlying {
      *
      * @param os The output stream it prints to.
      */
-    void Print(std::ostream &os) const;
+    void Print(IndentedOStream &os) const;
 
     // Set to the Identity element (here the identity).
     void Identity();

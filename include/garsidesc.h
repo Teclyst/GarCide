@@ -260,24 +260,81 @@ template <class B> class SlidingCircuitSet {
 
     inline sint16 Card() const { return Set.size(); }
 
-    void Print(std::ostream &os) const {
+    void Print(IndentedOStream &os) const {
         for (sint16 i = 0; i < int(Orbits.size()); i++) {
-            os << "Orbit " << i << ":" << std::endl;
+            os << "Orbit " << i << ":";
+            os.Indent(4);
+            os << EndLine();
+            os << EndLine();
             for (sint16 j = 0; j < int(Orbits[i].size()); j++) {
                 Orbits[i][j].Print(os);
-                os << std::endl;
+                if (j == int(Orbits[i].size()) - 1) {
+                    os.Indent(-4);
+                } else {
+                    os << EndLine();
+                }
+            }
+            if (i != int(Orbits.size()) - 1) {
+                os << EndLine();
+                os << EndLine();
             }
         }
     }
 
-    void Debug(std::ostream &os) const {
+    void Debug(IndentedOStream &os) const {
+        os << "{   ";
+        os.Indent(4);
+        os << "Orbits:";
+        os.Indent(4);
+        os << EndLine();
+        os << "[   ";
+        os.Indent(4);
         for (sint16 i = 0; i < int(Orbits.size()); i++) {
-            os << "Orbit " << i << ":" << std::endl;
+            os << "[   ";
+            os.Indent(4);
             for (sint16 j = 0; j < int(Orbits[i].size()); j++) {
                 Orbits[i][j].Debug(os);
-                os << std::endl;
+                if (j == int(Orbits[i].size()) - 1) {
+                    os.Indent(-4);
+                } else {
+                    os << ",";
+                }
+                os << EndLine();
             }
+            os << "]";
+            if (i == int(Orbits.size()) - 1) {
+                os.Indent(-4);
+            } else {
+                os << ",";
+            }
+            os << EndLine();
         }
+        os << "]";
+        os.Indent(-4);
+        os << EndLine();
+        os << "Set:";
+        os.Indent(4);
+        os << EndLine();
+        os << "{   ";
+        os.Indent(4);
+        bool is_first = true;
+        for (typename std::unordered_map<B, sint16>::const_iterator it =
+                 Set.begin();
+             it != Set.end(); it++) {
+            if (!is_first) {
+                os << "," << EndLine();
+            } else {
+                is_first = false;
+            }
+            (*it).first.Debug(os);
+            os << ": " << (*it).second;
+        }
+        os.Indent(-4);
+        os << EndLine();
+        os << "}";
+        os.Indent(-8);
+        os << EndLine();
+        os << "}";
     }
 };
 

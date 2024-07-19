@@ -71,7 +71,7 @@ void ArtinBraidUnderlying::OfString(const std::string &str, size_t &pos) {
     }
 };
 
-void ArtinBraidUnderlying::Print(std::ostream &os) const {
+void ArtinBraidUnderlying::Print(IndentedOStream &os) const {
     sint16 i, j, k, n = GetParameter();
 
     ArtinBraidUnderlying c = ArtinBraidUnderlying(*this);

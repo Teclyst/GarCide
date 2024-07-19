@@ -52,7 +52,7 @@ template <class U> class Factor {
     void Debug(IndentedOStream &os) const { Underlying.Debug(os); }
 
     // a.Print(os) prints a to os.
-    void Print(std::ostream &os) const { Underlying.Print(os); }
+    void Print(IndentedOStream &os) const { Underlying.Print(os); }
 
     // a.Identity sets a to Identity.
     void Identity() { Underlying.Identity(); }
@@ -336,7 +336,7 @@ template <class F> class Braid {
      *
      * @param os The output stream it prints to.
      */
-    void Print(std::ostream &os) const {
+    void Print(IndentedOStream &os) const {
         if (Delta != 0 && Delta != 1) {
             os << "D ^ " << Delta << " . ";
         } else if (Delta == 1) {

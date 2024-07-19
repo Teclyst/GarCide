@@ -296,7 +296,9 @@ class IndentedOStream {
      *
      * @param indent_level New level of indentation.
      */
-    inline void SetIndentLevel(sint16 new_indent_level);
+    inline void SetIndentLevel(sint16 new_indent_level) {
+        indent_level = new_indent_level;
+    }
 
     /**
      * @brief Increment `indent_level`.
@@ -305,7 +307,7 @@ class IndentedOStream {
      *
      * @param indentation Variation of indentation.
      */
-    inline void Indent(sint16 indentation);
+    inline void Indent(sint16 indentation) { indent_level += indentation; }
 
     /**
      * @brief Inserts something in the stream.

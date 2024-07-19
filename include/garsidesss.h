@@ -107,10 +107,6 @@ template <class F> F MinSS(const Braid<F> &b, const F &f) {
     w.Delta = 0;
 
     while (!r2.IsIdentity()) {
-        r.Debug(std::cout);
-        std::cout << std::endl;
-        r.Print(std::cout);
-        std::cout << std::endl;
         r.RightProduct(r2);
         r2 = (w * r).Remainder(r.DeltaConjugate(b.Delta));
     }
@@ -184,20 +180,45 @@ template <class B> class SuperSummitSet {
 
     inline sint16 Card() const { return Set.size(); }
 
-    void Print(std::ostream &os) const {
-        for (typename std::unordered_set<B>::const_iterator it = Set.begin();
+    void Print(IndentedOStream &os) const {
+        bool is_first = true;
+        for (typename std::unordered_map<B, sint16>::const_iterator it =
+                 Set.begin();
              it != Set.end(); it++) {
+            if (!is_first) {
+                os << EndLine();
+            } else {
+                is_first = false;
+            }
             (*it).Print(os);
-            os << std::endl;
         }
     }
 
     void Debug(std::ostream &os) const {
-        for (typename std::unordered_set<B>::const_iterator it = Set.begin();
+        bool is_first = true;
+        os << "{   ";
+        os << Indent(4);
+        os << "Set:";
+        os.Indent(4);
+        os << EndLine();
+        os << "{   ";
+        os.Indent(4);
+        for (typename std::unordered_map<B, sint16>::const_iterator it =
+                 Set.begin();
              it != Set.end(); it++) {
+            if (!is_first) {
+                os << "," << EndLine();
+            } else {
+                is_first = false;
+            }
             (*it).Debug(os);
-            os << std::endl;
         }
+        os.Indent(-4);
+        os << EndLine();
+        os << "}";
+        os.Indent(-8);
+        os << EndLine();
+        os << "}";
     }
 };
 

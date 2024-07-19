@@ -7,7 +7,7 @@ class BDualBraidUnderlying {
   protected:
     sint16 PresentationParameter;
 
-    sint16 *PermutationTable;
+    std::vector<sint16> PermutationTable;
 
   public:
     typedef sint16 ParameterType;
@@ -19,30 +19,16 @@ class BDualBraidUnderlying {
     // Constructor
     BDualBraidUnderlying(sint16 n);
 
-    BDualBraidUnderlying(const BDualBraidUnderlying &a);
+    void OfString(const std::string &str, size_t &pos);
 
-    ~BDualBraidUnderlying() { delete[] PermutationTable; }
-
-    void OfString(std::string &str);
-
-    void Debug(std::ostream &os) const {
-        os << "[";
-        for (sint16 i = 1; i <= 2 * GetParameter(); i++) {
-            os << PermutationTable[i] << " ";
-        }
-        os << "]";
-    }
+    void Debug(IndentedOStream &os) const;
 
     void AssignDCDT(sint16 *x) const;
 
     void OfDCDT(const sint16 *x);
 
-    BDualBraidUnderlying &Assign(const BDualBraidUnderlying &a);
-
-    BDualBraidUnderlying &operator=(const BDualBraidUnderlying &a);
-
     // Print to os. Be wary, as it side-effects!
-    void Print(std::ostream &os) const;
+    void Print(IndentedOStream &os) const;
 
     // Set to the Identity element (here the identity).
     void Identity();
