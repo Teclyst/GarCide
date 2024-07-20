@@ -30,20 +30,21 @@ template <class F> Braid<F> SendToSSS(const Braid<F> &b) {
     }
 
     j = 0;
-    sint16 l = b3.Sup();
+    b2 = b3;
+    sint16 l = b2.Sup();
     while (j <= k) {
-        b3.Decycling();
+        b2.Decycling();
 
-        if (b3.Sup() == l) {
+        if (b2.Sup() == l) {
             j++;
         } else {
-            b2 = b3;
+            b3 = b2;
             l--;
             j = 0;
         }
     }
 
-    return b2;
+    return b3;
 }
 
 template <class F> Braid<F> SendToSSS(const Braid<F> &b, const Braid<F> &c) {
@@ -79,17 +80,18 @@ template <class F> Braid<F> SendToSSS(const Braid<F> &b, const Braid<F> &c) {
     }
 
     j = 0;
-    sint16 l = b3.Sup();
+    b2 = b3;
+    sint16 l = b2.Sup();
     c2.Identity();
 
     while (j <= k) {
-        c2.LeftProduct(b3.Final());
-        b3.Decycling();
+        c2.LeftProduct(b2.Final());
+        b2.Decycling();
 
-        if (b3.Sup() == l) {
+        if (b2.Sup() == l) {
             j++;
         } else {
-            b2 = b3;
+            b3 = b2;
             l--;
             j = 0;
             c.RightDivide(c2);
@@ -97,7 +99,7 @@ template <class F> Braid<F> SendToSSS(const Braid<F> &b, const Braid<F> &c) {
         }
     }
 
-    return b2;
+    return b3;
 }
 
 template <class F> F MinSS(const Braid<F> &b, const F &f) {
@@ -188,8 +190,7 @@ template <class B> class SuperSummitSet {
 
     void Print(IndentedOStream &os) const {
         bool is_first = true;
-        for (typename std::unordered_set<B>::const_iterator it =
-                 Set.begin();
+        for (typename std::unordered_set<B>::const_iterator it = Set.begin();
              it != Set.end(); it++) {
             if (!is_first) {
                 os << EndLine();
@@ -209,8 +210,7 @@ template <class B> class SuperSummitSet {
         os << EndLine();
         os << "{   ";
         os.Indent(4);
-        for (typename std::unordered_set<B>::const_iterator it =
-                 Set.begin();
+        for (typename std::unordered_set<B>::const_iterator it = Set.begin();
              it != Set.end(); it++) {
             if (!is_first) {
                 os << "," << EndLine();
@@ -253,7 +253,7 @@ template <class F> SuperSummitSet<Braid<F>> SSS(const Braid<F> &b) {
             if (!sss.Mem(b2)) {
                 b2_rcf = queue_rcf.front();
                 b2_rcf.ConjugateRCF(*itf);
-                
+
                 sss.Insert(b2);
                 queue.push_back(b2);
                 queue_rcf.push_back(b2_rcf);

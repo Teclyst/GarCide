@@ -27,15 +27,36 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include "artin_braid.h"
 
 namespace Braiding {
 
+using CGarside::EndLine;
+using CGarside::ind_cout;
 using CBraid::ArtinBraid;
 using CBraid::ArtinFactor;
 using CBraid::sint16;
 using std::cout;
 using std::endl;
 using std::list;
+
+CGarside::ArtinBraidFactor OfCBraidFactor(const CBraid::ArtinFactor &f) {
+    CGarside::ArtinBraidUnderlying u(f.Index());
+    for (int i = 1; i <= f.Index(); i++) {
+        u.At(i) = f.At(i);
+    }
+    return CGarside::ArtinBraidFactor(u);
+}
+
+CGarside::ArtinBraid OfCBraid(const CBraid::ArtinBraid &b) {
+    CGarside::ArtinBraid cb(b.Index());
+    cb.Delta = b.LeftDelta;
+    for (CBraid::ArtinBraid::ConstFactorItr it = b.FactorList.begin();
+         it != b.FactorList.end(); it++) {
+        cb.RightProduct(OfCBraidFactor(*it));
+    }
+    return cb;
+}
 
 // typedef ArtinPresentation P;
 
@@ -396,6 +417,7 @@ template <class P> CBraid::Braid<P> SendToSSS(CBraid::Braid<P> B) {
     p = B.LeftDelta;
 
     while (j <= k) {
+        cout << "New loop in CBraid. " << j << ", " << p << std::endl;
         B2 = Cycling(B2);
 
         if (B2.LeftDelta == p)
@@ -405,6 +427,10 @@ template <class P> CBraid::Braid<P> SendToSSS(CBraid::Braid<P> B) {
             p++;
             j = 0;
         }
+        OfCbraid(B2).Print(ind_cout);
+        ind_cout << EndLine();
+        OfCbraid(B3).Print(ind_cout);
+        ind_cout << EndLine();
     }
 
     j = 0;

@@ -32,14 +32,13 @@ endif
 # Compile with parallel algorithms.
 # To disable parallelism, compile with USE_PAR=0 (or anything else than 1).
 ifeq ($(USE_PAR),1)
-	LIBFLAGS_PAR = -ltbb -fopenmp
 	CPPFLAGS_PAR = -DUSE_PAR
 endif
 ifeq ($(RANDOMIZE_ON_ATOMS),1)
 	CPPFLAGS_RAND = -DRANDOMIZE_ON_ATOMS
 endif
 CPPFLAGS = -Wall -I$(CBRAID_INCDIR) -L$(CBRAID_LIBDIR) $(CPPFLAGS_CLN) $(CPPFLAGS_RAND) $(CPPFLAGS_PAR) -g
-LIBFLAGS = -lcbraid $(LIBFLAGS_CLN) $(LIBFLAGS_PAR)
+LIBFLAGS = -lcbraid $(LIBFLAGS_CLN) -ltbb
 MAKEDEPFLAGS = -M
 
 # Default arguments for test programs.

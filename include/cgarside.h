@@ -714,6 +714,16 @@ template <class F> class Braid {
         }
     }
 
+    inline F First() const {
+        if (CanonicalLength() == 0) {
+            F id = F(GetParameter());
+            id.Identity();
+            return id;
+        } else {
+            return FactorList.front();
+        }
+    }
+
     // `u.Final()` returns the final factor of u, that is, if u = Delta ^ r
     // u_1
     // ... u_k, u_k. If u has canonical length zero, returns the identity

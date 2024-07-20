@@ -24,6 +24,7 @@
 */
 
 #include "cbraid.h"
+#include "artin_braid.h"
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -38,6 +39,12 @@ using CBraid::sint16;
 using std::cout;
 using std::endl;
 using std::list;
+using CGarside::EndLine;
+using CGarside::ind_cout;
+
+CGarside::ArtinBraidFactor OfCBraidFactor(const CBraid::ArtinFactor &f);
+
+CGarside::ArtinBraid OfCBraid(const CBraid::ArtinBraid &b);
 
 // typedef ArtinPresentation P;
 
@@ -296,13 +303,13 @@ void Crossing(list<sint16> word, sint16 n, sint16 power, sint16 **cross);
 //
 /////////////////////////////////////////////////////////////
 
-template <class P> CBraid::Braid<P> SendToSSS(CBraid::Braid<P> B) {
+ArtinBraid SendToSSS(CBraid::ArtinBraid B) {
     sint16 n, k, j, p, l;
 
     n = B.Index();
     k = n * (n - 1) / 2;
 
-    CBraid::Braid<P> B2 = CBraid::Braid<P>(n), B3 = CBraid::Braid<P>(n);
+    CBraid::ArtinBraid B2 = CBraid::ArtinBraid(n), B3 = CBraid::ArtinBraid (n);
 
     B.MakeLCF();
 

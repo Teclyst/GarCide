@@ -1,5 +1,8 @@
 #include "cgarside.h"
 
+#ifndef ARTIN
+#define ARTIN
+
 namespace CGarside {
 
 /// A class for the underlying objects for canonical factors
@@ -160,3 +163,5 @@ typedef Factor<ArtinBraidUnderlying> ArtinBraidFactor;
 typedef Braid<ArtinBraidFactor> ArtinBraid;
 
 } // namespace CGarside
+
+#endif

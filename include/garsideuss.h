@@ -29,7 +29,7 @@ void Trajectory(Braid<F> b, Braid<F> b_rcf, std::vector<Braid<F>> &t,
 
     while (t_set.find(b) == t_set.end()) {
         t.push_back(b);
-        t_rcf.push_back(b);
+        t_rcf.push_back(b_rcf);
         t_set.insert(b);
         // Cycle in RCF.
         b_rcf.ConjugateRCF(b.Initial());
@@ -61,8 +61,8 @@ template <class F> Braid<F> SendToUSS(const Braid<F> &b, Braid<F> &c) {
 template <class F> Braid<F> Transport(const Braid<F> &b, const F &f) {
     Braid<F> b2 = b;
     b2.Conjugate(f);
-    Braid<F> b3 = (!Braid(b.FactorList.front()) * f) * b2.FactorList.front();
-    return b3.FactorList.front();
+    Braid<F> b3 = (!Braid(b.First()) * f) * b2.First();
+    return b3.First();
 }
 
 template <class F> std::list<F> Return(const Braid<F> &b, const F &f) {
@@ -72,11 +72,11 @@ template <class F> std::list<F> Return(const Braid<F> &b, const F &f) {
     sint16 i, n = 1;
     F f1 = F(f);
 
-    Braid<F> c1 = Braid(b1.FactorList.front().DeltaConjugate(b1.Delta));
+    Braid<F> c1 = Braid(b1.First().DeltaConjugate(b1.Delta));
     b1.Cycling();
 
     while (b1 != b) {
-        c1.RightProduct(Braid(b1.FactorList.front().DeltaConjugate(b1.Delta)));
+        c1.RightProduct(Braid(b1.First().DeltaConjugate(b1.Delta)));
         b1.Cycling();
         n++;
     }
@@ -87,7 +87,7 @@ template <class F> std::list<F> Return(const Braid<F> &b, const F &f) {
         b1.Conjugate(f1);
         c2.Identity();
         for (i = 0; i < n; i++) {
-            c2.RightProduct(b1.FactorList.front().DeltaConjugate(b1.Delta));
+            c2.RightProduct(b1.First().DeltaConjugate(b1.Delta));
             b1.Cycling();
         }
 
@@ -98,7 +98,7 @@ template <class F> std::list<F> Return(const Braid<F> &b, const F &f) {
         } else if (b2.IsIdentity()) {
             f1.Identity();
         } else {
-            f1 = b2.FactorList.front();
+            f1 = b2.First();
         }
     }
 
@@ -111,7 +111,7 @@ template <class F> std::list<F> Return(const Braid<F> &b, const F &f) {
 
 template <class F>
 F Pullback(const Braid<F> &b, const Braid<F> &b_rcf, const F &f) {
-    F f1 = b.FactorList.front().DeltaConjugate(b.Delta + 1);
+    F f1 = b.First().DeltaConjugate(b.Delta + 1);
     F f2 = f.DeltaConjugate();
 
     Braid<F> b2 = Braid(f1) * f2;
@@ -129,7 +129,7 @@ F Pullback(const Braid<F> &b, const Braid<F> &b_rcf, const F &f) {
     } else if (b2.IsIdentity()) {
         f0.Identity();
     } else {
-        f0 = b2.FactorList.front();
+        f0 = b2.First();
     }
 
     F fi = f.DeltaConjugate(b.Delta);
@@ -154,7 +154,7 @@ F MainPullback(const Braid<F> &b, const Braid<F> &b_rcf, const F &f) {
 
     Trajectory(b, b_rcf, t, t_rcf);
 
-    F f2 = F(f);
+    F f2 = f;
     sint16 index = 0;
 
     while (ret_set.find(f2) == ret_set.end()) {
@@ -208,7 +208,7 @@ std::vector<F> MinUSS(const Braid<F> &b, const Braid<F> &b_rcf) {
     std::vector<F> atoms = f.Atoms();
     std::vector<F> factors = atoms;
 
-    std::transform(execution_policy, atoms.begin(), atoms.end(),
+    std::transform(std::execution::seq, atoms.begin(), atoms.end(),
                    factors.begin(),
                    [&b, &b_rcf](F &atom) { return MinUSS(b, b_rcf, atom); });
 
