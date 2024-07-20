@@ -129,19 +129,23 @@ F MinSSS(const Braid<F> &b, const Braid<F> &b_rcf, const F &f) {
     return r;
 }
 
-template <class F> std::vector<F> MinSSS(const Braid<F> &b) {
-    Braid<F> b_rcf = b;
-    b_rcf.MakeRCFFromLCF();
+template <class F>
+std::vector<F> MinSSS(const Braid<F> &b, const Braid<F> &b_rcf) {
     F f = F(b.GetParameter());
     std::vector<F> atoms = f.Atoms();
+    std::vector<F> factors = atoms;
+
+    std::transform(execution_policy, atoms.begin(), atoms.end(),
+                   factors.begin(),
+                   [&b, &b_rcf](F &atom) { return MinSSS(b, b_rcf, atom); });
 
     std::vector<F> min;
 
-    bool table[atoms.size()] = {false};
+    std::vector<bool> table(atoms.size(), false);
     bool should_be_added;
 
     for (sint16 i = 0; i < int(atoms.size()); i++) {
-        f = MinSSS(b, b_rcf, atoms[i]);
+        f = factors[i];
         should_be_added = true;
 
         // We check, before adding f, that a divisor of it wasn't added already
@@ -184,7 +188,7 @@ template <class B> class SuperSummitSet {
 
     void Print(IndentedOStream &os) const {
         bool is_first = true;
-        for (typename std::unordered_map<B, sint16>::const_iterator it =
+        for (typename std::unordered_set<B>::const_iterator it =
                  Set.begin();
              it != Set.end(); it++) {
             if (!is_first) {
@@ -205,7 +209,7 @@ template <class B> class SuperSummitSet {
         os << EndLine();
         os << "{   ";
         os.Indent(4);
-        for (typename std::unordered_map<B, sint16>::const_iterator it =
+        for (typename std::unordered_set<B>::const_iterator it =
                  Set.begin();
              it != Set.end(); it++) {
             if (!is_first) {
@@ -225,31 +229,39 @@ template <class B> class SuperSummitSet {
 };
 
 template <class F> SuperSummitSet<Braid<F>> SSS(const Braid<F> &b) {
-    Braid<F> b2 = SendToSSS(b);
+    std::list<Braid<F>> queue, queue_rcf;
+    SuperSummitSet<Braid<F>> sss;
     F f = F(b.GetParameter());
 
-    std::list<Braid<F>> queue;
-    SuperSummitSet<Braid<F>> sss;
+    Braid<F> b2 = SendToSSS(b);
+    Braid<F> b2_rcf = b2;
+    b2_rcf.MakeRCFFromLCF();
 
     queue.push_back(b2);
+    queue_rcf.push_back(b2_rcf);
+
     sss.Insert(b2);
 
     while (!queue.empty()) {
-        Braid b3 = queue.front();
+        std::vector<F> min = MinSSS(queue.front(), queue_rcf.front());
 
-        std::vector<F> min = MinSSS(b3);
+        for (typename std::vector<F>::iterator itf = min.begin();
+             itf != min.end(); itf++) {
+            b2 = queue.front();
+            b2.Conjugate(*itf);
 
-        for (typename std::vector<F>::iterator it = min.begin();
-             it != min.end(); it++) {
-            b2 = b3;
-            b2.Conjugate(*it);
             if (!sss.Mem(b2)) {
+                b2_rcf = queue_rcf.front();
+                b2_rcf.ConjugateRCF(*itf);
+                
                 sss.Insert(b2);
                 queue.push_back(b2);
+                queue_rcf.push_back(b2_rcf);
             }
         }
 
         queue.pop_front();
+        queue_rcf.pop_front();
     }
 
     return sss;

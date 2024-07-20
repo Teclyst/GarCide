@@ -345,19 +345,21 @@ template <class F> SlidingCircuitSet<Braid<F>> SCS(const Braid<F> &b) {
     F f = F(b.GetParameter());
 
     Braid<F> b2 = SendToSC(b);
-    scs.Insert(Trajectory(b2));
-    queue.push_back(b2);
     Braid<F> b2_rcf = b2;
     b2_rcf.MakeRCFFromLCF();
+
+    scs.Insert(Trajectory(b2));
+    queue.push_back(b2);
     queue_rcf.push_back(b2_rcf);
 
     F delta = F(b.GetParameter());
     delta.Delta();
 
     b2.Conjugate(delta);
-    b2_rcf.ConjugateRCF(delta);
 
     if (!scs.Mem(b2)) {
+        b2_rcf.ConjugateRCF(delta);
+
         scs.Insert(Trajectory(b2));
         queue.push_back(b2);
         queue_rcf.push_back(b2_rcf);
@@ -369,17 +371,21 @@ template <class F> SlidingCircuitSet<Braid<F>> SCS(const Braid<F> &b) {
         for (typename std::vector<F>::iterator itf = min.begin();
              itf != min.end(); itf++) {
             b2 = queue.front();
-            b2_rcf = queue_rcf.front();
+
             b2.Conjugate(*itf);
-            b2_rcf.ConjugateRCF(*itf);
 
             if (!scs.Mem(b2)) {
+                b2_rcf = queue_rcf.front();
+                b2_rcf.ConjugateRCF(*itf);
+
                 scs.Insert(Trajectory(b2));
                 queue.push_back(b2);
                 queue_rcf.push_back(b2_rcf);
+
                 b2.Conjugate(delta);
-                b2_rcf.ConjugateRCF(delta);
                 if (!scs.Mem(b2)) {
+                    b2_rcf.ConjugateRCF(delta);
+
                     scs.Insert(Trajectory(b2));
                     queue.push_back(b2);
                     queue_rcf.push_back(b2_rcf);
@@ -397,7 +403,6 @@ SlidingCircuitSet<Braid<F>> SCS(const Braid<F> &b, std::vector<F> &mins,
                                 std::vector<sint16> &prev) {
     SlidingCircuitSet<Braid<F>> scs;
     std::list<Braid<F>> queue, queue_rcf;
-    ;
     F f = F(b.GetParameter());
 
     sint16 current = 0;
@@ -405,34 +410,36 @@ SlidingCircuitSet<Braid<F>> SCS(const Braid<F> &b, std::vector<F> &mins,
     prev.clear();
 
     Braid<F> b2 = SendToSC(b);
+    Braid<F> b2_rcf = b2;
+    b2_rcf.MakeRCFFromLCF();
 
     scs.Insert(Trajectory(b2));
     queue.push_back(b2);
-
-    Braid<F> b2_rcf = b2;
-    b2_rcf.MakeRCFFromLCF();
     queue_rcf.push_back(b2_rcf);
 
     while (!queue.empty()) {
-        std::vector<F> min = MinSC(queue.front());
+        std::vector<F> min = MinSC(queue.front(), queue_rcf.front());
 
         for (typename std::vector<F>::iterator itf = min.begin();
              itf != min.end(); itf++) {
             b2 = queue.front();
-            b2_rcf = queue_rcf.front();
             b2.Conjugate(*itf);
-            b2_rcf.ConjugateRCF(*itf);
 
             if (!scs.Mem(b2)) {
+                b2_rcf = queue_rcf.front();
+                b2_rcf.ConjugateRCF(*itf);
+
                 scs.Insert(Trajectory(b2));
                 queue.push_back(b2);
                 queue_rcf.push_back(b2_rcf);
+
                 mins.push_back(*itf);
                 prev.push_back(current);
             }
         }
         queue.pop_front();
         queue_rcf.pop_front();
+        
         current++;
     }
     return scs;

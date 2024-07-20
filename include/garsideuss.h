@@ -20,6 +20,23 @@ template <class F> std::vector<Braid<F>> Trajectory(Braid<F> b) {
     return t;
 }
 
+template <class F>
+void Trajectory(Braid<F> b, Braid<F> b_rcf, std::vector<Braid<F>> &t,
+                std::vector<Braid<F>> &t_rcf) {
+    std::unordered_set<Braid<F>> t_set;
+    t.clear();
+    t_rcf.clear();
+
+    while (t_set.find(b) == t_set.end()) {
+        t.push_back(b);
+        t_rcf.push_back(b);
+        t_set.insert(b);
+        // Cycle in RCF.
+        b_rcf.ConjugateRCF(b.Initial());
+        b.Cycling();
+    }
+}
+
 template <class F> Braid<F> SendToUSS(const Braid<F> &b) {
     Braid<F> b_uss = Trajectory(SSS::SendToSSS(b)).back();
     b_uss.Cycling();
@@ -92,7 +109,8 @@ template <class F> std::list<F> Return(const Braid<F> &b, const F &f) {
     return ret;
 }
 
-template <class F> F Pullback(const Braid<F> &b, const F &f) {
+template <class F>
+F Pullback(const Braid<F> &b, const Braid<F> &b_rcf, const F &f) {
     F f1 = b.FactorList.front().DeltaConjugate(b.Delta + 1);
     F f2 = f.DeltaConjugate();
 
@@ -122,16 +140,19 @@ template <class F> F Pullback(const Braid<F> &b, const F &f) {
             fi = fi.LeftJoin(*it) / *it;
         }
     }
-    return SSS::MinSSS(b, f0.LeftJoin(fi));
+    return SSS::MinSSS(b, b_rcf, f0.LeftJoin(fi));
 }
 
-template <class F> F MainPullback(const Braid<F> &b, const F &f) {
+template <class F>
+F MainPullback(const Braid<F> &b, const Braid<F> &b_rcf, const F &f) {
     std::vector<F> ret;
     std::unordered_map<F, sint16> ret_set;
 
     Braid<F> b2 = Braid(b);
 
-    std::vector<Braid<F>> t = Trajectory(b);
+    std::vector<Braid<F>> t, t_rcf;
+
+    Trajectory(b, b_rcf, t, t_rcf);
 
     F f2 = F(f);
     sint16 index = 0;
@@ -139,10 +160,8 @@ template <class F> F MainPullback(const Braid<F> &b, const F &f) {
     while (ret_set.find(f2) == ret_set.end()) {
         ret.push_back(f2);
         ret_set.insert(std::pair(f2, index));
-        for (typename std::vector<Braid<F>>::reverse_iterator revit =
-                 t.rbegin();
-             revit != t.rend(); revit++) {
-            f2 = Pullback(*revit, f2);
+        for (sint16 i = int(t.size()) - 1; i >= 0; i--) {
+            f2 = Pullback(t[i], t_rcf[i], f2);
         }
         index++;
     }
@@ -170,7 +189,7 @@ F MinUSS(const Braid<F> &b, const Braid<F> &b_rcf, const F &f) {
         }
     }
 
-    f2 = MainPullback(b, f);
+    f2 = MainPullback(b, b_rcf, f);
 
     ret = Return(b, f2);
 
@@ -183,19 +202,23 @@ F MinUSS(const Braid<F> &b, const Braid<F> &b_rcf, const F &f) {
     throw NotInUSS();
 }
 
-template <class F> std::vector<F> MinUSS(const Braid<F> &b) {
+template <class F>
+std::vector<F> MinUSS(const Braid<F> &b, const Braid<F> &b_rcf) {
     F f = F(b.GetParameter());
     std::vector<F> atoms = f.Atoms();
-    Braid<F> b_rcf = b;
-    b_rcf.MakeRCFFromLCF();
+    std::vector<F> factors = atoms;
+
+    std::transform(execution_policy, atoms.begin(), atoms.end(),
+                   factors.begin(),
+                   [&b, &b_rcf](F &atom) { return MinUSS(b, b_rcf, atom); });
 
     std::vector<F> min;
 
-    bool table[atoms.size()] = {false};
+    std::vector<bool> table(atoms.size(), false);
     bool should_be_added;
 
     for (sint16 i = 0; i < int(atoms.size()); i++) {
-        f = MinUSS(b, b_rcf, atoms[i]);
+        f = factors[i];
         should_be_added = true;
 
         // We check, before adding f, that a divisor of it wasn't added already
@@ -326,13 +349,16 @@ template <class B> class UltraSummitSet {
 
 template <class F> UltraSummitSet<Braid<F>> USS(const Braid<F> &b) {
     UltraSummitSet<Braid<F>> uss;
-    std::list<Braid<F>> queue;
+    std::list<Braid<F>> queue, queue_rcf;
     F f = F(b.GetParameter());
 
     Braid<F> b2 = SendToUSS(b);
+    Braid<F> b2_rcf = b2;
+    b2_rcf.MakeRCFFromLCF();
 
     uss.Insert(Trajectory(b2));
     queue.push_back(b2);
+    queue_rcf.push_back(b2_rcf);
 
     F delta = F(b.GetParameter());
     delta.Delta();
@@ -340,12 +366,15 @@ template <class F> UltraSummitSet<Braid<F>> USS(const Braid<F> &b) {
     b2.Conjugate(delta);
 
     if (!uss.Mem(b2)) {
+        b2_rcf.ConjugateRCF(delta);
+
         uss.Insert(Trajectory(b2));
         queue.push_back(b2);
+        queue_rcf.push_back(b2_rcf);
     }
 
     while (!queue.empty()) {
-        std::vector<F> min = MinUSS(queue.front());
+        std::vector<F> min = MinUSS(queue.front(), queue_rcf.front());
 
         for (typename std::vector<F>::iterator itf = min.begin();
              itf != min.end(); itf++) {
@@ -353,16 +382,25 @@ template <class F> UltraSummitSet<Braid<F>> USS(const Braid<F> &b) {
             b2.Conjugate(*itf);
 
             if (!uss.Mem(b2)) {
+                b2_rcf = queue_rcf.front();
+                b2_rcf.ConjugateRCF(*itf);
+
                 uss.Insert(Trajectory(b2));
                 queue.push_back(b2);
+                queue_rcf.push_back(b2_rcf);
+
                 b2.Conjugate(delta);
                 if (!uss.Mem(b2)) {
+                    b2_rcf.ConjugateRCF(delta);
+
                     uss.Insert(Trajectory(b2));
                     queue.push_back(b2);
+                    queue_rcf.push_back(b2_rcf);
                 }
             }
         }
         queue.pop_front();
+        queue_rcf.pop_front();
     }
     return uss;
 }
@@ -371,7 +409,7 @@ template <class F>
 UltraSummitSet<Braid<F>> USS(const Braid<F> &b, std::vector<F> &mins,
                              std::vector<sint16> &prev) {
     UltraSummitSet<Braid<F>> uss;
-    std::list<Braid<F>> queue;
+    std::list<Braid<F>> queue, queue_rcf;
     F f = F(b.GetParameter());
 
     sint16 current = 0;
@@ -379,12 +417,15 @@ UltraSummitSet<Braid<F>> USS(const Braid<F> &b, std::vector<F> &mins,
     prev.clear();
 
     Braid<F> b2 = SendToUSS(b);
+    Braid<F> b2_rcf = b2;
+    b2_rcf.MakeRCFFromLCF();
 
     uss.Insert(Trajectory(b2));
     queue.push_back(b2);
+    queue_rcf.push_back(b2_rcf);
 
     while (!queue.empty()) {
-        std::vector<F> min = MinUSS(queue.front());
+        std::vector<F> min = MinUSS(queue.front(), queue_rcf.front());
 
         for (typename std::vector<F>::iterator itf = min.begin();
              itf != min.end(); itf++) {
@@ -392,13 +433,20 @@ UltraSummitSet<Braid<F>> USS(const Braid<F> &b, std::vector<F> &mins,
             b2.Conjugate(*itf);
 
             if (!uss.Mem(b2)) {
+                b2_rcf = queue_rcf.front();
+                b2_rcf.ConjugateRCF(*itf);
+
                 uss.Insert(Trajectory(b2));
                 queue.push_back(b2);
+                queue_rcf.push_back(b2_rcf);
+
                 mins.push_back(*itf);
                 prev.push_back(current);
             }
         }
         queue.pop_front();
+        queue_rcf.pop_front();
+
         current++;
     }
     return uss;

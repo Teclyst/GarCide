@@ -84,7 +84,7 @@ int main() {
         std::cout << inval.error_source << std::endl;
     }
 
-    SC::SCS(b).Print(CGarside::ind_cout);
+    SSS::SSS(b).Print(CGarside::ind_cout);
     CGarside::ind_cout << CGarside::EndLine();
     CGarside::ind_cout << CGarside::EndLine();
     CGarside::ind_cout << b << CGarside::EndLine();
