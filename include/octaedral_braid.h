@@ -10,6 +10,20 @@ class BDualBraidUnderlying {
     std::vector<sint16> PermutationTable;
 
   public:
+
+    /**
+     * @brief Maximum braid index.
+     *
+     * The greatest index that may be used for braids.
+     *
+     * It is used because we use `thread_local` objects to avoid some
+     * allocations, and their size must be known at compile time.
+     *
+     * Having too big `thread_local` objects might cause some issue with thread
+     * spawning.
+     */
+    static const sint16 MaxBraidIndex = 256;
+
     typedef sint16 ParameterType;
 
     ParameterType GetParameter() const;

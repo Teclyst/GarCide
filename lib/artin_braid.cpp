@@ -242,4 +242,12 @@ void ArtinBraidUnderlying::DeltaConjugate(sint16 k) {
     }
 }
 
+std::size_t ArtinBraidUnderlying::Hash() const {
+        std::size_t h = 0;
+        for (CGarside::sint16 i = 1; i <= GetParameter(); i++) {
+            h = h * 31 + PermutationTable[i];
+        }
+        return h;
+    }
+
 } // namespace CGarside

@@ -24,13 +24,50 @@
 #   cbraid.o and braiding.o.
 
 # File Names.
-LIBCBRAID_SRC = utility.cpp cbraid.cpp braiding.cpp artin_braid.cpp band_braid.cpp octaedral_braid.cpp dual_complex_reflection.cpp standard_complex_reflection.cpp dihedral_braid.cpp
+LIBCBRAID_SRC = utility.cpp cbraid.cpp braiding.cpp
+LIBCBRAID_GROUP_SRC = artin_braid.cpp band_braid.cpp octaedral_braid.cpp dihedral_braid.cpp dual_complex_reflection.cpp standard_complex_reflection.cpp
+LIBCBRAID_SRC_CLEAN = $(LIBCBRAID_SRC) $(LIBCBRAID_GROUP_SRC)
 LIBCBRAID_INCLUDEDIR = ../include
 LIBCBRAID_OBJ = $(LIBCBRAID_SRC:.cpp=.o)
+LIBCBRAID_OBJ_CLEAN = $(LIBCBRAID_SRC_CLEAN:.cpp=.o)
 LIBCBRAID_A = libcbraid.a
-LIBCBRAID_CLEAN = $(LIBCBRAID_OBJ) $(LIBCBRAID_A)
+LIBCBRAID_CLEAN = $(LIBCBRAID_OBJ_CLEAN) $(LIBCBRAID_A)
 
 # Compile options.
+# Use make USE_XXX=1 to compile XXXxxx.cpp.
+# Use make USE_ALL=1 to compile everything.
+
+# Compile artin_braid.cpp.
+ifeq ($(USE_ART), 1)
+	LIBCBRAID_SRC += artin_braid.cpp
+endif
+
+# Compile band_braid.cpp.
+# Band braids need CLN to be randomizable.
+ifeq ($(USE_BAN), 1)
+	LIBCBRAID_SRC += band_braid.cpp
+	CPPFLAGS_CLN = -DUSE_CLN
+	LIBFLAGS_CLN = -lcln
+endif
+
+# Compile artin_braid.cpp.
+ifeq ($(USE_OCT), 1)
+	LIBCBRAID_SRC += octahedral_braid.cpp
+endif
+ifeq ($(USE_DIH), 1)
+	LIBCBRAID_SRC += dihedral_braid.cpp
+endif
+ifeq ($(USE_DCO), 1)
+	LIBCBRAID_SRC += dual_complex_reflection.cpp
+endif
+ifeq ($(USE_SCO), 1)
+	LIBCBRAID_SRC += standard_complex_reflection.cpp
+endif
+ifeq ($(USE_ALL),1)
+	LIBCBRAID_SRC += $(LIBCBRAID_GROUP_SRC)
+	CPPFLAGS_CLN = -DUSE_CLN
+	LIBFLAGS_CLN = -lcln
+endif
 # Use make USE_CLN=1 to compile with the CLN library.
 ifeq ($(USE_CLN),1)
 	CPPFLAGS_CLN = -DUSE_CLN

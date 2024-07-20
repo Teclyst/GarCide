@@ -2,7 +2,6 @@
 #define CGARSIDE
 
 #include "utility.h"
-#include <execution>
 #include <list>
 #include <unordered_map>
 #include <unordered_set>
@@ -187,7 +186,20 @@ template <class U> class Factor {
     Factor operator*(const Factor &b) const { return Product(b); }
 
     // a.Randomize() sets a to a random factor.
-    void Randomize() { Underlying.Randomize(); }
+    void Randomize() {
+
+#ifdef RANDOMIZE_ON_ATOMS
+
+        std::vector<Factor> atoms = Atoms();
+
+        *this = atoms[rand() % int(atoms.size())];
+
+#else
+
+        Underlying.Randomize();
+
+#endif
+    }
 
     // a.Atoms() returns the list of the atoms.
     std::vector<Factor> Atoms() const {
@@ -201,9 +213,10 @@ template <class U> class Factor {
     }
 };
 
-// MakeLeftWeighted(u, v) computes the left-weighted decomposition u' | v' = u |
-// v, and sets u = u' and v = v'. It then returns true if something was done (so
-// that it may be used with `apply_binfun`). SHOULD NEVER BE CALLED UPON u, v IF
+// MakeLeftWeighted(u, v) computes the left-weighted decomposition u' | v' =
+// u | v, and sets u = u' and v = v'. It then returns true if something was
+// done (so that it may be used with `apply_binfun`). SHOULD NEVER BE CALLED
+// UPON u, v IF
 // `&u == &v`!
 template <class F> bool MakeLeftWeighted(F &u, F &v) {
     F t = (~u) ^ v;
@@ -216,10 +229,10 @@ template <class F> bool MakeLeftWeighted(F &u, F &v) {
     }
 }
 
-// MakeRightWeighted(u, v) computes the right-weighted decomposition u' | v' = u
-// | v, and sets u = u' and v = v'. It then returns true if something was done
-// (so that it may be used with `apply_binfun`). SHOULD NEVER BE CALLED UPON u,
-// v IF `&u == &v`!
+// MakeRightWeighted(u, v) computes the right-weighted decomposition u' | v'
+// = u | v, and sets u = u' and v = v'. It then returns true if something
+// was done (so that it may be used with `apply_binfun`). SHOULD NEVER BE
+// CALLED UPON u, v IF `&u == &v`!
 template <class F> bool MakeRightWeighted(F &u, F &v) {
     F t = u.RightMeet(v.LeftComplement());
     if (t.IsIdentity()) {
@@ -233,7 +246,7 @@ template <class F> bool MakeRightWeighted(F &u, F &v) {
 
 // Overloading << for factor classes.
 template <class U>
-IndentedOStream& operator<<(IndentedOStream &os, const Factor<U> &f) {
+IndentedOStream &operator<<(IndentedOStream &os, const Factor<U> &f) {
     f.Print(os);
     return os;
 }
@@ -241,16 +254,16 @@ IndentedOStream& operator<<(IndentedOStream &os, const Factor<U> &f) {
 /**
  * @brief A class representing braids for generic Garside groups.
  *
- * This class represents elements of a Garside groups, whose canonicals factors
- * are represented by the class `F`.
+ * This class represents elements of a Garside groups, whose canonicals
+ * factors are represented by the class `F`.
  *
- * Braids are maintained in LCF most of the time. It should be assumed that a
- * method that does not have "RCF" in its name expects all of its arguments to
- * be in LCF.
+ * Braids are maintained in LCF most of the time. It should be assumed that
+ * a method that does not have "RCF" in its name expects all of its
+ * arguments to be in LCF.
  *
  * @tparam F A class that represents factors. It does not have to be a
- * `Factor<U>` for some class `U`, but has to implement all methods of `Factor`
- * classes.
+ * `Factor<U>` for some class `U`, but has to implement all methods of
+ * `Factor` classes.
  */
 template <class F> class Braid {
 
@@ -258,9 +271,9 @@ template <class F> class Braid {
     /**
      * @brief A type for parameters.
      *
-     * We often implement Garside structures for a series of groups, that are
-     * distinguished one from another by some parameter (often, but not always,
-     * an integer).
+     * We often implement Garside structures for a series of groups, that
+     * are distinguished one from another by some parameter (often, but not
+     * always, an integer).
      *
      */
     typedef typename F::ParameterType ParameterType;
@@ -268,9 +281,9 @@ template <class F> class Braid {
     /**
      * @brief A (group) parameter.
      *
-     * We often implement Garside structures for a series of groups, that are
-     * distinguished one from another by some parameter (often, but not always,
-     * an integer).
+     * We often implement Garside structures for a series of groups, that
+     * are distinguished one from another by some parameter (often, but not
+     * always, an integer).
      *
      */
     ParameterType Parameter;
@@ -280,8 +293,8 @@ template <class F> class Braid {
     /**
      * @brief Infimum.
      *
-     * The power of delta at the left end of the word (in LCF, otherwise at the
-     * right end in RCF).
+     * The power of delta at the left end of the word (in LCF, otherwise at
+     * the right end in RCF).
      *
      */
     sint32 Delta;
@@ -289,8 +302,8 @@ template <class F> class Braid {
     /**
      * @brief The braid's canonical factors.
      *
-     * A list of the braid's canonical factors, from left to right. It is left
-     * weighted when in LCF, and right weighted when in RCF.
+     * A list of the braid's canonical factors, from left to right. It is
+     * left weighted when in LCF, and right weighted when in RCF.
      */
     std::list<F> FactorList;
 
@@ -304,8 +317,8 @@ template <class F> class Braid {
     /**
      * @brief Construct a new Braid, with a group parameter.
      *
-     * Construct a new Braid, with `Parameter = parameter`. It is initialized as
-     * the identity braid.
+     * Construct a new Braid, with `Parameter = parameter`. It is
+     * initialized as the identity braid.
      *
      * @param parameter Group parameter.
      */
@@ -332,8 +345,8 @@ template <class F> class Braid {
     /**
      * @brief Prints `*this` to `os`.
      *
-     * Prints `*this` to `os`, in a format that is compatible with `OfString`
-     * (assuming that the same holds for `F`).
+     * Prints `*this` to `os`, in a format that is compatible with
+     * `OfString` (assuming that the same holds for `F`).
      *
      * @param os The output stream it prints to.
      */
@@ -373,8 +386,8 @@ template <class F> class Braid {
         return (Delta == v.Delta && FactorList == v.FactorList);
     }
 
-    // `u == v` returns whether u and v have the same internal representation.
-    // Syntactic sugar for `u.Compare(v)`.
+    // `u == v` returns whether u and v have the same internal
+    // representation. Syntactic sugar for `u.Compare(v)`.
     bool operator==(const Braid &v) const { return Compare(v); }
 
     // `u != v` returns whether u and v do not have the same internal
@@ -420,8 +433,8 @@ template <class F> class Braid {
     // Syntactic sugar for `u.Inverse()`.
     Braid operator!() const { return Inverse(); }
 
-    // Clean gets rid of (factor) Deltas at the start, and identity elements at
-    // the end pf `FactorList`.
+    // Clean gets rid of (factor) Deltas at the start, and identity elements
+    // at the end pf `FactorList`.
     void Clean() {
         FactorItr it = FactorList.begin();
         while (it != FactorList.end() && (*it).IsDelta()) {
@@ -688,9 +701,9 @@ template <class F> class Braid {
         RightProductRCF(v);
     }
 
-    // `u.Initial()` returns the initial factor of u, that is, if u = Delta ^ r
-    // u_1 ... u_k, Delta ^ r u_1 Delta ^ (- r). If u has canonical length zero,
-    // returns the identity factor instead.
+    // `u.Initial()` returns the initial factor of u, that is, if u = Delta
+    // ^ r u_1 ... u_k, Delta ^ r u_1 Delta ^ (- r). If u has canonical
+    // length zero, returns the identity factor instead.
     inline F Initial() const {
         if (CanonicalLength() == 0) {
             F id = F(GetParameter());
@@ -701,9 +714,10 @@ template <class F> class Braid {
         }
     }
 
-    // `u.Final()` returns the final factor of u, that is, if u = Delta ^ r u_1
-    // ... u_k, u_k. If u has canonical length zero, returns the identity factor
-    // instead.
+    // `u.Final()` returns the final factor of u, that is, if u = Delta ^ r
+    // u_1
+    // ... u_k, u_k. If u has canonical length zero, returns the identity
+    // factor instead.
     inline F Final() const {
         if (CanonicalLength() == 0) {
             F id = F(GetParameter());
@@ -714,9 +728,10 @@ template <class F> class Braid {
         }
     }
 
-    // `u.PreferredPrefix()` returns the preferred prefix of u, that is, if u =
-    // Delta ^ r u_1 ... u_k, p(u) = d_R(u_k) ^_L Delta ^ r u_1 Delta ^ (- r) If
-    // u has canonical length zero, returns the identity factor instead.
+    // `u.PreferredPrefix()` returns the preferred prefix of u, that is, if
+    // u = Delta ^ r u_1 ... u_k, p(u) = d_R(u_k) ^_L Delta ^ r u_1 Delta ^
+    // (- r) If u has canonical length zero, returns the identity factor
+    // instead.
     inline F PreferredPrefix() const { return Initial() ^ ~Final(); }
 
     F PreferredSuffixRCF() const {
@@ -736,9 +751,9 @@ template <class F> class Braid {
         return right.PreferredSuffixRCF();
     };
 
-    // `u.Cycling()` cycles u: if u = Delta ^ r u_1 ... u_k, then after applying
-    // cycling u will contain (the LNF of) Delta ^ r u_2 ... u_k (Delta ^ r u_1
-    // Delta ^ (-r)).
+    // `u.Cycling()` cycles u: if u = Delta ^ r u_1 ... u_k, then after
+    // applying cycling u will contain (the LNF of) Delta ^ r u_2 ... u_k
+    // (Delta ^ r u_1 Delta ^ (-r)).
     inline void Cycling() {
         if (CanonicalLength() == 0) {
             return;
@@ -749,8 +764,8 @@ template <class F> class Braid {
     }
 
     // `u.Decycling()` decycles u: if u = Delta ^ r u_1 ... u_k, then after
-    // applying cycling u will contain (the LNF of) Delta ^ r u_2 ... u_k (Delta
-    // ^ r u_1 Delta ^ (-r)).
+    // applying cycling u will contain (the LNF of) Delta ^ r u_2 ... u_k
+    // (Delta ^ r u_1 Delta ^ (-r)).
     inline void Decycling() {
         if (CanonicalLength() == 0) {
             return;
@@ -762,8 +777,8 @@ template <class F> class Braid {
 
     // `u.Sliding()` cyclically slides u: if u = Delta ^ r u_1 ... u_k, and
     // Delta ^ r u_1 Delta ^ (-r) = p(u) u'_1, then after applying cycling u
-    // will contain (the LNF of) Delta ^ r (Delta ^ r u'_1 Delta ^ (-r)) u_2 ...
-    // u_k p(u).
+    // will contain (the LNF of) Delta ^ r (Delta ^ r u'_1 Delta ^ (-r)) u_2
+    // ... u_k p(u).
     inline void Sliding() {
         if (CanonicalLength() == 0) {
             return;
@@ -779,8 +794,8 @@ template <class F> class Braid {
     }
 
     // `u.Power(k)` returns u raised to the power k.
-    // Uses a fast exponentiation algorithm; the number of multiplications is
-    // logarithmic in k.
+    // Uses a fast exponentiation algorithm; the number of multiplications
+    // is logarithmic in k.
     Braid Power(const sint16 k) const {
         if (k == 0) {
             return Braid(GetParameter());
@@ -806,8 +821,9 @@ template <class F> class Braid {
         Clean();
     }
 
-    // `u.LCFToRCF()` turns u, assumed to be in LCF (so that we may avoid having
-    // to clean up), into RCF. The result (r, [u_1, ..., u_k]) represents u_1
+    // `u.LCFToRCF()` turns u, assumed to be in LCF (so that we may avoid
+    // having to clean up), into RCF. The result (r, [u_1, ..., u_k])
+    // represents u_1
     // ... u_k Delta ^ r.
     inline void MakeRCFFromLCF() {
         for (FactorItr it = FactorList.begin(); it != FactorList.end(); ++it) {
@@ -816,8 +832,9 @@ template <class F> class Braid {
         bubble_sort(FactorList.begin(), FactorList.end(), MakeRightWeighted<F>);
     }
 
-    // `u.LCFToRCF()` turns u, assumed to be in LCF, into RCF (so that we may
-    // avoid having to clean up). The result (r, [u_1, ..., u_k]) represents u_1
+    // `u.LCFToRCF()` turns u, assumed to be in LCF, into RCF (so that we
+    // may avoid having to clean up). The result (r, [u_1, ..., u_k])
+    // represents u_1
     // ... u_k Delta ^ r.
     inline void MakeLCFFromRCF() {
         for (FactorItr it = FactorList.begin(); it != FactorList.end(); ++it) {
@@ -924,26 +941,30 @@ template <class F> class Braid {
      * Reads the string `str` and sets `this` to the corresponding braid, in
      * LCF.
      *
-     * Letting `L` be the language of (a generating subset of) the factors, `W =
-     * (\s | \t)*` be the language of whitespaces, and `Z = -? ([1 - 9] [0 - 9]*
-     * | 0)` be the language of integers, accepted strings are those represented
-     * by regular expression `(W | .)* ((D W ^ W Z | -? W L) (W | .)*)*`
+     * Letting `L` be the language of (a generating subset of) the factors,
+     * `W =
+     * (\s | \t)*` be the language of whitespaces, and `Z = -? ([1 - 9] [0 -
+     * 9]* | 0)` be the language of integers, accepted strings are those
+     * represented by regular expression `(W | .)* ((D W ^ W Z | -? W L) (W
+     * | .)*)*`
      *
      * @param str The string to convert from.
-     * @exception `InvalidStringError`: Thrown when it isn't possible to extract
-     * a factor from `str`, or when the factor we tried to extract does not
-     * exist (e.g. `4` isn't a legal factor for artin braids on 4 strands).
+     * @exception `InvalidStringError`: Thrown when it isn't possible to
+     * extract a factor from `str`, or when the factor we tried to extract
+     * does not exist (e.g. `4` isn't a legal factor for artin braids on 4
+     * strands).
      */
     void OfString(const std::string str) {
         size_t pos = 0;
 
         // We use double backslashes, as we want to obtain escape sequences.
-        // Otherwise, for instance, `\t` would be recognized as a tab by C++.
-        // For another example, `\^` would be recognized as an illegal escape
-        // sequence, and compilation would fail. If we wanted to recognize a
-        // single backslash `\`, we would have to escape it as `\\\\`. In C++
-        // `std::regex`, `\s` is a whitespace, `\t` a tab, `\.` a dot and `\^` a
-        // chevron (`.` and `^` are special characters for `std::regex`).
+        // Otherwise, for instance, `\t` would be recognized as a tab by
+        // C++. For another example, `\^` would be recognized as an illegal
+        // escape sequence, and compilation would fail. If we wanted to
+        // recognize a single backslash `\`, we would have to escape it as
+        // `\\\\`. In C++ `std::regex`, `\s` is a whitespace, `\t` a tab,
+        // `\.` a dot and `\^` a chevron (`.` and `^` are special characters
+        // for `std::regex`).
         std::regex ignore{"[\\s\\.\\t]*"};
         std::regex delta_power{"D[\\s\\t]*\\^[\\s\\t]*(" + number_regex + ")"};
         std::regex delta{"D"};

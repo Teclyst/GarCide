@@ -1,11 +1,6 @@
 #include "cgarside.h"
 
 namespace CGarside {
-// The greatest possible value for e such that it is possible to have braids
-// with parameter n as great as `MaxBraidIndex` It is possible to use objects
-// with e > MaxE, but then the other parameter will have to be smaller than
-// `MaxBraidIndex` / e.
-const sint16 MaxE = 1;
 
 // We represent B(e, e, n + 1).
 struct ComplexDualBraidParameter {
@@ -34,9 +29,9 @@ IndentedOStream &IndentedOStream::operator<< <ComplexDualBraidParameter>(
     const ComplexDualBraidParameter &p);
 
 // You may use Braids with parameter e, n such that e * n <= `MaxE` *
-// `MaxBraidIndex`. Note that `MaxE` IS NOT a strict bound; rather, it is the
+// `MaxN`. Note that `MaxE` IS NOT a strict bound; rather, it is the
 // greatest possible e such that it is possible to have braids with parameter n
-// as great as `MaxBraidIndex`. To understand what we are doing, it is advised
+// as great as `MaxN`. To understand what we are doing, it is advised
 // to look at `arXiv:math/0403400v2` (Bessis, Corran, 2004).
 class ComplexDualBraidUnderlying {
 
@@ -57,6 +52,34 @@ class ComplexDualBraidUnderlying {
     std::vector<sint16> CoefficientTable;
 
   public:
+    /**
+     * @brief Maximum value for `PresentationParameter.n`.
+     *
+     * The greatest `PresentationParameter.n` value that may be used for braids.
+     *
+     * It is used because we use `thread_local` objects to avoid some
+     * allocations, and their size must be known at compile time.
+     *
+     * Having too big `thread_local` objects might cause some issue with thread
+     * spawning.
+     */
+    static const sint16 MaxN = 256;
+
+    /**
+     * @brief Maximum value for `PresentationParameter.e`.
+     *
+     * Not exactly. This is not a strict bound on `PresentationParameter.e`. The
+     * real condition is `PresentationParameter.e * PresentationParameter.n <=
+     * MaxE * MaxN`.
+     *
+     * It is used because we use `thread_local` objects to avoid some
+     * allocations, and their size must be known at compile time.
+     *
+     * Having too big `thread_local` objects might cause some issue with thread
+     * spawning.
+     */
+    static const sint16 MaxE = 1;
+
     typedef ComplexDualBraidParameter ParameterType;
 
     ParameterType GetParameter() const;

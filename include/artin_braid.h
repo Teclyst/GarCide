@@ -7,20 +7,52 @@ namespace CGarside {
 /// In this case, permutations.
 class ArtinBraidUnderlying {
 
-  protected:
+  private:
     sint16 PresentationParameter;
 
     std::vector<sint16> PermutationTable;
 
+    /**
+     * @brief Maximum braid index.
+     *
+     * The greatest index that may be used for braids.
+     *
+     * It is used because we use `thread_local` objects to avoid some
+     * allocations, and their size must be known at compile time.
+     *
+     * Having too big `thread_local` objects might cause some issue with thread
+     * spawning.
+     */
+    static const sint16 MaxBraidIndex = 256;
+
   public:
     typedef sint16 ParameterType;
 
+    /**
+     * @brief Get the `PresentationParameter`.
+     *
+     * Get the `PresentationParameter` (which is `private`).
+     *
+     * @return `PresentationParameter`.
+     */
     ParameterType GetParameter() const;
 
     sint16 At(sint16 i) const { return PermutationTable[i]; }
     sint16 &At(sint16 i) { return PermutationTable[i]; }
 
-    // Constructor
+    /**
+     * @brief Construct a new `ArtinBraidUnderlying`.
+     *
+     * Construct a new `ArtinBraidUnderlying`, with `n` as its
+     * `PresentationParameter`.
+     *
+     * Its `PermutationTable` will have length `n`, and will be filled with
+     * zeros (thus this is not a valid factor). Initialize it with `Identity`,
+     * `Delta`, or another similar method.
+     *
+     * @param n The `PresentationParameter` of the factor (also the length of
+     * its `PermutationTable`).
+     */
     ArtinBraidUnderlying(ParameterType n);
 
     /**
@@ -92,10 +124,6 @@ class ArtinBraidUnderlying {
     // We check wether the underlying permutation table are (pointwise) equal.
     bool Compare(const ArtinBraidUnderlying &b) const;
 
-    // Computes the factor corresponding to the inverse permutation.
-    // Used to simplify complement operation.
-    ArtinBraidUnderlying Inverse() const;
-
     // Product under the hypothesis that it is still simple.
     ArtinBraidUnderlying Product(const ArtinBraidUnderlying &b) const;
 
@@ -115,15 +143,13 @@ class ArtinBraidUnderlying {
     // Used to speed up calculations compared to the default implementation.
     void DeltaConjugate(sint16 k);
 
-    std::size_t Hash() const {
-        std::size_t h = 0;
-        for (CGarside::sint16 i = 1; i <= GetParameter(); i++) {
-            h = h * 31 + PermutationTable[i];
-        }
-        return h;
-    }
+    std::size_t Hash() const;
 
   private:
+    // Computes the factor corresponding to the inverse permutation.
+    // Used to simplify complement operation.
+    ArtinBraidUnderlying Inverse() const;
+
     // Subroutine called by LeftMeet() and RightMeet().
     static void MeetSub(const sint16 *a, const sint16 *b, sint16 *r, sint16 s,
                         sint16 t);

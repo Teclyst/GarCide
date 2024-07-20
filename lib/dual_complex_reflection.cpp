@@ -344,7 +344,7 @@ void ComplexDualBraidUnderlying::AssignPartition(sint16 *x) const {
 
 // We assume e > 1.
 void ComplexDualBraidUnderlying::OfPartition(const sint16 *x) {
-    thread_local sint16 z[MaxBraidIndex + 1];
+    thread_local sint16 z[MaxN + 1];
     sint16 min_cycle_0 = 0, max_cycle_0 = 0;
     sint16 n = GetParameter().n, e = GetParameter().e, r;
 
@@ -470,13 +470,13 @@ void ComplexDualBraidUnderlying::OfPartition(const sint16 *x) {
 
 ComplexDualBraidUnderlying ComplexDualBraidUnderlying::LeftMeet(
     const ComplexDualBraidUnderlying &b) const {
-    thread_local sint16 x[MaxE * MaxBraidIndex + 1],
-        y[MaxE * MaxBraidIndex + 1], z[MaxE * MaxBraidIndex + 1];
+    thread_local sint16 x[MaxE * MaxN + 1],
+        y[MaxE * MaxN + 1], z[MaxE * MaxN + 1];
 
     AssignPartition(x);
     b.AssignPartition(y);
 
-    thread_local sint16 P[MaxE * MaxBraidIndex + 1][MaxE * MaxBraidIndex + 1];
+    thread_local sint16 P[MaxE * MaxN + 1][MaxE * MaxN + 1];
 
     for (sint16 i = GetParameter().e * GetParameter().n; i >= 0; i--) {
         P[x[i]][y[i]] = i;

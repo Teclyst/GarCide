@@ -194,7 +194,7 @@ std::vector<F> MinSC(const Braid<F> &b, const Braid<F> &b_rcf) {
     std::vector<F> atoms = f.Atoms();
     std::vector<F> factors = atoms;
 
-    std::transform(std::execution::seq, atoms.begin(), atoms.end(),
+    std::transform(execution_policy, atoms.begin(), atoms.end(),
                    factors.begin(),
                    [&b, &b_rcf](F &atom) { return MinSC(b, b_rcf, atom); });
 

@@ -171,6 +171,7 @@ template <class F> std::vector<F> MinSSS(const Braid<F> &b) {
 // closer to those for USSs and SCSs. This might change later - it could be
 // interesting to instead use a map and save for each element a conjugator.
 template <class B> class SuperSummitSet {
+  private:
     std::unordered_set<B> Set;
 
   public:

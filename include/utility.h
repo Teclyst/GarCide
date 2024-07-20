@@ -13,6 +13,7 @@
 #include <regex>
 #include <stdexcept>
 #include <string>
+#include <execution>
 
 namespace CGarside {
 
@@ -73,19 +74,6 @@ typedef unsigned long long uint64;
  * expressions, and there is no way to build them within `std::regex`.
  */
 const std::string number_regex{"-?[1-9][0-9]*|0"};
-
-/**
- * @brief Maximum braid index.
- *
- * The greatest index that may be used for braids.
- *
- * It is used because we use `thread_local` objects to avoid some allocations,
- * and their size must be known at compile time.
- *
- * Having too big `thread_local` objects might cause some issue with thread
- * spawning.
- */
-const sint16 MaxBraidIndex = 256;
 
 /**
  * @brief Euclidean quotient.
@@ -347,6 +335,16 @@ IndentedOStream &IndentedOStream::operator<< <EndLine>(const EndLine &el);
  * An `IndentedOStream` that wraps around `std::cout`.
  */
 static IndentedOStream ind_cout(std::cout);
+
+#ifndef USE_PAR
+
+constexpr __pstl::execution::v1::sequenced_policy execution_policy = std::execution::seq; 
+
+#else
+
+constexpr __pstl::execution::v1::parallel_policy execution_policy = std::execution::par; 
+
+#endif
 
 } // namespace CGarside
 

@@ -4,6 +4,19 @@
 
 namespace CGarside {
 
+/**
+ * @brief Maximum braid index.
+ *
+ * The greatest index that may be used for braids.
+ *
+ * It is used because we use `thread_local` objects to avoid some allocations,
+ * and their size must be known at compile time.
+ *
+ * Having too big `thread_local` objects might cause some issue with thread
+ * spawning.
+ */
+const sint16 MaxBraidIndex = 256;
+
 sint16 BDualBraidUnderlying::GetParameter() const {
     return PresentationParameter;
 }

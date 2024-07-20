@@ -10,6 +10,20 @@ class BandBraidUnderlying {
     std::vector<sint16> PermutationTable;
 
   public:
+
+    /**
+     * @brief Maximum braid index.
+     *
+     * The greatest index that may be used for braids.
+     *
+     * It is used because we use `thread_local` objects to avoid some
+     * allocations, and their size must be known at compile time.
+     *
+     * Having too big `thread_local` objects might cause some issue with thread
+     * spawning.
+     */
+    static const sint16 MaxBraidIndex = 256;
+
     typedef sint16 ParameterType;
 
     ParameterType GetParameter() const;
@@ -30,7 +44,7 @@ class BandBraidUnderlying {
      *
      * Letting `W = (\s | \t)*` be the language of whitespaces and `Z = -? ([1 -
      * 9] [0 - 9]* | 0)` be the language of integers, accepted strings are those
-     * represented by regular expression `\(W Z W,? W Z W\)`, under the
+     * represented by the regular expression `\(W Z W,? W Z W\)`, under the
      * additional hypothesis that the two integers lie in [`1`, `Parameter`] and
      * are not equal.
      *

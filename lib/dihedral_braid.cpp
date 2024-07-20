@@ -15,8 +15,6 @@ sint16 IDualBraidUnderlying::LatticeHeight() const { return 2; }
 IDualBraidUnderlying::IDualBraidUnderlying(sint16 n)
     : PresentationParameter(n), Type(0), Point(0) {}
 
-IDualBraidUnderlying::IDualBraidUnderlying(const IDualBraidUnderlying &a)
-    : PresentationParameter(a.GetParameter()), Type(a.Type), Point(a.Point) {}
 
 void IDualBraidUnderlying::Print(IndentedOStream &os) const {
     if (Type == 1) {

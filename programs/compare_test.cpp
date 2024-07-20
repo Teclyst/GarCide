@@ -10,6 +10,7 @@
 #include "dual_complex_reflection.h"
 #include "standard_complex_reflection.h"
 #include "garsidesc.h"
+#include "garsideuss.h"
 #include "octaedral_braid.h"
 
 int Index = 8;
@@ -57,12 +58,14 @@ CGarside::BandBraid OfCBraid(const CBraid::BandBraid &b) {
 
 int main() {
     std::string str =
-        std::string("D ^ 5 s4 s _ 3 s6 t6 ");
+        std::string("D ^ 1 (5, 3)");
 
-    CGarside::ComplexStandardBraid b(CGarside::ComplexStandardBraidParameter(E, Index));
-    CGarside::ComplexStandardBraid c(CGarside::ComplexStandardBraidParameter(Index, E));
-    CGarside::ComplexStandardBraidFactor f(CGarside::ComplexStandardBraidParameter(Index, E));
-    CGarside::ComplexStandardBraidFactor g(CGarside::ComplexStandardBraidParameter(Index, E));
+    CGarside::ComplexDualBraid b(CGarside::ComplexDualBraidParameter(E, Index));
+    // CGarside::ComplexStandardBraid c(CGarside::ComplexStandardBraidParameter(Index, E));
+    // CGarside::ComplexStandardBraidFactor f(CGarside::ComplexStandardBraidParameter(Index, E));
+    // CGarside::ComplexStandardBraidFactor g(CGarside::ComplexStandardBraidParameter(Index, E));
+
+    // CGarside::ArtinBraid b(Index);
 
     for (int i = 0; i < Count; i++) {
         //b.Randomize(CLength);
@@ -81,7 +84,7 @@ int main() {
         std::cout << inval.error_source << std::endl;
     }
 
-    SC::SCS(b).Debug(CGarside::ind_cout);
+    SC::SCS(b).Print(CGarside::ind_cout);
     CGarside::ind_cout << CGarside::EndLine();
     CGarside::ind_cout << CGarside::EndLine();
     CGarside::ind_cout << b << CGarside::EndLine();
