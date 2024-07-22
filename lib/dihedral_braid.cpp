@@ -4,7 +4,7 @@
 
 struct NotBelow {};
 
-namespace CGarside {
+namespace cgarside {
 
 sint16 IDualBraidUnderlying::GetParameter() const {
     return PresentationParameter;

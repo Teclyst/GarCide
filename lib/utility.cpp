@@ -1,6 +1,6 @@
 #include "utility.h"
 
-namespace CGarside {
+namespace cgarside {
 
 EndLine::EndLine(sint16 skip) : lines_to_skip(skip) {}
 

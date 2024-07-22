@@ -39,12 +39,12 @@ using CBraid::sint16;
 using std::cout;
 using std::endl;
 using std::list;
-using CGarside::EndLine;
-using CGarside::ind_cout;
+using cgarside::EndLine;
+using cgarside::ind_cout;
 
-CGarside::ArtinBraidFactor OfCBraidFactor(const CBraid::ArtinFactor &f);
+cgarside::ArtinBraidFactor OfCBraidFactor(const CBraid::ArtinFactor &f);
 
-CGarside::ArtinBraid OfCBraid(const CBraid::ArtinBraid &b);
+cgarside::ArtinBraid OfCBraid(const CBraid::ArtinBraid &b);
 
 // typedef ArtinPresentation P;
 

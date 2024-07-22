@@ -2,7 +2,7 @@
 #include <iostream>
 #include <string>
 
-namespace CGarside {
+namespace cgarside {
 
 /**
  * @brief Maximum braid index.

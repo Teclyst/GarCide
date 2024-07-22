@@ -2,7 +2,7 @@
 #include <iostream>
 #include <string>
 
-namespace CGarside {
+namespace cgarside {
 
 void ComplexDualBraidParameter::Print(IndentedOStream &os) const {
     os << "(e: " << e << ", n: " << n << ")";

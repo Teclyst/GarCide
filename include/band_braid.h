@@ -1,6 +1,6 @@
 #include "cgarside.h"
 
-namespace CGarside {
+namespace cgarside {
 
 class BandBraidUnderlying {
 
@@ -116,13 +116,7 @@ class BandBraidUnderlying {
     // Used to speed up calculations compared to the default implementation.
     void DeltaConjugate(sint16 k);
 
-    std::size_t Hash() const {
-        std::size_t h = 0;
-        for (CGarside::sint16 i = 1; i <= GetParameter(); i++) {
-            h = h * 31 + PermutationTable[i];
-        }
-        return h;
-    }
+    size_t Hash() const;
 };
 
 typedef Factor<BandBraidUnderlying> BandBraidFactor;

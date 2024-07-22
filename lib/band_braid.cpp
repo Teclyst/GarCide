@@ -3,7 +3,7 @@
 #include <iostream>
 #include <string>
 
-namespace CGarside {
+namespace cgarside {
 
 sint16 BandBraidUnderlying::GetParameter() const {
     return PresentationParameter;
@@ -240,5 +240,13 @@ std::vector<BandBraidUnderlying> BandBraidUnderlying::Atoms() const {
     }
     return atoms;
 }
+
+size_t BandBraidUnderlying::Hash() const {
+        std::size_t h = 0;
+        for (sint16 i = 1; i <= GetParameter(); i++) {
+            h = h * 31 + PermutationTable[i];
+        }
+        return h;
+    }
 
 } // namespace CGarside

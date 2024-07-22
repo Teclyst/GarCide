@@ -3,7 +3,7 @@
 #ifndef ARTIN
 #define ARTIN
 
-namespace CGarside {
+namespace cgarside {
 
 /// A class for the underlying objects for canonical factors
 /// in the Artin presentation braid group case.

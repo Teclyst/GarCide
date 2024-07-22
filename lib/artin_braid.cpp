@@ -1,6 +1,6 @@
 #include "artin_braid.h"
 
-namespace CGarside {
+namespace cgarside {
 
 void ArtinBraidUnderlying::MeetSub(const sint16 *a, const sint16 *b, sint16 *r,
                                    sint16 s, sint16 t) {
@@ -244,7 +244,7 @@ void ArtinBraidUnderlying::DeltaConjugate(sint16 k) {
 
 std::size_t ArtinBraidUnderlying::Hash() const {
         std::size_t h = 0;
-        for (CGarside::sint16 i = 1; i <= GetParameter(); i++) {
+        for (sint16 i = 1; i <= GetParameter(); i++) {
             h = h * 31 + PermutationTable[i];
         }
         return h;

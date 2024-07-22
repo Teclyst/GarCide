@@ -1,6 +1,6 @@
 #include "cgarside.h"
 
-namespace CGarside {
+namespace cgarside {
 
 // We represent B(e, e, n + 1).
 struct ComplexDualBraidParameter {
@@ -146,10 +146,10 @@ class ComplexDualBraidUnderlying {
 
     std::size_t Hash() const {
         std::size_t h = 0;
-        for (CGarside::sint16 i = 1; i <= GetParameter().n; i++) {
+        for (sint16 i = 1; i <= GetParameter().n; i++) {
             h = h * 31 + PermutationTable[i];
         }
-        for (CGarside::sint16 i = 1; i <= GetParameter().n; i++) {
+        for (sint16 i = 1; i <= GetParameter().n; i++) {
             h = h * 31 + CoefficientTable[i];
         }
         return h;

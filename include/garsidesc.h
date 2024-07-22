@@ -1,9 +1,7 @@
 #include "cgarside.h"
 #include "garsidesss.h"
 
-namespace SC {
-using namespace CGarside;
-using CGarside::sint16;
+namespace cgarside::sliding_circuit {
 
 template <class F> std::vector<Braid<F>> Trajectory(Braid<F> b) {
     std::vector<Braid<F>> t;
@@ -162,7 +160,7 @@ template <class F> F MainPullback(const Braid<F> &b, const F &f) {
 
 template <class F>
 F MinSC(const Braid<F> &b, const Braid<F> &b_rcf, const F &f) {
-    F f2 = SSS::MinSSS(b, b_rcf, f);
+    F f2 = super_summit::MinSSS(b, b_rcf, f);
 
     std::list<F> ret = Return(b, f2);
     for (typename std::list<F>::iterator it = ret.begin(); it != ret.end();

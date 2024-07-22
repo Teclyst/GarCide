@@ -3,9 +3,7 @@
 // An exception.
 struct NotInUSS {};
 
-namespace USS {
-using namespace CGarside;
-using CGarside::sint16;
+namespace cgarside::ultra_summit {
 
 template <class F> std::vector<Braid<F>> Trajectory(Braid<F> b) {
     std::vector<Braid<F>> t;
@@ -38,13 +36,13 @@ void Trajectory(Braid<F> b, Braid<F> b_rcf, std::vector<Braid<F>> &t,
 }
 
 template <class F> Braid<F> SendToUSS(const Braid<F> &b) {
-    Braid<F> b_uss = Trajectory(SSS::SendToSSS(b)).back();
+    Braid<F> b_uss = Trajectory(super_summit::SendToSSS(b)).back();
     b_uss.Cycling();
     return b_uss;
 }
 
 template <class F> Braid<F> SendToUSS(const Braid<F> &b, Braid<F> &c) {
-    Braid<F> b_sss = SSS::SendToSSS(b, c);
+    Braid<F> b_sss = super_summit::SendToSSS(b, c);
     std::list<Braid<F>> t = Trajectory(b_sss);
 
     Braid<F> b_uss = Braid(t.back());
@@ -141,7 +139,7 @@ F Pullback(const Braid<F> &b, const Braid<F> &b_rcf, const F &f) {
             fi = fi.LeftJoin(*it) / *it;
         }
     }
-    return SSS::MinSSS(b, b_rcf, f0.LeftJoin(fi));
+    return super_summit::MinSSS(b, b_rcf, f0.LeftJoin(fi));
 }
 
 template <class F>
@@ -178,7 +176,7 @@ F MainPullback(const Braid<F> &b, const Braid<F> &b_rcf, const F &f) {
 
 template <class F>
 F MinUSS(const Braid<F> &b, const Braid<F> &b_rcf, const F &f) {
-    F f2 = SSS::MinSSS(b, b_rcf, f);
+    F f2 = super_summit::MinSSS(b, b_rcf, f);
 
     std::list<F> ret = Return(b, f2);
 

@@ -15,7 +15,7 @@
 #include <stdexcept>
 #include <string>
 
-namespace CGarside {
+namespace cgarside {
 
 /**
  * @brief Alias for `char`.

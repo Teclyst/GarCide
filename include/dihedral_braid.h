@@ -1,6 +1,6 @@
 #include "cgarside.h"
 
-namespace CGarside {
+namespace cgarside {
 
 class IDualBraidUnderlying {
 

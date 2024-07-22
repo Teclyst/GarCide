@@ -1,6 +1,6 @@
 #include "cgarside.h"
 
-namespace CGarside {
+namespace cgarside {
 
 class BDualBraidUnderlying {
 
@@ -106,7 +106,7 @@ class BDualBraidUnderlying {
 
     std::size_t Hash() const {
         std::size_t h = 0;
-        for (CGarside::sint16 i = 1; i <= 2 * GetParameter(); i++) {
+        for (sint16 i = 1; i <= 2 * GetParameter(); i++) {
             h = h * 31 + PermutationTable[i];
         }
         return h;
