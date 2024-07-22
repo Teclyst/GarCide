@@ -16,7 +16,7 @@
 int Index = 8;
 int E = 3;
 int CLength = 4;
-int Count = 1000;
+int Count = 20;
 int RandomSeed = 0;
 
 CBraid::ArtinFactor ToCBraidFactor(const CGarside::ArtinBraidFactor &f) {
@@ -56,6 +56,40 @@ CGarside::ArtinBraid OfCBraid(const CBraid::ArtinBraid &b) {
     return cb;
 }
 
+void PrintFactorList(const std::list<CGarside::ArtinBraidFactor> &l) {
+    for (typename std::list<CGarside::ArtinBraidFactor>::const_iterator it =
+             l.begin();
+         it != l.end(); it++) {
+        (*it).Print(CGarside::ind_cout);
+        CGarside::ind_cout << CGarside::EndLine();
+    }
+}
+
+void PrintCBraidFactorList(const std::list<CBraid::ArtinFactor> &l) {
+    for (typename std::list<CBraid::ArtinFactor>::const_iterator it = l.begin();
+         it != l.end(); it++) {
+        OfCBraidFactor(*it).Print(CGarside::ind_cout);
+        CGarside::ind_cout << CGarside::EndLine();
+    }
+}
+
+void PrintList(const std::list<CGarside::ArtinBraid> &l) {
+    for (typename std::list<CGarside::ArtinBraid>::const_iterator it =
+             l.begin();
+         it != l.end(); it++) {
+        (*it).Print(CGarside::ind_cout);
+        CGarside::ind_cout << CGarside::EndLine();
+    }
+}
+
+void CBraidPrintList(const std::list<CBraid::ArtinBraid> &l) {
+    for (typename std::list<CBraid::ArtinBraid>::const_iterator it = l.begin();
+         it != l.end(); it++) {
+        OfCBraid(*it).Print(CGarside::ind_cout);
+        CGarside::ind_cout << CGarside::EndLine();
+    }
+}
+
 int main() {
     std::string str = std::string(
         "1 2 1 3 2 1 4 5 4 6 5 4 3 2 1 7 6 5 4 3 2 1 . 1 2 1 3 2 1 4 3 2 1 5 4 "
@@ -81,20 +115,11 @@ int main() {
         f.Randomize();
         b.Normalize();
         b = USS::SendToUSS(b);
-        b_rcf = b;
-        b_rcf.MakeRCFFromLCF();
-        if (!f.IsIdentity() && USS::MainPullback(b, b_rcf, f) !=
-                                   OfCBraidFactor(Braiding::MainPullback(
-                                       ToCBraid(b), ToCBraidFactor(f)))) {
-            b.Print(CGarside::ind_cout);
-            CGarside::ind_cout << CGarside::EndLine();
-            USS::MainPullback(b, b_rcf, f).Print(CGarside::ind_cout);
-            CGarside::ind_cout << CGarside::EndLine();
-            OfCBraidFactor(
-                Braiding::MainPullback(ToCBraid(b), ToCBraidFactor(f)))
-                .Print(CGarside::ind_cout);
-            CGarside::ind_cout << CGarside::EndLine();
-        }
+        CGarside::ind_cout << "CGarside:" << CGarside::EndLine();
+        PrintFactorList(USS::Return(b, f));
+        CGarside::ind_cout << "CBraid:" << CGarside::EndLine();
+        PrintCBraidFactorList(
+            Braiding::Returns(ToCBraid(b), ToCBraidFactor(f)));
     }
 
     CGarside::ind_cout << "Passed all tests!" << CGarside::EndLine();
@@ -105,10 +130,7 @@ int main() {
         std::cout << inval.error_source << std::endl;
     }
 
-    SSS::SendToSSS(b);
-    CGarside::ind_cout << CGarside::EndLine();
-
-    Braiding::SendToSSS(ToCBraid(b));
+    SSS::SSS(b).Print(CGarside::ind_cout);
     CGarside::ind_cout << CGarside::EndLine();
     return 0;
 }

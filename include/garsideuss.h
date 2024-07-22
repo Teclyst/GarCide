@@ -70,7 +70,7 @@ template <class F> std::list<F> Return(const Braid<F> &b, const F &f) {
     std::unordered_set<F> ret_set;
     Braid<F> b1 = Braid(b), c2 = Braid<F>(b.GetParameter());
     sint16 i, n = 1;
-    F f1 = F(f);
+    F f1 = f;
 
     Braid<F> c1 = Braid(b1.First().DeltaConjugate(b1.Delta));
     b1.Cycling();
@@ -84,6 +84,7 @@ template <class F> std::list<F> Return(const Braid<F> &b, const F &f) {
     while (ret_set.find(f1) == ret_set.end()) {
         ret.push_back(f1);
         ret_set.insert(f1);
+        b1 = b;
         b1.Conjugate(f1);
         c2.Identity();
         for (i = 0; i < n; i++) {
@@ -269,24 +270,81 @@ template <class B> class UltraSummitSet {
     // Finds b's orbit.
     inline sint16 Orbit(const B &b) const { return *Set.find(b); }
 
+    inline size_t NumberOfOrbits() const { return Orbits.size(); }
+
+    inline size_t Card() const { return Set.size(); }
+
+    inline std::vector<size_t> OrbitSizes() const {
+        std::vector<size_t> sizes;
+        for (size_t i = 0; i < Orbits.size(); i++) {
+            sizes.push_back(Orbits[i].size());
+        }
+        return sizes;
+    }
+
     void Print(IndentedOStream &os) const {
+
+        std::vector<size_t> sizes = OrbitSizes();
+        os << "There " << (Card() > 1 ? "are " : "is ") << Card() << " element"
+           << (Card() > 1 ? "s " : " ") << "in the Ultra Summit Set."
+           << EndLine(1);
+
+        if (NumberOfOrbits() > 1) {
+            os << "They are split among " << NumberOfOrbits()
+               << " orbits, of respective sizes ";
+
+            for (sint16 i = 0; i < int(Orbits.size()); i++) {
+                os << sizes[i]
+                   << (i == int(Orbits.size()) - 1     ? "."
+                       : (i == int(Orbits.size()) - 2) ? " and "
+                                                       : ", ");
+            }
+        } else {
+            os << "There is only one orbit.";
+        }
+
+        os << EndLine(2);
+
         for (sint16 i = 0; i < int(Orbits.size()); i++) {
-            os << "Orbit " << i << ":";
+            std::string str_i = std::to_string(i);
+            for (size_t _ = 0; _ < str_i.length() + 8; _++) {
+                os << "-";
+            }
+            os << EndLine() << " Orbit " << str_i << EndLine();
+            for (size_t _ = 0; _ < str_i.length() + 8; _++) {
+                os << "-";
+            }
             os.Indent(4);
-            os << EndLine();
-            os << EndLine();
+            os << EndLine(1) << "There " << (sizes[i] > 1 ? "are " : "is ")
+               << sizes[i] << " element" << (sizes[i] > 1 ? "s " : " ")
+               << "in this orbit." << EndLine(1);
+            if (sizes[i] > 1) {
+                os << "They are " << Orbits[i].front().Rigidity() << "-rigid.";
+            } else {
+                os << "It is " << Orbits[i].front().Rigidity() << "-rigid.";
+            }
+            os << EndLine(1);
+            sint16 indent =
+                (int(std::to_string(Orbits[i].size() - 1).length()) + 1) / 4 +
+                1;
             for (sint16 j = 0; j < int(Orbits[i].size()); j++) {
+                os << j << ":";
+                for (sint16 _ = 0;
+                     _ < 4 * indent - 1 -
+                             int(std::to_string(Orbits[i].size() - 1).length());
+                     _++) {
+                    os << " ";
+                }
+                os.Indent(4 * indent);
                 Orbits[i][j].Print(os);
+                os.Indent(-4 * indent);
                 if (j == int(Orbits[i].size()) - 1) {
                     os.Indent(-4);
                 } else {
                     os << EndLine();
                 }
             }
-            if (i != int(Orbits.size()) - 1) {
-                os << EndLine();
-                os << EndLine();
-            }
+            os << EndLine(2);
         }
     }
 

@@ -8,12 +8,12 @@
 #ifndef UTILITY
 #define UTILITY
 
-#include <ostream>
+#include <execution>
 #include <iostream>
+#include <ostream>
 #include <regex>
 #include <stdexcept>
 #include <string>
-#include <execution>
 
 namespace CGarside {
 
@@ -238,8 +238,30 @@ inline void bubble_sort(ForItr first, ForItr last, BinFun f) {
  *
  * A struct that represents a endline character. Used as an equivalent for
  * `std::endl` for `IndentedOStream`.
+ *
+ * You may pass an integer parameter to its constructor to specify the number of
+ * lines to skip.
  */
-struct EndLine {};
+struct EndLine {
+
+    /**
+     * @brief Number of lines to skip.
+     *
+     * The number of lines that should be skipped when this is inserted in
+     * `IndentedOStream` (i.e., the number of fully white lines, inserting an
+     * `EndLine` will always result in a linebreak).
+     */
+    sint16 lines_to_skip;
+
+    /**
+     * @brief Constructs a new `EndLine`.
+     *
+     * Constructs a new `Endline` object, whith `lines_to_skip` set to `skip`.
+     *
+     * @param skip What `lines_to_skip` is to be set to. Default value is 0.
+     */
+    EndLine(sint16 skip = 0);
+};
 
 /**
  * @brief A class for output streams that keep track of indentation.
@@ -338,11 +360,13 @@ static IndentedOStream ind_cout(std::cout);
 
 #ifndef USE_PAR
 
-constexpr __pstl::execution::v1::sequenced_policy execution_policy = std::execution::seq; 
+constexpr __pstl::execution::v1::sequenced_policy execution_policy =
+    std::execution::seq;
 
 #else
 
-constexpr __pstl::execution::v1::parallel_policy execution_policy = std::execution::par; 
+constexpr __pstl::execution::v1::parallel_policy execution_policy =
+    std::execution::par;
 
 #endif
 

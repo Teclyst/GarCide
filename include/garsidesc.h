@@ -257,28 +257,72 @@ template <class B> class SlidingCircuitSet {
     // Finds b's orbit.
     inline sint16 Orbit(const B &b) const { return Set.at(b); }
 
-    inline sint16 NumberOfOrbits() const { return Orbits.size(); }
+    inline size_t NumberOfOrbits() const { return Orbits.size(); }
 
-    inline sint16 Card() const { return Set.size(); }
+    inline size_t Card() const { return Set.size(); }
+
+    inline std::vector<size_t> OrbitSizes() const {
+        std::vector<size_t> sizes;
+        for (size_t i = 0; i < Orbits.size(); i++) {
+            sizes.push_back(Orbits[i].size());
+        }
+        return sizes;
+    }
 
     void Print(IndentedOStream &os) const {
+
+        std::vector<size_t> sizes = OrbitSizes();
+        os << "There " << (Card() > 1 ? "are " : "is ") << Card() << " element"
+           << (Card() > 1 ? "s " : " ") << "in the Sliding Circuit Set."
+           << EndLine(1);
+
+        if (NumberOfOrbits() > 1) {
+            os << "They are split among " << NumberOfOrbits()
+               << " circuits, of respective sizes ";
+
+            for (sint16 i = 0; i < int(Orbits.size()); i++) {
+                os << sizes[i]
+                   << (i == int(Orbits.size()) - 1     ? "."
+                       : (i == int(Orbits.size()) - 2) ? " and "
+                                                       : ", ");
+            }
+        } else {
+            os << "There is only one cicuit.";
+        }
+
+        os << EndLine(2);
+
         for (sint16 i = 0; i < int(Orbits.size()); i++) {
-            os << "Orbit " << i << ":";
+            std::string str_i = std::to_string(i);
+            for (size_t _ = 0; _ < str_i.length() + 10;
+                 _++) {
+                os << "-";
+            }
+            os << EndLine() << " Circuit " << str_i << EndLine();
+            for (size_t _ = 0; _ < str_i.length() + 10;
+                 _++) {
+                os << "-";
+            }
             os.Indent(4);
-            os << EndLine();
-            os << EndLine();
+            os << EndLine(1) << "There " << (sizes[i] > 1 ? "are " : "is ")
+               << sizes[i] << " element" << (sizes[i] > 1 ? "s " : " ")
+               << "in this circuit." << EndLine(1);
+            sint16 indent = (int(std::to_string(Orbits[i].size() - 1).length()) + 1) / 4 + 1;
             for (sint16 j = 0; j < int(Orbits[i].size()); j++) {
+                os << j << ":";
+                for (sint16 _ = 0; _ < 4 * indent - 1 - int(std::to_string(Orbits[i].size() - 1).length()); _++) {
+                    os << " ";
+                }
+                os.Indent(4 * indent);
                 Orbits[i][j].Print(os);
+                os.Indent(- 4 * indent);
                 if (j == int(Orbits[i].size()) - 1) {
                     os.Indent(-4);
                 } else {
                     os << EndLine();
                 }
             }
-            if (i != int(Orbits.size()) - 1) {
-                os << EndLine();
-                os << EndLine();
-            }
+            os << EndLine(2);
         }
     }
 
@@ -439,7 +483,7 @@ SlidingCircuitSet<Braid<F>> SCS(const Braid<F> &b, std::vector<F> &mins,
         }
         queue.pop_front();
         queue_rcf.pop_front();
-        
+
         current++;
     }
     return scs;

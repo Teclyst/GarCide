@@ -189,16 +189,35 @@ template <class B> class SuperSummitSet {
     inline sint16 Card() const { return Set.size(); }
 
     void Print(IndentedOStream &os) const {
-        bool is_first = true;
+
+        os << "There " << (Card() > 1 ? "are " : "is ") << Card() << " element"
+           << (Card() > 1 ? "s " : " ") << "in the Ultra Summit Set."
+           << EndLine(2);
+
+        os << "-----" << EndLine() << " Set " << EndLine() << "-----";
+        
+        os.Indent(4);
+
+        os << EndLine(1);
+
+        sint16 indent = (int(std::to_string(Card() - 1).length()) + 1) / 4 + 1;
+        sint16 count = 0;
         for (typename std::unordered_set<B>::const_iterator it = Set.begin();
              it != Set.end(); it++) {
-            if (!is_first) {
-                os << EndLine();
-            } else {
-                is_first = false;
+            os << count << ":";
+            for (sint16 _ = 0;
+                 _ < 4 * indent - 1 - int(std::to_string(Card() - 1).length());
+                 _++) {
+                os << " ";
             }
+            count++;
+            os.Indent(4 * indent);
             (*it).Print(os);
+            os.Indent(-4 * indent);
+            os << EndLine();
         }
+        os.Indent(-4);
+        os << EndLine(1);
     }
 
     void Debug(IndentedOStream &os) const {
