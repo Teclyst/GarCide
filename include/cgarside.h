@@ -1031,16 +1031,16 @@ IndentedOStream &operator<<(IndentedOStream &os, const Braid<F> &b) {
     return os;
 }
 
-} // namespace CGarside
+} // namespace cgarside
 
 template <class U> struct std::hash<cgarside::Factor<U>> {
-    std::size_t operator()(CGarside::Factor<U> const &f) const noexcept {
+    std::size_t operator()(cgarside::Factor<U> const &f) const noexcept {
         return f.Hash();
     }
 };
 
 template <class F> struct std::hash<cgarside::Braid<F>> {
-    std::size_t operator()(CGarside::Braid<F> const &u) const noexcept {
+    std::size_t operator()(cgarside::Braid<F> const &u) const noexcept {
         return u.Hash();
     }
 };

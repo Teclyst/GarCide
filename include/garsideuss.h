@@ -1,3 +1,6 @@
+#ifndef ULTRA_SUMMIT
+#define ULTRA_SUMMIT
+
 #include "garsidesss.h"
 
 // An exception.
@@ -243,6 +246,43 @@ std::vector<F> MinUSS(const Braid<F> &b, const Braid<F> &b_rcf) {
     return min;
 }
 
+template <class B> struct ConstIterator {
+  private:
+    pointer ptr;
+
+  public:
+    using iterator_category = std::forward_iterator_tag;
+    using difference_type = std::ptrdiff_t;
+    using value_type = B;
+    using pointer = typename std::unordered_map<B, int>::const_iterator;
+    using reference = B &;
+
+    ConstIterator(pointer ptr) : ptr(ptr) {}
+
+    const reference operator*() const { return (*ptr).first; }
+    pointer operator->() { return m_ptr; }
+
+    // Prefix increment
+    ConstIterator &operator++() {
+        m_ptr++;
+        return *this;
+    }
+
+    // Postfix increment
+    ConstIterator operator++(int) {
+        Iterator tmp = *this;
+        ++(*this);
+        return tmp;
+    }
+
+    bool operator==(const Iterator &b) const {
+        return ptr == b.ptr;
+    }
+    bool operator!=(const Iterator &b) const {
+        return a.ptr != b.ptr;
+    }
+};
+
 // An USS is stored as, on one side, an union of (disjoint) trajectories, and on
 // the other side a set. The set is actually a map: for each key it stores the
 // orbit it belongs to (as an index referring to Orbits). Both are built
@@ -252,6 +292,16 @@ template <class B> class UltraSummitSet {
     std::unordered_map<B, sint16> Set;
 
   public:
+    using ConstIterator = ConstIterator<B>;
+
+    inline ConstIterator begin() const {
+        return ConstIterator(Set.begin());
+    }
+
+    inline ConstIterator end() const {
+        return ConstIterator(Set.end());
+    }
+    
     // Adds a trajectory to the USS.
     // Linear in the trajectory's length.
     inline void Insert(std::vector<B> t) {
@@ -306,11 +356,11 @@ template <class B> class UltraSummitSet {
         for (sint16 i = 0; i < int(Orbits.size()); i++) {
             std::string str_i = std::to_string(i);
             for (size_t _ = 0; _ < str_i.length() + 8; _++) {
-                os << "-";
+                os << "─";
             }
             os << EndLine() << " Orbit " << str_i << EndLine();
             for (size_t _ = 0; _ < str_i.length() + 8; _++) {
-                os << "-";
+                os << "─";
             }
             os.Indent(4);
             os << EndLine(1) << "There " << (sizes[i] > 1 ? "are " : "is ")
@@ -563,4 +613,6 @@ bool AreConjugate(const Braid<F> &b1, const Braid<F> &b2, Braid<F> &c) {
 
     return true;
 }
-} // namespace USS
+} // namespace cgarside::ultra_summit
+
+#endif

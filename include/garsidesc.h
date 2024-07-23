@@ -294,12 +294,12 @@ template <class B> class SlidingCircuitSet {
             std::string str_i = std::to_string(i);
             for (size_t _ = 0; _ < str_i.length() + 10;
                  _++) {
-                os << "-";
+                os << "─";
             }
             os << EndLine() << " Circuit " << str_i << EndLine();
             for (size_t _ = 0; _ < str_i.length() + 10;
                  _++) {
-                os << "-";
+                os << "─";
             }
             os.Indent(4);
             os << EndLine(1) << "There " << (sizes[i] > 1 ? "are " : "is ")

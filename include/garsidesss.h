@@ -2,6 +2,8 @@
 #define SUPER
 
 #include "cgarside.h"
+#include <cstddef>
+#include <iterator>
 
 namespace cgarside::super_summit {
 
@@ -179,6 +181,16 @@ template <class B> class SuperSummitSet {
     std::unordered_set<B> Set;
 
   public:
+    using ConstIterator = typename std::unordered_set<B>::const_iterator;
+
+    inline ConstIterator begin() const {
+        return ConstIterator(Set.begin());
+    }
+
+    inline ConstIterator end() const {
+        return ConstIterator(Set.end());
+    }
+
     inline void Insert(B b) { Set.insert(b); }
 
     // Checks membership.
@@ -186,14 +198,18 @@ template <class B> class SuperSummitSet {
 
     inline sint16 Card() const { return Set.size(); }
 
+    inline Iterator<B> begin() {
+        return Set.begin();
+    }
+
     void Print(IndentedOStream &os) const {
 
         os << "There " << (Card() > 1 ? "are " : "is ") << Card() << " element"
            << (Card() > 1 ? "s " : " ") << "in the Ultra Summit Set."
            << EndLine(2);
 
-        os << "-----" << EndLine() << " Set " << EndLine() << "-----";
-        
+        os << "─────" << EndLine() << " Set " << EndLine() << "─────";
+
         os.Indent(4);
 
         os << EndLine(1);
@@ -290,6 +306,6 @@ inline bool AreConjugate(const Braid<F> &u, const Braid<F> &v) {
     return u_sss.Mem(SendToSSS(v));
 }
 
-} // namespace SSS
+} // namespace cgarside::super_summit
 
 #endif
