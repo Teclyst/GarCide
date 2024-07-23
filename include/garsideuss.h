@@ -246,105 +246,99 @@ std::vector<F> MinUSS(const Braid<F> &b, const Braid<F> &b_rcf) {
     return min;
 }
 
-template <class B> struct ConstIterator {
-  private:
-    pointer ptr;
+template <class B> struct USSConstIterator {
 
   public:
     using iterator_category = std::forward_iterator_tag;
     using difference_type = std::ptrdiff_t;
     using value_type = B;
     using pointer = typename std::unordered_map<B, int>::const_iterator;
-    using reference = B &;
+    using reference = const B &;
 
-    ConstIterator(pointer ptr) : ptr(ptr) {}
+  private:
+    pointer ptr;
 
-    const reference operator*() const { return (*ptr).first; }
-    pointer operator->() { return m_ptr; }
+  public:
+    USSConstIterator(pointer ptr) : ptr(ptr) {}
+
+    reference operator*() const { return std::get<0>(*ptr); }
+    pointer operator->() { return ptr; }
 
     // Prefix increment
-    ConstIterator &operator++() {
-        m_ptr++;
+    USSConstIterator &operator++() {
+        ptr++;
         return *this;
     }
 
     // Postfix increment
-    ConstIterator operator++(int) {
-        Iterator tmp = *this;
+    USSConstIterator operator++(int) {
+        USSConstIterator tmp = *this;
         ++(*this);
         return tmp;
     }
 
-    bool operator==(const Iterator &b) const {
-        return ptr == b.ptr;
-    }
-    bool operator!=(const Iterator &b) const {
-        return a.ptr != b.ptr;
-    }
+    bool operator==(const USSConstIterator &b) const { return ptr == b.ptr; }
+    bool operator!=(const USSConstIterator &b) const { return ptr != b.ptr; }
 };
 
 // An USS is stored as, on one side, an union of (disjoint) trajectories, and on
 // the other side a set. The set is actually a map: for each key it stores the
-// orbit it belongs to (as an index referring to Orbits). Both are built
+// orbit it belongs to (as an index referring to orbits). Both are built
 // concurrently; the set part is used to speed up membership tests.
 template <class B> class UltraSummitSet {
-    std::vector<std::vector<B>> Orbits;
-    std::unordered_map<B, sint16> Set;
+    std::vector<std::vector<B>> orbits;
+    std::unordered_map<B, sint16> set;
 
   public:
-    using ConstIterator = ConstIterator<B>;
+    using ConstIterator = USSConstIterator<B>;
 
-    inline ConstIterator begin() const {
-        return ConstIterator(Set.begin());
-    }
+    inline ConstIterator begin() const { return ConstIterator(set.begin()); }
 
-    inline ConstIterator end() const {
-        return ConstIterator(Set.end());
-    }
-    
+    inline ConstIterator end() const { return ConstIterator(set.end()); }
+
     // Adds a trajectory to the USS.
     // Linear in the trajectory's length.
-    inline void Insert(std::vector<B> t) {
-        Orbits.push_back(t);
+    inline void insert(std::vector<B> t) {
+        orbits.push_back(t);
         for (typename std::vector<B>::iterator it = t.begin(); it != t.end();
              it++) {
-            Set.insert(std::pair(*it, int(Orbits.size()) - 1));
+            set.insert(std::pair(*it, int(orbits.size()) - 1));
         }
     }
 
     // Checks membership.
-    inline bool Mem(const B &b) const { return Set.find(b) != Set.end(); }
+    inline bool mem(const B &b) const { return set.find(b) != set.end(); }
 
     // Finds b's orbit.
-    inline sint16 Orbit(const B &b) const { return *Set.find(b); }
+    inline sint16 orbit(const B &b) const { return *set.find(b); }
 
-    inline size_t NumberOfOrbits() const { return Orbits.size(); }
+    inline size_t number_of_orbits() const { return orbits.size(); }
 
-    inline size_t Card() const { return Set.size(); }
+    inline size_t card() const { return set.size(); }
 
-    inline std::vector<size_t> OrbitSizes() const {
+    inline std::vector<size_t> orbit_sizes() const {
         std::vector<size_t> sizes;
-        for (size_t i = 0; i < Orbits.size(); i++) {
-            sizes.push_back(Orbits[i].size());
+        for (size_t i = 0; i < orbits.size(); i++) {
+            sizes.push_back(orbits[i].size());
         }
         return sizes;
     }
 
-    void Print(IndentedOStream &os) const {
+    void print(IndentedOStream &os) const {
 
-        std::vector<size_t> sizes = OrbitSizes();
-        os << "There " << (Card() > 1 ? "are " : "is ") << Card() << " element"
-           << (Card() > 1 ? "s " : " ") << "in the Ultra Summit Set."
+        std::vector<size_t> sizes = orbit_sizes();
+        os << "There " << (card() > 1 ? "are " : "is ") << card() << " element"
+           << (card() > 1 ? "s " : " ") << "in the Ultra Summit set."
            << EndLine(1);
 
-        if (NumberOfOrbits() > 1) {
-            os << "They are split among " << NumberOfOrbits()
+        if (number_of_orbits() > 1) {
+            os << "They are split among " << number_of_orbits()
                << " orbits, of respective sizes ";
 
-            for (sint16 i = 0; i < int(Orbits.size()); i++) {
+            for (sint16 i = 0; i < int(orbits.size()); i++) {
                 os << sizes[i]
-                   << (i == int(Orbits.size()) - 1     ? "."
-                       : (i == int(Orbits.size()) - 2) ? " and "
+                   << (i == int(orbits.size()) - 1     ? "."
+                       : (i == int(orbits.size()) - 2) ? " and "
                                                        : ", ");
             }
         } else {
@@ -353,12 +347,12 @@ template <class B> class UltraSummitSet {
 
         os << EndLine(2);
 
-        for (sint16 i = 0; i < int(Orbits.size()); i++) {
+        for (sint16 i = 0; i < int(orbits.size()); i++) {
             std::string str_i = std::to_string(i);
             for (size_t _ = 0; _ < str_i.length() + 8; _++) {
                 os << "─";
             }
-            os << EndLine() << " Orbit " << str_i << EndLine();
+            os << EndLine() << " orbit " << str_i << EndLine();
             for (size_t _ = 0; _ < str_i.length() + 8; _++) {
                 os << "─";
             }
@@ -367,26 +361,26 @@ template <class B> class UltraSummitSet {
                << sizes[i] << " element" << (sizes[i] > 1 ? "s " : " ")
                << "in this orbit." << EndLine(1);
             if (sizes[i] > 1) {
-                os << "They are " << Orbits[i].front().Rigidity() << "-rigid.";
+                os << "They are " << orbits[i].front().Rigidity() << "-rigid.";
             } else {
-                os << "It is " << Orbits[i].front().Rigidity() << "-rigid.";
+                os << "It is " << orbits[i].front().Rigidity() << "-rigid.";
             }
             os << EndLine(1);
             sint16 indent =
-                (int(std::to_string(Orbits[i].size() - 1).length()) + 1) / 4 +
+                (int(std::to_string(orbits[i].size() - 1).length()) + 1) / 4 +
                 1;
-            for (sint16 j = 0; j < int(Orbits[i].size()); j++) {
+            for (sint16 j = 0; j < int(orbits[i].size()); j++) {
                 os << j << ":";
                 for (sint16 _ = 0;
                      _ < 4 * indent - 1 -
-                             int(std::to_string(Orbits[i].size() - 1).length());
+                             int(std::to_string(orbits[i].size() - 1).length());
                      _++) {
                     os << " ";
                 }
                 os.Indent(4 * indent);
-                Orbits[i][j].Print(os);
+                orbits[i][j].Print(os);
                 os.Indent(-4 * indent);
-                if (j == int(Orbits[i].size()) - 1) {
+                if (j == int(orbits[i].size()) - 1) {
                     os.Indent(-4);
                 } else {
                     os << EndLine();
@@ -396,20 +390,20 @@ template <class B> class UltraSummitSet {
         }
     }
 
-    void Debug(IndentedOStream &os) const {
+    void debug(IndentedOStream &os) const {
         os << "{   ";
         os.Indent(4);
-        os << "Orbits:";
+        os << "orbits:";
         os.Indent(4);
         os << EndLine();
         os << "[   ";
         os.Indent(4);
-        for (sint16 i = 0; i < int(Orbits.size()); i++) {
+        for (sint16 i = 0; i < int(orbits.size()); i++) {
             os << "[   ";
             os.Indent(4);
-            for (sint16 j = 0; j < int(Orbits[i].size()); j++) {
-                Orbits[i][j].Debug(os);
-                if (j == int(Orbits[i].size()) - 1) {
+            for (sint16 j = 0; j < int(orbits[i].size()); j++) {
+                orbits[i][j].Debug(os);
+                if (j == int(orbits[i].size()) - 1) {
                     os.Indent(-4);
                 } else {
                     os << ",";
@@ -417,7 +411,7 @@ template <class B> class UltraSummitSet {
                 os << EndLine();
             }
             os << "]";
-            if (i == int(Orbits.size()) - 1) {
+            if (i == int(orbits.size()) - 1) {
                 os.Indent(-4);
             } else {
                 os << ",";
@@ -427,15 +421,15 @@ template <class B> class UltraSummitSet {
         os << "]";
         os.Indent(-4);
         os << EndLine();
-        os << "Set:";
+        os << "set:";
         os.Indent(4);
         os << EndLine();
         os << "{   ";
         os.Indent(4);
         bool is_first = true;
         for (typename std::unordered_map<B, sint16>::const_iterator it =
-                 Set.begin();
-             it != Set.end(); it++) {
+                 set.begin();
+             it != set.end(); it++) {
             if (!is_first) {
                 os << "," << EndLine();
             } else {
@@ -462,7 +456,7 @@ template <class F> UltraSummitSet<Braid<F>> USS(const Braid<F> &b) {
     Braid<F> b2_rcf = b2;
     b2_rcf.MakeRCFFromLCF();
 
-    uss.Insert(Trajectory(b2));
+    uss.insert(Trajectory(b2));
     queue.push_back(b2);
     queue_rcf.push_back(b2_rcf);
 
@@ -471,10 +465,10 @@ template <class F> UltraSummitSet<Braid<F>> USS(const Braid<F> &b) {
 
     b2.Conjugate(delta);
 
-    if (!uss.Mem(b2)) {
+    if (!uss.mem(b2)) {
         b2_rcf.ConjugateRCF(delta);
 
-        uss.Insert(Trajectory(b2));
+        uss.insert(Trajectory(b2));
         queue.push_back(b2);
         queue_rcf.push_back(b2_rcf);
     }
@@ -487,19 +481,19 @@ template <class F> UltraSummitSet<Braid<F>> USS(const Braid<F> &b) {
             b2 = queue.front();
             b2.Conjugate(*itf);
 
-            if (!uss.Mem(b2)) {
+            if (!uss.mem(b2)) {
                 b2_rcf = queue_rcf.front();
                 b2_rcf.ConjugateRCF(*itf);
 
-                uss.Insert(Trajectory(b2));
+                uss.insert(Trajectory(b2));
                 queue.push_back(b2);
                 queue_rcf.push_back(b2_rcf);
 
                 b2.Conjugate(delta);
-                if (!uss.Mem(b2)) {
+                if (!uss.mem(b2)) {
                     b2_rcf.ConjugateRCF(delta);
 
-                    uss.Insert(Trajectory(b2));
+                    uss.insert(Trajectory(b2));
                     queue.push_back(b2);
                     queue_rcf.push_back(b2_rcf);
                 }
@@ -526,7 +520,7 @@ UltraSummitSet<Braid<F>> USS(const Braid<F> &b, std::vector<F> &mins,
     Braid<F> b2_rcf = b2;
     b2_rcf.MakeRCFFromLCF();
 
-    uss.Insert(Trajectory(b2));
+    uss.insert(Trajectory(b2));
     queue.push_back(b2);
     queue_rcf.push_back(b2_rcf);
 
@@ -538,11 +532,11 @@ UltraSummitSet<Braid<F>> USS(const Braid<F> &b, std::vector<F> &mins,
             b2 = queue.front();
             b2.Conjugate(*itf);
 
-            if (!uss.Mem(b2)) {
+            if (!uss.mem(b2)) {
                 b2_rcf = queue_rcf.front();
                 b2_rcf.ConjugateRCF(*itf);
 
-                uss.Insert(Trajectory(b2));
+                uss.insert(Trajectory(b2));
                 queue.push_back(b2);
                 queue_rcf.push_back(b2_rcf);
 
@@ -567,10 +561,10 @@ Braid<F> TreePath(const Braid<F> &b, const UltraSummitSet<Braid<F>> &uss,
         return c;
     }
 
-    sint16 current = uss.Orbit(b);
+    sint16 current = uss.orbit(b);
 
     for (typename std::list<Braid<F>>::iterator itb =
-             uss.Orbits[current].begin();
+             uss.orbits[current].begin();
          *itb != b; itb++) {
         c.RightProduct((*itb).FactorList.front().DeltaConjugate(b.Delta));
     }
@@ -605,7 +599,7 @@ bool AreConjugate(const Braid<F> &b1, const Braid<F> &b2, Braid<F> &c) {
 
     UltraSummitSet<Braid<F>> uss = USS(bt1, mins, prev);
 
-    if (!uss.Mem(bt2)) {
+    if (!uss.mem(bt2)) {
         return false;
     }
 

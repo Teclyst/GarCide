@@ -1,5 +1,4 @@
 #include "artin_braid.h"
-#include "garsideuss.h"
 
 namespace cgarside {
 
@@ -356,18 +355,16 @@ bool preserves_circles(const ArtinBraid &b) {
         return false;
 }
 
-ThurstonType thurston_type(const ArtinBraid &b) {
+ThurstonType thurston_type(const ArtinBraid &b, const ultra_summit::UltraSummitSet<ArtinBraid> &uss) {
     sint16 n = b.GetParameter();
 
-    ArtinBraid pot = b;
+    ArtinBraid pow = b;
 
     for (sint16 i = 0; i < n; i++) {
-        if (pot.CanonicalLength() == 0)
+        if (pow.CanonicalLength() == 0)
             return ThurstonType::Periodic;
-        pot.RightProduct(b);
+        pow.RightProduct(b);
     }
-
-    ultra_summit::UltraSummitSet uss = ultra_summit::USS(b);
 
     for (typename ultra_summit::UltraSummitSet<ArtinBraid>::ConstIterator it =
              uss.begin();
@@ -378,6 +375,10 @@ ThurstonType thurston_type(const ArtinBraid &b) {
     }
 
     return ThurstonType::PseudoAsonov;
+}
+
+ThurstonType thurston_type(const ArtinBraid &b) {
+    return thurston_type(b, ultra_summit::USS(b));
 }
 
 } // namespace artin
@@ -397,6 +398,7 @@ IndentedOStream &IndentedOStream::operator<< <artin::ThurstonType>(
         os << "pseudo-Asonov";
         break;
     }
+    return *this;
 };
 
 } // namespace cgarside

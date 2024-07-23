@@ -228,60 +228,101 @@ std::vector<F> MinSC(const Braid<F> &b, const Braid<F> &b_rcf) {
     return min;
 }
 
-// A SCS is stored as both an union of (disjoint) orbits, and a set.
-// The set is actually a map: for each key it stores the orbit it belongs to (as
-// an index referring to Orbits). Both are built concurrently; the set part is
+template <class B> struct SCSConstIterator {
+
+  public:
+    using iterator_category = std::forward_iterator_tag;
+    using difference_type = std::ptrdiff_t;
+    using value_type = B;
+    using pointer = typename std::unordered_map<B, int>::const_iterator;
+    using reference = const B &;
+
+  private:
+    pointer ptr;
+
+  public:
+    SCSConstIterator(pointer ptr) : ptr(ptr) {}
+
+    reference operator*() const { return std::get<0>(*ptr); }
+    pointer operator->() { return ptr; }
+
+    // Prefix increment
+    SCSConstIterator &operator++() {
+        ptr++;
+        return *this;
+    }
+
+    // Postfix increment
+    SCSConstIterator operator++(int) {
+        SCSConstIterator tmp = *this;
+        ++(*this);
+        return tmp;
+    }
+
+    bool operator==(const SCSConstIterator &b) const { return ptr == b.ptr; }
+    bool operator!=(const SCSConstIterator &b) const { return ptr != b.ptr; }
+};
+
+// A SCS is stored as both an union of (disjoint) circuits, and a set.
+// The set is actually a map: for each key it stores the circuit it belongs to (as
+// an index referring to circuits). Both are built concurrently; the set part is
 // used to speed up membership tests. Up to names, this is exactly the same data
 // structure as `USS::UltraSummitSet`.
 template <class B> class SlidingCircuitSet {
   private:
-    std::vector<std::vector<B>> Orbits;
-    std::unordered_map<B, sint16> Set;
+    std::vector<std::vector<B>> circuits;
+    std::unordered_map<B, sint16> set;
 
   public:
+    using ConstIterator = SCSConstIterator<B>;
+
+    inline ConstIterator begin() const { return ConstIterator(set.begin()); }
+
+    inline ConstIterator end() const { return ConstIterator(set.end()); }
+
     // Adds a trajectory to the SCS.
     // Linear in the trajectory's length.
-    inline void Insert(std::vector<B> t) {
-        Orbits.push_back(t);
+    inline void insert(std::vector<B> t) {
+        circuits.push_back(t);
         for (typename std::vector<B>::iterator it = t.begin(); it != t.end();
              it++) {
-            Set.insert(std::pair(*it, int(Orbits.size()) - 1));
+            set.insert(std::pair(*it, int(circuits.size()) - 1));
         }
     }
 
     // Checks membership.
-    inline bool Mem(const B &b) const { return Set.find(b) != Set.end(); }
+    inline bool mem(const B &b) const { return set.find(b) != set.end(); }
 
-    // Finds b's orbit.
-    inline sint16 Orbit(const B &b) const { return Set.at(b); }
+    // Finds b's circuit.
+    inline sint16 circuit(const B &b) const { return set.at(b); }
 
-    inline size_t NumberOfOrbits() const { return Orbits.size(); }
+    inline size_t number_of_circuits() const { return circuits.size(); }
 
-    inline size_t Card() const { return Set.size(); }
+    inline size_t card() const { return set.size(); }
 
-    inline std::vector<size_t> OrbitSizes() const {
+    inline std::vector<size_t> circuit_sizes() const {
         std::vector<size_t> sizes;
-        for (size_t i = 0; i < Orbits.size(); i++) {
-            sizes.push_back(Orbits[i].size());
+        for (size_t i = 0; i < circuits.size(); i++) {
+            sizes.push_back(circuits[i].size());
         }
         return sizes;
     }
 
-    void Print(IndentedOStream &os) const {
+    void print(IndentedOStream &os) const {
 
-        std::vector<size_t> sizes = OrbitSizes();
-        os << "There " << (Card() > 1 ? "are " : "is ") << Card() << " element"
-           << (Card() > 1 ? "s " : " ") << "in the Sliding Circuit Set."
+        std::vector<size_t> sizes = circuit_sizes();
+        os << "There " << (card() > 1 ? "are " : "is ") << card() << " element"
+           << (card() > 1 ? "s " : " ") << "in the Sliding Circuit set."
            << EndLine(1);
 
-        if (NumberOfOrbits() > 1) {
-            os << "They are split among " << NumberOfOrbits()
+        if (number_of_circuits() > 1) {
+            os << "They are split among " << number_of_circuits()
                << " circuits, of respective sizes ";
 
-            for (sint16 i = 0; i < int(Orbits.size()); i++) {
+            for (sint16 i = 0; i < int(circuits.size()); i++) {
                 os << sizes[i]
-                   << (i == int(Orbits.size()) - 1     ? "."
-                       : (i == int(Orbits.size()) - 2) ? " and "
+                   << (i == int(circuits.size()) - 1     ? "."
+                       : (i == int(circuits.size()) - 2) ? " and "
                                                        : ", ");
             }
         } else {
@@ -290,31 +331,34 @@ template <class B> class SlidingCircuitSet {
 
         os << EndLine(2);
 
-        for (sint16 i = 0; i < int(Orbits.size()); i++) {
+        for (sint16 i = 0; i < int(circuits.size()); i++) {
             std::string str_i = std::to_string(i);
-            for (size_t _ = 0; _ < str_i.length() + 10;
-                 _++) {
+            for (size_t _ = 0; _ < str_i.length() + 10; _++) {
                 os << "─";
             }
             os << EndLine() << " Circuit " << str_i << EndLine();
-            for (size_t _ = 0; _ < str_i.length() + 10;
-                 _++) {
+            for (size_t _ = 0; _ < str_i.length() + 10; _++) {
                 os << "─";
             }
             os.Indent(4);
             os << EndLine(1) << "There " << (sizes[i] > 1 ? "are " : "is ")
                << sizes[i] << " element" << (sizes[i] > 1 ? "s " : " ")
                << "in this circuit." << EndLine(1);
-            sint16 indent = (int(std::to_string(Orbits[i].size() - 1).length()) + 1) / 4 + 1;
-            for (sint16 j = 0; j < int(Orbits[i].size()); j++) {
+            sint16 indent =
+                (int(std::to_string(circuits[i].size() - 1).length()) + 1) / 4 +
+                1;
+            for (sint16 j = 0; j < int(circuits[i].size()); j++) {
                 os << j << ":";
-                for (sint16 _ = 0; _ < 4 * indent - 1 - int(std::to_string(Orbits[i].size() - 1).length()); _++) {
+                for (sint16 _ = 0;
+                     _ < 4 * indent - 1 -
+                             int(std::to_string(circuits[i].size() - 1).length());
+                     _++) {
                     os << " ";
                 }
                 os.Indent(4 * indent);
-                Orbits[i][j].Print(os);
-                os.Indent(- 4 * indent);
-                if (j == int(Orbits[i].size()) - 1) {
+                circuits[i][j].Print(os);
+                os.Indent(-4 * indent);
+                if (j == int(circuits[i].size()) - 1) {
                     os.Indent(-4);
                 } else {
                     os << EndLine();
@@ -324,20 +368,20 @@ template <class B> class SlidingCircuitSet {
         }
     }
 
-    void Debug(IndentedOStream &os) const {
+    void debug(IndentedOStream &os) const {
         os << "{   ";
         os.Indent(4);
-        os << "Orbits:";
+        os << "circuits:";
         os.Indent(4);
         os << EndLine();
         os << "[   ";
         os.Indent(4);
-        for (sint16 i = 0; i < int(Orbits.size()); i++) {
+        for (sint16 i = 0; i < int(circuits.size()); i++) {
             os << "[   ";
             os.Indent(4);
-            for (sint16 j = 0; j < int(Orbits[i].size()); j++) {
-                Orbits[i][j].Debug(os);
-                if (j == int(Orbits[i].size()) - 1) {
+            for (sint16 j = 0; j < int(circuits[i].size()); j++) {
+                circuits[i][j].Debug(os);
+                if (j == int(circuits[i].size()) - 1) {
                     os.Indent(-4);
                 } else {
                     os << ",";
@@ -345,7 +389,7 @@ template <class B> class SlidingCircuitSet {
                 os << EndLine();
             }
             os << "]";
-            if (i == int(Orbits.size()) - 1) {
+            if (i == int(circuits.size()) - 1) {
                 os.Indent(-4);
             } else {
                 os << ",";
@@ -355,15 +399,15 @@ template <class B> class SlidingCircuitSet {
         os << "]";
         os.Indent(-4);
         os << EndLine();
-        os << "Set:";
+        os << "set:";
         os.Indent(4);
         os << EndLine();
         os << "{   ";
         os.Indent(4);
         bool is_first = true;
         for (typename std::unordered_map<B, sint16>::const_iterator it =
-                 Set.begin();
-             it != Set.end(); it++) {
+                 set.begin();
+             it != set.end(); it++) {
             if (!is_first) {
                 os << "," << EndLine();
             } else {
@@ -390,7 +434,7 @@ template <class F> SlidingCircuitSet<Braid<F>> SCS(const Braid<F> &b) {
     Braid<F> b2_rcf = b2;
     b2_rcf.MakeRCFFromLCF();
 
-    scs.Insert(Trajectory(b2));
+    scs.insert(Trajectory(b2));
     queue.push_back(b2);
     queue_rcf.push_back(b2_rcf);
 
@@ -399,10 +443,10 @@ template <class F> SlidingCircuitSet<Braid<F>> SCS(const Braid<F> &b) {
 
     b2.Conjugate(delta);
 
-    if (!scs.Mem(b2)) {
+    if (!scs.mem(b2)) {
         b2_rcf.ConjugateRCF(delta);
 
-        scs.Insert(Trajectory(b2));
+        scs.insert(Trajectory(b2));
         queue.push_back(b2);
         queue_rcf.push_back(b2_rcf);
     }
@@ -416,19 +460,19 @@ template <class F> SlidingCircuitSet<Braid<F>> SCS(const Braid<F> &b) {
 
             b2.Conjugate(*itf);
 
-            if (!scs.Mem(b2)) {
+            if (!scs.mem(b2)) {
                 b2_rcf = queue_rcf.front();
                 b2_rcf.ConjugateRCF(*itf);
 
-                scs.Insert(Trajectory(b2));
+                scs.insert(Trajectory(b2));
                 queue.push_back(b2);
                 queue_rcf.push_back(b2_rcf);
 
                 b2.Conjugate(delta);
-                if (!scs.Mem(b2)) {
+                if (!scs.mem(b2)) {
                     b2_rcf.ConjugateRCF(delta);
 
-                    scs.Insert(Trajectory(b2));
+                    scs.insert(Trajectory(b2));
                     queue.push_back(b2);
                     queue_rcf.push_back(b2_rcf);
                 }
@@ -455,7 +499,7 @@ SlidingCircuitSet<Braid<F>> SCS(const Braid<F> &b, std::vector<F> &mins,
     Braid<F> b2_rcf = b2;
     b2_rcf.MakeRCFFromLCF();
 
-    scs.Insert(Trajectory(b2));
+    scs.insert(Trajectory(b2));
     queue.push_back(b2);
     queue_rcf.push_back(b2_rcf);
 
@@ -467,11 +511,11 @@ SlidingCircuitSet<Braid<F>> SCS(const Braid<F> &b, std::vector<F> &mins,
             b2 = queue.front();
             b2.Conjugate(*itf);
 
-            if (!scs.Mem(b2)) {
+            if (!scs.mem(b2)) {
                 b2_rcf = queue_rcf.front();
                 b2_rcf.ConjugateRCF(*itf);
 
-                scs.Insert(Trajectory(b2));
+                scs.insert(Trajectory(b2));
                 queue.push_back(b2);
                 queue_rcf.push_back(b2_rcf);
 
@@ -496,10 +540,10 @@ Braid<F> TreePath(const Braid<F> &b, const SlidingCircuitSet<Braid<F>> &scs,
         return c;
     }
 
-    sint16 current = scs.Orbit(b);
+    sint16 current = scs.circuit(b);
 
     for (typename std::list<Braid<F>>::iterator itb =
-             scs.Orbits[current].begin();
+             scs.circuits[current].begin();
          *itb != b; itb++) {
         c.RightProduct((*itb).PreferredPrefix());
     }
@@ -534,7 +578,7 @@ bool AreConjugate(const Braid<F> &b1, const Braid<F> &b2, Braid<F> &c) {
 
     SlidingCircuitSet<Braid<F>> scs = SCS(bt1, mins, prev);
 
-    if (!scs.Mem(bt2)) {
+    if (!scs.mem(bt2)) {
         return false;
     }
 
@@ -542,4 +586,4 @@ bool AreConjugate(const Braid<F> &b1, const Braid<F> &b2, Braid<F> &c) {
 
     return true;
 }
-} // namespace SC
+} // namespace cgarside::sliding_circuit

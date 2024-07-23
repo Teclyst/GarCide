@@ -1,7 +1,8 @@
-#include "cgarside.h"
-
 #ifndef ARTIN
 #define ARTIN
+
+#include "cgarside.h"
+#include "garsideuss.h"
 
 namespace cgarside {
 
@@ -194,6 +195,19 @@ enum class ThurstonType { Periodic, Reducible, PseudoAsonov };
  * @return Whether `b` preserves a family of circles.
  */
 bool preserves_circles(const ArtinBraid &b);
+
+/**
+ * @brief Computes the Thurston type of a braid whose USS was already computed.
+ *
+ * Computes the Thurston type of braid `b`, using its USS `uss`, in the case where we have access to it.
+ *
+ * This was directly copied (mutatis mutandis) from Juan Gonzalez-Meneses' code.
+ *
+ * @param b The braid whose Thurston type is to be computed.
+ * @param uss `b`'s USS.
+ * @return `b`'s Thurston type.
+ */
+ThurstonType thurston_type(const ArtinBraid &b, const ultra_summit::UltraSummitSet<ArtinBraid> &uss);
 
 /**
  * @brief Computes the Thurston type of a braid.

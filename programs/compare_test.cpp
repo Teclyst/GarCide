@@ -116,6 +116,7 @@ int main() {
         std::cout << inval.error_source << std::endl;
     }
 
-    cgarside::sliding_circuit::SCS(b).Print(cgarside::ind_cout);
+    cgarside::sliding_circuit::SCS(b).print(cgarside::ind_cout);
+    cgarside::ind_cout << "b is "<< cgarside::artin::thurston_type(b) << "." << cgarside::EndLine();
     return 0;
 }

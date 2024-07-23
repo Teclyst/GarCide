@@ -178,49 +178,45 @@ std::vector<F> MinSSS(const Braid<F> &b, const Braid<F> &b_rcf) {
 // interesting to instead use a map and save for each element a conjugator.
 template <class B> class SuperSummitSet {
   private:
-    std::unordered_set<B> Set;
+    std::unordered_set<B> set;
 
   public:
     using ConstIterator = typename std::unordered_set<B>::const_iterator;
 
     inline ConstIterator begin() const {
-        return ConstIterator(Set.begin());
+        return ConstIterator(set.begin());
     }
 
     inline ConstIterator end() const {
-        return ConstIterator(Set.end());
+        return ConstIterator(set.end());
     }
 
-    inline void Insert(B b) { Set.insert(b); }
+    inline void insert(B b) { set.insert(b); }
 
     // Checks membership.
-    inline bool Mem(const B &b) const { return Set.find(b) != Set.end(); }
+    inline bool mem(const B &b) const { return set.find(b) != set.end(); }
 
-    inline sint16 Card() const { return Set.size(); }
+    inline sint16 card() const { return set.size(); }
 
-    inline Iterator<B> begin() {
-        return Set.begin();
-    }
+    void print(IndentedOStream &os) const {
 
-    void Print(IndentedOStream &os) const {
-
-        os << "There " << (Card() > 1 ? "are " : "is ") << Card() << " element"
-           << (Card() > 1 ? "s " : " ") << "in the Ultra Summit Set."
+        os << "There " << (card() > 1 ? "are " : "is ") << card() << " element"
+           << (card() > 1 ? "s " : " ") << "in the Ultra Summit set."
            << EndLine(2);
 
-        os << "─────" << EndLine() << " Set " << EndLine() << "─────";
+        os << "─────" << EndLine() << " set " << EndLine() << "─────";
 
         os.Indent(4);
 
         os << EndLine(1);
 
-        sint16 indent = (int(std::to_string(Card() - 1).length()) + 1) / 4 + 1;
+        sint16 indent = (int(std::to_string(card() - 1).length()) + 1) / 4 + 1;
         sint16 count = 0;
-        for (typename std::unordered_set<B>::const_iterator it = Set.begin();
-             it != Set.end(); it++) {
+        for (typename std::unordered_set<B>::const_iterator it = set.begin();
+             it != set.end(); it++) {
             os << count << ":";
             for (sint16 _ = 0;
-                 _ < 4 * indent - 1 - int(std::to_string(Card() - 1).length());
+                 _ < 4 * indent - 1 - int(std::to_string(card() - 1).length());
                  _++) {
                 os << " ";
             }
@@ -234,17 +230,17 @@ template <class B> class SuperSummitSet {
         os << EndLine(1);
     }
 
-    void Debug(IndentedOStream &os) const {
+    void debug(IndentedOStream &os) const {
         bool is_first = true;
         os << "{   ";
         os.Indent(4);
-        os << "Set:";
+        os << "set:";
         os.Indent(4);
         os << EndLine();
         os << "{   ";
         os.Indent(4);
-        for (typename std::unordered_set<B>::const_iterator it = Set.begin();
-             it != Set.end(); it++) {
+        for (typename std::unordered_set<B>::const_iterator it = set.begin();
+             it != set.end(); it++) {
             if (!is_first) {
                 os << "," << EndLine();
             } else {
@@ -273,7 +269,7 @@ template <class F> SuperSummitSet<Braid<F>> SSS(const Braid<F> &b) {
     queue.push_back(b2);
     queue_rcf.push_back(b2_rcf);
 
-    sss.Insert(b2);
+    sss.insert(b2);
 
     while (!queue.empty()) {
         std::vector<F> min = MinSSS(queue.front(), queue_rcf.front());
@@ -283,11 +279,11 @@ template <class F> SuperSummitSet<Braid<F>> SSS(const Braid<F> &b) {
             b2 = queue.front();
             b2.Conjugate(*itf);
 
-            if (!sss.Mem(b2)) {
+            if (!sss.mem(b2)) {
                 b2_rcf = queue_rcf.front();
                 b2_rcf.ConjugateRCF(*itf);
 
-                sss.Insert(b2);
+                sss.insert(b2);
                 queue.push_back(b2);
                 queue_rcf.push_back(b2_rcf);
             }
@@ -303,7 +299,7 @@ template <class F> SuperSummitSet<Braid<F>> SSS(const Braid<F> &b) {
 template <class F>
 inline bool AreConjugate(const Braid<F> &u, const Braid<F> &v) {
     std::unordered_set<Braid<F>> u_sss = SSS(u);
-    return u_sss.Mem(SendToSSS(v));
+    return u_sss.mem(SendToSSS(v));
 }
 
 } // namespace cgarside::super_summit
