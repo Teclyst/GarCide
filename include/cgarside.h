@@ -33,9 +33,15 @@ template <class U> class Factor {
 
     U GetUnderlying() const { return Underlying; }
 
-    ParameterType GetParameter() const { return Underlying.GetParameter(); }
+    inline static ParameterType parameter_of_string(const std::string &str) {
+        return U::parameter_of_string(str);
+    }
 
-    sint16 LatticeHeight() const { return Underlying.LatticeHeight(); };
+    inline ParameterType GetParameter() const {
+        return Underlying.GetParameter();
+    }
+
+    inline sint16 LatticeHeight() const { return Underlying.LatticeHeight(); };
 
     // a.OfString sets a to the factor specified by str.
     void OfString(const std::string &str, size_t &pos) {
@@ -43,7 +49,7 @@ template <class U> class Factor {
     }
 
     // a.Debug(os) prints a's internal representation to os.
-    void Debug(IndentedOStream &os) const {
+    void Debug(IndentedOStream &os = ind_cout) const {
         os << "{   Underlying:";
         os.Indent(8);
         os << EndLine();
@@ -53,7 +59,7 @@ template <class U> class Factor {
     }
 
     // a.Print(os) prints a to os.
-    void Print(IndentedOStream &os) const { Underlying.Print(os); }
+    void Print(IndentedOStream &os = ind_cout) const { Underlying.Print(os); }
 
     // a.Identity sets a to Identity.
     void Identity() { Underlying.Identity(); }
@@ -340,6 +346,10 @@ template <class F> class Braid {
         }
     }
 
+    inline static ParameterType parameter_of_string(const std::string &str) {
+        return F::parameter_of_string(str);
+    }
+
     ParameterType GetParameter() const { return Parameter; }
 
     /**
@@ -350,11 +360,11 @@ template <class F> class Braid {
      *
      * @param os The output stream it prints to.
      */
-    void Print(IndentedOStream &os) const {
+    void Print(IndentedOStream &os = ind_cout) const {
         if (Delta != 0 && Delta != 1) {
-            os << "D ^ " << Delta << " . ";
+            os << "D ^ " << Delta << (CanonicalLength() > 0 ? " . " : "");
         } else if (Delta == 1) {
-            os << "D . ";
+            os << "D" << (CanonicalLength() > 0 ? " . " : "");
         }
         ConstFactorItr it_end = FactorList.end();
         it_end--;
@@ -364,6 +374,31 @@ template <class F> class Braid {
             if (it != it_end) {
                 os << " . ";
             }
+        }
+    }
+
+    /**
+     * @brief Prints `*this` (in RCF) to `os`.
+     *
+     * Prints `*this` to `os`, in a format that is compatible with
+     * `OfString` (assuming that the same holds for `F`).
+     *
+     * @param os The output stream it prints to.
+     */
+    void print_rcf(IndentedOStream &os = ind_cout) const {
+        ConstFactorItr it_end = FactorList.end();
+        it_end--;
+        for (ConstFactorItr it = FactorList.begin(); it != FactorList.end();
+             it++) {
+            (*it).Print(os);
+            if (it != it_end) {
+                os << " . ";
+            }
+        }
+        if (Delta != 0 && Delta != 1) {
+            os << (CanonicalLength() > 0 ? " . " : "") << "D ^ " << Delta;
+        } else if (Delta == 1) {
+            os << (CanonicalLength() > 0 ? " . " : "") << "D";
         }
     }
 
@@ -901,39 +936,39 @@ template <class F> class Braid {
         }
     }
 
-    void Debug(IndentedOStream &ios) const {
-        ios << "{   ";
-        ios.Indent(4);
-        ios << "Parameter:";
-        ios.Indent(4);
-        ios << EndLine();
-        ios << Parameter;
-        ios.Indent(-4);
-        ios << EndLine();
-        ios << "Delta:";
-        ios.Indent(4);
-        ios << EndLine();
-        ios << Delta;
-        ios.Indent(-4);
-        ios << EndLine();
-        ios << "FactorList:";
-        ios.Indent(4);
-        ios << EndLine();
-        ios << "[   ";
-        ios.Indent(4);
+    void Debug(IndentedOStream &os = ind_cout) const {
+        os << "{   ";
+        os.Indent(4);
+        os << "Parameter:";
+        os.Indent(4);
+        os << EndLine();
+        os << Parameter;
+        os.Indent(-4);
+        os << EndLine();
+        os << "Delta:";
+        os.Indent(4);
+        os << EndLine();
+        os << Delta;
+        os.Indent(-4);
+        os << EndLine();
+        os << "FactorList:";
+        os.Indent(4);
+        os << EndLine();
+        os << "[   ";
+        os.Indent(4);
         ConstFactorItr it_end = FactorList.end();
         it_end--;
         for (ConstFactorItr it = FactorList.begin(); it != FactorList.end();
              it++) {
-            (*it).Debug(ios);
+            (*it).Debug(os);
             if (it != it_end) {
-                ios << "," << EndLine();
+                os << "," << EndLine();
             }
         }
-        ios.Indent(-4);
-        ios << EndLine() << "]";
-        ios.Indent(-8);
-        ios << EndLine() << "}";
+        os.Indent(-4);
+        os << EndLine() << "]";
+        os.Indent(-8);
+        os << EndLine() << "}";
     }
 
     std::size_t Hash() const {
@@ -955,7 +990,7 @@ template <class F> class Braid {
      * `W =
      * (\s | \t)*` be the language of whitespaces, and `Z = -? ([1 - 9] [0 -
      * 9]* | 0)` be the language of integers, accepted strings are those
-     * represented by regular expression `(W | .)* ((D W ^ W Z | -? W L) (W
+     * represented by regular expression `(W | .)* (((D | L) (W ^ W Z)?) (W
      * | .)*)*`
      *
      * @param str The string to convert from.
@@ -976,9 +1011,8 @@ template <class F> class Braid {
         // `\.` a dot and `\^` a chevron (`.` and `^` are special characters
         // for `std::regex`).
         std::regex ignore{"[\\s\\.\\t]*"};
-        std::regex delta_power{"D[\\s\\t]*\\^[\\s\\t]*(" + number_regex + ")"};
-        std::regex delta{"D"};
-        std::regex minus{"-[\\s\\t]*"};
+        std::regex power{"[\\s\\t]*\\^[\\s\\t]*(" + number_regex + ")"};
+        std::regex inverse{"![\\s\\t]*"};
 
         Braid b = *this;
         b.Identity();
@@ -992,29 +1026,26 @@ template <class F> class Braid {
         pos += match[0].length();
 
         while (pos != str.length()) {
-            if (std::regex_search(str.begin() + pos, str.end(), match,
-                                  delta_power,
+            sint16 pow;
+
+            fact.OfString(str, pos);
+
+            if (std::regex_search(str.begin() + pos, str.end(), match, power,
                                   std::regex_constants::match_continuous)) {
                 pos += match[0].length();
-                fact.Delta();
-                for (sint16 _ = 0; _ < std::stoi(match[1]); _++) {
+                pow = std::stoi(match[1]);
+            } else {
+                pow = 1;
+            }
+            if (pow >= 0) {
+                for (sint16 _ = 0; _ < pow; _++) {
                     b.RightProduct(fact);
                 }
-            } else if (std::regex_search(
-                           str.begin() + pos, str.end(), match, delta,
-                           std::regex_constants::match_continuous)) {
-                pos += match[0].length();
-                fact.Delta();
-                b.RightProduct(fact);
-            } else if (std::regex_search(
-                           str.begin() + pos, str.end(), match, minus,
-                           std::regex_constants::match_continuous)) {
-                pos += match[0].length();
-                fact.OfString(str, pos);
-                b.RightDivide(fact);
             } else {
-                fact.OfString(str, pos);
-                b.RightProduct(fact);
+                pow = -pow;
+                for (sint16 _ = 0; _ < pow; _++) {
+                    b.RightDivide(fact);
+                }
             }
             std::regex_search(str.begin() + pos, str.end(), match, ignore,
                               std::regex_constants::match_continuous);

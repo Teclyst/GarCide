@@ -34,6 +34,8 @@ class Underlying {
   public:
     typedef sint16 ParameterType;
 
+    static ParameterType parameter_of_string(const std::string &str);
+
     /**
      * @brief Get the `PresentationParameter`.
      *
@@ -199,7 +201,8 @@ bool preserves_circles(const ArtinBraid &b);
 /**
  * @brief Computes the Thurston type of a braid whose USS was already computed.
  *
- * Computes the Thurston type of braid `b`, using its USS `uss`, in the case where we have access to it.
+ * Computes the Thurston type of braid `b`, using its USS `uss`, in the case
+ * where we have access to it.
  *
  * This was directly copied (mutatis mutandis) from Juan Gonzalez-Meneses' code.
  *
@@ -207,7 +210,8 @@ bool preserves_circles(const ArtinBraid &b);
  * @param uss `b`'s USS.
  * @return `b`'s Thurston type.
  */
-ThurstonType thurston_type(const ArtinBraid &b, const ultra_summit::UltraSummitSet<ArtinBraid> &uss);
+ThurstonType thurston_type(const ArtinBraid &b,
+                           const ultra_summit::UltraSummitSet<ArtinBraid> &uss);
 
 /**
  * @brief Computes the Thurston type of a braid.

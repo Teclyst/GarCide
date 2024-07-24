@@ -5,12 +5,12 @@
 
 #include "artin_braid.h"
 // #include "band_braid.h"
-#include "braiding.h"
 #include "cbraid.h"
 // #include "dual_complex_reflection.h"
 // #include "standard_complex_reflection.h"
 #include "garsidesc.h"
 #include "garsideuss.h"
+#include "braiding.h"
 // #include "octaedral_braid.h"
 
 int Index = 8;
@@ -91,9 +91,7 @@ int RandomSeed = 0;
 // }
 
 int main() {
-    std::string str = std::string(
-        "1 2 1 3 2 1 4 5 4 6 5 4 3 2 1 7 6 5 4 3 2 1 . 1 2 1 3 2 1 4 3 2 1 5 4 "
-        "3 2 6 5 4 3 2 7 6 5 4 3 2 1 . 3 4 3 5 4 3 . 4 5 4 3 6 5");
+    std::string str = std::string("1 2 3 2 7 6 5 4 3 2 1 3 4 3 5 4 3 4 5 4 3 6 5");
 
     // cgarside::ComplexDualBraid b(cgarside::ComplexDualBraidParameter(E,
     // Index)); cgarside::ComplexStandardBraid
@@ -102,6 +100,10 @@ int main() {
     // f(cgarside::ComplexStandardBraidParameter(Index, E));
     // cgarside::ComplexStandardBraidFactor
     // g(cgarside::ComplexStandardBraidParameter(Index, E));
+
+    braiding::print_header();
+    braiding::print_options();
+
 
     cgarside::artin::ArtinBraid b(Index);
     cgarside::artin::ArtinBraid b_rcf(Index);
@@ -112,6 +114,12 @@ int main() {
 
     try {
         b.OfString(str);
+    } catch (cgarside::InvalidStringError inval) {
+        std::cout << inval.error_source << std::endl;
+    }
+
+    try {
+        braiding::prompt_braid(b);
     } catch (cgarside::InvalidStringError inval) {
         std::cout << inval.error_source << std::endl;
     }

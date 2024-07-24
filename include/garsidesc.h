@@ -37,7 +37,7 @@ std::vector<Braid<F>> Trajectory(Braid<F> b, Braid<F> &c, sint16 &d) {
     b2.Sliding();
     d--;
     while (b2 != b) {
-        c2.RightProduct(PreferredPrefix(b2));
+        c2.RightProduct(b2.PreferredPrefix());
         b2.Sliding();
         d--;
     }
@@ -264,16 +264,14 @@ template <class B> struct SCSConstIterator {
 };
 
 // A SCS is stored as both an union of (disjoint) circuits, and a set.
-// The set is actually a map: for each key it stores the circuit it belongs to (as
-// an index referring to circuits). Both are built concurrently; the set part is
-// used to speed up membership tests. Up to names, this is exactly the same data
-// structure as `USS::UltraSummitSet`.
+// The set is actually a map: for each key it stores the circuit it belongs to
+// (as an index referring to circuits). Both are built concurrently; the set
+// part is used to speed up membership tests. Up to names, this is exactly the
+// same data structure as `USS::UltraSummitSet`.
 template <class B> class SlidingCircuitSet {
-  private:
+  public:
     std::vector<std::vector<B>> circuits;
     std::unordered_map<B, sint16> set;
-
-  public:
     using ConstIterator = SCSConstIterator<B>;
 
     inline ConstIterator begin() const { return ConstIterator(set.begin()); }
@@ -323,7 +321,7 @@ template <class B> class SlidingCircuitSet {
                 os << sizes[i]
                    << (i == int(circuits.size()) - 1     ? "."
                        : (i == int(circuits.size()) - 2) ? " and "
-                                                       : ", ");
+                                                         : ", ");
             }
         } else {
             os << "There is only one cicuit.";
@@ -350,8 +348,9 @@ template <class B> class SlidingCircuitSet {
             for (sint16 j = 0; j < int(circuits[i].size()); j++) {
                 os << j << ":";
                 for (sint16 _ = 0;
-                     _ < 4 * indent - 1 -
-                             int(std::to_string(circuits[i].size() - 1).length());
+                     _ <
+                     4 * indent - 1 -
+                         int(std::to_string(circuits[i].size() - 1).length());
                      _++) {
                     os << " ";
                 }
@@ -534,7 +533,7 @@ SlidingCircuitSet<Braid<F>> SCS(const Braid<F> &b, std::vector<F> &mins,
 template <class F>
 Braid<F> TreePath(const Braid<F> &b, const SlidingCircuitSet<Braid<F>> &scs,
                   const std::vector<F> &mins, const std::vector<sint16> &prev) {
-    Braid<F> c = Braid(b.GetParameter());
+    Braid<F> c = Braid<F>(b.GetParameter());
 
     if (b.CanonicalLength() == 0) {
         return c;
@@ -542,14 +541,14 @@ Braid<F> TreePath(const Braid<F> &b, const SlidingCircuitSet<Braid<F>> &scs,
 
     sint16 current = scs.circuit(b);
 
-    for (typename std::list<Braid<F>>::iterator itb =
+    for (typename std::vector<Braid<F>>::const_iterator itb =
              scs.circuits[current].begin();
          *itb != b; itb++) {
         c.RightProduct((*itb).PreferredPrefix());
     }
 
     while (current != 0) {
-        c.LeftMultiply(mins[current]);
+        c.LeftProduct(mins[current]);
         current = prev[current];
     }
 

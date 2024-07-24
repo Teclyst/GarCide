@@ -4,6 +4,34 @@ namespace cgarside {
 
 namespace artin {
 
+Underlying::ParameterType Underlying::parameter_of_string(const std::string &str) {
+    std::smatch match;
+
+    if (std::regex_match(str, match,
+                          std::regex{"[\\s\\t]*(" + number_regex + ")[\\s\\t]*"},
+                          std::regex_constants::match_continuous)) {
+        sint16 i;
+        try {
+            i = std::stoi(match[1]);
+        } catch (std::out_of_range const &) {
+            throw InvalidStringError("Number of strands is too big!\n" +
+                                     match.str(1) + "could not be converted to a C++ integer.");
+        }
+        if (((2 <= i) && (i <= MaxBraidIndex))) {
+            return i;
+        } else if (2 > i) {
+            throw InvalidStringError("Number of strands should be at least 2!");
+        } else {
+            throw InvalidStringError("Number of strands is too big!\n" +
+                                     match.str(1) + " is strictly greater than " +
+                                     std::to_string(MaxBraidIndex) + ".");
+        }
+    } else {
+        throw InvalidStringError(
+            std::string("Could not extract an integer from \"str\"!"));
+    }
+};
+
 void Underlying::MeetSub(const sint16 *a, const sint16 *b, sint16 *r, sint16 s,
                          sint16 t) {
     thread_local sint16 u[MaxBraidIndex], v[MaxBraidIndex], w[MaxBraidIndex];
@@ -53,7 +81,14 @@ void Underlying::OfString(const std::string &str, size_t &pos) {
     if (std::regex_search(str.begin() + pos, str.end(), match,
                           std::regex{"(" + number_regex + ")"},
                           std::regex_constants::match_continuous)) {
-        sint16 i = std::stoi(match[1]);
+        sint16 i;
+        try {
+            i = std::stoi(match[1]);
+        } catch (std::out_of_range const &) {
+            throw InvalidStringError("Invalid index for Artin generator!\n" +
+                                     match.str(1) + " is not in [1, " +
+                                     std::to_string(n) + "[.");
+        }
         pos += match[0].length();
         if ((i >= 1) && (i < n)) {
             Identity();
@@ -61,13 +96,17 @@ void Underlying::OfString(const std::string &str, size_t &pos) {
             PermutationTable[i + 1] = i;
         } else {
             throw InvalidStringError("Invalid index for Artin generator!\n" +
-                                     std::to_string(i) + " is not in [1, " +
+                                     match.str(1) + " is not in [1, " +
                                      std::to_string(n) + "[.");
         }
+    } else if (std::regex_search(str.begin() + pos, str.end(), match,
+                                 std::regex{"D"},
+                                 std::regex_constants::match_continuous)) {
+        Delta();
     } else {
         throw InvalidStringError(
-            std::string("Could not extract a factor from \"" + str.substr(pos) +
-                        "\"!\nA factor should match regex [1 - 9] [0 - 9]*."));
+            std::string("Could not extract a factor from\n\"" + str.substr(pos) +
+                        "\"!\nA factor should match regex ['1' - '9'] ['0' - '9']* | 'D'."));
     }
 };
 
@@ -355,7 +394,9 @@ bool preserves_circles(const ArtinBraid &b) {
         return false;
 }
 
-ThurstonType thurston_type(const ArtinBraid &b, const ultra_summit::UltraSummitSet<ArtinBraid> &uss) {
+ThurstonType
+thurston_type(const ArtinBraid &b,
+              const ultra_summit::UltraSummitSet<ArtinBraid> &uss) {
     sint16 n = b.GetParameter();
 
     ArtinBraid pow = b;
@@ -385,9 +426,8 @@ ThurstonType thurston_type(const ArtinBraid &b) {
 
 template <>
 IndentedOStream &IndentedOStream::operator<< <artin::ThurstonType>(
-    const artin::ThurstonType &type){
-    switch (type)
-    {
+    const artin::ThurstonType &type) {
+    switch (type) {
     case artin::ThurstonType::Periodic:
         os << "periodic";
         break;

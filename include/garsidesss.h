@@ -204,7 +204,7 @@ template <class B> class SuperSummitSet {
            << (card() > 1 ? "s " : " ") << "in the Ultra Summit set."
            << EndLine(2);
 
-        os << "─────" << EndLine() << " set " << EndLine() << "─────";
+        os << "─────" << EndLine() << " Set " << EndLine() << "─────";
 
         os.Indent(4);
 
