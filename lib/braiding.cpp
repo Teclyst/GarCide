@@ -46,19 +46,33 @@ void explain_braid_input() {
 #if BRAIDING_CLASS == 0
 
     ind_cout
-        << "For Artin braids, factors must match regexp Z | 'D'." << EndLine()
-        << "An integer i represents classic Artin generator σ_i." << EndLine()
+        << "For Artin braids, F = Z | 'D'." << EndLine()
+        << "The integer i represents classic Artin generator σ_i." << EndLine()
         << "It must therefore be in [1, n[, with n the number of strands."
         << EndLine() << "'D' represents the half-twist, Δ." << EndLine(1)
         << "For example, with n = 3," << EndLine()
-        << " \"1 ^ 1 2 1\",  \"2. 1 . 2\" or \"D\" Are three ways to enter Δ."
+        << " \"1 ^ 1 2 1\",  \"2. 1 . 2\" or \"D\" are three ways to enter Δ."
         << EndLine(1);
+
+#endif
+
+#if BRAIDING_CLASS == 1
+
+    ind_cout << "For Artin dual braids, F = '('Z ','? Z')' | 'D'." << EndLine()
+             << "The couple of integers (i, j) (with an optional comma)"
+             << EndLine() << "stands for Birman-Ko-Lee's a_(i,j)." << EndLine()
+             << "i and j must therefore be distinct and in [1, n]," << EndLine()
+             << "where n is the number of strands." << EndLine()
+             << "'D' represents Birman-Ko-Lee's cyclic permutation δ."
+             << EndLine(1) << "For example, with n = 3," << EndLine()
+             << " \"(3 2) (1, 2)\" or \"D\" are two ways to enter δ."
+             << EndLine(1);
 
 #endif
 }
 
 void explain_braid_parameter_input() {
-#if BRAIDING_CLASS == 0
+#if (BRAIDING_CLASS == 0 || BRAIDING_CLASS == 1)
 
     ind_cout << "Enter the number of strands." << EndLine(1);
 
@@ -146,7 +160,10 @@ void print_header(IndentedOStream &os) {
 
 void print_options(IndentedOStream &os) {
 #if BRAIDING_CLASS == 0
-    os << "Using Artin Braids." << EndLine(1);
+    os << "Using Garside's original structure for Artin Braids." << EndLine(1);
+#endif
+#if BRAIDING_CLASS == 1
+    os << "Using Birman-Ko-Lee's dual Garside structure for Artin Braids." << EndLine(1);
 #endif
     os << "l:      Left Normal Form        r:      Right Normal Form       "
        << EndLine(1)
@@ -278,7 +295,7 @@ void right_lcm_case() {
 void sss_case() {
     Braid b(prompt_braid_parameter());
     prompt_braid(b);
-    ind_cout << EndLine() << "Its supper summit set is:" << EndLine(1);
+    ind_cout << EndLine();
     cgarside::super_summit::SSS(b).print(ind_cout);
     ind_cout << EndLine(1);
 }
@@ -286,17 +303,15 @@ void sss_case() {
 void uss_case() {
     Braid b(prompt_braid_parameter());
     prompt_braid(b);
-    ind_cout << EndLine() << "Its ultra summit set is:" << EndLine(1);
+    ind_cout << EndLine();
     cgarside::ultra_summit::USS(b).print(ind_cout);
-    ind_cout << EndLine(1);
 }
 
 void scs_case() {
     Braid b(prompt_braid_parameter());
     prompt_braid(b);
-    ind_cout << EndLine() << "Its sliding circuit set is:" << EndLine(1);
+    ind_cout << EndLine();
     cgarside::sliding_circuit::SCS(b).print(ind_cout);
-    ind_cout << EndLine(1);
 }
 
 void conjugacy_case() {
@@ -318,7 +333,8 @@ void conjugacy_case() {
 void thurston_type_case() {
     Braid b(prompt_braid_parameter());
     prompt_braid(b);
-    ind_cout << EndLine() << "Its Thurston type is " << cgarside::artin::thurston_type(b) << "." << EndLine(1);
+    ind_cout << EndLine() << "Its Thurston type is "
+             << cgarside::artin::thurston_type(b) << "." << EndLine(1);
 }
 
 #endif

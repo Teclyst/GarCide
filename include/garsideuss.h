@@ -328,7 +328,7 @@ template <class B> class UltraSummitSet {
 
         std::vector<size_t> sizes = orbit_sizes();
         os << "There " << (card() > 1 ? "are " : "is ") << card() << " element"
-           << (card() > 1 ? "s " : " ") << "in the Ultra Summit set."
+           << (card() > 1 ? "s " : " ") << "in the ultra summit set."
            << EndLine(1);
 
         if (number_of_orbits() > 1) {

@@ -4,18 +4,20 @@ namespace cgarside {
 
 namespace artin {
 
-Underlying::ParameterType Underlying::parameter_of_string(const std::string &str) {
+Underlying::ParameterType
+Underlying::parameter_of_string(const std::string &str) {
     std::smatch match;
 
     if (std::regex_match(str, match,
-                          std::regex{"[\\s\\t]*(" + number_regex + ")[\\s\\t]*"},
-                          std::regex_constants::match_continuous)) {
+                         std::regex{"[\\s\\t]*(" + number_regex + ")[\\s\\t]*"},
+                         std::regex_constants::match_continuous)) {
         sint16 i;
         try {
             i = std::stoi(match[1]);
         } catch (std::out_of_range const &) {
             throw InvalidStringError("Number of strands is too big!\n" +
-                                     match.str(1) + "could not be converted to a C++ integer.");
+                                     match.str(1) +
+                                     " can not be converted to a C++ integer.");
         }
         if (((2 <= i) && (i <= MaxBraidIndex))) {
             return i;
@@ -23,7 +25,8 @@ Underlying::ParameterType Underlying::parameter_of_string(const std::string &str
             throw InvalidStringError("Number of strands should be at least 2!");
         } else {
             throw InvalidStringError("Number of strands is too big!\n" +
-                                     match.str(1) + " is strictly greater than " +
+                                     match.str(1) +
+                                     " is strictly greater than " +
                                      std::to_string(MaxBraidIndex) + ".");
         }
     } else {
@@ -85,9 +88,8 @@ void Underlying::OfString(const std::string &str, size_t &pos) {
         try {
             i = std::stoi(match[1]);
         } catch (std::out_of_range const &) {
-            throw InvalidStringError("Invalid index for Artin generator!\n" +
-                                     match.str(1) + " is not in [1, " +
-                                     std::to_string(n) + "[.");
+            throw InvalidStringError("Index is too big!\n" + match.str(1) +
+                                     " can not be converted to a C++ integer.");
         }
         pos += match[0].length();
         if ((i >= 1) && (i < n)) {
@@ -104,9 +106,10 @@ void Underlying::OfString(const std::string &str, size_t &pos) {
                                  std::regex_constants::match_continuous)) {
         Delta();
     } else {
-        throw InvalidStringError(
-            std::string("Could not extract a factor from\n\"" + str.substr(pos) +
-                        "\"!\nA factor should match regex ['1' - '9'] ['0' - '9']* | 'D'."));
+        throw InvalidStringError(std::string(
+            "Could not extract a factor from\n\"" + str.substr(pos) +
+            "\"!\nA factor should match regex Z | 'D',\nwhere Z matches "
+            "integers."));
     }
 };
 

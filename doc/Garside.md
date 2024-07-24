@@ -1,3 +1,5 @@
+NOT UP TO DATE!
+
 As of 2024, code was factored so as to allow easy implementations of other Garside structures, taking advantage of the fact that algorithms for Garside Groups are generic, once a very limited subset of operations are define. 
 
 ## How the code is currently structured

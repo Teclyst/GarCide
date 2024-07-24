@@ -310,7 +310,7 @@ template <class B> class SlidingCircuitSet {
 
         std::vector<size_t> sizes = circuit_sizes();
         os << "There " << (card() > 1 ? "are " : "is ") << card() << " element"
-           << (card() > 1 ? "s " : " ") << "in the Sliding Circuit set."
+           << (card() > 1 ? "s " : " ") << "in the sliding circuit set."
            << EndLine(1);
 
         if (number_of_circuits() > 1) {

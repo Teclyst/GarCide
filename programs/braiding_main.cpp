@@ -18,6 +18,7 @@ int main() {
             try {
                 lcf_case();
             } catch (InterruptAskedFor) {
+                ind_cout << EndLine();
             }
             break;
         }
@@ -25,6 +26,7 @@ int main() {
             try {
                 rcf_case();
             } catch (InterruptAskedFor) {
+                ind_cout << EndLine();
             }
             break;
         }
@@ -32,6 +34,7 @@ int main() {
             try {
                 left_gcd_case();
             } catch (InterruptAskedFor) {
+                ind_cout << EndLine();
             }
             break;
         }
@@ -39,6 +42,7 @@ int main() {
             try {
                 right_gcd_case();
             } catch (InterruptAskedFor) {
+                ind_cout << EndLine();
             }
             break;
         }
@@ -46,6 +50,7 @@ int main() {
             try {
                 left_lcm_case();
             } catch (InterruptAskedFor) {
+                ind_cout << EndLine();
             }
             break;
         }
@@ -53,6 +58,7 @@ int main() {
             try {
                 right_lcm_case();
             } catch (InterruptAskedFor) {
+                ind_cout << EndLine();
             }
             break;
         }
@@ -60,6 +66,7 @@ int main() {
             try {
                 sss_case();
             } catch (InterruptAskedFor) {
+                ind_cout << EndLine();
             }
             break;
         }
@@ -67,6 +74,7 @@ int main() {
             try {
                 uss_case();
             } catch (InterruptAskedFor) {
+                ind_cout << EndLine();
             }
             break;
         }
@@ -74,6 +82,7 @@ int main() {
             try {
                 scs_case();
             } catch (InterruptAskedFor) {
+                ind_cout << EndLine();
             }
             break;
         }
@@ -81,6 +90,7 @@ int main() {
             try {
                 conjugacy_case();
             } catch (InterruptAskedFor) {
+                ind_cout << EndLine();
             }
             break;
         }
@@ -89,6 +99,7 @@ int main() {
             try {
                 thurston_type_case();
             } catch (InterruptAskedFor) {
+                ind_cout << EndLine();
             }
             break;
         }

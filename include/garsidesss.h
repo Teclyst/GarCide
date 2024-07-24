@@ -201,7 +201,7 @@ template <class B> class SuperSummitSet {
     void print(IndentedOStream &os) const {
 
         os << "There " << (card() > 1 ? "are " : "is ") << card() << " element"
-           << (card() > 1 ? "s " : " ") << "in the Ultra Summit set."
+           << (card() > 1 ? "s " : " ") << "in the super summit set."
            << EndLine(2);
 
         os << "─────" << EndLine() << " Set " << EndLine() << "─────";

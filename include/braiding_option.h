@@ -23,8 +23,8 @@ using Braid = cgarside::artin::ArtinBraid;
 
 #if BRAIDING_CLASS == 1
 
-using Factor = cgarside::BandBraidFactor;
-using Braid = cgarside::BandBraid;
+using Factor = cgarside::band::BandBraidFactor;
+using Braid = cgarside::band::BandBraid;
 
 #endif
 

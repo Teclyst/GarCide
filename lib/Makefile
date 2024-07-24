@@ -38,42 +38,37 @@ LIBCBRAID_CLEAN = $(LIBCBRAID_OBJ_CLEAN) $(LIBCBRAID_A)
 # Use make USE_ALL=1 to compile everything.
 
 # Compile artin_braid.cpp.
-ifeq ($(USE_ART), 1)
+ifeq ($(USE_ARTIN), 1)
 	LIBCBRAID_SRC += artin_braid.cpp
 endif
 
 # Compile band_braid.cpp.
 # Band braids need CLN to be randomizable.
-ifeq ($(USE_BAN), 1)
+ifeq ($(USE_BAND), 1)
 	LIBCBRAID_SRC += band_braid.cpp
-	CPPFLAGS_CLN = -DUSE_CLN
-	LIBFLAGS_CLN = -lcln
 endif
 
-# Compile artin_braid.cpp.
-ifeq ($(USE_OCT), 1)
+ifeq ($(USE_OCTAEDRAL), 1)
 	LIBCBRAID_SRC += octahedral_braid.cpp
 endif
-ifeq ($(USE_DIH), 1)
+ifeq ($(USE_DIHEDRAL), 1)
 	LIBCBRAID_SRC += dihedral_braid.cpp
 endif
-ifeq ($(USE_DCO), 1)
+ifeq ($(USE_DUAL_COMPLEX), 1)
 	LIBCBRAID_SRC += dual_complex_reflection.cpp
 endif
-ifeq ($(USE_SCO), 1)
+ifeq ($(USE_STANDARD_COMPLEX), 1)
 	LIBCBRAID_SRC += standard_complex_reflection.cpp
 endif
 ifeq ($(USE_ALL),1)
 	LIBCBRAID_SRC += $(LIBCBRAID_GROUP_SRC)
-	CPPFLAGS_CLN = -DUSE_CLN
-	LIBFLAGS_CLN = -lcln
 endif
 # Use make USE_CLN=1 to compile with the CLN library.
 ifeq ($(USE_CLN),1)
 	CPPFLAGS_CLN = -DUSE_CLN
 	LIBFLAGS_CLN = -lcln
 endif
-CPPFLAGS = -Wall -O -I$(LIBCBRAID_INCLUDEDIR) $(CPPFLAGS_CLN)
+CPPFLAGS = -Wall -O -I$(LIBCBRAID_INCLUDEDIR) $(CPPFLAGS_CLN) -DBRAIDING_CLASS=$(BRAIDING_CLASS)
 LIBFLAGS = -lcbraid -lm $(LIBFLAGS_CLN)
 ARFLAGS = rv
 CXX = g++
