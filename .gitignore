@@ -1,4 +1,3 @@
-lib/.depends
 .depends
 braiding
 speedtest
@@ -8,3 +7,4 @@ test
 programs/*
 !programs/Makefile
 !programs/*.cpp
+.vscode/
