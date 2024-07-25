@@ -42,7 +42,7 @@ using std::list;
 using cgarside::EndLine;
 using cgarside::ind_cout;
 
-cgarside::artin::ArtinFactor OfCBraidFactor(const CBraid::ArtinFactor &f);
+cgarside::artin::Factor OfCBraidFactor(const CBraid::ArtinFactor &f);
 
 cgarside::artin::ArtinBraid OfCBraid(const CBraid::ArtinBraid &b);
 

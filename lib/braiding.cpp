@@ -47,26 +47,90 @@ void explain_braid_input() {
 
     ind_cout
         << "For Artin braids, F = Z | 'D'." << EndLine()
-        << "The integer i represents classic Artin generator σ_i." << EndLine()
+        << "The integer \"i\" represents classic Artin generator σ_i."
+        << EndLine()
         << "It must therefore be in [1, n[, with n the number of strands."
-        << EndLine() << "'D' represents the half-twist, Δ." << EndLine(1)
+        << EndLine() << "\"D\" represents the half-twist, Δ." << EndLine(1)
         << "For example, with n = 3," << EndLine()
-        << " \"1 ^ 1 2 1\",  \"2. 1 . 2\" or \"D\" are three ways to enter Δ."
+        << "\"1 ^ 1 2 1\",  \"2. 1 . 2\" or \"D\" are three ways to enter Δ."
         << EndLine(1);
 
-#endif
+#elif BRAIDING_CLASS == 1
 
-#if BRAIDING_CLASS == 1
-
-    ind_cout << "For Artin dual braids, F = '('Z ','? Z')' | 'D'." << EndLine()
-             << "The couple of integers (i, j) (with an optional comma)"
+    ind_cout << "For Artin dual braids, F = '(' Z ','? Z ')' | 'D'."
+             << EndLine()
+             << "The couple of integers \"(i, j)\" (with an optional comma)"
              << EndLine() << "stands for Birman-Ko-Lee's a_(i,j)." << EndLine()
              << "i and j must therefore be distinct and in [1, n]," << EndLine()
              << "where n is the number of strands." << EndLine()
-             << "'D' represents Birman-Ko-Lee's cyclic permutation δ."
+             << "\"D\" represents Birman-Ko-Lee's cyclic permutation δ."
              << EndLine(1) << "For example, with n = 3," << EndLine()
-             << " \"(3 2) (1, 2)\" or \"D\" are two ways to enter δ."
+             << "\"(3 2) ^1 (1, 2)\" or \"D\" are two ways to enter δ."
              << EndLine(1);
+
+#elif BRAIDING_CLASS == 2
+
+    ind_cout << "For B-series dual braids, F = '(' Z ','? Z ')' | Z | 'D'."
+             << EndLine()
+             << "The couple of integers \"(i, j)\" (with an optional comma)"
+             << EndLine() << "stands for what Bessis calls a short generator."
+             << EndLine()
+             << "It behaves (in the Coxeter group) as a double transposition,"
+             << EndLine()
+             << "Swapping i and j, and i + n and j + n (indexes are mod 2n),"
+             << EndLine()
+             << "where n is the parameter such that we are working in A(B_n)."
+             << EndLine() << "The integer i stands for a long generator."
+             << EndLine()
+             << "In the Coxeter group, it is the transposition (i i + n)."
+             << EndLine()
+             << "\"D\" represents the Δ element for the Garside structure,"
+             << EndLine() << "which is a cyclic permutation." << EndLine(1)
+             << "For example, with n = 3," << EndLine()
+             << "\"(3 2) ^ 1 (1, 2) 1\" or \"D\" are two ways to enter Δ."
+             << EndLine(1);
+
+#elif BRAIDING_CLASS == 3
+
+    ind_cout
+        << "For I-series dual braids, F = ('s' '_'?)? Z | 'D'." << EndLine()
+        << "\"s_k\" (whith optional s_) represents the reflection that sends 1"
+        << EndLine() << "on ζ^k, where ζ = exp(i τ / n)." << EndLine()
+        << "\"D\" represents the rotation Δ." << EndLine(1)
+        << "For example, with n = 3," << EndLine()
+        << "\"s0 2\",  \"1 . s_0\" or \"D ^ 1\" are three ways to enter Δ."
+        << EndLine(1);
+
+#elif BRAIDING_CLASS == 4
+
+    ind_cout << "For the dual structure on B(e, e, n + 1)," << EndLine()
+             << "F = '(' Z ','? Z ')' | Z | 'D'." << EndLine()
+             << "The couple of integers \"(i, j)\" (with an optional comma)"
+             << EndLine()
+             << "stands for Bessis-Corran's symmetric generator a_i,j,"
+             << EndLine()
+             << "whence |i - j| must be at most n - 1 (taking indexes mod en)."
+             << EndLine()
+             << "The integer \"i\" stands for assymetric generator a_i."
+             << EndLine()
+             << "\"D\" represents the Δ element for the Garside structure."
+             << EndLine(1) << "For example, with n = 3, e = 3," << EndLine()
+             << "\"(10 9) ^ 1 (9, 8) 8\" or \"D\" are two ways to enter Δ."
+             << EndLine(1);
+
+#elif BRAIDING_CLASS == 5
+
+    ind_cout
+        << "For the semi-classic structure on B(e, e, n)," << EndLine()
+        << "F = 's' '_'? Z | 't' '_'? Z | 'D'." << EndLine()
+        << "\"s_i\" (optional underscore) stands for Corran-Picantin's s_i,"
+        << EndLine() << "so i must belong to [3, n]." << EndLine()
+        << "\"t_i\" (optional underscore) stands for Corran-Picantin's t_i."
+        << EndLine()
+        << "'D' represents the Δ element for the Garside structure."
+        << EndLine(1) << "For example, with n = 3, e = 3," << EndLine()
+        << " \"t1 ^ 1 t_0 s_3 t1 t0 s3\" or \"D\" are two ways to enter Δ."
+        << EndLine(1);
 
 #endif
 }
@@ -75,6 +139,24 @@ void explain_braid_parameter_input() {
 #if (BRAIDING_CLASS == 0 || BRAIDING_CLASS == 1)
 
     ind_cout << "Enter the number of strands." << EndLine(1);
+
+#elif (BRAIDING_CLASS == 2 || BRAIDING_CLASS == 3)
+
+    ind_cout << "Enter the group parameter (an integer)." << EndLine(1);
+
+#elif (BRAIDING_CLASS == 4)
+
+    ind_cout << "Enter a tuple '(' Z ','? Z ')' of integers." << EndLine()<<
+        "((e, n) for B(e, e, n + 1).)" << EndLine(1);
+
+#elif (BRAIDING_CLASS == 5)
+
+    ind_cout << "Enter a tuple '(' Z ','? Z ')' of integers." << EndLine() <<
+        "((e, n) for B(e, e, n).)" << EndLine(1);
+
+#else
+
+    ind_cout << "Enter the group parameter." << EndLine(1);
 
 #endif
 }
@@ -139,6 +221,7 @@ void print_header(IndentedOStream &os) {
        << "││││││││   See GNU General Public License in GPL.txt    ││││││││"
        << EndLine()
        << "├──────┴──┬──────────────────────────────────────────┬──┴──────┤"
+#if BRAIDING_CLASS == 0
        << EndLine()
        << "│││││││││││     _____________________ __________     │││││││││││"
        << EndLine()
@@ -153,6 +236,97 @@ void print_header(IndentedOStream &os) {
        << "│││││││││││     _/___/_____/_______/_________/__     │││││││││││"
        << EndLine()
        << "│││││││││││                                          │││││││││││"
+#elif BRAIDING_CLASS == 1
+       << EndLine()
+       << "│││││││││││               _ __________               │││││││││││"
+       << EndLine()
+       << "│││││││││││               _/_ ________               │││││││││││"
+       << EndLine()
+       << "│││││││││││               ___/_ ______               │││││││││││"
+       << EndLine()
+       << "│││││││││││               _____/_ ____               │││││││││││"
+       << EndLine()
+       << "│││││││││││               _______/_ __               │││││││││││"
+       << EndLine()
+       << "│││││││││││               _________/__               │││││││││││"
+       << EndLine()
+       << "│││││││││││                                          │││││││││││"
+#elif BRAIDING_CLASS == 2
+       << EndLine()
+       << "│││││││││││                 +------+                 │││││││││││"
+       << EndLine()
+       << "│││││││││││                / \\      \\                │││││││││││"
+       << EndLine()
+       << "│││││││││││               /   \\      \\               │││││││││││"
+       << EndLine()
+       << "│││││││││││              +     +------+              │││││││││││"
+       << EndLine()
+       << "│││││││││││               \\   /      /               │││││││││││"
+       << EndLine()
+       << "│││││││││││                \\ /      /                │││││││││││"
+       << EndLine()
+       << "│││││││││││                 +------+                 │││││││││││"
+#elif BRAIDING_CLASS == 3
+       << EndLine()
+       << "│││││││││││                 +------+                 │││││││││││"
+       << EndLine()
+       << "│││││││││││                /        \\                │││││││││││"
+       << EndLine()
+       << "│││││││││││               /          \\               │││││││││││"
+       << EndLine()
+       << "│││││││││││              +            +              │││││││││││"
+       << EndLine()
+       << "│││││││││││               \\          /               │││││││││││"
+       << EndLine()
+       << "│││││││││││                \\        /                │││││││││││"
+       << EndLine()
+       << "│││││││││││                 +------+                 │││││││││││"
+#elif BRAIDING_CLASS == 4
+       << EndLine()
+       << "│││││││││││                 <------>                 │││││││││││"
+       << EndLine()
+       << "│││││││││││                                          │││││││││││"
+       << EndLine()
+       << "│││││││││││                                          │││││││││││"
+       << EndLine()
+       << "│││││││││││              <-----∧      ∧              │││││││││││"
+       << EndLine()
+       << "│││││││││││               \\   /      /               │││││││││││"
+       << EndLine()
+       << "│││││││││││                \\ /      /                │││││││││││"
+       << EndLine()
+       << "│││││││││││                 ∨      ∨                 │││││││││││"
+#elif BRAIDING_CLASS == 5
+       << EndLine()
+       << "│││││││││││                _                         │││││││││││"
+       << EndLine()
+       << "│││││││││││              | j 0 0 0 0 |               │││││││││││"
+       << EndLine()
+       << "│││││││││││              | 0 j 0 0 0 |               │││││││││││"
+       << EndLine()
+       << "│││││││││││              | 0 0 j 0 0 |               │││││││││││"
+       << EndLine()
+       << "│││││││││││              | 0 0 0 j 0 |               │││││││││││"
+       << EndLine()
+       << "│││││││││││              | 0 0 0 0 j |               │││││││││││"
+       << EndLine()
+       << "│││││││││││                                          │││││││││││"
+#else
+       << EndLine()
+       << "│││││││││││                                          │││││││││││"
+       << EndLine()
+       << "│││││││││││                                          │││││││││││"
+       << EndLine()
+       << "│││││││││││                                          │││││││││││"
+       << EndLine()
+       << "│││││││││││                                          │││││││││││"
+       << EndLine()
+       << "│││││││││││                                          │││││││││││"
+       << EndLine()
+       << "│││││││││││                                          │││││││││││"
+       << EndLine()
+       << "│││││││││││                                          │││││││││││"
+#endif
        << EndLine()
        << "└─────────┴──────────────────────────────────────────┴─────────┘"
        << EndLine(1);
@@ -160,10 +334,20 @@ void print_header(IndentedOStream &os) {
 
 void print_options(IndentedOStream &os) {
 #if BRAIDING_CLASS == 0
-    os << "Using Garside's original structure for Artin Braids." << EndLine(1);
-#endif
-#if BRAIDING_CLASS == 1
-    os << "Using Birman-Ko-Lee's dual Garside structure for Artin Braids." << EndLine(1);
+    os << "Using Garside's classic structure for Artin braids." << EndLine(1);
+#elif BRAIDING_CLASS == 1
+    os << "Using Birman-Ko-Lee's dual structure for Artin braid groups."
+       << EndLine(1);
+#elif BRAIDING_CLASS == 2
+    os << "Using the dual structure for B-series Artin groups." << EndLine(1);
+#elif BRAIDING_CLASS == 3
+    os << "Using the dual structure for I-series Artin groups." << EndLine(1);
+#elif BRAIDING_CLASS == 4
+    os << "Using Bessis-Corran's dual structure for B(e,e,n) complex"
+       << EndLine() << "reflection braid groups." << EndLine(1);
+#elif BRAIDING_CLASS == 5
+    os << "Using Corran-Picantin's semi-classic structure for B(e,e,n)"
+       << EndLine() << "complex reflection braid groups." << EndLine(1);
 #endif
     os << "l:      Left Normal Form        r:      Right Normal Form       "
        << EndLine(1)
@@ -224,6 +408,9 @@ Option prompt_option() {
         } else if (std::regex_match(str,
                                     std::regex{"[\\s\\t]*[qQ][\\s\\t]*"})) {
             return Option::Quit;
+        } else if (std::regex_match(str,
+                                    std::regex{"[\\s\\t]*[hH][\\s\\t]*"})) {
+            return Option::Header;
 #if BRAIDING_CLASS == 0
         } else if (std::regex_match(str,
                                     std::regex{"[\\s\\t]*[tT][\\s\\t]*"})) {

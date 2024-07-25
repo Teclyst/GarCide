@@ -2,41 +2,39 @@
 
 namespace cgarside {
 
+namespace dual_complex {
+
 // We represent B(e, e, n + 1).
-struct ComplexDualBraidParameter {
+struct Parameter {
     sint16 e;
     sint16 n;
 
-    ComplexDualBraidParameter(sint16 e, sint16 n) : e(e), n(n) {}
+    Parameter(sint16 e, sint16 n) : e(e), n(n) {}
 
-    inline bool Compare(const ComplexDualBraidParameter &p) const {
+    inline bool Compare(const Parameter &p) const {
         return ((e == p.e) && (n == p.n));
     }
 
-    inline bool operator==(const ComplexDualBraidParameter &p) const {
+    inline bool operator==(const Parameter &p) const {
         return Compare(p);
     }
 
-    inline bool operator!=(const ComplexDualBraidParameter &p) const {
+    inline bool operator!=(const Parameter &p) const {
         return !Compare(p);
     }
 
     void Print(IndentedOStream &os) const;
 };
 
-template <>
-IndentedOStream &IndentedOStream::operator<< <ComplexDualBraidParameter>(
-    const ComplexDualBraidParameter &p);
-
 // You may use Braids with parameter e, n such that e * n <= `MaxE` *
 // `MaxN`. Note that `MaxE` IS NOT a strict bound; rather, it is the
 // greatest possible e such that it is possible to have braids with parameter n
 // as great as `MaxN`. To understand what we are doing, it is advised
 // to look at `arXiv:math/0403400v2` (Bessis, Corran, 2004).
-class ComplexDualBraidUnderlying {
+class Underlying {
 
   protected:
-    ComplexDualBraidParameter PresentationParameter;
+    Parameter PresentationParameter;
 
     // The induced permutation, where 0 is the 0-th coordinates, and then the
     // next n coordinates represent the powers w ^ -i (with i ranging between 0
@@ -80,14 +78,16 @@ class ComplexDualBraidUnderlying {
      */
     static const sint16 MaxE = 1;
 
-    typedef ComplexDualBraidParameter ParameterType;
+    typedef Parameter ParameterType;
+
+    static ParameterType parameter_of_string(const std::string &str);
 
     ParameterType GetParameter() const;
 
     sint16 LatticeHeight() const;
 
     // Constructor
-    ComplexDualBraidUnderlying(ComplexDualBraidParameter p);
+    Underlying(Parameter p);
 
     void OfString(const std::string &str, size_t &pos);
 
@@ -106,58 +106,55 @@ class ComplexDualBraidUnderlying {
     // Set to delta.
     void Delta();
 
-    ComplexDualBraidUnderlying
-    LeftMeet(const ComplexDualBraidUnderlying &b) const;
+    Underlying
+    LeftMeet(const Underlying &b) const;
 
-    inline ComplexDualBraidUnderlying
-    RightMeet(const ComplexDualBraidUnderlying &b) const {
+    inline Underlying
+    RightMeet(const Underlying &b) const {
         return LeftMeet(b);
     };
 
     // Equality check.
     // We check whether the underlying permutation table are (pointwise) equal.
-    bool Compare(const ComplexDualBraidUnderlying &b) const;
+    bool Compare(const Underlying &b) const;
 
     // Computes the factor corresponding to the inverse permutation.
     // Used to simplify complement operation.
-    ComplexDualBraidUnderlying Inverse() const;
+    Underlying Inverse() const;
 
     // Product under the hypothesis that it is still simple.
-    ComplexDualBraidUnderlying
-    Product(const ComplexDualBraidUnderlying &b) const;
+    Underlying
+    Product(const Underlying &b) const;
 
     // Under the assumption a <= b, a.LeftComplement(b) computes
     // The factor c such that ac = b.
-    ComplexDualBraidUnderlying
-    LeftComplement(const ComplexDualBraidUnderlying &b) const;
+    Underlying
+    LeftComplement(const Underlying &b) const;
 
-    ComplexDualBraidUnderlying
-    RightComplement(const ComplexDualBraidUnderlying &b) const;
+    Underlying
+    RightComplement(const Underlying &b) const;
 
     // Generate a random factor.
     void Randomize();
 
     // List of atoms.
-    std::vector<ComplexDualBraidUnderlying> Atoms() const;
+    std::vector<Underlying> Atoms() const;
 
     // Conjugate by Delta^k.
     // Used to speed up calculations compared to the default implementation.
     void DeltaConjugate(sint16 k);
 
-    std::size_t Hash() const {
-        std::size_t h = 0;
-        for (sint16 i = 1; i <= GetParameter().n; i++) {
-            h = h * 31 + PermutationTable[i];
-        }
-        for (sint16 i = 1; i <= GetParameter().n; i++) {
-            h = h * 31 + CoefficientTable[i];
-        }
-        return h;
-    }
+    std::size_t Hash() const;
 };
 
-typedef Factor<ComplexDualBraidUnderlying> ComplexDualBraidFactor;
+typedef FactorTemplate<Underlying> Factor;
 
-typedef Braid<ComplexDualBraidFactor> ComplexDualBraid;
+typedef BraidTemplate<Factor> Braid;
 
 } // namespace CGarside
+
+template <>
+IndentedOStream &IndentedOStream::operator<< <dual_complex::Parameter>(
+    const dual_complex::Parameter &p);
+
+}

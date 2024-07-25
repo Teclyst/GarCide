@@ -108,7 +108,7 @@ int main() {
     cgarside::artin::ArtinBraid b(Index);
     cgarside::artin::ArtinBraid b_rcf(Index);
 
-    cgarside::artin::ArtinFactor f(Index);
+    cgarside::artin::Factor f(Index);
 
     std::vector<cgarside::artin::ArtinBraid> t, t_rcf;
 

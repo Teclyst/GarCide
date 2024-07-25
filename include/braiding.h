@@ -36,6 +36,7 @@ enum class Option {
     USS,
     SCS,
     Conjugacy,
+    Header,
     Quit,
 #if BRAIDING_CLASS == 0
     ThurstonType,

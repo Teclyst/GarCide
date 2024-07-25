@@ -4,31 +4,68 @@
 
 namespace cgarside {
 
-void ComplexDualBraidParameter::Print(IndentedOStream &os) const {
+namespace dual_complex {
+
+void Parameter::Print(IndentedOStream &os) const {
     os << "(e: " << e << ", n: " << n << ")";
 }
 
-template <>
-IndentedOStream &IndentedOStream::operator<< <ComplexDualBraidParameter>(
-    const ComplexDualBraidParameter &p) {
-    p.Print(*this);
-    return *this;
-};
+Parameter Underlying::GetParameter() const { return PresentationParameter; }
 
-ComplexDualBraidParameter ComplexDualBraidUnderlying::GetParameter() const {
-    return PresentationParameter;
+Underlying::ParameterType
+Underlying::parameter_of_string(const std::string &str) {
+    std::smatch match;
+
+    if (std::regex_match(str, match,
+                         std::regex{"[\\s\\t]*\\([\\s\\t]*(" + number_regex +
+                                    ")[\\s\\t]*,?[\\s\\t]*(" + number_regex +
+                                    ")[\\s\\t]*\\)[\\s\\t]*"},
+                         std::regex_constants::match_continuous)) {
+        sint16 e, n;
+        try {
+            e = std::stoi(match[1]);
+        } catch (std::out_of_range const &) {
+            throw InvalidStringError("Parameter e is too big!\n" +
+                                     match.str(1) +
+                                     " can not be converted to a C++ integer.");
+        }
+        try {
+            n = std::stoi(match[2]);
+        } catch (std::out_of_range const &) {
+            throw InvalidStringError("Parameter n is too big!\n" +
+                                     match.str(2) +
+                                     " can not be converted to a C++ integer.");
+        }
+        if ((2 <= e) && (2 <= n) && (n <= MaxN) && (e * n <= MaxE * MaxN)) {
+            return Parameter(e, n);
+        } else if (2 > e) {
+            throw InvalidStringError("e should be at least 2!");
+            } else if (2 > n) {
+            throw InvalidStringError("n should be at least 2!");
+        } else if (n > MaxN) {
+            throw InvalidStringError("n is too big!\n" +
+                                     match.str(1) +
+                                     " is strictly greater than " +
+                                     std::to_string(MaxN) + ".");
+        } else {
+            throw InvalidStringError("e * n is too big!\n" +
+                                     match.str(1) + " * " + match.str(2) + " = " + std::to_string(e * n) +
+                                     " is strictly greater than " +
+                                     std::to_string(MaxN * MaxE) + ".");
+        }
+    } else {
+        throw InvalidStringError(
+            std::string("Could not extract an integer from \"str\"!"));
+    }
 }
 
-sint16 ComplexDualBraidUnderlying::LatticeHeight() const {
-    return GetParameter().n + 1;
-}
+sint16 Underlying::LatticeHeight() const { return GetParameter().n + 1; }
 
-ComplexDualBraidUnderlying::ComplexDualBraidUnderlying(
-    ComplexDualBraidParameter p)
+Underlying::Underlying(Parameter p)
     : PresentationParameter(p), PermutationTable(p.n + 1),
       CoefficientTable(p.n + 1) {}
 
-void ComplexDualBraidUnderlying::Debug(IndentedOStream &os) const {
+void Underlying::Debug(IndentedOStream &os) const {
     os << "{   ";
     os.Indent(4);
     os << "PresentationParameter:";
@@ -61,7 +98,7 @@ void ComplexDualBraidUnderlying::Debug(IndentedOStream &os) const {
     os << "}";
 }
 
-void ComplexDualBraidUnderlying::Print(IndentedOStream &os) const {
+void Underlying::Print(IndentedOStream &os) const {
     sint16 n = GetParameter().n, e = GetParameter().e;
     std::vector<bool> seen(n + 1, false);
     std::vector<sint16> curr_cycle;
@@ -170,10 +207,14 @@ void ComplexDualBraidUnderlying::Print(IndentedOStream &os) const {
     }
 }
 
-void ComplexDualBraidUnderlying::OfString(const std::string &str, size_t &pos) {
+void Underlying::OfString(const std::string &str, size_t &pos) {
     sint16 n = GetParameter().n, e = GetParameter().e;
     std::smatch match;
     if (std::regex_search(str.begin() + pos, str.end(), match,
+                                 std::regex{"D"},
+                                 std::regex_constants::match_continuous)) {
+        Delta();
+    } else if (std::regex_search(str.begin() + pos, str.end(), match,
                           std::regex{"\\([\\s\\t]*(" + number_regex +
                                      ")[\\s\\t]*,?[\\s\\t]*(" + number_regex +
                                      ")[\\s\\t]*\\)"},
@@ -232,12 +273,12 @@ void ComplexDualBraidUnderlying::OfString(const std::string &str, size_t &pos) {
     } else {
         throw InvalidStringError(
             "Could not extract a factor from \"" + str.substr(pos) +
-            "\"!\nA factor should match regex \\([1 - 9] [0 - 9]*,? [1 - 9] [0 "
-            "- 9]*\\) | [1 - 9] [0 - 9]* (ignoring whitespaces).");
+            "\"!\nA factor should match regex '(' Z ','? Z ')' | Z | "
+            "'D',\nwhere Z matches integers, and ignoring whitespaces.");
     }
 }
 
-void ComplexDualBraidUnderlying::AssignPartition(sint16 *x) const {
+void Underlying::AssignPartition(sint16 *x) const {
     sint16 n = GetParameter().n, e = GetParameter().e;
     std::vector<sint16> curr_cycle;
     sint16 other_smallest, cycle_type, curr, c;
@@ -343,7 +384,7 @@ void ComplexDualBraidUnderlying::AssignPartition(sint16 *x) const {
 }
 
 // We assume e > 1.
-void ComplexDualBraidUnderlying::OfPartition(const sint16 *x) {
+void Underlying::OfPartition(const sint16 *x) {
     thread_local sint16 z[MaxN + 1];
     sint16 min_cycle_0 = 0, max_cycle_0 = 0;
     sint16 n = GetParameter().n, e = GetParameter().e, r;
@@ -468,10 +509,9 @@ void ComplexDualBraidUnderlying::OfPartition(const sint16 *x) {
     }
 }
 
-ComplexDualBraidUnderlying ComplexDualBraidUnderlying::LeftMeet(
-    const ComplexDualBraidUnderlying &b) const {
-    thread_local sint16 x[MaxE * MaxN + 1],
-        y[MaxE * MaxN + 1], z[MaxE * MaxN + 1];
+Underlying Underlying::LeftMeet(const Underlying &b) const {
+    thread_local sint16 x[MaxE * MaxN + 1], y[MaxE * MaxN + 1],
+        z[MaxE * MaxN + 1];
 
     AssignPartition(x);
     b.AssignPartition(y);
@@ -486,21 +526,21 @@ ComplexDualBraidUnderlying ComplexDualBraidUnderlying::LeftMeet(
         z[i] = P[x[i]][y[i]];
     }
 
-    ComplexDualBraidUnderlying c = ComplexDualBraidUnderlying(*this);
+    Underlying c = Underlying(*this);
 
     c.OfPartition(z);
 
     return c;
 }
 
-void ComplexDualBraidUnderlying::Identity() {
+void Underlying::Identity() {
     for (sint16 i = 0; i <= GetParameter().n; i++) {
         PermutationTable[i] = i;
         CoefficientTable[i] = 0;
     }
 }
 
-void ComplexDualBraidUnderlying::Delta() {
+void Underlying::Delta() {
     sint16 i, n = GetParameter().n;
     for (i = 1; i <= n; i++) {
         PermutationTable[i] = i + 1;
@@ -512,8 +552,7 @@ void ComplexDualBraidUnderlying::Delta() {
     CoefficientTable[n] = 1;
 }
 
-bool ComplexDualBraidUnderlying::Compare(
-    const ComplexDualBraidUnderlying &b) const {
+bool Underlying::Compare(const Underlying &b) const {
     sint16 i;
     for (i = 0; i <= GetParameter().n; i++) {
         if ((PermutationTable[i] != b.PermutationTable[i]) ||
@@ -524,8 +563,8 @@ bool ComplexDualBraidUnderlying::Compare(
     return true;
 };
 
-ComplexDualBraidUnderlying ComplexDualBraidUnderlying::Inverse() const {
-    ComplexDualBraidUnderlying f = ComplexDualBraidUnderlying(GetParameter());
+Underlying Underlying::Inverse() const {
+    Underlying f = Underlying(GetParameter());
     sint16 i, n = GetParameter().n, e = GetParameter().e;
     for (i = 0; i <= n; i++) {
         if ((PermutationTable[i] > n) || (PermutationTable[i] < 0)) {
@@ -539,9 +578,8 @@ ComplexDualBraidUnderlying ComplexDualBraidUnderlying::Inverse() const {
     return f;
 };
 
-ComplexDualBraidUnderlying
-ComplexDualBraidUnderlying::Product(const ComplexDualBraidUnderlying &b) const {
-    ComplexDualBraidUnderlying f = ComplexDualBraidUnderlying(GetParameter());
+Underlying Underlying::Product(const Underlying &b) const {
+    Underlying f = Underlying(GetParameter());
     sint16 i, n = GetParameter().n, e = GetParameter().e;
     for (i = 0; i <= n; i++) {
         f.PermutationTable[i] = b.PermutationTable[PermutationTable[i]];
@@ -551,22 +589,19 @@ ComplexDualBraidUnderlying::Product(const ComplexDualBraidUnderlying &b) const {
     return f;
 };
 
-ComplexDualBraidUnderlying ComplexDualBraidUnderlying::LeftComplement(
-    const ComplexDualBraidUnderlying &b) const {
+Underlying Underlying::LeftComplement(const Underlying &b) const {
     return b.Product(Inverse());
 };
 
-ComplexDualBraidUnderlying ComplexDualBraidUnderlying::RightComplement(
-    const ComplexDualBraidUnderlying &b) const {
+Underlying Underlying::RightComplement(const Underlying &b) const {
     return Inverse().Product(b);
 };
 
-void ComplexDualBraidUnderlying::DeltaConjugate(sint16 k) {
+void Underlying::DeltaConjugate(sint16 k) {
     sint16 i, n = GetParameter().n, e = GetParameter().e;
     sint16 q = Quot(k, n), r = Rem(k, n), q_e = Rem(q, e);
 
-    ComplexDualBraidUnderlying delta_k =
-        ComplexDualBraidUnderlying(GetParameter());
+    Underlying delta_k = Underlying(GetParameter());
 
     delta_k.PermutationTable[0] = 0;
     delta_k.CoefficientTable[0] = Rem(-k, e);
@@ -584,13 +619,12 @@ void ComplexDualBraidUnderlying::DeltaConjugate(sint16 k) {
     *this = delta_k.Inverse().Product((*this).Product(delta_k));
 }
 
-void ComplexDualBraidUnderlying::Randomize() { throw NonRandomizable(); }
+void Underlying::Randomize() { throw NonRandomizable(); }
 
-std::vector<ComplexDualBraidUnderlying>
-ComplexDualBraidUnderlying::Atoms() const {
-    ComplexDualBraidParameter p = GetParameter();
-    std::vector<ComplexDualBraidUnderlying> atoms;
-    ComplexDualBraidUnderlying atom = ComplexDualBraidUnderlying(p);
+std::vector<Underlying> Underlying::Atoms() const {
+    Parameter p = GetParameter();
+    std::vector<Underlying> atoms;
+    Underlying atom = Underlying(p);
     sint16 n = p.n, e = p.e;
     for (sint16 i = 1; i <= n; i++) {
         for (sint16 j = i + 1; j <= n; j++) {
@@ -629,4 +663,24 @@ ComplexDualBraidUnderlying::Atoms() const {
     return atoms;
 }
 
-} // namespace CGarside
+std::size_t Underlying::Hash() const {
+    std::size_t h = 0;
+    for (sint16 i = 1; i <= GetParameter().n; i++) {
+        h = h * 31 + PermutationTable[i];
+    }
+    for (sint16 i = 1; i <= GetParameter().n; i++) {
+        h = h * 31 + CoefficientTable[i];
+    }
+    return h;
+}
+
+} // namespace dual_complex
+
+template <>
+IndentedOStream &
+    IndentedOStream::operator<< <dual_complex::Parameter>(const dual_complex::Parameter &p) {
+    p.Print(*this);
+    return *this;
+};
+
+} // namespace cgarside

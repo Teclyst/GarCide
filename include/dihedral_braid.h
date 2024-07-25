@@ -1,8 +1,8 @@
 #include "cgarside.h"
 
-namespace cgarside {
+namespace cgarside::dihedral {
 
-class IDualBraidUnderlying {
+class Underlying {
 
   protected:
     sint16 PresentationParameter;
@@ -16,12 +16,14 @@ class IDualBraidUnderlying {
   public:
     typedef sint16 ParameterType;
 
+    static ParameterType parameter_of_string(const std::string &str);
+
     ParameterType GetParameter() const;
 
     sint16 LatticeHeight() const;
 
     // Constructor
-    IDualBraidUnderlying(sint16 n);
+    Underlying(sint16 n);
 
     void OfString(const std::string &str, size_t &pos);
 
@@ -38,32 +40,32 @@ class IDualBraidUnderlying {
     // Set to delta.
     void Delta();
 
-    IDualBraidUnderlying LeftMeet(const IDualBraidUnderlying &b) const;
+    Underlying LeftMeet(const Underlying &b) const;
 
-    IDualBraidUnderlying RightMeet(const IDualBraidUnderlying &b) const;
+    Underlying RightMeet(const Underlying &b) const;
 
     // Equality check.
     // We check wether the underlying permutation table are (pointwise) equal.
-    bool Compare(const IDualBraidUnderlying &b) const;
+    bool Compare(const Underlying &b) const;
 
     // Product under the hypothesis that it is still simple.
-    IDualBraidUnderlying Product(const IDualBraidUnderlying &b) const;
+    Underlying Product(const Underlying &b) const;
 
     // Under the assumption a <= b, a.LeftComplement(b) computes
     // The factor c such that ac = b.
-    IDualBraidUnderlying LeftComplement(const IDualBraidUnderlying &b) const;
+    Underlying LeftComplement(const Underlying &b) const;
 
-    IDualBraidUnderlying RightComplement(const IDualBraidUnderlying &b) const;
+    Underlying RightComplement(const Underlying &b) const;
 
     // Generate a random factor.
     void Randomize();
 
     // List of atoms.
-    std::vector<IDualBraidUnderlying> Atoms() const;
+    std::vector<Underlying> Atoms() const;
 
     // Conjugate by Delta^k.
     // Used to speed up calculations compared to default implementation.
-    IDualBraidUnderlying DeltaConjugate(sint16 k) const;
+    Underlying DeltaConjugate(sint16 k) const;
 
     inline std::size_t Hash() const {
         std::size_t h = Point;
@@ -71,8 +73,8 @@ class IDualBraidUnderlying {
     }
 };
 
-typedef Factor<IDualBraidUnderlying> IDualBraidFactor;
+typedef FactorTemplate<Underlying> Factor;
 
-typedef Braid<IDualBraidFactor> IDualBraid;
+typedef BraidTemplate<Factor> Braid;
 
-} // namespace CGarside
+} // namespace cgarside::dihedral

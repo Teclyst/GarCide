@@ -1,8 +1,8 @@
-#include "octaedral_braid.h"
+#include "octahedral_braid.h"
 #include <iostream>
 #include <string>
 
-namespace cgarside {
+namespace cgarside::octahedral {
 
 /**
  * @brief Maximum braid index.
@@ -17,16 +17,44 @@ namespace cgarside {
  */
 const sint16 MaxBraidIndex = 256;
 
-sint16 BDualBraidUnderlying::GetParameter() const {
-    return PresentationParameter;
-}
+Underlying::ParameterType
+Underlying::parameter_of_string(const std::string &str) {
+    std::smatch match;
 
-sint16 BDualBraidUnderlying::LatticeHeight() const { return GetParameter(); }
+    if (std::regex_match(str, match,
+                         std::regex{"[\\s\\t]*(" + number_regex + ")[\\s\\t]*"},
+                         std::regex_constants::match_continuous)) {
+        sint16 i;
+        try {
+            i = std::stoi(match[1]);
+        } catch (std::out_of_range const &) {
+            throw InvalidStringError("Parameter is too big!\n" + match.str(1) +
+                                     " can not be converted to a C++ integer.");
+        }
+        if (((1 <= i) && (i <= MaxBraidIndex))) {
+            return i;
+        } else if (1 > i) {
+            throw InvalidStringError("Parameter should be at least 1!");
+        } else {
+            throw InvalidStringError("Parameter strands is too big!\n" +
+                                     match.str(1) +
+                                     " is strictly greater than " +
+                                     std::to_string(MaxBraidIndex) + ".");
+        }
+    } else {
+        throw InvalidStringError(
+            std::string("Could not extract an integer from \"str\"!"));
+    }
+};
 
-BDualBraidUnderlying::BDualBraidUnderlying(sint16 n)
+sint16 Underlying::GetParameter() const { return PresentationParameter; }
+
+sint16 Underlying::LatticeHeight() const { return GetParameter(); }
+
+Underlying::Underlying(sint16 n)
     : PresentationParameter(n), PermutationTable(2 * n + 1) {}
 
-void BDualBraidUnderlying::Print(IndentedOStream &os) const {
+void Underlying::Print(IndentedOStream &os) const {
     // Recall that a band braid is represented by decreasing cycles.
     sint16 i, j, n = GetParameter();
     std::vector<sint16> curr_cycle;
@@ -52,7 +80,8 @@ void BDualBraidUnderlying::Print(IndentedOStream &os) const {
                 is_first = false;
             }
             for (sint16 l = int(curr_cycle.size()) - 1; l >= 1; --l) {
-                os << "(" << curr_cycle[l] << ", " << curr_cycle[l - 1] << ")" << ((l == 1) ? "" : " ");
+                os << "(" << curr_cycle[l] << ", " << curr_cycle[l - 1] << ")"
+                   << ((l == 1) ? "" : " ");
             }
             // Long cycle.
             if (j > n) {
@@ -62,7 +91,7 @@ void BDualBraidUnderlying::Print(IndentedOStream &os) const {
     }
 }
 
-void BDualBraidUnderlying::Debug(IndentedOStream &os) const {
+void Underlying::Debug(IndentedOStream &os) const {
     os << "{   ";
     os.Indent(4);
     os << "PresentationParameter:";
@@ -84,16 +113,31 @@ void BDualBraidUnderlying::Debug(IndentedOStream &os) const {
     os << "}";
 }
 
-void BDualBraidUnderlying::OfString(const std::string &str, size_t &pos) {
+void Underlying::OfString(const std::string &str, size_t &pos) {
     sint16 n = GetParameter();
     std::smatch match;
-    if (std::regex_search(str.begin() + pos, str.end(), match,
-                          std::regex{"\\([\\s\\t]*(" + number_regex +
-                                     ")[\\s\\t]*,?[\\s\\t]*(" + number_regex +
-                                     ")[\\s\\t]*\\)"},
+    if (std::regex_search(str.begin() + pos, str.end(), match, std::regex{"D"},
                           std::regex_constants::match_continuous)) {
-        sint16 i = std::stoi(match[1]);
-        sint16 j = std::stoi(match[2]);
+        pos += match[0].length();
+        Delta();
+    } else if (std::regex_search(str.begin() + pos, str.end(), match,
+                                 std::regex{"\\([\\s\\t]*(" + number_regex +
+                                            ")[\\s\\t]*,?[\\s\\t]*(" +
+                                            number_regex + ")[\\s\\t]*\\)"},
+                                 std::regex_constants::match_continuous)) {
+        sint16 i, j;
+        try {
+            i = std::stoi(match[1]);
+        } catch (std::out_of_range const &) {
+            throw InvalidStringError("Index is too big!\n" + match.str(1) +
+                                     " can not be converted to a C++ integer.");
+        }
+        try {
+            j = std::stoi(match[2]);
+        } catch (std::out_of_range const &) {
+            throw InvalidStringError("Index is too big!\n" + match.str(2) +
+                                     " can not be converted to a C++ integer.");
+        }
         i = Rem(i - 1, 2 * n) + 1;
         j = Rem(j - 1, 2 * n) + 1;
         pos += match[0].length();
@@ -108,15 +152,19 @@ void BDualBraidUnderlying::OfString(const std::string &str, size_t &pos) {
         } else {
             throw InvalidStringError(
                 "Indexes for short generators should not be equal mod " +
-                std::to_string(n) + "!\n(" +
-                std::to_string(std::stoi(match[1])) + ", " +
-                std::to_string(std::stoi(match[2])) +
-                ") is not a valid factor.");
+                std::to_string(n) + "!\n(" + match.str(1) + ", " +
+                match.str(2) + ") is not a valid factor.");
         }
     } else if (std::regex_search(str.begin() + pos, str.end(), match,
                                  std::regex{"(" + number_regex + ")"},
                                  std::regex_constants::match_continuous)) {
-        sint16 i = std::stoi(match[1]);
+        sint16 i;
+        try {
+            i = std::stoi(match[1]);
+        } catch (std::out_of_range const &) {
+            throw InvalidStringError("Index is too big!\n" + match.str(1) +
+                                     " can not be converted to a C++ integer.");
+        }
         i = Rem(i - 1, 2 * n) + 1;
         pos += match[0].length();
         Identity();
@@ -125,12 +173,12 @@ void BDualBraidUnderlying::OfString(const std::string &str, size_t &pos) {
     } else {
         throw InvalidStringError(
             "Could not extract a factor from \"" + str.substr(pos) +
-            "\"!\nA factor should match regex \\([1 - 9] [0 - 9]*,? [1 - 9] [0 "
-            "- 9]*\\) | [1 - 9] [0 - 9]* (ignoring whitespaces).");
+            "\"!\nA factor should match regex '(' Z ','? Z ')' | Z | "
+            "'D',\nwhere Z matches integers, and ignoring whitespaces.");
     }
 }
 
-void BDualBraidUnderlying::AssignDCDT(sint16 *x) const {
+void Underlying::AssignDCDT(sint16 *x) const {
     for (sint16 i = 1; i <= 2 * GetParameter(); ++i)
         x[i] = 0;
     for (sint16 i = 1; i <= 2 * GetParameter(); ++i) {
@@ -141,7 +189,7 @@ void BDualBraidUnderlying::AssignDCDT(sint16 *x) const {
     }
 }
 
-void BDualBraidUnderlying::OfDCDT(const sint16 *x) {
+void Underlying::OfDCDT(const sint16 *x) {
     thread_local sint16 z[2 * MaxBraidIndex + 1];
 
     for (sint16 i = 1; i <= 2 * GetParameter(); ++i)
@@ -152,8 +200,7 @@ void BDualBraidUnderlying::OfDCDT(const sint16 *x) {
     }
 }
 
-BDualBraidUnderlying
-BDualBraidUnderlying::LeftMeet(const BDualBraidUnderlying &b) const {
+Underlying Underlying::LeftMeet(const Underlying &b) const {
     thread_local sint16 x[2 * MaxBraidIndex + 1], y[2 * MaxBraidIndex + 1],
         z[2 * MaxBraidIndex + 1];
 
@@ -170,25 +217,24 @@ BDualBraidUnderlying::LeftMeet(const BDualBraidUnderlying &b) const {
         z[i] = P[x[i]][y[i]];
     }
 
-    BDualBraidUnderlying c = BDualBraidUnderlying(*this);
+    Underlying c = Underlying(*this);
 
     c.OfDCDT(z);
 
     return c;
 }
 
-BDualBraidUnderlying
-BDualBraidUnderlying::RightMeet(const BDualBraidUnderlying &b) const {
+Underlying Underlying::RightMeet(const Underlying &b) const {
     return LeftMeet(b);
 }
 
-void BDualBraidUnderlying::Identity() {
+void Underlying::Identity() {
     for (sint16 i = 1; i <= 2 * GetParameter(); i++) {
         PermutationTable[i] = i;
     }
 }
 
-void BDualBraidUnderlying::Delta() {
+void Underlying::Delta() {
     sint16 i, n = GetParameter();
     for (i = 1; i < 2 * n; i++) {
         PermutationTable[i] = i + 1;
@@ -196,7 +242,7 @@ void BDualBraidUnderlying::Delta() {
     PermutationTable[2 * n] = 1;
 }
 
-bool BDualBraidUnderlying::Compare(const BDualBraidUnderlying &b) const {
+bool Underlying::Compare(const Underlying &b) const {
     sint16 i;
     for (i = 1; i <= GetParameter(); i++) {
         if (PermutationTable[i] != b.PermutationTable[i]) {
@@ -206,8 +252,8 @@ bool BDualBraidUnderlying::Compare(const BDualBraidUnderlying &b) const {
     return true;
 };
 
-BDualBraidUnderlying BDualBraidUnderlying::Inverse() const {
-    BDualBraidUnderlying f = BDualBraidUnderlying(GetParameter());
+Underlying Underlying::Inverse() const {
+    Underlying f = Underlying(GetParameter());
     sint16 i;
     for (i = 1; i <= 2 * GetParameter(); i++) {
         f.PermutationTable[PermutationTable[i]] = i;
@@ -215,9 +261,8 @@ BDualBraidUnderlying BDualBraidUnderlying::Inverse() const {
     return f;
 };
 
-BDualBraidUnderlying
-BDualBraidUnderlying::Product(const BDualBraidUnderlying &b) const {
-    BDualBraidUnderlying f = BDualBraidUnderlying(GetParameter());
+Underlying Underlying::Product(const Underlying &b) const {
+    Underlying f = Underlying(GetParameter());
     sint16 i;
     for (i = 1; i <= 2 * GetParameter(); i++) {
         f.PermutationTable[i] = b.PermutationTable[PermutationTable[i]];
@@ -225,18 +270,16 @@ BDualBraidUnderlying::Product(const BDualBraidUnderlying &b) const {
     return f;
 };
 
-BDualBraidUnderlying
-BDualBraidUnderlying::LeftComplement(const BDualBraidUnderlying &b) const {
+Underlying Underlying::LeftComplement(const Underlying &b) const {
     return b.Product(Inverse());
 };
 
-BDualBraidUnderlying
-BDualBraidUnderlying::RightComplement(const BDualBraidUnderlying &b) const {
+Underlying Underlying::RightComplement(const Underlying &b) const {
     return Inverse().Product(b);
 };
 
-void BDualBraidUnderlying::DeltaConjugate(sint16 k) {
-    BDualBraidUnderlying under = *this;
+void Underlying::DeltaConjugate(sint16 k) {
+    Underlying under = *this;
     sint16 i, n = GetParameter();
 
     for (i = 1; i <= 2 * n; i++) {
@@ -246,14 +289,14 @@ void BDualBraidUnderlying::DeltaConjugate(sint16 k) {
     *this = under;
 }
 
-void BDualBraidUnderlying::Randomize() { throw NonRandomizable(); }
+void Underlying::Randomize() { throw NonRandomizable(); }
 
-std::vector<BDualBraidUnderlying> BDualBraidUnderlying::Atoms() const {
+std::vector<Underlying> Underlying::Atoms() const {
     sint16 n = GetParameter();
-    std::vector<BDualBraidUnderlying> atoms;
+    std::vector<Underlying> atoms;
     for (sint16 i = 1; i <= n; i++) {
         for (sint16 j = i + 1; j <= n; j++) {
-            BDualBraidUnderlying atom = BDualBraidUnderlying(n);
+            Underlying atom = Underlying(n);
             atom.Identity();
             atom.PermutationTable[i] = j;
             atom.PermutationTable[j] = i;
@@ -262,7 +305,7 @@ std::vector<BDualBraidUnderlying> BDualBraidUnderlying::Atoms() const {
             atoms.push_back(atom);
         }
         for (sint16 j = n + i + 1; j <= 2 * n; j++) {
-            BDualBraidUnderlying atom = BDualBraidUnderlying(n);
+            Underlying atom = Underlying(n);
             atom.Identity();
             atom.PermutationTable[i] = j;
             atom.PermutationTable[j] = i;
@@ -270,7 +313,7 @@ std::vector<BDualBraidUnderlying> BDualBraidUnderlying::Atoms() const {
             atom.PermutationTable[j - n] = i + n;
             atoms.push_back(atom);
         }
-        BDualBraidUnderlying atom = BDualBraidUnderlying(n);
+        Underlying atom = Underlying(n);
         atom.Identity();
         atom.PermutationTable[i] = n + i;
         atom.PermutationTable[n + i] = i;
@@ -279,4 +322,4 @@ std::vector<BDualBraidUnderlying> BDualBraidUnderlying::Atoms() const {
     return atoms;
 }
 
-} // namespace CGarside
+} // namespace cgarside::octahedral

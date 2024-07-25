@@ -1,8 +1,8 @@
 #include "cgarside.h"
 
-namespace cgarside {
+namespace cgarside::octahedral {
 
-class BDualBraidUnderlying {
+class Underlying {
 
   protected:
     sint16 PresentationParameter;
@@ -26,12 +26,14 @@ class BDualBraidUnderlying {
 
     typedef sint16 ParameterType;
 
+    static ParameterType parameter_of_string(const std::string &str);
+
     ParameterType GetParameter() const;
 
     sint16 LatticeHeight() const;
 
     // Constructor
-    BDualBraidUnderlying(sint16 n);
+    Underlying(sint16 n);
 
     /**
      * @brief Extraction from string.
@@ -73,32 +75,32 @@ class BDualBraidUnderlying {
     // Set to delta.
     void Delta();
 
-    BDualBraidUnderlying LeftMeet(const BDualBraidUnderlying &b) const;
+    Underlying LeftMeet(const Underlying &b) const;
 
-    BDualBraidUnderlying RightMeet(const BDualBraidUnderlying &b) const;
+    Underlying RightMeet(const Underlying &b) const;
 
     // Equality check.
     // We check wether the underlying permutation table are (pointwise) equal.
-    bool Compare(const BDualBraidUnderlying &b) const;
+    bool Compare(const Underlying &b) const;
 
     // Computes the factor corresponding to the inverse permutation.
     // Used to simplify complement operation.
-    BDualBraidUnderlying Inverse() const;
+    Underlying Inverse() const;
 
     // Product under the hypothesis that it is still simple.
-    BDualBraidUnderlying Product(const BDualBraidUnderlying &b) const;
+    Underlying Product(const Underlying &b) const;
 
     // Under the assumption a <= b, a.LeftComplement(b) computes
     // The factor c such that ac = b.
-    BDualBraidUnderlying LeftComplement(const BDualBraidUnderlying &b) const;
+    Underlying LeftComplement(const Underlying &b) const;
 
-    BDualBraidUnderlying RightComplement(const BDualBraidUnderlying &b) const;
+    Underlying RightComplement(const Underlying &b) const;
 
     // Generate a random factor.
     void Randomize();
 
     // List of atoms.
-    std::vector<BDualBraidUnderlying> Atoms() const;
+    std::vector<Underlying> Atoms() const;
 
     // Conjugate by Delta^k.
     // Used to speed up calculations compared to the default implementation.
@@ -113,8 +115,8 @@ class BDualBraidUnderlying {
     }
 };
 
-typedef Factor<BDualBraidUnderlying> BDualBraidFactor;
+typedef FactorTemplate<Underlying> Factor;
 
-typedef Braid<BDualBraidFactor> BDualBraid;
+typedef BraidTemplate<Factor> Braid;
 
 } // namespace CGarside

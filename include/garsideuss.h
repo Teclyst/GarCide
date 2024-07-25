@@ -8,9 +8,9 @@ struct NotInUSS {};
 
 namespace cgarside::ultra_summit {
 
-template <class F> std::vector<Braid<F>> Trajectory(Braid<F> b) {
-    std::vector<Braid<F>> t;
-    std::unordered_set<Braid<F>> t_set;
+template <class F> std::vector<BraidTemplate<F>> Trajectory(BraidTemplate<F> b) {
+    std::vector<BraidTemplate<F>> t;
+    std::unordered_set<BraidTemplate<F>> t_set;
 
     while (t_set.find(b) == t_set.end()) {
         t.push_back(b);
@@ -22,9 +22,9 @@ template <class F> std::vector<Braid<F>> Trajectory(Braid<F> b) {
 }
 
 template <class F>
-void Trajectory(Braid<F> b, Braid<F> b_rcf, std::vector<Braid<F>> &t,
-                std::vector<Braid<F>> &t_rcf) {
-    std::unordered_set<Braid<F>> t_set;
+void Trajectory(BraidTemplate<F> b, BraidTemplate<F> b_rcf, std::vector<BraidTemplate<F>> &t,
+                std::vector<BraidTemplate<F>> &t_rcf) {
+    std::unordered_set<BraidTemplate<F>> t_set;
     t.clear();
     t_rcf.clear();
 
@@ -38,20 +38,20 @@ void Trajectory(Braid<F> b, Braid<F> b_rcf, std::vector<Braid<F>> &t,
     }
 }
 
-template <class F> Braid<F> SendToUSS(const Braid<F> &b) {
-    Braid<F> b_uss = Trajectory(super_summit::SendToSSS(b)).back();
+template <class F> BraidTemplate<F> SendToUSS(const BraidTemplate<F> &b) {
+    BraidTemplate<F> b_uss = Trajectory(super_summit::SendToSSS(b)).back();
     b_uss.Cycling();
     return b_uss;
 }
 
-template <class F> Braid<F> SendToUSS(const Braid<F> &b, Braid<F> &c) {
-    Braid<F> b_sss = super_summit::SendToSSS(b, c);
-    std::list<Braid<F>> t = Trajectory(b_sss);
+template <class F> BraidTemplate<F> SendToUSS(const BraidTemplate<F> &b, BraidTemplate<F> &c) {
+    BraidTemplate<F> b_sss = super_summit::SendToSSS(b, c);
+    std::list<BraidTemplate<F>> t = Trajectory(b_sss);
 
-    Braid<F> b_uss = Braid(t.back());
+    BraidTemplate<F> b_uss = BraidTemplate(t.back());
     b_uss.cycling();
 
-    for (typename std::vector<Braid<F>>::iterator it = t.begin(); *it != b_uss;
+    for (typename std::vector<BraidTemplate<F>>::iterator it = t.begin(); *it != b_uss;
          it++) {
         c.RightProduct((*it).DeltaConjugate(b_sss.Delta));
     }
@@ -59,25 +59,25 @@ template <class F> Braid<F> SendToUSS(const Braid<F> &b, Braid<F> &c) {
     return b_uss;
 }
 
-template <class F> Braid<F> Transport(const Braid<F> &b, const F &f) {
-    Braid<F> b2 = b;
+template <class F> BraidTemplate<F> Transport(const BraidTemplate<F> &b, const F &f) {
+    BraidTemplate<F> b2 = b;
     b2.Conjugate(f);
-    Braid<F> b3 = (!Braid(b.First()) * f) * b2.First();
+    BraidTemplate<F> b3 = (!BraidTemplate(b.First()) * f) * b2.First();
     return b3.First();
 }
 
-template <class F> std::list<F> Return(const Braid<F> &b, const F &f) {
+template <class F> std::list<F> Return(const BraidTemplate<F> &b, const F &f) {
     std::list<F> ret;
     std::unordered_set<F> ret_set;
-    Braid<F> b1 = Braid(b), c2 = Braid<F>(b.GetParameter());
+    BraidTemplate<F> b1 = BraidTemplate(b), c2 = BraidTemplate<F>(b.GetParameter());
     sint16 i, n = 1;
     F f1 = f;
 
-    Braid<F> c1 = Braid(b1.First().DeltaConjugate(b1.Delta));
+    BraidTemplate<F> c1 = BraidTemplate(b1.First().DeltaConjugate(b1.Delta));
     b1.Cycling();
 
     while (b1 != b) {
-        c1.RightProduct(Braid(b1.First().DeltaConjugate(b1.Delta)));
+        c1.RightProduct(BraidTemplate(b1.First().DeltaConjugate(b1.Delta)));
         b1.Cycling();
         n++;
     }
@@ -93,7 +93,7 @@ template <class F> std::list<F> Return(const Braid<F> &b, const F &f) {
             b1.Cycling();
         }
 
-        Braid<F> b2 = (!c1) * f1 * c2;
+        BraidTemplate<F> b2 = (!c1) * f1 * c2;
 
         if (b2.Delta == 1) {
             f1.Delta();
@@ -112,11 +112,11 @@ template <class F> std::list<F> Return(const Braid<F> &b, const F &f) {
 }
 
 template <class F>
-F Pullback(const Braid<F> &b, const Braid<F> &b_rcf, const F &f) {
+F Pullback(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf, const F &f) {
     F f1 = b.First().DeltaConjugate(b.Delta + 1);
     F f2 = f.DeltaConjugate();
 
-    Braid<F> b2 = Braid(f1) * f2;
+    BraidTemplate<F> b2 = BraidTemplate(f1) * f2;
 
     F delta = F(b.GetParameter());
     delta.Delta();
@@ -136,7 +136,7 @@ F Pullback(const Braid<F> &b, const Braid<F> &b_rcf, const F &f) {
 
     F fi = f.DeltaConjugate(b.Delta);
 
-    for (typename Braid<F>::ConstFactorItr it = b.FactorList.begin();
+    for (typename BraidTemplate<F>::ConstFactorItr it = b.FactorList.begin();
          it != b.FactorList.end(); it++) {
         if (it != b.FactorList.begin()) {
             fi = fi.LeftJoin(*it) / *it;
@@ -146,13 +146,13 @@ F Pullback(const Braid<F> &b, const Braid<F> &b_rcf, const F &f) {
 }
 
 template <class F>
-F MainPullback(const Braid<F> &b, const Braid<F> &b_rcf, const F &f) {
+F MainPullback(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf, const F &f) {
     std::vector<F> ret;
     std::unordered_map<F, sint16> ret_set;
 
-    Braid<F> b2 = Braid(b);
+    BraidTemplate<F> b2 = BraidTemplate(b);
 
-    std::vector<Braid<F>> t, t_rcf;
+    std::vector<BraidTemplate<F>> t, t_rcf;
 
     Trajectory(b, b_rcf, t, t_rcf);
 
@@ -178,12 +178,12 @@ F MainPullback(const Braid<F> &b, const Braid<F> &b_rcf, const F &f) {
 }
 
 template <class F>
-F MinUSS(const Braid<F> &b, const Braid<F> &b_rcf, const F &f) {
+F MinUSS(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf, const F &f) {
     F f2 = super_summit::MinSSS(b, b_rcf, f);
 
     std::list<F> ret = Return(b, f2);
 
-    typename Braid<F>::FactorItr it;
+    typename BraidTemplate<F>::FactorItr it;
 
     for (it = ret.begin(); it != ret.end(); it++) {
         if ((f ^ *it) == f) {
@@ -205,7 +205,7 @@ F MinUSS(const Braid<F> &b, const Braid<F> &b_rcf, const F &f) {
 }
 
 template <class F>
-std::vector<F> MinUSS(const Braid<F> &b, const Braid<F> &b_rcf) {
+std::vector<F> MinUSS(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf) {
     F f = F(b.GetParameter());
     std::vector<F> atoms = f.Atoms();
     std::vector<F> factors = atoms;
@@ -447,13 +447,12 @@ template <class B> class UltraSummitSet {
     }
 };
 
-template <class F> UltraSummitSet<Braid<F>> USS(const Braid<F> &b) {
-    UltraSummitSet<Braid<F>> uss;
-    std::list<Braid<F>> queue, queue_rcf;
-    F f = F(b.GetParameter());
+template <class F> UltraSummitSet<BraidTemplate<F>> USS(const BraidTemplate<F> &b) {
+    UltraSummitSet<BraidTemplate<F>> uss;
+    std::list<BraidTemplate<F>> queue, queue_rcf;
 
-    Braid<F> b2 = SendToUSS(b);
-    Braid<F> b2_rcf = b2;
+    BraidTemplate<F> b2 = SendToUSS(b);
+    BraidTemplate<F> b2_rcf = b2;
     b2_rcf.MakeRCFFromLCF();
 
     uss.insert(Trajectory(b2));
@@ -506,18 +505,17 @@ template <class F> UltraSummitSet<Braid<F>> USS(const Braid<F> &b) {
 }
 
 template <class F>
-UltraSummitSet<Braid<F>> USS(const Braid<F> &b, std::vector<F> &mins,
+UltraSummitSet<BraidTemplate<F>> USS(const BraidTemplate<F> &b, std::vector<F> &mins,
                              std::vector<sint16> &prev) {
-    UltraSummitSet<Braid<F>> uss;
-    std::list<Braid<F>> queue, queue_rcf;
-    F f = F(b.GetParameter());
+    UltraSummitSet<BraidTemplate<F>> uss;
+    std::list<BraidTemplate<F>> queue, queue_rcf;
 
     sint16 current = 0;
     mins.clear();
     prev.clear();
 
-    Braid<F> b2 = SendToUSS(b);
-    Braid<F> b2_rcf = b2;
+    BraidTemplate<F> b2 = SendToUSS(b);
+    BraidTemplate<F> b2_rcf = b2;
     b2_rcf.MakeRCFFromLCF();
 
     uss.insert(Trajectory(b2));
@@ -553,9 +551,9 @@ UltraSummitSet<Braid<F>> USS(const Braid<F> &b, std::vector<F> &mins,
 }
 
 template <class F>
-Braid<F> TreePath(const Braid<F> &b, const UltraSummitSet<Braid<F>> &uss,
+BraidTemplate<F> TreePath(const BraidTemplate<F> &b, const UltraSummitSet<BraidTemplate<F>> &uss,
                   const std::vector<F> &mins, const std::vector<sint16> &prev) {
-    Braid<F> c = Braid(b.GetParameter());
+    BraidTemplate<F> c = BraidTemplate(b.GetParameter());
 
     if (b.CanonicalLength() == 0) {
         return c;
@@ -563,7 +561,7 @@ Braid<F> TreePath(const Braid<F> &b, const UltraSummitSet<Braid<F>> &uss,
 
     sint16 current = uss.orbit(b);
 
-    for (typename std::list<Braid<F>>::iterator itb =
+    for (typename std::list<BraidTemplate<F>>::iterator itb =
              uss.orbits[current].begin();
          *itb != b; itb++) {
         c.RightProduct((*itb).FactorList.front().DeltaConjugate(b.Delta));
@@ -578,11 +576,11 @@ Braid<F> TreePath(const Braid<F> &b, const UltraSummitSet<Braid<F>> &uss,
 }
 
 template <class F>
-bool AreConjugate(const Braid<F> &b1, const Braid<F> &b2, Braid<F> &c) {
+bool AreConjugate(const BraidTemplate<F> &b1, const BraidTemplate<F> &b2, BraidTemplate<F> &c) {
     sint16 n = b1.GetParameter();
-    Braid<F> c1 = Braid<F>(n), c2 = Braid<F>(n);
+    BraidTemplate<F> c1 = BraidTemplate<F>(n), c2 = BraidTemplate<F>(n);
 
-    Braid<F> bt1 = SendToUSS(b1, c1), bt2 = SendToUSS(b2, c2);
+    BraidTemplate<F> bt1 = SendToUSS(b1, c1), bt2 = SendToUSS(b2, c2);
 
     if (bt1.CanonicalLength() != bt2.CanonicalLength() ||
         bt1.Sup() != bt2.Sup()) {
@@ -597,7 +595,7 @@ bool AreConjugate(const Braid<F> &b1, const Braid<F> &b2, Braid<F> &c) {
     std::vector<F> mins;
     std::vector<sint16> prev;
 
-    UltraSummitSet<Braid<F>> uss = USS(bt1, mins, prev);
+    UltraSummitSet<BraidTemplate<F>> uss = USS(bt1, mins, prev);
 
     if (!uss.mem(bt2)) {
         return false;

@@ -104,6 +104,10 @@ int main() {
             break;
         }
 #endif
+        case Option::Header: {
+            print_header();
+            break;
+        }
         case Option::Quit: {
             ind_cout << "Leaving Braiding." << EndLine(1);
             return 0;

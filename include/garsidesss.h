@@ -7,12 +7,12 @@
 
 namespace cgarside::super_summit {
 
-template <class F> Braid<F> SendToSSS(const Braid<F> &b) {
+template <class F> BraidTemplate<F> SendToSSS(const BraidTemplate<F> &b) {
     typename F::ParameterType n = b.GetParameter();
 
     sint16 k = F(n).LatticeHeight();
 
-    Braid<F> b2 = b, b3 = b;
+    BraidTemplate<F> b2 = b, b3 = b;
 
     sint16 p = b.Delta;
     sint16 j = 0;
@@ -47,13 +47,13 @@ template <class F> Braid<F> SendToSSS(const Braid<F> &b) {
     return b3;
 }
 
-template <class F> Braid<F> SendToSSS(const Braid<F> &b, const Braid<F> &c) {
+template <class F> BraidTemplate<F> SendToSSS(const BraidTemplate<F> &b, const BraidTemplate<F> &c) {
 
     typename F::ParameterType n = b.GetParameter();
 
     sint16 k = F(n).LatticeHeight();
 
-    Braid<F> b2 = Braid(b), b3 = Braid(b), c2 = Braid(n);
+    BraidTemplate<F> b2 = b, b3 = b, c2 = BraidTemplate(n);
 
     c.Identity();
 
@@ -102,11 +102,11 @@ template <class F> Braid<F> SendToSSS(const Braid<F> &b, const Braid<F> &c) {
     return b3;
 }
 
-template <class F> F MinSS(const Braid<F> &b, const F &f) {
+template <class F> F MinSS(const BraidTemplate<F> &b, const F &f) {
     F r2 = f, r = F(f.GetParameter());
     r.Identity();
 
-    Braid<F> w = b;
+    BraidTemplate<F> w = b;
     w.Delta = 0;
 
     while (!r2.IsIdentity()) {
@@ -118,9 +118,9 @@ template <class F> F MinSS(const Braid<F> &b, const F &f) {
 }
 
 template <class F>
-F MinSSS(const Braid<F> &b, const Braid<F> &b_rcf, const F &f) {
+F MinSSS(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf, const F &f) {
     F r = MinSS(b, f);
-    Braid<F> b2 = b_rcf;
+    BraidTemplate<F> b2 = b_rcf;
     b2.ConjugateRCF(r);
 
     while (b2.CanonicalLength() > b.CanonicalLength()) {
@@ -132,7 +132,7 @@ F MinSSS(const Braid<F> &b, const Braid<F> &b_rcf, const F &f) {
 }
 
 template <class F>
-std::vector<F> MinSSS(const Braid<F> &b, const Braid<F> &b_rcf) {
+std::vector<F> MinSSS(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf) {
     F f = F(b.GetParameter());
     std::vector<F> atoms = f.Atoms();
     std::vector<F> factors = atoms;
@@ -257,13 +257,12 @@ template <class B> class SuperSummitSet {
     }
 };
 
-template <class F> SuperSummitSet<Braid<F>> SSS(const Braid<F> &b) {
-    std::list<Braid<F>> queue, queue_rcf;
-    SuperSummitSet<Braid<F>> sss;
-    F f = F(b.GetParameter());
+template <class F> SuperSummitSet<BraidTemplate<F>> SSS(const BraidTemplate<F> &b) {
+    std::list<BraidTemplate<F>> queue, queue_rcf;
+    SuperSummitSet<BraidTemplate<F>> sss;
 
-    Braid<F> b2 = SendToSSS(b);
-    Braid<F> b2_rcf = b2;
+    BraidTemplate<F> b2 = SendToSSS(b);
+    BraidTemplate<F> b2_rcf = b2;
     b2_rcf.MakeRCFFromLCF();
 
     queue.push_back(b2);
@@ -297,8 +296,8 @@ template <class F> SuperSummitSet<Braid<F>> SSS(const Braid<F> &b) {
 }
 
 template <class F>
-inline bool AreConjugate(const Braid<F> &u, const Braid<F> &v) {
-    std::unordered_set<Braid<F>> u_sss = SSS(u);
+inline bool AreConjugate(const BraidTemplate<F> &u, const BraidTemplate<F> &v) {
+    std::unordered_set<BraidTemplate<F>> u_sss = SSS(u);
     return u_sss.mem(SendToSSS(v));
 }
 

@@ -120,8 +120,8 @@ class Underlying {
     size_t Hash() const;
 };
 
-typedef Factor<Underlying> BandBraidFactor;
+typedef FactorTemplate<Underlying> Factor;
 
-typedef Braid<BandBraidFactor> BandBraid;
+typedef BraidTemplate<Factor> Braid;
 
 } // namespace cgarside::band

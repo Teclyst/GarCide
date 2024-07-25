@@ -2,43 +2,37 @@
 
 namespace cgarside {
 
+namespace standard_complex {
+
 // We represent B(e, e, n).
-struct ComplexStandardBraidParameter {
+struct Parameter {
     sint16 e;
     sint16 n;
 
-    ComplexStandardBraidParameter(sint16 e, sint16 n) : e(e), n(n) {}
+    Parameter(sint16 e, sint16 n) : e(e), n(n) {}
 
-    inline bool Compare(const ComplexStandardBraidParameter &p) const {
+    inline bool Compare(const Parameter &p) const {
         return ((e == p.e) && (n == p.n));
     }
 
-    inline bool operator==(const ComplexStandardBraidParameter &p) const {
-        return Compare(p);
-    }
+    inline bool operator==(const Parameter &p) const { return Compare(p); }
 
-    inline bool operator!=(const ComplexStandardBraidParameter &p) const {
-        return !Compare(p);
-    }
+    inline bool operator!=(const Parameter &p) const { return !Compare(p); }
 
     void Print(IndentedOStream &os) const;
 };
 
-template <>
-IndentedOStream &IndentedOStream::operator<< <ComplexStandardBraidParameter>(
-    const ComplexStandardBraidParameter &p);
-
-class ComplexStandardBraidUnderlying {
+class Underlying {
 
   protected:
-    ComplexStandardBraidParameter PresentationParameter;
+    Parameter PresentationParameter;
 
     /**
      * @brief The induced permutation.
      *
      * The table of the permutation induced by the matrix on indexes (from 0
-     * to `PresentationParameter.n` - 1), through its action by left multiplication on
-     * vectors.
+     * to `PresentationParameter.n` - 1), through its action by left
+     * multiplication on vectors.
      *
      * This permutation sends i to the j such that the i-th coordinate is the
      * j-th after multiplication. That is to say, j is the index such that the
@@ -50,19 +44,20 @@ class ComplexStandardBraidUnderlying {
 
     /**
      * @brief The multiplicating coefficients.
-     * 
+     *
      * Let e = `PresentationParameter.e` and n = `PresentationParameter.n`.
-     * 
+     *
      * The multiplicating coefficients. These are e-th roots of unity, with the
      * added condition of their product's being one. They are represented by
-     * integer ranging between 0 and e - 1, with i standing for zeta^i (with zeta an e-th root of unity).
-     * 
-     * `CoefficientTable` is the diagonal coefficient matrix, when considering G(e, e, n) as the semi-direct product Delta(e, e, n) ⋊ S(n).
+     * integer ranging between 0 and e - 1, with i standing for zeta^i (with
+     * zeta an e-th root of unity).
+     *
+     * `CoefficientTable` is the diagonal coefficient matrix, when considering
+     * G(e, e, n) as the semi-direct product Delta(e, e, n) ⋊ S(n).
      */
     std::vector<sint16> CoefficientTable;
 
   public:
-
     /**
      * @brief Maximum braid index.
      *
@@ -74,16 +69,18 @@ class ComplexStandardBraidUnderlying {
      * Having too big `thread_local` objects might cause some issue with thread
      * spawning.
      */
-    static const sint16 MaxBraidIndex = 256;
+    static const sint16 MaxN = 256;
 
-    typedef ComplexStandardBraidParameter ParameterType;
+    typedef Parameter ParameterType;
+
+    static ParameterType parameter_of_string(const std::string &str);
 
     ParameterType GetParameter() const;
 
     sint16 LatticeHeight() const;
 
     // Constructor
-    ComplexStandardBraidUnderlying(ComplexStandardBraidParameter p);
+    Underlying(Parameter p);
 
     void OfString(const std::string &str, size_t &pos);
 
@@ -192,39 +189,34 @@ class ComplexStandardBraidUnderlying {
         std::swap(dir_perm[0], dir_perm[1]);
     };
 
-    ComplexStandardBraidUnderlying
-    LeftMeet(const ComplexStandardBraidUnderlying &b) const;
+    Underlying LeftMeet(const Underlying &b) const;
 
-    inline ComplexStandardBraidUnderlying
-    RightMeet(const ComplexStandardBraidUnderlying &b) const {
+    inline Underlying RightMeet(const Underlying &b) const {
         return Inverse().LeftMeet(b.Inverse()).Inverse();
     };
 
     // Equality check.
     // We check whether the underlying permutation table are (pointwise) equal.
-    bool Compare(const ComplexStandardBraidUnderlying &b) const;
+    bool Compare(const Underlying &b) const;
 
     // Computes the factor corresponding to the inverse permutation.
     // Used to simplify complement operation.
-    ComplexStandardBraidUnderlying Inverse() const;
+    Underlying Inverse() const;
 
     // Product under the hypothesis that it is still simple.
-    ComplexStandardBraidUnderlying
-    Product(const ComplexStandardBraidUnderlying &b) const;
+    Underlying Product(const Underlying &b) const;
 
     // Under the assumption a <= b, a.LeftComplement(b) computes
     // The factor c such that ac = b.
-    ComplexStandardBraidUnderlying
-    LeftComplement(const ComplexStandardBraidUnderlying &b) const;
+    Underlying LeftComplement(const Underlying &b) const;
 
-    ComplexStandardBraidUnderlying
-    RightComplement(const ComplexStandardBraidUnderlying &b) const;
+    Underlying RightComplement(const Underlying &b) const;
 
     // Generate a random factor.
     void Randomize();
 
     // List of atoms.
-    std::vector<ComplexStandardBraidUnderlying> Atoms() const;
+    std::vector<Underlying> Atoms() const;
 
     // Conjugate by Delta^k.
     // Used to speed up calculations compared to the default implementation.
@@ -242,8 +234,14 @@ class ComplexStandardBraidUnderlying {
     }
 };
 
-typedef Factor<ComplexStandardBraidUnderlying> ComplexStandardBraidFactor;
+typedef FactorTemplate<Underlying> Factor;
 
-typedef Braid<ComplexStandardBraidFactor> ComplexStandardBraid;
+typedef BraidTemplate<Factor> Braid;
 
-} // namespace CGarside
+} // namespace standard_complex
+
+template <>
+IndentedOStream &IndentedOStream::operator<< <standard_complex::Parameter>(
+    const standard_complex::Parameter &p);
+
+} // namespace cgarside

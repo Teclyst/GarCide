@@ -175,9 +175,9 @@ class Underlying {
                         sint16 t);
 };
 
-typedef Factor<Underlying> ArtinFactor;
+typedef FactorTemplate<Underlying> Factor;
 
-typedef Braid<ArtinFactor> ArtinBraid;
+typedef BraidTemplate<Factor> ArtinBraid;
 
 /**
  * @brief Enum for Thurston types.

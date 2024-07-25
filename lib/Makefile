@@ -25,7 +25,7 @@
 
 # File Names.
 LIBCBRAID_SRC = utility.cpp cbraid.cpp braiding.cpp
-LIBCBRAID_GROUP_SRC = artin_braid.cpp band_braid.cpp octaedral_braid.cpp dihedral_braid.cpp dual_complex_reflection.cpp standard_complex_reflection.cpp
+LIBCBRAID_GROUP_SRC = artin_braid.cpp band_braid.cpp octahedral_braid.cpp dihedral_braid.cpp dual_complex_reflection.cpp standard_complex_reflection.cpp
 LIBCBRAID_SRC_CLEAN = $(LIBCBRAID_SRC) $(LIBCBRAID_GROUP_SRC)
 LIBCBRAID_INCLUDEDIR = ../include
 LIBCBRAID_OBJ = $(LIBCBRAID_SRC:.cpp=.o)
@@ -48,7 +48,7 @@ ifeq ($(USE_BAND), 1)
 	LIBCBRAID_SRC += band_braid.cpp
 endif
 
-ifeq ($(USE_OCTAEDRAL), 1)
+ifeq ($(USE_OCTAHEDRAL), 1)
 	LIBCBRAID_SRC += octahedral_braid.cpp
 endif
 ifeq ($(USE_DIHEDRAL), 1)
