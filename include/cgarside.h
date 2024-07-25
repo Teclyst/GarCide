@@ -282,7 +282,7 @@ template <class F> class BraidTemplate {
      * always, an integer).
      *
      */
-    typedef typename F::ParameterType ParameterType;
+    using ParameterType = typename F::ParameterType;
 
     /**
      * @brief A (group) parameter.

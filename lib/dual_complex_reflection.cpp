@@ -213,6 +213,7 @@ void Underlying::OfString(const std::string &str, size_t &pos) {
     if (std::regex_search(str.begin() + pos, str.end(), match,
                                  std::regex{"D"},
                                  std::regex_constants::match_continuous)) {
+        pos += match[0].length();
         Delta();
     } else if (std::regex_search(str.begin() + pos, str.end(), match,
                           std::regex{"\\([\\s\\t]*(" + number_regex +

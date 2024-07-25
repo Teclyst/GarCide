@@ -7,7 +7,8 @@
 
 namespace cgarside::super_summit {
 
-template <class F> BraidTemplate<F> SendToSSS(const BraidTemplate<F> &b) {
+template <class F>
+BraidTemplate<F> send_to_super_summit(const BraidTemplate<F> &b) {
     typename F::ParameterType n = b.GetParameter();
 
     sint16 k = F(n).LatticeHeight();
@@ -47,13 +48,15 @@ template <class F> BraidTemplate<F> SendToSSS(const BraidTemplate<F> &b) {
     return b3;
 }
 
-template <class F> BraidTemplate<F> SendToSSS(const BraidTemplate<F> &b, const BraidTemplate<F> &c) {
+template <class F>
+BraidTemplate<F> send_to_super_summit(const BraidTemplate<F> &b,
+                                      BraidTemplate<F> &c) {
 
     typename F::ParameterType n = b.GetParameter();
 
     sint16 k = F(n).LatticeHeight();
 
-    BraidTemplate<F> b2 = b, b3 = b, c2 = BraidTemplate(n);
+    BraidTemplate<F> b2 = b, b3 = b, c2 = BraidTemplate<F>(n);
 
     c.Identity();
 
@@ -65,10 +68,10 @@ template <class F> BraidTemplate<F> SendToSSS(const BraidTemplate<F> &b, const B
             return b2;
         }
 
-        c2.RightProduct(b2.FactorList.front().DeltaConjugate(b2.delta));
+        c2.RightProduct(b2.First().DeltaConjugate(b2.Inf()));
         b2.Cycling();
 
-        if (b2.LeftDelta == p) {
+        if (b2.Delta == p) {
             j++;
         } else {
             b3 = b2;
@@ -102,7 +105,7 @@ template <class F> BraidTemplate<F> SendToSSS(const BraidTemplate<F> &b, const B
     return b3;
 }
 
-template <class F> F MinSS(const BraidTemplate<F> &b, const F &f) {
+template <class F> F min_summit(const BraidTemplate<F> &b, const F &f) {
     F r2 = f, r = F(f.GetParameter());
     r.Identity();
 
@@ -118,8 +121,9 @@ template <class F> F MinSS(const BraidTemplate<F> &b, const F &f) {
 }
 
 template <class F>
-F MinSSS(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf, const F &f) {
-    F r = MinSS(b, f);
+F min_super_summit(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf,
+                   const F &f) {
+    F r = min_summit(b, f);
     BraidTemplate<F> b2 = b_rcf;
     b2.ConjugateRCF(r);
 
@@ -132,21 +136,23 @@ F MinSSS(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf, const F &f) {
 }
 
 template <class F>
-std::vector<F> MinSSS(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf) {
+std::vector<F> min_super_summit(const BraidTemplate<F> &b,
+                                const BraidTemplate<F> &b_rcf) {
     F f = F(b.GetParameter());
     std::vector<F> atoms = f.Atoms();
     std::vector<F> factors = atoms;
 
 #ifndef USE_PAR
 
-    std::transform(atoms.begin(), atoms.end(), factors.begin(),
-                   [&b, &b_rcf](F &atom) { return MinSSS(b, b_rcf, atom); });
+    std::transform(
+        atoms.begin(), atoms.end(), factors.begin(),
+        [&b, &b_rcf](F &atom) { return min_super_summit(b, b_rcf, atom); });
 
 #else
 
-    std::transform(std::execution::par, atoms.begin(), atoms.end(),
-                   factors.begin(),
-                   [&b, &b_rcf](F &atom) { return MinSSS(b, b_rcf, atom); });
+    std::transform(
+        std::execution::par, atoms.begin(), atoms.end(), factors.begin(),
+        [&b, &b_rcf](F &atom) { return min_super_summit(b, b_rcf, atom); });
 
 #endif
 
@@ -192,13 +198,9 @@ template <class B> class SuperSummitSet {
   public:
     using ConstIterator = typename std::unordered_set<B>::const_iterator;
 
-    inline ConstIterator begin() const {
-        return ConstIterator(set.begin());
-    }
+    inline ConstIterator begin() const { return ConstIterator(set.begin()); }
 
-    inline ConstIterator end() const {
-        return ConstIterator(set.end());
-    }
+    inline ConstIterator end() const { return ConstIterator(set.end()); }
 
     inline void insert(B b) { set.insert(b); }
 
@@ -207,8 +209,7 @@ template <class B> class SuperSummitSet {
 
     inline sint16 card() const { return set.size(); }
 
-    void print(IndentedOStream &os) const {
-
+    void print(IndentedOStream &os = ind_cout) const {
         os << "There " << (card() > 1 ? "are " : "is ") << card() << " element"
            << (card() > 1 ? "s " : " ") << "in the super summit set."
            << EndLine(2);
@@ -221,8 +222,7 @@ template <class B> class SuperSummitSet {
 
         sint16 indent = (int(std::to_string(card() - 1).length()) + 1) / 4 + 1;
         sint16 count = 0;
-        for (typename std::unordered_set<B>::const_iterator it = set.begin();
-             it != set.end(); it++) {
+        for (ConstIterator it = begin(); it != end(); it++) {
             os << count << ":";
             for (sint16 _ = 0;
                  _ < 4 * indent - 1 - int(std::to_string(card() - 1).length());
@@ -239,7 +239,7 @@ template <class B> class SuperSummitSet {
         os << EndLine(1);
     }
 
-    void debug(IndentedOStream &os) const {
+    void debug(IndentedOStream &os = ind_cout) const {
         bool is_first = true;
         os << "{   ";
         os.Indent(4);
@@ -248,8 +248,7 @@ template <class B> class SuperSummitSet {
         os << EndLine();
         os << "{   ";
         os.Indent(4);
-        for (typename std::unordered_set<B>::const_iterator it = set.begin();
-             it != set.end(); it++) {
+        for (ConstIterator it = begin(); it != end(); it++) {
             if (!is_first) {
                 os << "," << EndLine();
             } else {
@@ -266,11 +265,12 @@ template <class B> class SuperSummitSet {
     }
 };
 
-template <class F> SuperSummitSet<BraidTemplate<F>> SSS(const BraidTemplate<F> &b) {
+template <class F>
+SuperSummitSet<BraidTemplate<F>> super_summit_set(const BraidTemplate<F> &b) {
     std::list<BraidTemplate<F>> queue, queue_rcf;
     SuperSummitSet<BraidTemplate<F>> sss;
 
-    BraidTemplate<F> b2 = SendToSSS(b);
+    BraidTemplate<F> b2 = send_to_super_summit(b);
     BraidTemplate<F> b2_rcf = b2;
     b2_rcf.MakeRCFFromLCF();
 
@@ -280,7 +280,7 @@ template <class F> SuperSummitSet<BraidTemplate<F>> SSS(const BraidTemplate<F> &
     sss.insert(b2);
 
     while (!queue.empty()) {
-        std::vector<F> min = MinSSS(queue.front(), queue_rcf.front());
+        std::vector<F> min = min_super_summit(queue.front(), queue_rcf.front());
 
         for (typename std::vector<F>::iterator itf = min.begin();
              itf != min.end(); itf++) {
@@ -305,9 +305,10 @@ template <class F> SuperSummitSet<BraidTemplate<F>> SSS(const BraidTemplate<F> &
 }
 
 template <class F>
-inline bool AreConjugate(const BraidTemplate<F> &u, const BraidTemplate<F> &v) {
-    std::unordered_set<BraidTemplate<F>> u_sss = SSS(u);
-    return u_sss.mem(SendToSSS(v));
+inline bool are_conjugate(const BraidTemplate<F> &u,
+                          const BraidTemplate<F> &v) {
+    std::unordered_set<BraidTemplate<F>> u_sss = super_summit_set(u);
+    return u_sss.mem(send_to_super_summit(v));
 }
 
 } // namespace cgarside::super_summit

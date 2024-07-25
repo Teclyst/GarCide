@@ -1,6 +1,6 @@
 #include "braiding.h"
+#include "centralizer.h"
 #include "garsidesc.h"
-#include "garsideuss.h"
 
 namespace braiding {
 
@@ -146,13 +146,13 @@ void explain_braid_parameter_input() {
 
 #elif (BRAIDING_CLASS == 4)
 
-    ind_cout << "Enter a tuple '(' Z ','? Z ')' of integers." << EndLine()<<
-        "((e, n) for B(e, e, n + 1).)" << EndLine(1);
+    ind_cout << "Enter a tuple '(' Z ','? Z ')' of integers." << EndLine()
+             << "((e, n) for B(e, e, n + 1).)" << EndLine(1);
 
 #elif (BRAIDING_CLASS == 5)
 
-    ind_cout << "Enter a tuple '(' Z ','? Z ')' of integers." << EndLine() <<
-        "((e, n) for B(e, e, n).)" << EndLine(1);
+    ind_cout << "Enter a tuple '(' Z ','? Z ')' of integers." << EndLine()
+             << "((e, n) for B(e, e, n).)" << EndLine(1);
 
 #else
 
@@ -357,10 +357,10 @@ void print_options(IndentedOStream &os) {
        << EndLine(1)
        << "sss:    Super Summit Set        uss:    Ultra Summit Set        "
        << EndLine(1)
-       << "scs:    Sliding Circuits Set    c:      Conjugacy Test          "
-       << EndLine(1)
+       << "scs:    Sliding Circuits Set    ctr:    Centralizer             "
+       << EndLine(1) << "c:      Conjugacy Test          "
 #if BRAIDING_CLASS == 0
-       << "t:      Thurston Type           "
+       << "t:      Thurston Type           " << EndLine(1)
 #endif
        << "q:      Quit" << EndLine(1);
 }
@@ -402,6 +402,9 @@ Option prompt_option() {
         } else if (std::regex_match(
                        str, std::regex{"[\\s\\t]*[sS][cC][sS][\\s\\t]*"})) {
             return Option::SCS;
+        } else if (std::regex_match(
+                       str, std::regex{"[\\s\\t]*[cC][tT][rR][\\s\\t]*"})) {
+            return Option::Centralizer;
         } else if (std::regex_match(str,
                                     std::regex{"[\\s\\t]*[cC][\\s\\t]*"})) {
             return Option::Conjugacy;
@@ -483,7 +486,7 @@ void sss_case() {
     Braid b(prompt_braid_parameter());
     prompt_braid(b);
     ind_cout << EndLine();
-    cgarside::super_summit::SSS(b).print(ind_cout);
+    cgarside::super_summit::super_summit_set(b).print(ind_cout);
     ind_cout << EndLine(1);
 }
 
@@ -491,14 +494,21 @@ void uss_case() {
     Braid b(prompt_braid_parameter());
     prompt_braid(b);
     ind_cout << EndLine();
-    cgarside::ultra_summit::USS(b).print(ind_cout);
+    cgarside::ultra_summit::ultra_summit_set(b).print();
 }
 
 void scs_case() {
     Braid b(prompt_braid_parameter());
     prompt_braid(b);
     ind_cout << EndLine();
-    cgarside::sliding_circuit::SCS(b).print(ind_cout);
+    cgarside::sliding_circuit::sliding_circuits_set(b).print();
+}
+
+void centralizer_case() {
+    Braid b(prompt_braid_parameter());
+    prompt_braid(b);
+    ind_cout << EndLine();
+    cgarside::centralizer::centralizer(b).print();
 }
 
 void conjugacy_case() {
@@ -506,7 +516,7 @@ void conjugacy_case() {
     Braid b(p), c(p), conj(p);
     prompt_braid(b);
     prompt_braid(c);
-    if (cgarside::sliding_circuit::AreConjugate(b, c, conj)) {
+    if (cgarside::sliding_circuit::are_conjugate(b, c, conj)) {
         ind_cout << EndLine() << "They are conjugates." << EndLine()
                  << "A conjugating element is:" << EndLine() << conj
                  << EndLine(1);

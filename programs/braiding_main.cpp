@@ -86,6 +86,14 @@ int main() {
             }
             break;
         }
+        case Option::Centralizer: {
+            try {
+                centralizer_case();
+            } catch (InterruptAskedFor) {
+                ind_cout << EndLine();
+            }
+            break;
+        }
         case Option::Conjugacy: {
             try {
                 conjugacy_case();

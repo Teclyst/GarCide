@@ -35,6 +35,7 @@ enum class Option {
     SSS,
     USS,
     SCS,
+    Centralizer,
     Conjugacy,
     Header,
     Quit,
@@ -178,6 +179,8 @@ void sss_case();
 void uss_case();
 
 void scs_case();
+
+void centralizer_case();
 
 void conjugacy_case();
 
