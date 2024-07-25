@@ -8,7 +8,12 @@
 #ifndef UTILITY
 #define UTILITY
 
+#ifdef USE_PAR
+
 #include <execution>
+
+#endif
+
 #include <iostream>
 #include <ostream>
 #include <regex>
@@ -357,18 +362,6 @@ IndentedOStream &IndentedOStream::operator<< <EndLine>(const EndLine &el);
  * An `IndentedOStream` that wraps around `std::cout`.
  */
 static IndentedOStream ind_cout(std::cout);
-
-#ifndef USE_PAR
-
-constexpr __pstl::execution::v1::sequenced_policy execution_policy =
-    std::execution::seq;
-
-#else
-
-constexpr __pstl::execution::v1::parallel_policy execution_policy =
-    std::execution::par;
-
-#endif
 
 } // namespace CGarside
 

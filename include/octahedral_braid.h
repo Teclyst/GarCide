@@ -1,3 +1,6 @@
+#ifndef OCTAHEDRAL
+#define OCTAHEDRAL
+
 #include "cgarside.h"
 
 namespace cgarside::octahedral {
@@ -120,3 +123,5 @@ typedef FactorTemplate<Underlying> Factor;
 typedef BraidTemplate<Factor> Braid;
 
 } // namespace CGarside
+
+#endif

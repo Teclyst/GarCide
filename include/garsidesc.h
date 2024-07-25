@@ -3,7 +3,8 @@
 
 namespace cgarside::sliding_circuit {
 
-template <class F> std::vector<BraidTemplate<F>> Trajectory(BraidTemplate<F> b) {
+template <class F>
+std::vector<BraidTemplate<F>> Trajectory(BraidTemplate<F> b) {
     std::vector<BraidTemplate<F>> t;
     std::unordered_set<BraidTemplate<F>> t_set;
 
@@ -17,7 +18,8 @@ template <class F> std::vector<BraidTemplate<F>> Trajectory(BraidTemplate<F> b) 
 }
 
 template <class F>
-std::vector<BraidTemplate<F>> Trajectory(BraidTemplate<F> b, BraidTemplate<F> &c, sint16 &d) {
+std::vector<BraidTemplate<F>> Trajectory(BraidTemplate<F> b,
+                                         BraidTemplate<F> &c, sint16 &d) {
     std::vector<BraidTemplate<F>> t;
     std::unordered_set<BraidTemplate<F>> t_set;
 
@@ -52,7 +54,8 @@ template <class F> BraidTemplate<F> SendToSC(const BraidTemplate<F> &b) {
     return b_sc;
 }
 
-template <class F> BraidTemplate<F> SendToSC(const BraidTemplate<F> &b, BraidTemplate<F> &c) {
+template <class F>
+BraidTemplate<F> SendToSC(const BraidTemplate<F> &b, BraidTemplate<F> &c) {
     sint16 d;
     BraidTemplate<F> b_sc = Trajectory(b, c, d).back();
     b_sc.Sliding();
@@ -62,7 +65,8 @@ template <class F> BraidTemplate<F> SendToSC(const BraidTemplate<F> &b, BraidTem
 template <class F> F Transport(const BraidTemplate<F> &b, const F &f) {
     BraidTemplate<F> b2 = b;
     b2.Conjugate(f);
-    BraidTemplate<F> b3 = !BraidTemplate(b.PreferredPrefix()) * f * b2.PreferredPrefix();
+    BraidTemplate<F> b3 =
+        !BraidTemplate(b.PreferredPrefix()) * f * b2.PreferredPrefix();
 
     F f2 = F(b.GetParameter());
 
@@ -150,7 +154,8 @@ template <class F> F MainPullback(const BraidTemplate<F> &b, const F &f) {
         ret.push_back(f2);
         ret_set.insert(f2);
 
-        for (typename std::vector<BraidTemplate<F>>::reverse_iterator itb = t.rbegin();
+        for (typename std::vector<BraidTemplate<F>>::reverse_iterator itb =
+                 t.rbegin();
              itb != t.rend(); itb++) {
             f2 = Pullback(*itb, f2);
         }
@@ -192,9 +197,18 @@ std::vector<F> MinSC(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf) {
     std::vector<F> atoms = f.Atoms();
     std::vector<F> factors = atoms;
 
-    std::transform(execution_policy, atoms.begin(), atoms.end(),
+#ifndef USE_PAR
+
+    std::transform(atoms.begin(), atoms.end(), factors.begin(),
+                   [&b, &b_rcf](F &atom) { return MinSC(b, b_rcf, atom); });
+
+#else
+
+    std::transform(std::execution::par, atoms.begin(), atoms.end(),
                    factors.begin(),
                    [&b, &b_rcf](F &atom) { return MinSC(b, b_rcf, atom); });
+
+#endif
 
     std::vector<F> min;
 
@@ -424,7 +438,8 @@ template <class B> class SlidingCircuitSet {
     }
 };
 
-template <class F> SlidingCircuitSet<BraidTemplate<F>> SCS(const BraidTemplate<F> &b) {
+template <class F>
+SlidingCircuitSet<BraidTemplate<F>> SCS(const BraidTemplate<F> &b) {
     SlidingCircuitSet<BraidTemplate<F>> scs;
     std::list<BraidTemplate<F>> queue, queue_rcf;
 
@@ -483,8 +498,9 @@ template <class F> SlidingCircuitSet<BraidTemplate<F>> SCS(const BraidTemplate<F
 }
 
 template <class F>
-SlidingCircuitSet<BraidTemplate<F>> SCS(const BraidTemplate<F> &b, std::vector<F> &mins,
-                                std::vector<sint16> &prev) {
+SlidingCircuitSet<BraidTemplate<F>> SCS(const BraidTemplate<F> &b,
+                                        std::vector<F> &mins,
+                                        std::vector<sint16> &prev) {
     SlidingCircuitSet<BraidTemplate<F>> scs;
     std::list<BraidTemplate<F>> queue, queue_rcf;
 
@@ -529,8 +545,10 @@ SlidingCircuitSet<BraidTemplate<F>> SCS(const BraidTemplate<F> &b, std::vector<F
 }
 
 template <class F>
-BraidTemplate<F> TreePath(const BraidTemplate<F> &b, const SlidingCircuitSet<BraidTemplate<F>> &scs,
-                  const std::vector<F> &mins, const std::vector<sint16> &prev) {
+BraidTemplate<F> TreePath(const BraidTemplate<F> &b,
+                          const SlidingCircuitSet<BraidTemplate<F>> &scs,
+                          const std::vector<F> &mins,
+                          const std::vector<sint16> &prev) {
     BraidTemplate<F> c = BraidTemplate<F>(b.GetParameter());
 
     if (b.CanonicalLength() == 0) {
@@ -554,7 +572,8 @@ BraidTemplate<F> TreePath(const BraidTemplate<F> &b, const SlidingCircuitSet<Bra
 }
 
 template <class F>
-bool AreConjugate(const BraidTemplate<F> &b1, const BraidTemplate<F> &b2, BraidTemplate<F> &c) {
+bool AreConjugate(const BraidTemplate<F> &b1, const BraidTemplate<F> &b2,
+                  BraidTemplate<F> &c) {
     typename F::ParameterType n = b1.GetParameter();
     BraidTemplate<F> c1 = BraidTemplate<F>(n), c2 = BraidTemplate<F>(n);
 

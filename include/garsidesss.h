@@ -137,9 +137,18 @@ std::vector<F> MinSSS(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf) 
     std::vector<F> atoms = f.Atoms();
     std::vector<F> factors = atoms;
 
-    std::transform(execution_policy, atoms.begin(), atoms.end(),
+#ifndef USE_PAR
+
+    std::transform(atoms.begin(), atoms.end(), factors.begin(),
+                   [&b, &b_rcf](F &atom) { return MinSSS(b, b_rcf, atom); });
+
+#else
+
+    std::transform(std::execution::par, atoms.begin(), atoms.end(),
                    factors.begin(),
                    [&b, &b_rcf](F &atom) { return MinSSS(b, b_rcf, atom); });
+
+#endif
 
     std::vector<F> min;
 

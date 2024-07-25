@@ -8,7 +8,8 @@ struct NotInUSS {};
 
 namespace cgarside::ultra_summit {
 
-template <class F> std::vector<BraidTemplate<F>> Trajectory(BraidTemplate<F> b) {
+template <class F>
+std::vector<BraidTemplate<F>> Trajectory(BraidTemplate<F> b) {
     std::vector<BraidTemplate<F>> t;
     std::unordered_set<BraidTemplate<F>> t_set;
 
@@ -22,7 +23,8 @@ template <class F> std::vector<BraidTemplate<F>> Trajectory(BraidTemplate<F> b) 
 }
 
 template <class F>
-void Trajectory(BraidTemplate<F> b, BraidTemplate<F> b_rcf, std::vector<BraidTemplate<F>> &t,
+void Trajectory(BraidTemplate<F> b, BraidTemplate<F> b_rcf,
+                std::vector<BraidTemplate<F>> &t,
                 std::vector<BraidTemplate<F>> &t_rcf) {
     std::unordered_set<BraidTemplate<F>> t_set;
     t.clear();
@@ -44,22 +46,24 @@ template <class F> BraidTemplate<F> SendToUSS(const BraidTemplate<F> &b) {
     return b_uss;
 }
 
-template <class F> BraidTemplate<F> SendToUSS(const BraidTemplate<F> &b, BraidTemplate<F> &c) {
+template <class F>
+BraidTemplate<F> SendToUSS(const BraidTemplate<F> &b, BraidTemplate<F> &c) {
     BraidTemplate<F> b_sss = super_summit::SendToSSS(b, c);
     std::list<BraidTemplate<F>> t = Trajectory(b_sss);
 
     BraidTemplate<F> b_uss = BraidTemplate(t.back());
     b_uss.cycling();
 
-    for (typename std::vector<BraidTemplate<F>>::iterator it = t.begin(); *it != b_uss;
-         it++) {
+    for (typename std::vector<BraidTemplate<F>>::iterator it = t.begin();
+         *it != b_uss; it++) {
         c.RightProduct((*it).DeltaConjugate(b_sss.Delta));
     }
 
     return b_uss;
 }
 
-template <class F> BraidTemplate<F> Transport(const BraidTemplate<F> &b, const F &f) {
+template <class F>
+BraidTemplate<F> Transport(const BraidTemplate<F> &b, const F &f) {
     BraidTemplate<F> b2 = b;
     b2.Conjugate(f);
     BraidTemplate<F> b3 = (!BraidTemplate(b.First()) * f) * b2.First();
@@ -69,7 +73,8 @@ template <class F> BraidTemplate<F> Transport(const BraidTemplate<F> &b, const F
 template <class F> std::list<F> Return(const BraidTemplate<F> &b, const F &f) {
     std::list<F> ret;
     std::unordered_set<F> ret_set;
-    BraidTemplate<F> b1 = BraidTemplate(b), c2 = BraidTemplate<F>(b.GetParameter());
+    BraidTemplate<F> b1 = BraidTemplate(b),
+                     c2 = BraidTemplate<F>(b.GetParameter());
     sint16 i, n = 1;
     F f1 = f;
 
@@ -112,7 +117,8 @@ template <class F> std::list<F> Return(const BraidTemplate<F> &b, const F &f) {
 }
 
 template <class F>
-F Pullback(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf, const F &f) {
+F Pullback(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf,
+           const F &f) {
     F f1 = b.First().DeltaConjugate(b.Delta + 1);
     F f2 = f.DeltaConjugate();
 
@@ -146,7 +152,8 @@ F Pullback(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf, const F &f)
 }
 
 template <class F>
-F MainPullback(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf, const F &f) {
+F MainPullback(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf,
+               const F &f) {
     std::vector<F> ret;
     std::unordered_map<F, sint16> ret_set;
 
@@ -205,14 +212,24 @@ F MinUSS(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf, const F &f) {
 }
 
 template <class F>
-std::vector<F> MinUSS(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf) {
+std::vector<F> MinUSS(const BraidTemplate<F> &b,
+                      const BraidTemplate<F> &b_rcf) {
     F f = F(b.GetParameter());
     std::vector<F> atoms = f.Atoms();
     std::vector<F> factors = atoms;
 
-    std::transform(std::execution::seq, atoms.begin(), atoms.end(),
+#ifndef USE_PAR
+
+    std::transform(atoms.begin(), atoms.end(), factors.begin(),
+                   [&b, &b_rcf](F &atom) { return MinUSS(b, b_rcf, atom); });
+
+#else
+
+    std::transform(std::execution::par, atoms.begin(), atoms.end(),
                    factors.begin(),
                    [&b, &b_rcf](F &atom) { return MinUSS(b, b_rcf, atom); });
+
+#endif
 
     std::vector<F> min;
 
@@ -308,6 +325,17 @@ template <class B> class UltraSummitSet {
 
     // Checks membership.
     inline bool mem(const B &b) const { return set.find(b) != set.end(); }
+
+    /**
+     * @brief Access a braid in the USS with its position.
+     *
+     * @param orbit_index Index of its orbit.
+     * @param shift Position within that orbit.
+     * @return B
+     */
+    inline B at(sint16 orbit_index, sint16 shift) const {
+        return orbits[orbit_index][shift];
+    }
 
     // Finds b's orbit.
     inline sint16 orbit(const B &b) const { return *set.find(b); }
@@ -447,7 +475,8 @@ template <class B> class UltraSummitSet {
     }
 };
 
-template <class F> UltraSummitSet<BraidTemplate<F>> USS(const BraidTemplate<F> &b) {
+template <class F>
+UltraSummitSet<BraidTemplate<F>> USS(const BraidTemplate<F> &b) {
     UltraSummitSet<BraidTemplate<F>> uss;
     std::list<BraidTemplate<F>> queue, queue_rcf;
 
@@ -505,8 +534,9 @@ template <class F> UltraSummitSet<BraidTemplate<F>> USS(const BraidTemplate<F> &
 }
 
 template <class F>
-UltraSummitSet<BraidTemplate<F>> USS(const BraidTemplate<F> &b, std::vector<F> &mins,
-                             std::vector<sint16> &prev) {
+UltraSummitSet<BraidTemplate<F>> USS(const BraidTemplate<F> &b,
+                                     std::vector<F> &mins,
+                                     std::vector<sint16> &prev) {
     UltraSummitSet<BraidTemplate<F>> uss;
     std::list<BraidTemplate<F>> queue, queue_rcf;
 
@@ -551,8 +581,9 @@ UltraSummitSet<BraidTemplate<F>> USS(const BraidTemplate<F> &b, std::vector<F> &
 }
 
 template <class F>
-BraidTemplate<F> TreePath(const BraidTemplate<F> &b, const UltraSummitSet<BraidTemplate<F>> &uss,
-                  const std::vector<F> &mins, const std::vector<sint16> &prev) {
+BraidTemplate<F>
+TreePath(const BraidTemplate<F> &b, const UltraSummitSet<BraidTemplate<F>> &uss,
+         const std::vector<F> &mins, const std::vector<sint16> &prev) {
     BraidTemplate<F> c = BraidTemplate(b.GetParameter());
 
     if (b.CanonicalLength() == 0) {
@@ -576,7 +607,8 @@ BraidTemplate<F> TreePath(const BraidTemplate<F> &b, const UltraSummitSet<BraidT
 }
 
 template <class F>
-bool AreConjugate(const BraidTemplate<F> &b1, const BraidTemplate<F> &b2, BraidTemplate<F> &c) {
+bool AreConjugate(const BraidTemplate<F> &b1, const BraidTemplate<F> &b2,
+                  BraidTemplate<F> &c) {
     sint16 n = b1.GetParameter();
     BraidTemplate<F> c1 = BraidTemplate<F>(n), c2 = BraidTemplate<F>(n);
 

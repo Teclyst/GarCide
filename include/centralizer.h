@@ -3,33 +3,36 @@
 
 #include "garsideuss.h"
 
-template <class F> class Centralizer {
+namespace cgarside::centralizer {
+
+template <class B> class Centralizer {
   private:
-    std::vector<F> generators;
+    std::vector<B> generators;
 
   public:
-    using Iterator = typename std::vector<F>::iterator;
-    using ConstIterator = typename std::vector<F>::const_iterator;
+    using Iterator = typename std::vector<B>::iterator;
+    using ConstIterator = typename std::vector<B>::const_iterator;
 
-    inline Iterator begin() const {
-        return generators.begin();
-    }
+    inline Iterator begin() const { return generators.begin(); }
 
-    inline ConstIterator cbegin() const {
-        return generators.begin();
-    }
+    inline ConstIterator cbegin() const { return generators.begin(); }
 
-    inline Iterator end() const {
-        return generators.end();
-    }
+    inline Iterator end() const { return generators.end(); }
 
-    inline ConstIterator cend() const {
-        return generators.end();
-    }
+    inline ConstIterator cend() const { return generators.end(); }
 
-    inline void insert(const F &f) {
-        generators.push_back(f);
-    }
+    inline void insert(const B &f) { generators.push_back(B); }
 };
+
+template <class F>
+Centralizer<BraidTemplate<F>>
+centralizer(const ultra_summit::UltraSummitSet<BraidTemplate<F>> &uss,
+            const std::vector<F> &mins, const std::vector<sint16> &prev) {
+    BraidTemplate<F> b = uss.at(0, 0);
+    typename F::ParameterType p = b.GetParameter();
+    Centralizer<BraidTemplate<F>> centralizer;
+}
+
+} // namespace cgarside::centralizer
 
 #endif
