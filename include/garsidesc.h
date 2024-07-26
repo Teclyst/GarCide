@@ -1,7 +1,7 @@
 #include "cgarside.h"
 #include "garsidesss.h"
 
-namespace cgarside::sliding_circuit {
+namespace cgarside::sliding_circuits {
 
 template <class F>
 std::vector<BraidTemplate<F>> trajectory(BraidTemplate<F> b) {
@@ -48,14 +48,14 @@ std::vector<BraidTemplate<F>> trajectory(BraidTemplate<F> b,
     return t;
 }
 
-template <class F> BraidTemplate<F> send_to_sliding_circuit(const BraidTemplate<F> &b) {
+template <class F> BraidTemplate<F> send_to_sliding_circuits(const BraidTemplate<F> &b) {
     BraidTemplate<F> b_sc = trajectory(b).back();
     b_sc.Sliding();
     return b_sc;
 }
 
 template <class F>
-BraidTemplate<F> send_to_sliding_circuit(const BraidTemplate<F> &b, BraidTemplate<F> &c) {
+BraidTemplate<F> send_to_sliding_circuits(const BraidTemplate<F> &b, BraidTemplate<F> &c) {
     sint16 d;
     BraidTemplate<F> b_sc = trajectory(b, c, d).back();
     b_sc.Sliding();
@@ -164,7 +164,7 @@ template <class F> F main_pullback(const BraidTemplate<F> &b, const F &f) {
 }
 
 template <class F>
-F min_sliding_circuit(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf, const F &f) {
+F min_sliding_circuits(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf, const F &f) {
     F f2 = super_summit::min_super_summit(b, b_rcf, f);
 
     std::list<F> ret = transports_sending_to_trajectory(b, f2);
@@ -192,7 +192,7 @@ F min_sliding_circuit(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf, 
 }
 
 template <class F>
-std::vector<F> min_sliding_circuit(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf) {
+std::vector<F> min_sliding_circuits(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf) {
     F f = F(b.GetParameter());
     std::vector<F> atoms = f.Atoms();
     std::vector<F> factors = atoms;
@@ -200,13 +200,13 @@ std::vector<F> min_sliding_circuit(const BraidTemplate<F> &b, const BraidTemplat
 #ifndef USE_PAR
 
     std::transform(atoms.begin(), atoms.end(), factors.begin(),
-                   [&b, &b_rcf](F &atom) { return min_sliding_circuit(b, b_rcf, atom); });
+                   [&b, &b_rcf](F &atom) { return min_sliding_circuits(b, b_rcf, atom); });
 
 #else
 
     std::transform(std::execution::par, atoms.begin(), atoms.end(),
                    factors.begin(),
-                   [&b, &b_rcf](F &atom) { return min_sliding_circuit(b, b_rcf, atom); });
+                   [&b, &b_rcf](F &atom) { return min_sliding_circuits(b, b_rcf, atom); });
 
 #endif
 
@@ -443,7 +443,7 @@ SlidingCircuitsSet<BraidTemplate<F>> sliding_circuits_set(const BraidTemplate<F>
     SlidingCircuitsSet<BraidTemplate<F>> scs;
     std::list<BraidTemplate<F>> queue, queue_rcf;
 
-    BraidTemplate<F> b2 = send_to_sliding_circuit(b);
+    BraidTemplate<F> b2 = send_to_sliding_circuits(b);
     BraidTemplate<F> b2_rcf = b2;
     b2_rcf.MakeRCFFromLCF();
 
@@ -465,7 +465,7 @@ SlidingCircuitsSet<BraidTemplate<F>> sliding_circuits_set(const BraidTemplate<F>
     }
 
     while (!queue.empty()) {
-        std::vector<F> min = min_sliding_circuit(queue.front(), queue_rcf.front());
+        std::vector<F> min = min_sliding_circuits(queue.front(), queue_rcf.front());
 
         for (typename std::vector<F>::iterator itf = min.begin();
              itf != min.end(); itf++) {
@@ -511,7 +511,7 @@ SlidingCircuitsSet<BraidTemplate<F>> sliding_circuits_set(const BraidTemplate<F>
     mins[0].Identity();
     prev.push_back(0);
 
-    BraidTemplate<F> b2 = send_to_sliding_circuit(b);
+    BraidTemplate<F> b2 = send_to_sliding_circuits(b);
     BraidTemplate<F> b2_rcf = b2;
     b2_rcf.MakeRCFFromLCF();
 
@@ -520,7 +520,7 @@ SlidingCircuitsSet<BraidTemplate<F>> sliding_circuits_set(const BraidTemplate<F>
     queue_rcf.push_back(b2_rcf);
 
     while (!queue.empty()) {
-        std::vector<F> min = min_sliding_circuit(queue.front(), queue_rcf.front());
+        std::vector<F> min = min_sliding_circuits(queue.front(), queue_rcf.front());
 
         for (typename std::vector<F>::iterator itf = min.begin();
              itf != min.end(); itf++) {
@@ -580,7 +580,7 @@ bool are_conjugate(const BraidTemplate<F> &b1, const BraidTemplate<F> &b2,
     typename F::ParameterType n = b1.GetParameter();
     BraidTemplate<F> c1 = BraidTemplate<F>(n), c2 = BraidTemplate<F>(n);
 
-    BraidTemplate<F> bt1 = send_to_sliding_circuit(b1, c1), bt2 = send_to_sliding_circuit(b2, c2);
+    BraidTemplate<F> bt1 = send_to_sliding_circuits(b1, c1), bt2 = send_to_sliding_circuits(b2, c2);
 
     if (bt1.CanonicalLength() != bt2.CanonicalLength() ||
         bt1.Sup() != bt2.Sup()) {
@@ -605,4 +605,4 @@ bool are_conjugate(const BraidTemplate<F> &b1, const BraidTemplate<F> &b2,
 
     return true;
 }
-} // namespace cgarside::sliding_circuit
+} // namespace cgarside::sliding_circuits

@@ -208,17 +208,27 @@ Braid::ParameterType prompt_braid_parameter() {
 void print_header(IndentedOStream &os) {
     os << "┌──────────────────┬────────────────────────┬──────────────────┐"
        << EndLine()
-       << "│──────────────────│  This is Braiding 2.0  │──────────────────│"
+       << "│──────────────────│   This is Braiding 2   │──────────────────│"
        << EndLine()
-       << "├──────┬───────────┴────────────────────────┴───────────┬──────┤"
+       << "│──────────────────│      Pre-release       │──────────────────│"
        << EndLine()
-       << "││││││││           Copyright and authors here           ││││││││"
+       << "├───┬──────────────┴────────────────────────┴──────────────┬───┤"
        << EndLine()
-       << "││││││││   Braiding comes with ABSOLUTELY NO WARRANTY   ││││││││"
+       << "│││││            Copyright (C) 2024 Matteo Wei.            │││││"
        << EndLine()
-       << "││││││││             This is free software              ││││││││"
+       << "│││││                   Based on Braiding                  │││││"
        << EndLine()
-       << "││││││││   See GNU General Public License in GPL.txt    ││││││││"
+       << "│││││       Copyright (C) 2004 Juan Gonzalez-Meneses.      │││││"
+       << EndLine()
+       << "├───┴──┬────────────────────────────────────────────────┬──┴───┤"
+       << EndLine()
+       << "││││││││  Braiding 2 comes with ABSOLUTELY NO WARRANTY; ││││││││"
+       << EndLine()
+       << "││││││││   this is free software, and you are welcome   ││││││││"
+       << EndLine()
+       << "││││││││  to redistribute it under certain conditions.  ││││││││"
+       << EndLine()
+       << "││││││││   See GNU General Public License in LICENCE.   ││││││││"
        << EndLine()
        << "├──────┴──┬──────────────────────────────────────────┬──┴──────┤"
 #if BRAIDING_CLASS == 0
@@ -501,7 +511,7 @@ void scs_case() {
     Braid b(prompt_braid_parameter());
     prompt_braid(b);
     ind_cout << EndLine();
-    cgarside::sliding_circuit::sliding_circuits_set(b).print();
+    cgarside::sliding_circuits::sliding_circuits_set(b).print();
 }
 
 void centralizer_case() {
@@ -516,7 +526,7 @@ void conjugacy_case() {
     Braid b(p), c(p), conj(p);
     prompt_braid(b);
     prompt_braid(c);
-    if (cgarside::sliding_circuit::are_conjugate(b, c, conj)) {
+    if (cgarside::sliding_circuits::are_conjugate(b, c, conj)) {
         ind_cout << EndLine() << "They are conjugates." << EndLine()
                  << "A conjugating element is:" << EndLine() << conj
                  << EndLine(1);
