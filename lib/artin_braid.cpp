@@ -313,7 +313,7 @@ void Underlying::tableau(sint16 **&tab) const {
     }
 }
 
-bool preserves_circles(const ArtinBraid &b) {
+bool preserves_circles(const Braid &b) {
     sint16 j, k, t, d, n = b.GetParameter();
     sint16 *disj = new sint16[n + 1];
 
@@ -330,7 +330,7 @@ bool preserves_circles(const ArtinBraid &b) {
     delta = delta % 2;
 
     sint16 ***tabarray = new sint16 **[cl + delta];
-    ArtinBraid::ConstFactorItr it = b.FactorList.begin();
+    Braid::ConstFactorItr it = b.FactorList.begin();
 
     for (j = 0; j < cl + delta; j++) {
         tabarray[j] = new sint16 *[n];
@@ -399,11 +399,11 @@ bool preserves_circles(const ArtinBraid &b) {
 }
 
 ThurstonType
-thurston_type(const ArtinBraid &b,
-              const ultra_summit::UltraSummitSet<ArtinBraid> &uss) {
+thurston_type(const Braid &b,
+              const ultra_summit::UltraSummitSet<Braid> &uss) {
     sint16 n = b.GetParameter();
 
-    ArtinBraid pow = b;
+    Braid pow = b;
 
     for (sint16 i = 0; i < n; i++) {
         if (pow.CanonicalLength() == 0)
@@ -411,7 +411,7 @@ thurston_type(const ArtinBraid &b,
         pow.RightProduct(b);
     }
 
-    for (typename ultra_summit::UltraSummitSet<ArtinBraid>::ConstIterator it =
+    for (typename ultra_summit::UltraSummitSet<Braid>::ConstIterator it =
              uss.begin();
          it != uss.end(); it++) {
         if (preserves_circles(*it)) {
@@ -422,7 +422,7 @@ thurston_type(const ArtinBraid &b,
     return ThurstonType::PseudoAsonov;
 }
 
-ThurstonType thurston_type(const ArtinBraid &b) {
+ThurstonType thurston_type(const Braid &b) {
     return thurston_type(b, ultra_summit::ultra_summit_set(b));
 }
 

@@ -31,7 +31,7 @@ namespace braiding {
 #if BRAIDING_CLASS == 0
 
 using Factor = cgarside::artin::Factor;
-using Braid = cgarside::artin::ArtinBraid;
+using Braid = cgarside::artin::Braid;
 
 #elif BRAIDING_CLASS == 1
 

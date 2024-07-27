@@ -45,8 +45,8 @@ class Underlying {
      */
     ParameterType GetParameter() const;
 
-    sint16 At(sint16 i) const { return PermutationTable[i]; }
-    sint16 &At(sint16 i) { return PermutationTable[i]; }
+    sint16 at(sint16 i) const { return PermutationTable[i]; }
+    sint16 &at(sint16 i) { return PermutationTable[i]; }
 
     /**
      * @brief Construct a new `Underlying`.
@@ -177,7 +177,7 @@ class Underlying {
 
 typedef FactorTemplate<Underlying> Factor;
 
-typedef BraidTemplate<Factor> ArtinBraid;
+typedef BraidTemplate<Factor> Braid;
 
 /**
  * @brief Enum for Thurston types.
@@ -196,7 +196,7 @@ enum class ThurstonType { Periodic, Reducible, PseudoAsonov };
  * @param b The braid to be tested.
  * @return Whether `b` preserves a family of circles.
  */
-bool preserves_circles(const ArtinBraid &b);
+bool preserves_circles(const Braid &b);
 
 /**
  * @brief Computes the Thurston type of a braid whose USS was already computed.
@@ -210,8 +210,8 @@ bool preserves_circles(const ArtinBraid &b);
  * @param uss `b`'s USS.
  * @return `b`'s Thurston type.
  */
-ThurstonType thurston_type(const ArtinBraid &b,
-                           const ultra_summit::UltraSummitSet<ArtinBraid> &uss);
+ThurstonType thurston_type(const Braid &b,
+                           const ultra_summit::UltraSummitSet<Braid> &uss);
 
 /**
  * @brief Computes the Thurston type of a braid.
@@ -223,7 +223,7 @@ ThurstonType thurston_type(const ArtinBraid &b,
  * @param b The braid whose Thurston type is to be computed.
  * @return `b`'s Thurston type.
  */
-ThurstonType thurston_type(const ArtinBraid &b);
+ThurstonType thurston_type(const Braid &b);
 
 } // namespace artin
 

@@ -34,8 +34,8 @@ class Underlying {
     // Constructor
     Underlying(sint16 n);
 
-    sint16 At(sint16 i) const { return PermutationTable[i]; }
-    sint16 &At(sint16 i) { return PermutationTable[i]; }
+    sint16 at(sint16 i) const { return PermutationTable[i]; }
+    sint16 &at(sint16 i) { return PermutationTable[i]; }
 
     /**
      * @brief Extraction from string.
