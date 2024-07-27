@@ -1,6 +1,6 @@
 ## GarCide (prerelease)
 
-This project (written in <img src = https://github.com/devicons/devicon/blob/master/icons/cplusplus/cplusplus-original.svg height = 16>) contains two parts: on one side, the _GarCide_ library, that allows various computations on Garside groups (notably super summit, ultra summit and sliding circuits set calculations). The idea behind this project is that since algorithms for Garside groups are totally generic once base factor operations have been taken care of, it should be easy and fast to implement a Garside group.
+This project (written in ![C++](https://img.shields.io/badge/c++-%2300599C.svg?style=for-the-badge&logo=c%2B%2B&logoColor=white)) contains two parts: on one side, the _GarCide_ library, that allows various computations on Garside groups (notably super summit, ultra summit and sliding circuits set calculations). The idea behind this project is that since algorithms for Garside groups are totally generic once base factor operations have been taken care of, it should be easy and fast to implement a Garside group.
 
 The goal of _GarCide_ is to give anyone (even someone that does not have extensive programming experience) who wishes to do calculations in a Garside group a tool to do so, with (relatively) little work having to be done; it is the author's opinion that such a tool should focus on efficiency rather than stark minimality, and this reflects on the way things are implemented.
 
