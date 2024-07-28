@@ -1,10 +1,5 @@
 .depends
 braiding
-speedtest
-test
 *.o
 *.a
-programs/*
-!programs/Makefile
-!programs/*.cpp
 .vscode/
