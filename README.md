@@ -10,7 +10,7 @@ The other (much smaller) part is the _Braiding 2_ executable. It provides a shel
 
 This library is based on 2001 _CBraid_ by **[Jae Choon Cha](http://gt.postech.ac.kr/~jccha/)** and 2004 _Braiding_ by **[Juan Gonzalez-Meneses](http://personal.us.es/meneses/)**, with contributions from **[Maria Cumplido](https://personal.us.es/cumplido/)**.
 
-These two projects, maintained by **[Jean-Luc Thiffeault](http://www.math.wisc.edu/~jeanluc)**, can be found at TODO [the repository this is a fork of](https://github.com/jeanluct/cbraid).
+These two projects, maintained by **[Jean-Luc Thiffeault](http://www.math.wisc.edu/~jeanluc)**, can be found at [the repository this is a fork of](https://github.com/jeanluct/cbraid).
 
 Although names may suggest otherwise, _GarCide_ roughly corresponds to a merge of _CBraid_ and computation-oriented parts of the original _Braiding_, with _Braiding 2_ only encompassing shell-handling parts.
 

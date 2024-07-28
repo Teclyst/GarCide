@@ -1,7 +1,39 @@
+/**
+ * @file sliding_circuits.h
+ * @author Matteo Wei (matteo.wei@ens.psl.eu)
+ * @brief Header (and implementation) file for sliding circuit sets.
+ * @version 0.1
+ * @date 2024-07-28
+ *
+ * @copyright Copyright (C) 2024. Distributed under the GNU General Public
+ * License, version 3.
+ *
+ */
+
+/*
+ * GarCide Copyright (C) 2024 Matteo Wei.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License in LICENSE for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#ifndef SLIDING_CIRCUITS
+#define SLIDING_CIRCUITS
+
 #include "cgarside.h"
 #include "garsidesss.h"
 
-namespace cgarside::sliding_circuits {
+namespace garcide::sliding_circuits {
 
 template <class F>
 std::vector<BraidTemplate<F>> trajectory(BraidTemplate<F> b) {
@@ -48,14 +80,16 @@ std::vector<BraidTemplate<F>> trajectory(BraidTemplate<F> b,
     return t;
 }
 
-template <class F> BraidTemplate<F> send_to_sliding_circuits(const BraidTemplate<F> &b) {
+template <class F>
+BraidTemplate<F> send_to_sliding_circuits(const BraidTemplate<F> &b) {
     BraidTemplate<F> b_sc = trajectory(b).back();
     b_sc.sliding();
     return b_sc;
 }
 
 template <class F>
-BraidTemplate<F> send_to_sliding_circuits(const BraidTemplate<F> &b, BraidTemplate<F> &c) {
+BraidTemplate<F> send_to_sliding_circuits(const BraidTemplate<F> &b,
+                                          BraidTemplate<F> &c) {
     sint16 d;
     BraidTemplate<F> b_sc = trajectory(b, c, d).back();
     b_sc.sliding();
@@ -81,7 +115,9 @@ template <class F> F transport(const BraidTemplate<F> &b, const F &f) {
     return f2;
 }
 
-template <class F> std::list<F> transports_sending_to_trajectory(const BraidTemplate<F> &b, const F &f) {
+template <class F>
+std::list<F> transports_sending_to_trajectory(const BraidTemplate<F> &b,
+                                              const F &f) {
     std::list<F> ret;
     std::unordered_set<F> ret_set;
     F g = f;
@@ -164,7 +200,8 @@ template <class F> F main_pullback(const BraidTemplate<F> &b, const F &f) {
 }
 
 template <class F>
-F min_sliding_circuits(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf, const F &f) {
+F min_sliding_circuits(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf,
+                       const F &f) {
     F f2 = super_summit::min_super_summit(b, b_rcf, f);
 
     std::list<F> ret = transports_sending_to_trajectory(b, f2);
@@ -192,21 +229,23 @@ F min_sliding_circuits(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf,
 }
 
 template <class F>
-std::vector<F> min_sliding_circuits(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf) {
+std::vector<F> min_sliding_circuits(const BraidTemplate<F> &b,
+                                    const BraidTemplate<F> &b_rcf) {
     F f = F(b.get_parameter());
     std::vector<F> atoms = f.atoms();
     std::vector<F> factors = atoms;
 
 #ifndef USE_PAR
 
-    std::transform(atoms.begin(), atoms.end(), factors.begin(),
-                   [&b, &b_rcf](F &atom) { return min_sliding_circuits(b, b_rcf, atom); });
+    std::transform(
+        atoms.begin(), atoms.end(), factors.begin(),
+        [&b, &b_rcf](F &atom) { return min_sliding_circuits(b, b_rcf, atom); });
 
 #else
 
-    std::transform(std::execution::par, atoms.begin(), atoms.end(),
-                   factors.begin(),
-                   [&b, &b_rcf](F &atom) { return min_sliding_circuits(b, b_rcf, atom); });
+    std::transform(
+        std::execution::par, atoms.begin(), atoms.end(), factors.begin(),
+        [&b, &b_rcf](F &atom) { return min_sliding_circuits(b, b_rcf, atom); });
 
 #endif
 
@@ -439,7 +478,8 @@ template <class B> class SlidingCircuitsSet {
 };
 
 template <class F>
-SlidingCircuitsSet<BraidTemplate<F>> sliding_circuits_set(const BraidTemplate<F> &b) {
+SlidingCircuitsSet<BraidTemplate<F>>
+sliding_circuits_set(const BraidTemplate<F> &b) {
     SlidingCircuitsSet<BraidTemplate<F>> scs;
     std::list<BraidTemplate<F>> queue, queue_rcf;
 
@@ -465,7 +505,8 @@ SlidingCircuitsSet<BraidTemplate<F>> sliding_circuits_set(const BraidTemplate<F>
     }
 
     while (!queue.empty()) {
-        std::vector<F> min = min_sliding_circuits(queue.front(), queue_rcf.front());
+        std::vector<F> min =
+            min_sliding_circuits(queue.front(), queue_rcf.front());
 
         for (typename std::vector<F>::iterator itf = min.begin();
              itf != min.end(); itf++) {
@@ -498,9 +539,9 @@ SlidingCircuitsSet<BraidTemplate<F>> sliding_circuits_set(const BraidTemplate<F>
 }
 
 template <class F>
-SlidingCircuitsSet<BraidTemplate<F>> sliding_circuits_set(const BraidTemplate<F> &b,
-                                        std::vector<F> &mins,
-                                        std::vector<sint16> &prev) {
+SlidingCircuitsSet<BraidTemplate<F>>
+sliding_circuits_set(const BraidTemplate<F> &b, std::vector<F> &mins,
+                     std::vector<sint16> &prev) {
     SlidingCircuitsSet<BraidTemplate<F>> scs;
     std::list<BraidTemplate<F>> queue, queue_rcf;
 
@@ -520,7 +561,8 @@ SlidingCircuitsSet<BraidTemplate<F>> sliding_circuits_set(const BraidTemplate<F>
     queue_rcf.push_back(b2_rcf);
 
     while (!queue.empty()) {
-        std::vector<F> min = min_sliding_circuits(queue.front(), queue_rcf.front());
+        std::vector<F> min =
+            min_sliding_circuits(queue.front(), queue_rcf.front());
 
         for (typename std::vector<F>::iterator itf = min.begin();
              itf != min.end(); itf++) {
@@ -549,9 +591,9 @@ SlidingCircuitsSet<BraidTemplate<F>> sliding_circuits_set(const BraidTemplate<F>
 
 template <class F>
 BraidTemplate<F> tree_path(const BraidTemplate<F> &b,
-                          const SlidingCircuitsSet<BraidTemplate<F>> &scs,
-                          const std::vector<F> &mins,
-                          const std::vector<sint16> &prev) {
+                           const SlidingCircuitsSet<BraidTemplate<F>> &scs,
+                           const std::vector<F> &mins,
+                           const std::vector<sint16> &prev) {
     BraidTemplate<F> c = BraidTemplate<F>(b.get_parameter());
 
     if (b.canonical_length() == 0) {
@@ -576,11 +618,12 @@ BraidTemplate<F> tree_path(const BraidTemplate<F> &b,
 
 template <class F>
 bool are_conjugate(const BraidTemplate<F> &b1, const BraidTemplate<F> &b2,
-                  BraidTemplate<F> &c) {
+                   BraidTemplate<F> &c) {
     typename F::Parameter n = b1.get_parameter();
     BraidTemplate<F> c1 = BraidTemplate<F>(n), c2 = BraidTemplate<F>(n);
 
-    BraidTemplate<F> bt1 = send_to_sliding_circuits(b1, c1), bt2 = send_to_sliding_circuits(b2, c2);
+    BraidTemplate<F> bt1 = send_to_sliding_circuits(b1, c1),
+                     bt2 = send_to_sliding_circuits(b2, c2);
 
     if (bt1.canonical_length() != bt2.canonical_length() ||
         bt1.sup() != bt2.sup()) {
@@ -595,7 +638,8 @@ bool are_conjugate(const BraidTemplate<F> &b1, const BraidTemplate<F> &b2,
     std::vector<F> mins;
     std::vector<sint16> prev;
 
-    SlidingCircuitsSet<BraidTemplate<F>> scs = sliding_circuits_set(bt1, mins, prev);
+    SlidingCircuitsSet<BraidTemplate<F>> scs =
+        sliding_circuits_set(bt1, mins, prev);
 
     if (!scs.mem(bt2)) {
         return false;
@@ -605,4 +649,7 @@ bool are_conjugate(const BraidTemplate<F> &b1, const BraidTemplate<F> &b2,
 
     return true;
 }
-} // namespace cgarside::sliding_circuits
+
+} // namespace garcide::sliding_circuits
+
+#endif

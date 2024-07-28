@@ -1,13 +1,42 @@
+/**
+ * @file braiding.h
+ * @author Matteo Wei (matteo.wei@ens.psl.eu)
+ * @brief Header file for most of braiding.
+ * @version 0.1
+ * @date 2024-07-28
+ *
+ * @copyright Copyright (C) 2024. Distributed under the GNU General Public
+ * License, version 3.
+ *
+ */
+
+/*
+ * GarCide Copyright (C) 2024 Matteo Wei.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License in LICENSE for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "braiding_option.h"
 
-#ifndef NEW_BRAIDING
-#define NEW_BRAIDING
+#ifndef BRAIDING
+#define BRAIDING
 
 namespace braiding {
-using cgarside::EndLine;
-using cgarside::ind_cout;
-using cgarside::IndentedOStream;
-using cgarside::sint16;
+using garcide::EndLine;
+using garcide::ind_cout;
+using garcide::IndentedOStream;
+using garcide::sint16;
 
 /**
  * @brief Exception raised when asking for help.
@@ -52,7 +81,7 @@ enum class Option {
  *
  * @param b The braid that is to be set to what is read from `is`.
  * @param is The input stream we read from. Its default value is `std::cin`.
- * @exception `cgarside::InvalidStringError`: may be raised by `of_string`.
+ * @exception `garcide::InvalidStringError`: may be raised by `of_string`.
  * @exception `HelpAskedFor`: raised when `"?"` is entered.
  * @exception `InterruptAskedFor`: raised when `"q"` or `"Q"` is entered.
  */
@@ -64,7 +93,7 @@ void read_braid(Braid &b, std::istream &is = std::cin);
  * Reads a line from `is`, parses it as a parameter and returns it.
  *
  * @param is The input stream we read from. Its default value is `std::cin`.
- * @exception `cgarside::InvalidStringError`: may be raised by
+ * @exception `garcide::InvalidStringError`: may be raised by
  * `parameter_of_string`.
  * @exception `HelpAskedFor`: raised when `"?"` is entered.
  * @exception `InterruptAskedFor`: raised when `"q"` or `"Q"` is entered.

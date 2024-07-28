@@ -1,3 +1,32 @@
+/**
+ * @file braiding_option.h
+ * @author Matteo Wei (matteo.wei@ens.psl.eu)
+ * @brief Header file to configure the braiding executable.
+ * @version 0.1
+ * @date 2024-07-28
+ *
+ * @copyright Copyright (C) 2024. Distributed under the GNU General Public
+ * License, version 3.
+ *
+ */
+
+/*
+ * GarCide Copyright (C) 2024 Matteo Wei.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License in LICENSE for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef BRAIDING_OPTION
 #define BRAIDING_OPTION
 
@@ -30,34 +59,34 @@
 namespace braiding {
 #if BRAIDING_CLASS == 0
 
-using Factor = cgarside::artin::Factor;
-using Braid = cgarside::artin::Braid;
+using Factor = garcide::artin::Factor;
+using Braid = garcide::artin::Braid;
 
 #elif BRAIDING_CLASS == 1
 
-using Factor = cgarside::band::Factor;
-using Braid = cgarside::band::Braid;
+using Factor = garcide::band::Factor;
+using Braid = garcide::band::Braid;
 
 
 #elif BRAIDING_CLASS == 2
 
-using Factor = cgarside::octahedral::Factor;
-using Braid = cgarside::octahedral::Braid;
+using Factor = garcide::octahedral::Factor;
+using Braid = garcide::octahedral::Braid;
 
 #elif BRAIDING_CLASS == 3
 
-using Factor = cgarside::dihedral::Factor;
-using Braid = cgarside::dihedral::Braid;
+using Factor = garcide::dihedral::Factor;
+using Braid = garcide::dihedral::Braid;
 
 #elif BRAIDING_CLASS == 4
 
-using Factor = cgarside::dual_complex::Factor;
-using Braid = cgarside::dual_complex::Braid;
+using Factor = garcide::dual_complex::Factor;
+using Braid = garcide::dual_complex::Braid;
 
 #elif BRAIDING_CLASS == 5
 
-using Factor = cgarside::standard_complex::Factor;
-using Braid = cgarside::standard_complex::Braid;
+using Factor = garcide::standard_complex::Factor;
+using Braid = garcide::standard_complex::Braid;
 
 
 #endif

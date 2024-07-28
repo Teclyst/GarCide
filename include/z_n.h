@@ -1,9 +1,38 @@
+/**
+ * @file z_n.h
+ * @author Matteo Wei (matteo.wei@ens.psl.eu)
+ * @brief Header file for Z ^ n.
+ * @version 0.1
+ * @date 2024-07-28
+ *
+ * @copyright Copyright (C) 2024. Distributed under the GNU General Public
+ * License, version 3.
+ *
+ */
+
+/*
+ * GarCide Copyright (C) 2024 Matteo Wei.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License in LICENSE for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef Z_N
 #define Z_N
 
 #include "cgarside.h"
 
-namespace cgarside::z_n {
+namespace garcide::z_n {
 /**
  * @brief A class for Z ^ n canonical factors.
  *

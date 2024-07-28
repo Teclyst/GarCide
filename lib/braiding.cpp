@@ -1,3 +1,32 @@
+/**
+ * @file braiding.cpp
+ * @author Matteo Wei (matteo.wei@ens.psl.eu)
+ * @brief Implementation file for most of braiding.
+ * @version 0.1
+ * @date 2024-07-28
+ *
+ * @copyright Copyright (C) 2024. Distributed under the GNU General Public
+ * License, version 3.
+ *
+ */
+
+/*
+ * GarCide Copyright (C) 2024 Matteo Wei.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License in LICENSE for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "braiding.h"
 #include "centralizer.h"
 #include "garsidesc.h"
@@ -169,7 +198,7 @@ void prompt_braid(Braid &b) {
             read_braid(b);
             ind_cout << EndLine();
             return;
-        } catch (cgarside::InvalidStringError inval) {
+        } catch (garcide::InvalidStringError inval) {
             ind_cout << EndLine() << "This is not a valid braid!" << EndLine(1)
                      << inval.error_source << EndLine(1)
                      << "Please try again (? for help, q to abort):"
@@ -191,7 +220,7 @@ Braid::Parameter prompt_braid_parameter() {
             Braid::Parameter p = read_braid_parameter();
             ind_cout << EndLine();
             return p;
-        } catch (cgarside::InvalidStringError inval) {
+        } catch (garcide::InvalidStringError inval) {
             ind_cout << EndLine() << "This is not a valid braid parameter!"
                      << EndLine(1) << inval.error_source << EndLine(1)
                      << "Please try again (? for help, q to abort):"
@@ -496,7 +525,7 @@ void sss_case() {
     Braid b(prompt_braid_parameter());
     prompt_braid(b);
     ind_cout << EndLine();
-    cgarside::super_summit::super_summit_set(b).print(ind_cout);
+    garcide::super_summit::super_summit_set(b).print(ind_cout);
     ind_cout << EndLine(1);
 }
 
@@ -504,21 +533,21 @@ void uss_case() {
     Braid b(prompt_braid_parameter());
     prompt_braid(b);
     ind_cout << EndLine();
-    cgarside::ultra_summit::ultra_summit_set(b).print();
+    garcide::ultra_summit::ultra_summit_set(b).print();
 }
 
 void scs_case() {
     Braid b(prompt_braid_parameter());
     prompt_braid(b);
     ind_cout << EndLine();
-    cgarside::sliding_circuits::sliding_circuits_set(b).print();
+    garcide::sliding_circuits::sliding_circuits_set(b).print();
 }
 
 void centralizer_case() {
     Braid b(prompt_braid_parameter());
     prompt_braid(b);
     ind_cout << EndLine();
-    cgarside::centralizer::centralizer(b).print();
+    garcide::centralizer::centralizer(b).print();
 }
 
 void conjugacy_case() {
@@ -526,7 +555,7 @@ void conjugacy_case() {
     Braid b(p), c(p), conj(p);
     prompt_braid(b);
     prompt_braid(c);
-    if (cgarside::sliding_circuits::are_conjugate(b, c, conj)) {
+    if (garcide::sliding_circuits::are_conjugate(b, c, conj)) {
         ind_cout << EndLine() << "They are conjugates." << EndLine()
                  << "A conjugating element is:" << EndLine() << conj
                  << EndLine(1);
@@ -541,7 +570,7 @@ void thurston_type_case() {
     Braid b(prompt_braid_parameter());
     prompt_braid(b);
     ind_cout << EndLine() << "Its Thurston type is "
-             << cgarside::artin::thurston_type(b) << "." << EndLine(1);
+             << garcide::artin::thurston_type(b) << "." << EndLine(1);
 }
 
 #endif

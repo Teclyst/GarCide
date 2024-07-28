@@ -1,11 +1,40 @@
-#ifndef SUPER
-#define SUPER
+/**
+ * @file sliding_circuits.h
+ * @author Matteo Wei (matteo.wei@ens.psl.eu)
+ * @brief Header (and implementation) file for super summit sets.
+ * @version 0.1
+ * @date 2024-07-28
+ *
+ * @copyright Copyright (C) 2024. Distributed under the GNU General Public
+ * License, version 3.
+ *
+ */
+
+/*
+ * GarCide Copyright (C) 2024 Matteo Wei.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License in LICENSE for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#ifndef SUPER_SUMMIT
+#define SUPER_SUMMIT
 
 #include "cgarside.h"
 #include <cstddef>
 #include <iterator>
 
-namespace cgarside::super_summit {
+namespace garcide::super_summit {
 
 template <class F>
 BraidTemplate<F> send_to_super_summit(const BraidTemplate<F> &b) {
@@ -311,6 +340,6 @@ inline bool are_conjugate(const BraidTemplate<F> &u,
     return u_sss.mem(send_to_super_summit(v));
 }
 
-} // namespace cgarside::super_summit
+} // namespace garcide::super_summit
 
 #endif

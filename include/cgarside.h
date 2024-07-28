@@ -1,5 +1,34 @@
-#ifndef CGARSIDE
-#define CGARSIDE
+/**
+ * @file garcide.h
+ * @author Matteo Wei (matteo.wei@ens.psl.eu)
+ * @brief Header (and implementation) file for generic Garside groups.
+ * @version 0.1
+ * @date 2024-07-28
+ *
+ * @copyright Copyright (C) 2024. Distributed under the GNU General Public
+ * License, version 3.
+ *
+ */
+
+/*
+ * GarCide Copyright (C) 2024 Matteo Wei.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License in LICENSE for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#ifndef GARCIDE
+#define GARCIDE
 
 #include "utility.h"
 #include <list>
@@ -7,13 +36,7 @@
 #include <unordered_set>
 #include <vector>
 
-/**
- * @brief Generic factors and braids representation for Garside groups.
- *
- * In this namespace, we define (templated) classes that represent elements for
- * generic Garside groups.
- */
-namespace cgarside {
+namespace garcide {
 
 template <class U> class FactorTemplate {
 
@@ -1117,17 +1140,17 @@ inline IndentedOStream &operator<<(IndentedOStream &os,
     return os;
 }
 
-} // namespace cgarside
+} // namespace garcide
 
-template <class U> struct std::hash<cgarside::FactorTemplate<U>> {
+template <class U> struct std::hash<garcide::FactorTemplate<U>> {
     std::size_t
-    operator()(cgarside::FactorTemplate<U> const &f) const noexcept {
+    operator()(garcide::FactorTemplate<U> const &f) const noexcept {
         return f.hash();
     }
 };
 
-template <class F> struct std::hash<cgarside::BraidTemplate<F>> {
-    std::size_t operator()(cgarside::BraidTemplate<F> const &u) const noexcept {
+template <class F> struct std::hash<garcide::BraidTemplate<F>> {
+    std::size_t operator()(garcide::BraidTemplate<F> const &u) const noexcept {
         return u.hash();
     }
 };
