@@ -1,5 +1,5 @@
 /**
- * @file z_n.h
+ * @file euclidean_lattice.h
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
  * @brief Header file for Z ^ n.
  * @version 0.1
@@ -30,7 +30,7 @@
 #ifndef Z_N
 #define Z_N
 
-#include "cgarside.h"
+#include "garcide.h"
 
 namespace garcide::z_n {
 /**

@@ -1,5 +1,5 @@
 /**
- * @file band_braid.h
+ * @file band.h
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
  * @brief Header file for standard braid groups (dual Garside structure).
  * @version 0.1
@@ -30,7 +30,7 @@
 #ifndef BAND
 #define BAND
 
-#include "cgarside.h"
+#include "garcide.h"
 
 #ifdef USE_CLN
 

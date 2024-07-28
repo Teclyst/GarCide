@@ -27,7 +27,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "dihedral_braid.h"
+#include "dihedral.h"
 
 struct NotBelow {};
 

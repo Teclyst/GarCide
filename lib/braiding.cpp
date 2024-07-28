@@ -29,7 +29,7 @@
 
 #include "braiding.h"
 #include "centralizer.h"
-#include "garsidesc.h"
+#include "sliding_circuits.h"
 
 namespace braiding {
 

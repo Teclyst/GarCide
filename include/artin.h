@@ -1,5 +1,5 @@
 /**
- * @file artin_braid.h
+ * @file artin.h
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
  * @brief Header file for standard braid groups (classic Garside structure).
  * @version 0.1
@@ -30,8 +30,8 @@
 #ifndef ARTIN
 #define ARTIN
 
-#include "cgarside.h"
-#include "garsideuss.h"
+#include "garcide.h"
+#include "ultra_summit.h"
 
 namespace garcide {
 

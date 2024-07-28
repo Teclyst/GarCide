@@ -32,27 +32,27 @@
 
 #if BRAIDING_CLASS == 0
 
-#include "artin_braid.h"
+#include "artin.h"
 
 #elif BRAIDING_CLASS == 1
 
-#include "band_braid.h"
+#include "band.h"
 
 #elif BRAIDING_CLASS == 2
 
-#include "octahedral_braid.h"
+#include "octahedral.h"
 
 #elif BRAIDING_CLASS == 3
 
-#include "dihedral_braid.h"
+#include "dihedral.h"
 
 #elif BRAIDING_CLASS == 4
 
-#include "dual_complex_reflection.h"
+#include "dual_complex.h"
 
 #elif BRAIDING_CLASS == 5
 
-#include "standard_complex_reflection.h"
+#include "standard_complex.h"
 
 #endif
 

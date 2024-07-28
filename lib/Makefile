@@ -25,7 +25,7 @@
 
 # File Names.
 LIBCBRAID_SRC = utility.cpp braiding.cpp
-LIBCBRAID_GROUP_SRC = artin_braid.cpp band_braid.cpp octahedral_braid.cpp dihedral_braid.cpp dual_complex_reflection.cpp standard_complex_reflection.cpp
+LIBCBRAID_GROUP_SRC = artin.cpp band.cpp octahedral.cpp dihedral.cpp dual_complex.cpp standard_complex.cpp
 LIBCBRAID_SRC_CLEAN = $(LIBCBRAID_SRC) $(LIBCBRAID_GROUP_SRC)
 LIBCBRAID_INCLUDEDIR = ../include
 LIBCBRAID_OBJ = $(LIBCBRAID_SRC:.cpp=.o)
@@ -39,26 +39,26 @@ LIBCBRAID_CLEAN = $(LIBCBRAID_OBJ_CLEAN) $(LIBCBRAID_A)
 
 # Compile artin_braid.cpp.
 ifeq ($(USE_ARTIN), 1)
-	LIBCBRAID_SRC += artin_braid.cpp
+	LIBCBRAID_SRC += artin.cpp
 endif
 
 # Compile band_braid.cpp.
 # Band braids need CLN to be randomizable.
 ifeq ($(USE_BAND), 1)
-	LIBCBRAID_SRC += band_braid.cpp
+	LIBCBRAID_SRC += band.cpp
 endif
 
 ifeq ($(USE_OCTAHEDRAL), 1)
-	LIBCBRAID_SRC += octahedral_braid.cpp
+	LIBCBRAID_SRC += octahedral.cpp
 endif
 ifeq ($(USE_DIHEDRAL), 1)
-	LIBCBRAID_SRC += dihedral_braid.cpp
+	LIBCBRAID_SRC += dihedral.cpp
 endif
 ifeq ($(USE_DUAL_COMPLEX), 1)
-	LIBCBRAID_SRC += dual_complex_reflection.cpp
+	LIBCBRAID_SRC += dual_complex.cpp
 endif
 ifeq ($(USE_STANDARD_COMPLEX), 1)
-	LIBCBRAID_SRC += standard_complex_reflection.cpp
+	LIBCBRAID_SRC += standard_complex.cpp
 endif
 ifeq ($(USE_ALL),1)
 	LIBCBRAID_SRC += $(LIBCBRAID_GROUP_SRC)

@@ -1,5 +1,5 @@
 /**
- * @file octahedral_braid.h
+ * @file octahedral.h
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
  * @brief Header file for B-series Artin groups (dual Garside structure).
  * @version 0.1
@@ -30,7 +30,7 @@
 #ifndef OCTAHEDRAL
 #define OCTAHEDRAL
 
-#include "cgarside.h"
+#include "garcide.h"
 
 namespace garcide::octahedral {
 

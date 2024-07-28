@@ -27,7 +27,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "artin_braid.h"
+#include "artin.h"
 
 namespace garcide {
 

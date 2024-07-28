@@ -1,5 +1,5 @@
 /**
- * @file dihedral_braid.h
+ * @file dihedral.h
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
  * @brief Header file for I-series Artin groups (dual Garside structure).
  * @version 0.1
@@ -27,7 +27,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "cgarside.h"
+#include "garcide.h"
 
 namespace garcide::dihedral {
 

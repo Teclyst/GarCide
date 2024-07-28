@@ -30,7 +30,7 @@
 #ifndef ULTRA_SUMMIT
 #define ULTRA_SUMMIT
 
-#include "garsidesss.h"
+#include "super_summit.h"
 
 // An exception.
 struct NotInUSS {};

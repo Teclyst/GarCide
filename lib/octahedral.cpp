@@ -27,7 +27,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "octahedral_braid.h"
+#include "octahedral.h"
 
 namespace garcide::octahedral {
 

@@ -27,7 +27,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "band_braid.h"
+#include "band.h"
 
 namespace garcide::band {
 

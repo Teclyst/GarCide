@@ -27,7 +27,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "dual_complex_reflection.h"
+#include "dual_complex.h"
 
 namespace garcide {
 
