@@ -13,8 +13,11 @@ namespace artin {
 /// In this case, permutations.
 class Underlying {
 
+  public:
+    using Parameter = sint16;
+
   private:
-    sint16 PresentationParameter;
+    Parameter number_of_strands;
 
     std::vector<sint16> permutation_table;
 
@@ -29,36 +32,34 @@ class Underlying {
      * Having too big `thread_local` objects might cause some issue with thread
      * spawning.
      */
-    static const sint16 MaxBraidIndex = 256;
+    static const sint16 MAX_NUMBER_OF_STRANDS = 256;
 
   public:
-    typedef sint16 Parameter;
 
     static Parameter parameter_of_string(const std::string &str);
 
     /**
-     * @brief Get the `PresentationParameter`.
+     * @brief Get the `number_of_strands`.
      *
-     * Get the `PresentationParameter` (which is `private`).
+     * Get the `number_of_strands` (which is `private`).
      *
-     * @return `PresentationParameter`.
+     * @return `number_of_strands`.
      */
     Parameter get_parameter() const;
 
-    sint16 at(sint16 i) const { return permutation_table[i]; }
-    sint16 &at(sint16 i) { return permutation_table[i]; }
+    sint16 at(size_t i) const { return permutation_table[i]; }
 
     /**
      * @brief Construct a new `Underlying`.
      *
      * Construct a new `Underlying`, with `n` as its
-     * `PresentationParameter`.
+     * `number_of_strands`.
      *
      * Its `permutation_table` will have length `n`, and will be filled with
      * zeros (thus this is not a valid factor). Initialize it with `identity`,
      * `delta`, or another similar method.
      *
-     * @param n The `PresentationParameter` of the factor (also the length of
+     * @param n The `number_of_strands` of the factor (also the length of
      * its `permutation_table`).
      */
     Underlying(Parameter n);
@@ -168,7 +169,7 @@ class Underlying {
   private:
     // Computes the factor corresponding to the inverse permutation.
     // Used to simplify complement operation.
-    Underlying Inverse() const;
+    Underlying inverse() const;
 
     // Subroutine called by left_meet() and right_meet().
     static void MeetSub(const sint16 *a, const sint16 *b, sint16 *r, sint16 s,

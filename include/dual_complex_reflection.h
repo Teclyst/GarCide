@@ -5,36 +5,39 @@ namespace cgarside {
 namespace dual_complex {
 
 // We represent B(e, e, n + 1).
-struct Parameter {
+struct EENParameter {
     sint16 e;
     sint16 n;
 
-    Parameter(sint16 e, sint16 n) : e(e), n(n) {}
+    EENParameter(sint16 e, sint16 n) : e(e), n(n) {}
 
-    inline bool compare(const Parameter &p) const {
+    inline bool compare(const EENParameter &p) const {
         return ((e == p.e) && (n == p.n));
     }
 
-    inline bool operator==(const Parameter &p) const {
+    inline bool operator==(const EENParameter &p) const {
         return compare(p);
     }
 
-    inline bool operator!=(const Parameter &p) const {
+    inline bool operator!=(const EENParameter &p) const {
         return !compare(p);
     }
 
     void print(IndentedOStream &os) const;
 };
 
-// You may use Braids with parameter e, n such that e * n <= `MaxE` *
-// `MaxN`. Note that `MaxE` IS NOT a strict bound; rather, it is the
+// You may use Braids with parameter e, n such that e * n <= `MAX_E` *
+// `MAX_N`. Note that `MAX_E` IS NOT a strict bound; rather, it is the
 // greatest possible e such that it is possible to have braids with parameter n
-// as great as `MaxN`. To understand what we are doing, it is advised
+// as great as `MAX_N`. To understand what we are doing, it is advised
 // to look at `arXiv:math/0403400v2` (Bessis, Corran, 2004).
 class Underlying {
 
-  protected:
-    Parameter PresentationParameter;
+  public:
+    using Parameter = EENParameter;
+
+  private:
+    Parameter een_index;
 
     // The induced permutation, where 0 is the 0-th coordinates, and then the
     // next n coordinates represent the powers w ^ -i (with i ranging between 0
@@ -47,13 +50,13 @@ class Underlying {
     // added condition of their product's being one. They are represented by
     // integer ranging between 0 and e - 1, with i standing for w^(ei) (with w
     // the same root as for the permutation_table).
-    std::vector<sint16> CoefficientTable;
+    std::vector<sint16> coefficient_table;
 
   public:
     /**
-     * @brief Maximum value for `PresentationParameter.n`.
+     * @brief Maximum value for `een_index.n`.
      *
-     * The greatest `PresentationParameter.n` value that may be used for braids.
+     * The greatest `een_index.n` value that may be used for braids.
      *
      * It is used because we use `thread_local` objects to avoid some
      * allocations, and their size must be known at compile time.
@@ -61,14 +64,14 @@ class Underlying {
      * Having too big `thread_local` objects might cause some issue with thread
      * spawning.
      */
-    static const sint16 MaxN = 256;
+    static const sint16 MAX_N = 256;
 
     /**
-     * @brief Maximum value for `PresentationParameter.e`.
+     * @brief Maximum value for `een_index.e`.
      *
-     * Not exactly. This is not a strict bound on `PresentationParameter.e`. The
-     * real condition is `PresentationParameter.e * PresentationParameter.n <=
-     * MaxE * MaxN`.
+     * Not exactly. This is not a strict bound on `een_index.e`. The
+     * real condition is `een_index.e * een_index.n <=
+     * MAX_E * MAX_N`.
      *
      * It is used because we use `thread_local` objects to avoid some
      * allocations, and their size must be known at compile time.
@@ -76,9 +79,7 @@ class Underlying {
      * Having too big `thread_local` objects might cause some issue with thread
      * spawning.
      */
-    static const sint16 MaxE = 1;
-
-    typedef Parameter Parameter;
+    static const sint16 MAX_E = 1;
 
     static Parameter parameter_of_string(const std::string &str);
 
@@ -93,9 +94,9 @@ class Underlying {
 
     void debug(IndentedOStream &os) const;
 
-    void AssignPartition(sint16 *x) const;
+    void assign_partition(sint16 *x) const;
 
-    void OfPartition(const sint16 *x);
+    void of_partition(const sint16 *x);
 
     // print to os. Be wary, as it side-effects!
     void print(IndentedOStream &os) const;
@@ -120,7 +121,7 @@ class Underlying {
 
     // Computes the factor corresponding to the inverse permutation.
     // Used to simplify complement operation.
-    Underlying Inverse() const;
+    Underlying inverse() const;
 
     // product under the hypothesis that it is still simple.
     Underlying
@@ -154,7 +155,7 @@ typedef BraidTemplate<Factor> Braid;
 } // namespace CGarside
 
 template <>
-IndentedOStream &IndentedOStream::operator<< <dual_complex::Parameter>(
-    const dual_complex::Parameter &p);
+IndentedOStream &IndentedOStream::operator<< <dual_complex::EENParameter>(
+    const dual_complex::EENParameter &p);
 
 }

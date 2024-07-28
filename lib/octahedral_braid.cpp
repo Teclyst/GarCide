@@ -178,7 +178,7 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
     }
 }
 
-void Underlying::AssignDCDT(sint16 *x) const {
+void Underlying::assign_partition(sint16 *x) const {
     for (sint16 i = 1; i <= 2 * get_parameter(); ++i)
         x[i] = 0;
     for (sint16 i = 1; i <= 2 * get_parameter(); ++i) {
@@ -189,7 +189,7 @@ void Underlying::AssignDCDT(sint16 *x) const {
     }
 }
 
-void Underlying::OfDCDT(const sint16 *x) {
+void Underlying::of_partition(const sint16 *x) {
     thread_local sint16 z[2 * MaxBraidIndex + 1];
 
     for (sint16 i = 1; i <= 2 * get_parameter(); ++i)
@@ -204,8 +204,8 @@ Underlying Underlying::left_meet(const Underlying &b) const {
     thread_local sint16 x[2 * MaxBraidIndex + 1], y[2 * MaxBraidIndex + 1],
         z[2 * MaxBraidIndex + 1];
 
-    AssignDCDT(x);
-    b.AssignDCDT(y);
+    assign_partition(x);
+    b.assign_partition(y);
 
     thread_local sint16 P[2 * MaxBraidIndex + 1][2 * MaxBraidIndex + 1];
 
@@ -219,7 +219,7 @@ Underlying Underlying::left_meet(const Underlying &b) const {
 
     Underlying c = Underlying(*this);
 
-    c.OfDCDT(z);
+    c.of_partition(z);
 
     return c;
 }
@@ -252,7 +252,7 @@ bool Underlying::compare(const Underlying &b) const {
     return true;
 };
 
-Underlying Underlying::Inverse() const {
+Underlying Underlying::inverse() const {
     Underlying f = Underlying(get_parameter());
     sint16 i;
     for (i = 1; i <= 2 * get_parameter(); i++) {
@@ -271,11 +271,11 @@ Underlying Underlying::product(const Underlying &b) const {
 };
 
 Underlying Underlying::left_complement(const Underlying &b) const {
-    return b.product(Inverse());
+    return b.product(inverse());
 };
 
 Underlying Underlying::right_complement(const Underlying &b) const {
-    return Inverse().product(b);
+    return inverse().product(b);
 };
 
 void Underlying::delta_conjugate_mut(sint16 k) {

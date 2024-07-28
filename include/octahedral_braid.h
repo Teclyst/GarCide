@@ -65,9 +65,9 @@ class Underlying {
 
     void debug(IndentedOStream &os) const;
 
-    void AssignDCDT(sint16 *x) const;
+    void assign_partition(sint16 *x) const;
 
-    void OfDCDT(const sint16 *x);
+    void of_partition(const sint16 *x);
 
     // print to os. Be wary, as it side-effects!
     void print(IndentedOStream &os) const;
@@ -88,7 +88,7 @@ class Underlying {
 
     // Computes the factor corresponding to the inverse permutation.
     // Used to simplify complement operation.
-    Underlying Inverse() const;
+    Underlying inverse() const;
 
     // product under the hypothesis that it is still simple.
     Underlying product(const Underlying &b) const;

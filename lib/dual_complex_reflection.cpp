@@ -6,11 +6,11 @@ namespace cgarside {
 
 namespace dual_complex {
 
-void Parameter::print(IndentedOStream &os) const {
+void EENParameter::print(IndentedOStream &os) const {
     os << "(e: " << e << ", n: " << n << ")";
 }
 
-Parameter Underlying::get_parameter() const { return PresentationParameter; }
+EENParameter Underlying::get_parameter() const { return een_index; }
 
 Underlying::Parameter
 Underlying::parameter_of_string(const std::string &str) {
@@ -36,22 +36,22 @@ Underlying::parameter_of_string(const std::string &str) {
                                      match.str(2) +
                                      " can not be converted to a C++ integer.");
         }
-        if ((2 <= e) && (2 <= n) && (n <= MaxN) && (e * n <= MaxE * MaxN)) {
-            return Parameter(e, n);
+        if ((2 <= e) && (2 <= n) && (n <= MAX_N) && (e * n <= MAX_E * MAX_N)) {
+            return EENParameter(e, n);
         } else if (2 > e) {
             throw InvalidStringError("e should be at least 2!");
             } else if (2 > n) {
             throw InvalidStringError("n should be at least 2!");
-        } else if (n > MaxN) {
+        } else if (n > MAX_N) {
             throw InvalidStringError("n is too big!\n" +
                                      match.str(1) +
                                      " is strictly greater than " +
-                                     std::to_string(MaxN) + ".");
+                                     std::to_string(MAX_N) + ".");
         } else {
             throw InvalidStringError("e * n is too big!\n" +
                                      match.str(1) + " * " + match.str(2) + " = " + std::to_string(e * n) +
                                      " is strictly greater than " +
-                                     std::to_string(MaxN * MaxE) + ".");
+                                     std::to_string(MAX_N * MAX_E) + ".");
         }
     } else {
         throw InvalidStringError(
@@ -62,13 +62,13 @@ Underlying::parameter_of_string(const std::string &str) {
 sint16 Underlying::lattice_height() const { return get_parameter().n + 1; }
 
 Underlying::Underlying(Parameter p)
-    : PresentationParameter(p), permutation_table(p.n + 1),
-      CoefficientTable(p.n + 1) {}
+    : een_index(p), permutation_table(p.n + 1),
+      coefficient_table(p.n + 1) {}
 
 void Underlying::debug(IndentedOStream &os) const {
     os << "{   ";
     os.Indent(4);
-    os << "PresentationParameter:";
+    os << "een_index:";
     os.Indent(4);
     os << EndLine() << get_parameter();
     os.Indent(-4);
@@ -89,9 +89,9 @@ void Underlying::debug(IndentedOStream &os) const {
     os << EndLine();
     os << "[";
     for (sint16 i = 0; i < get_parameter().n; i++) {
-        os << CoefficientTable[i] << ", ";
+        os << coefficient_table[i] << ", ";
     }
-    os << CoefficientTable[get_parameter().n];
+    os << coefficient_table[get_parameter().n];
     os << "]";
     os.Indent(-8);
     os << EndLine();
@@ -127,15 +127,15 @@ void Underlying::print(IndentedOStream &os) const {
         for (sint16 i = int(curr_cycle.size()) - 1; i >= 1; i--) {
             os << "("
                << ((i >= other_smallest)
-                       ? curr_cycle[i] + Rem(CoefficientTable[0] + 1, e) * n
-                       : curr_cycle[i] + CoefficientTable[0] * n)
+                       ? curr_cycle[i] + Rem(coefficient_table[0] + 1, e) * n
+                       : curr_cycle[i] + coefficient_table[0] * n)
                << ", "
                << ((i >= other_smallest + 1)
-                       ? curr_cycle[i - 1] + Rem(CoefficientTable[0] + 1, e) * n
-                       : curr_cycle[i - 1] + CoefficientTable[0] * n)
+                       ? curr_cycle[i - 1] + Rem(coefficient_table[0] + 1, e) * n
+                       : curr_cycle[i - 1] + coefficient_table[0] * n)
                << ") ";
         }
-        os << curr_cycle[0] + CoefficientTable[0] * n;
+        os << curr_cycle[0] + coefficient_table[0] * n;
     }
 
     for (sint16 i = 1; i <= n; ++i) {
@@ -143,8 +143,8 @@ void Underlying::print(IndentedOStream &os) const {
             seen[i] = true;
             c = 0;
             other_smallest = 0;
-            cycle_type = CoefficientTable[i];
-            if (CoefficientTable[i] == e - 1) {
+            cycle_type = coefficient_table[i];
+            if (coefficient_table[i] == e - 1) {
                 other_smallest = c + 1;
             }
             curr = permutation_table[i];
@@ -154,10 +154,10 @@ void Underlying::print(IndentedOStream &os) const {
                 curr_cycle.push_back(curr);
                 seen[curr] = true;
                 c++;
-                if (CoefficientTable[curr] == e - 1) {
+                if (coefficient_table[curr] == e - 1) {
                     other_smallest = c + 1;
                 }
-                cycle_type += CoefficientTable[curr];
+                cycle_type += coefficient_table[curr];
                 curr = permutation_table[curr];
             }
             // If cycle_type == 0, then the cycle is short.
@@ -240,8 +240,8 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
             identity();
             permutation_table[i] = (j > n) ? j - n : j;
             permutation_table[(j > n) ? j - n : j] = i;
-            CoefficientTable[i] = (j > n) ? 1 : 0;
-            CoefficientTable[(j > n) ? j - n : j] = (j > n) ? e - 1 : 0;
+            coefficient_table[i] = (j > n) ? 1 : 0;
+            coefficient_table[(j > n) ? j - n : j] = (j > n) ? e - 1 : 0;
         } else if ((Rem(i, n) == Rem(j, n))) {
             throw InvalidStringError("Indexes for short symmetric generators "
                                      "should not be equal mod " +
@@ -269,8 +269,8 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
         identity();
         permutation_table[0] = r;
         permutation_table[r] = 0;
-        CoefficientTable[0] = q;
-        CoefficientTable[r] = (q == 0) ? 0 : e - q;
+        coefficient_table[0] = q;
+        coefficient_table[r] = (q == 0) ? 0 : e - q;
     } else {
         throw InvalidStringError(
             "Could not extract a factor from \"" + str.substr(pos) +
@@ -279,7 +279,7 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
     }
 }
 
-void Underlying::AssignPartition(sint16 *x) const {
+void Underlying::assign_partition(sint16 *x) const {
     sint16 n = get_parameter().n, e = get_parameter().e;
     std::vector<sint16> curr_cycle;
     sint16 other_smallest, cycle_type, curr, c;
@@ -307,21 +307,21 @@ void Underlying::AssignPartition(sint16 *x) const {
                     x[curr_cycle[k] + l * n] = curr_cycle[0] + l * n;
                 }
                 x[curr_cycle[k] + (e - 1) * n] = curr_cycle[other_smallest];
-                x[curr_cycle[k] + Rem(CoefficientTable[0], e) * n] = 0;
+                x[curr_cycle[k] + Rem(coefficient_table[0], e) * n] = 0;
             }
             for (sint16 k = other_smallest; k < int(curr_cycle.size()); k++) {
                 for (sint16 l = 0; l < e - 1; l++) {
                     x[curr_cycle[k] + (l + 1) * n] = curr_cycle[0] + l * n;
                 }
                 x[curr_cycle[k]] = curr_cycle[other_smallest];
-                x[curr_cycle[k] + Rem(CoefficientTable[0] + 1, e) * n] = 0;
+                x[curr_cycle[k] + Rem(coefficient_table[0] + 1, e) * n] = 0;
             }
         } else {
             for (sint16 k = 0; k < int(curr_cycle.size()); k++) {
                 for (sint16 l = 0; l < e; l++) {
                     x[curr_cycle[k] + l * n] = curr_cycle[0] + l * n;
                 }
-                x[curr_cycle[k] + Rem(CoefficientTable[0], e) * n] = 0;
+                x[curr_cycle[k] + Rem(coefficient_table[0], e) * n] = 0;
             }
         }
     }
@@ -330,8 +330,8 @@ void Underlying::AssignPartition(sint16 *x) const {
         if (x[i] < 0) {
             c = 0;
             other_smallest = 0;
-            cycle_type = CoefficientTable[i];
-            if (CoefficientTable[i] == e - 1) {
+            cycle_type = coefficient_table[i];
+            if (coefficient_table[i] == e - 1) {
                 other_smallest = 1;
             }
             curr = permutation_table[i];
@@ -340,10 +340,10 @@ void Underlying::AssignPartition(sint16 *x) const {
             while (curr != i) {
                 curr_cycle.push_back(curr);
                 c++;
-                if (CoefficientTable[curr] == e - 1) {
+                if (coefficient_table[curr] == e - 1) {
                     other_smallest = c + 1;
                 }
-                cycle_type += CoefficientTable[curr];
+                cycle_type += coefficient_table[curr];
                 curr = permutation_table[curr];
             }
             // If cycle_type == 0, then the cycle is short.
@@ -385,15 +385,15 @@ void Underlying::AssignPartition(sint16 *x) const {
 }
 
 // We assume e > 1.
-void Underlying::OfPartition(const sint16 *x) {
-    thread_local sint16 z[MaxN + 1];
+void Underlying::of_partition(const sint16 *x) {
+    thread_local sint16 z[MAX_N + 1];
     sint16 min_cycle_0 = 0, max_cycle_0 = 0;
     sint16 n = get_parameter().n, e = get_parameter().e, r;
 
     for (sint16 i = 0; i <= n; ++i) {
         z[i] = -1;
         permutation_table[i] = -1;
-        CoefficientTable[i] = -1;
+        coefficient_table[i] = -1;
     }
     // First find short symmetrical cycles.
     for (sint16 i = 2 * n - 1; i >= n + 1; --i) {
@@ -401,11 +401,11 @@ void Underlying::OfPartition(const sint16 *x) {
             r = i - n;
             if (z[x[i]] == -1) {
                 permutation_table[r] = x[i];
-                CoefficientTable[r] = e - 1;
+                coefficient_table[r] = e - 1;
                 z[x[i]] = r;
             } else {
                 permutation_table[r] = z[x[i]];
-                CoefficientTable[r] = 0;
+                coefficient_table[r] = 0;
                 z[x[i]] = r;
             }
         }
@@ -414,9 +414,9 @@ void Underlying::OfPartition(const sint16 *x) {
         if ((x[i] <= n) && (x[i] >= 1) && (x[i + n] > n)) {
             if ((z[x[i]] == -1)) {
                 permutation_table[i] = x[i];
-                CoefficientTable[i] = 0;
+                coefficient_table[i] = 0;
             } else {
-                CoefficientTable[i] = (z[x[i]] < i) ? 1 : 0;
+                coefficient_table[i] = (z[x[i]] < i) ? 1 : 0;
                 permutation_table[i] = z[x[i]];
             }
             z[x[i]] = i;
@@ -433,16 +433,16 @@ void Underlying::OfPartition(const sint16 *x) {
     if (min_cycle_0 != 0) {
         // Determine if it is long symmetric.
         if (x[Rem(min_cycle_0 + n - 1, e * n) + 1] == 0) {
-            CoefficientTable[0] = e - 1;
+            coefficient_table[0] = e - 1;
             permutation_table[0] = 0;
             for (sint16 i = n; i >= 1; i--) {
                 if (x[i] == 0) {
                     if (z[x[i]] == -1) {
                         permutation_table[i] = min_cycle_0;
-                        CoefficientTable[i] = 1;
+                        coefficient_table[i] = 1;
                     } else {
                         permutation_table[i] = z[x[i]];
-                        CoefficientTable[i] = 0;
+                        coefficient_table[i] = 0;
                     }
                     z[x[i]] = i;
                 }
@@ -474,7 +474,7 @@ void Underlying::OfPartition(const sint16 *x) {
                    q_max = Quot(max_cycle_0 - 1, n);
             sint16 r_min = Rem(min_cycle_0 - 1, n) + 1;
             z[0] = 0;
-            CoefficientTable[0] = q_min;
+            coefficient_table[0] = q_min;
             permutation_table[0] = r_min;
 
             for (sint16 i = n - 1; i >= n - r_min + 1; --i) {
@@ -482,7 +482,7 @@ void Underlying::OfPartition(const sint16 *x) {
                 r = Rem(i + min_cycle_0 - 1, n) + 1;
                 if (x[i_en] == 0) {
                     permutation_table[r] = z[0];
-                    CoefficientTable[r] = (z[0] == 0) ? Rem(e - q_max, e) : 0;
+                    coefficient_table[r] = (z[0] == 0) ? Rem(e - q_max, e) : 0;
                     z[0] = r;
                 }
             }
@@ -492,9 +492,9 @@ void Underlying::OfPartition(const sint16 *x) {
                 if ((x[i_en] == 0)) {
                     if (z[0] == 0) {
                         permutation_table[r] = z[0];
-                        CoefficientTable[r] = Rem(e - q_min, e);
+                        coefficient_table[r] = Rem(e - q_min, e);
                     } else {
-                        CoefficientTable[r] = (z[0] < r) ? 1 : 0;
+                        coefficient_table[r] = (z[0] < r) ? 1 : 0;
                         permutation_table[r] = z[0];
                     }
                     z[0] = r;
@@ -505,19 +505,19 @@ void Underlying::OfPartition(const sint16 *x) {
 
     // Short symmetric case.
     else {
-        CoefficientTable[0] = 0;
+        coefficient_table[0] = 0;
         permutation_table[0] = 0;
     }
 }
 
 Underlying Underlying::left_meet(const Underlying &b) const {
-    thread_local sint16 x[MaxE * MaxN + 1], y[MaxE * MaxN + 1],
-        z[MaxE * MaxN + 1];
+    thread_local sint16 x[MAX_E * MAX_N + 1], y[MAX_E * MAX_N + 1],
+        z[MAX_E * MAX_N + 1];
 
-    AssignPartition(x);
-    b.AssignPartition(y);
+    assign_partition(x);
+    b.assign_partition(y);
 
-    thread_local sint16 P[MaxE * MaxN + 1][MaxE * MaxN + 1];
+    thread_local sint16 P[MAX_E * MAX_N + 1][MAX_E * MAX_N + 1];
 
     for (sint16 i = get_parameter().e * get_parameter().n; i >= 0; i--) {
         P[x[i]][y[i]] = i;
@@ -529,7 +529,7 @@ Underlying Underlying::left_meet(const Underlying &b) const {
 
     Underlying c = Underlying(*this);
 
-    c.OfPartition(z);
+    c.of_partition(z);
 
     return c;
 }
@@ -537,7 +537,7 @@ Underlying Underlying::left_meet(const Underlying &b) const {
 void Underlying::identity() {
     for (sint16 i = 0; i <= get_parameter().n; i++) {
         permutation_table[i] = i;
-        CoefficientTable[i] = 0;
+        coefficient_table[i] = 0;
     }
 }
 
@@ -545,26 +545,26 @@ void Underlying::delta() {
     sint16 i, n = get_parameter().n;
     for (i = 1; i <= n; i++) {
         permutation_table[i] = i + 1;
-        CoefficientTable[i] = 0;
+        coefficient_table[i] = 0;
     }
     permutation_table[0] = 0;
-    CoefficientTable[0] = get_parameter().e - 1;
+    coefficient_table[0] = get_parameter().e - 1;
     permutation_table[n] = 1;
-    CoefficientTable[n] = 1;
+    coefficient_table[n] = 1;
 }
 
 bool Underlying::compare(const Underlying &b) const {
     sint16 i;
     for (i = 0; i <= get_parameter().n; i++) {
         if ((permutation_table[i] != b.permutation_table[i]) ||
-            (CoefficientTable[i] != b.CoefficientTable[i])) {
+            (coefficient_table[i] != b.coefficient_table[i])) {
             return false;
         }
     }
     return true;
 };
 
-Underlying Underlying::Inverse() const {
+Underlying Underlying::inverse() const {
     Underlying f = Underlying(get_parameter());
     sint16 i, n = get_parameter().n, e = get_parameter().e;
     for (i = 0; i <= n; i++) {
@@ -573,8 +573,8 @@ Underlying Underlying::Inverse() const {
             };
         }
         f.permutation_table[permutation_table[i]] = i;
-        f.CoefficientTable[permutation_table[i]] =
-            CoefficientTable[i] == 0 ? 0 : e - CoefficientTable[i];
+        f.coefficient_table[permutation_table[i]] =
+            coefficient_table[i] == 0 ? 0 : e - coefficient_table[i];
     }
     return f;
 };
@@ -584,18 +584,18 @@ Underlying Underlying::product(const Underlying &b) const {
     sint16 i, n = get_parameter().n, e = get_parameter().e;
     for (i = 0; i <= n; i++) {
         f.permutation_table[i] = b.permutation_table[permutation_table[i]];
-        f.CoefficientTable[i] = Rem(
-            b.CoefficientTable[permutation_table[i]] + CoefficientTable[i], e);
+        f.coefficient_table[i] = Rem(
+            b.coefficient_table[permutation_table[i]] + coefficient_table[i], e);
     }
     return f;
 };
 
 Underlying Underlying::left_complement(const Underlying &b) const {
-    return b.product(Inverse());
+    return b.product(inverse());
 };
 
 Underlying Underlying::right_complement(const Underlying &b) const {
-    return Inverse().product(b);
+    return inverse().product(b);
 };
 
 void Underlying::delta_conjugate_mut(sint16 k) {
@@ -605,19 +605,19 @@ void Underlying::delta_conjugate_mut(sint16 k) {
     Underlying delta_k = Underlying(get_parameter());
 
     delta_k.permutation_table[0] = 0;
-    delta_k.CoefficientTable[0] = Rem(-k, e);
+    delta_k.coefficient_table[0] = Rem(-k, e);
     for (i = 1; i <= n - r; i++) {
         delta_k.permutation_table[i] = Rem(i + k - 1, n) + 1;
-        delta_k.CoefficientTable[i] = q_e;
+        delta_k.coefficient_table[i] = q_e;
     }
     q_e += 1;
     q_e = ((q_e == e) ? 0 : q_e);
     for (i = n - r + 1; i <= n; i++) {
         delta_k.permutation_table[i] = Rem(i + k - 1, n) + 1;
-        delta_k.CoefficientTable[i] = q_e;
+        delta_k.coefficient_table[i] = q_e;
     }
 
-    *this = delta_k.Inverse().product((*this).product(delta_k));
+    *this = delta_k.inverse().product((*this).product(delta_k));
 }
 
 void Underlying::randomize() { throw NonRandomizable(); }
@@ -638,8 +638,8 @@ std::vector<Underlying> Underlying::atoms() const {
             atom.identity();
             atom.permutation_table[i] = j;
             atom.permutation_table[j] = i;
-            atom.CoefficientTable[i] = 1;
-            atom.CoefficientTable[j] = e - 1;
+            atom.coefficient_table[i] = 1;
+            atom.coefficient_table[j] = e - 1;
             atoms.push_back(atom);
         }
     }
@@ -647,8 +647,8 @@ std::vector<Underlying> Underlying::atoms() const {
         atom.identity();
         atom.permutation_table[0] = i;
         atom.permutation_table[i] = 0;
-        atom.CoefficientTable[0] = 0;
-        atom.CoefficientTable[i] = 0;
+        atom.coefficient_table[0] = 0;
+        atom.coefficient_table[i] = 0;
         atoms.push_back(atom);
     }
     for (sint16 k = 1; k < e; k++) {
@@ -656,8 +656,8 @@ std::vector<Underlying> Underlying::atoms() const {
             atom.identity();
             atom.permutation_table[0] = i;
             atom.permutation_table[i] = 0;
-            atom.CoefficientTable[0] = k;
-            atom.CoefficientTable[i] = e - k;
+            atom.coefficient_table[0] = k;
+            atom.coefficient_table[i] = e - k;
             atoms.push_back(atom);
         }
     }
@@ -670,7 +670,7 @@ std::size_t Underlying::hash() const {
         h = h * 31 + permutation_table[i];
     }
     for (sint16 i = 1; i <= get_parameter().n; i++) {
-        h = h * 31 + CoefficientTable[i];
+        h = h * 31 + coefficient_table[i];
     }
     return h;
 }
@@ -679,7 +679,7 @@ std::size_t Underlying::hash() const {
 
 template <>
 IndentedOStream &
-    IndentedOStream::operator<< <dual_complex::Parameter>(const dual_complex::Parameter &p) {
+    IndentedOStream::operator<< <dual_complex::EENParameter>(const dual_complex::EENParameter &p) {
     p.print(*this);
     return *this;
 };

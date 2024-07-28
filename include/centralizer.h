@@ -100,7 +100,7 @@ centralizer(const ultra_summit::UltraSummitSet<BraidTemplate<F>> &uss,
                          c = d, b2(b.get_parameter());
         for (size_t shift = 0; shift < uss.orbit_size(orbit_index); shift++) {
             c.right_multiply(
-                uss.at(orbit_index, shift).First().delta_conjugate(b.Inf()));
+                uss.at(orbit_index, shift).first().delta_conjugate(b.inf()));
         }
         c.right_multiply(!d);
 
@@ -109,7 +109,7 @@ centralizer(const ultra_summit::UltraSummitSet<BraidTemplate<F>> &uss,
         }
 
         BraidTemplate<F> orbit_base_rcf = uss.at(orbit_index, (size_t)0);
-        orbit_base_rcf.MakeRCFFromLCF();
+        orbit_base_rcf.lcf_to_rcf();
 
         std::vector<F> min = ultra_summit::min_ultra_summit(
             uss.at(orbit_index, (size_t)0), orbit_base_rcf);
@@ -117,7 +117,7 @@ centralizer(const ultra_summit::UltraSummitSet<BraidTemplate<F>> &uss,
         for (typename std::vector<F>::const_iterator it = min.begin();
              it != min.end(); it++) {
             b2 = uss.at(orbit_index, (size_t)0);
-            b2.Conjugate(*it);
+            b2.conjugate(*it);
             c = d * (*it) * !ultra_summit::tree_path(b2, uss, mins, prev);
 
             if ((!(c.is_identity())) && !centralizer.mem(c)) {
@@ -148,7 +148,7 @@ Centralizer<BraidTemplate<F>> centralizer(const BraidTemplate<F> &b) {
              centralizer_uss.begin();
          it != centralizer_uss.end(); it++) {
         d = *it;
-        d.Conjugate(c);
+        d.conjugate(c);
         centralizer.insert(d);
     }
 

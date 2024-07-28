@@ -1,10 +1,6 @@
 #include "braiding.h"
 
 using namespace braiding;
-using cgarside::EndLine;
-using cgarside::ind_cout;
-using cgarside::IndentedOStream;
-using cgarside::sint16;
 
 int main() {
     ind_cout << EndLine();

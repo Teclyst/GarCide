@@ -12,9 +12,11 @@
 namespace cgarside::band {
 
 class Underlying {
+  public:
+    using Parameter = sint16;
 
-  protected:
-    sint16 PresentationParameter;
+  private:
+    Parameter number_of_strands;
 
     std::vector<sint16> permutation_table;
 
@@ -30,9 +32,7 @@ class Underlying {
      * Having too big `thread_local` objects might cause some issue with thread
      * spawning.
      */
-    static const sint16 MaxBraidIndex = 256;
-
-    typedef sint16 Parameter;
+    static const Parameter MAX_NUMBER_OF_STRANDS = 256;
 
     static Parameter parameter_of_string(const std::string &str);
 
@@ -43,8 +43,7 @@ class Underlying {
     // Constructor
     Underlying(sint16 n);
 
-    sint16 at(sint16 i) const { return permutation_table[i]; }
-    sint16 &at(sint16 i) { return permutation_table[i]; }
+    sint16 at(size_t i) const { return permutation_table[i]; }
 
     /**
      * @brief Extraction from string.
@@ -76,9 +75,9 @@ class Underlying {
      */
     void debug(IndentedOStream &os) const;
 
-    void AssignDCDT(sint16 *x) const;
+    void assign_partition(sint16 *x) const;
 
-    void OfDCDT(const sint16 *x);
+    void of_partition(const sint16 *x);
 
     /**
      * @brief Prints the factor to `os`.
@@ -105,7 +104,7 @@ class Underlying {
 
     // Computes the factor corresponding to the inverse permutation.
     // Used to simplify complement operation.
-    Underlying Inverse() const;
+    Underlying inverse() const;
 
     // product under the hypothesis that it is still simple.
     Underlying product(const Underlying &b) const;
@@ -138,6 +137,8 @@ typedef BraidTemplate<Factor> Braid;
 #ifdef USE_CLN
 
 void ballot_sequence(sint16 n, cln::cl_I k, sint8 *s);
+
+const cln::cl_I &get_catalan_number(sint16 n);
 
 #endif
 

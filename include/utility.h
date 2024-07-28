@@ -341,7 +341,7 @@ class IndentedOStream {
     template <class C> IndentedOStream &operator<<(const C &c) {
         os << c;
         return *this;
-    };
+    }
 };
 
 /**

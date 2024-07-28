@@ -16,7 +16,7 @@ std::vector<BraidTemplate<F>> trajectory(BraidTemplate<F> b) {
     while (t_set.find(b) == t_set.end()) {
         t.push_back(b);
         t_set.insert(b);
-        b.Cycling();
+        b.cycling();
     }
 
     return t;
@@ -35,8 +35,8 @@ void trajectory(BraidTemplate<F> b, BraidTemplate<F> b_rcf,
         t_rcf.push_back(b_rcf);
         t_set.insert(b);
         // Cycle in RCF.
-        b_rcf.ConjugateRCF(b.Initial());
-        b.Cycling();
+        b_rcf.conjugate_rcf(b.initial());
+        b.cycling();
     }
 }
 
@@ -44,7 +44,7 @@ template <class F>
 BraidTemplate<F> send_to_ultra_summit(const BraidTemplate<F> &b) {
     BraidTemplate<F> b_uss =
         trajectory(super_summit::send_to_super_summit(b)).back();
-    b_uss.Cycling();
+    b_uss.cycling();
     return b_uss;
 }
 
@@ -55,11 +55,11 @@ BraidTemplate<F> send_to_ultra_summit(const BraidTemplate<F> &b,
     std::vector<BraidTemplate<F>> t = trajectory(b_sss);
 
     BraidTemplate<F> b_uss = BraidTemplate(t.back());
-    b_uss.Cycling();
+    b_uss.cycling();
 
     for (typename std::vector<BraidTemplate<F>>::iterator it = t.begin();
          *it != b_uss; it++) {
-        c.right_multiply((*it).First().delta_conjugate(b_sss.Delta));
+        c.right_multiply((*it).first().delta_conjugate(b_sss.inf()));
     }
 
     return b_uss;
@@ -68,9 +68,9 @@ BraidTemplate<F> send_to_ultra_summit(const BraidTemplate<F> &b,
 template <class F>
 BraidTemplate<F> transport(const BraidTemplate<F> &b, const F &f) {
     BraidTemplate<F> b2 = b;
-    b2.Conjugate(f);
-    BraidTemplate<F> b3 = (!BraidTemplate(b.First()) * f) * b2.First();
-    return b3.First();
+    b2.conjugate(f);
+    BraidTemplate<F> b3 = (!BraidTemplate(b.first()) * f) * b2.first();
+    return b3.first();
 }
 
 template <class F>
@@ -83,12 +83,12 @@ std::list<F> transports_sending_to_trajectory(const BraidTemplate<F> &b,
     sint16 i, n = 1;
     F f1 = f;
 
-    BraidTemplate<F> c1 = BraidTemplate(b1.First().delta_conjugate(b1.Delta));
-    b1.Cycling();
+    BraidTemplate<F> c1 = BraidTemplate(b1.first().delta_conjugate(b1.inf()));
+    b1.cycling();
 
     while (b1 != b) {
-        c1.right_multiply(BraidTemplate(b1.First().delta_conjugate(b1.Delta)));
-        b1.Cycling();
+        c1.right_multiply(BraidTemplate(b1.first().delta_conjugate(b1.inf())));
+        b1.cycling();
         n++;
     }
 
@@ -96,21 +96,21 @@ std::list<F> transports_sending_to_trajectory(const BraidTemplate<F> &b,
         ret.push_back(f1);
         ret_set.insert(f1);
         b1 = b;
-        b1.Conjugate(f1);
+        b1.conjugate(f1);
         c2.identity();
         for (i = 0; i < n; i++) {
-            c2.right_multiply(b1.First().delta_conjugate(b1.Delta));
-            b1.Cycling();
+            c2.right_multiply(b1.first().delta_conjugate(b1.inf()));
+            b1.cycling();
         }
 
         BraidTemplate<F> b2 = (!c1) * f1 * c2;
 
-        if (b2.Delta == 1) {
+        if (b2.inf() == 1) {
             f1.delta();
         } else if (b2.is_identity()) {
             f1.identity();
         } else {
-            f1 = b2.First();
+            f1 = b2.first();
         }
     }
 
@@ -124,32 +124,32 @@ std::list<F> transports_sending_to_trajectory(const BraidTemplate<F> &b,
 template <class F>
 F pullback(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf,
            const F &f) {
-    F f1 = b.First().delta_conjugate(b.Delta + 1);
+    F f1 = b.first().delta_conjugate(b.inf() + 1);
     F f2 = f.delta_conjugate();
 
     BraidTemplate<F> b2 = BraidTemplate(f1) * f2;
 
     F delta = F(b.get_parameter());
     delta.delta();
-    b2.right_multiply(b2.Remainder(delta));
+    b2.right_multiply(b2.remainder(delta));
 
-    b2.Delta--;
+    b2.set_delta(b2.inf() - 1);
 
     F f0 = f;
 
-    if (b2.Delta == 1) {
+    if (b2.inf() == 1) {
         f0.delta();
     } else if (b2.is_identity()) {
         f0.identity();
     } else {
-        f0 = b2.First();
+        f0 = b2.first();
     }
 
-    F fi = f.delta_conjugate(b.Delta);
+    F fi = f.delta_conjugate(b.inf());
 
-    for (typename BraidTemplate<F>::ConstFactorItr it = b.FactorList.begin();
-         it != b.FactorList.end(); it++) {
-        if (it != b.FactorList.begin()) {
+    for (typename BraidTemplate<F>::ConstFactorItr it = b.cbegin();
+         it != b.cend(); it++) {
+        if (it != b.cbegin()) {
             fi = fi.left_join(*it) / *it;
         }
     }
@@ -409,9 +409,9 @@ template <class B> class UltraSummitSet {
                << (orbit_size(i) > 1 ? "s " : " ") << "in this orbit."
                << EndLine(1);
             if (orbit_size(i) > 1) {
-                os << "They are " << at(i, (size_t)0).Rigidity() << "-rigid.";
+                os << "They are " << at(i, (size_t)0).rigidity() << "-rigid.";
             } else {
-                os << "It is " << at(i, (size_t)0).Rigidity() << "-rigid.";
+                os << "It is " << at(i, (size_t)0).rigidity() << "-rigid.";
             }
             os << EndLine(1);
             sint16 indent =
@@ -501,7 +501,7 @@ UltraSummitSet<BraidTemplate<F>> ultra_summit_set(const BraidTemplate<F> &b) {
 
     BraidTemplate<F> b2 = send_to_ultra_summit(b);
     BraidTemplate<F> b2_rcf = b2;
-    b2_rcf.MakeRCFFromLCF();
+    b2_rcf.lcf_to_rcf();
 
     uss.insert(trajectory(b2));
     queue.push_back(b2);
@@ -513,11 +513,11 @@ UltraSummitSet<BraidTemplate<F>> ultra_summit_set(const BraidTemplate<F> &b) {
         for (typename std::vector<F>::iterator itf = min.begin();
              itf != min.end(); itf++) {
             b2 = queue.front();
-            b2.Conjugate(*itf);
+            b2.conjugate(*itf);
 
             if (!uss.mem(b2)) {
                 b2_rcf = queue_rcf.front();
-                b2_rcf.ConjugateRCF(*itf);
+                b2_rcf.conjugate_rcf(*itf);
 
                 uss.insert(trajectory(b2));
                 queue.push_back(b2);
@@ -546,7 +546,7 @@ UltraSummitSet<BraidTemplate<F>> ultra_summit_set(const BraidTemplate<F> &b,
 
     BraidTemplate<F> b2 = send_to_ultra_summit(b);
     BraidTemplate<F> b2_rcf = b2;
-    b2_rcf.MakeRCFFromLCF();
+    b2_rcf.lcf_to_rcf();
 
     uss.insert(trajectory(b2));
     queue.push_back(b2);
@@ -558,11 +558,11 @@ UltraSummitSet<BraidTemplate<F>> ultra_summit_set(const BraidTemplate<F> &b,
         for (typename std::vector<F>::iterator itf = min.begin();
              itf != min.end(); itf++) {
             b2 = queue.front();
-            b2.Conjugate(*itf);
+            b2.conjugate(*itf);
 
             if (!uss.mem(b2)) {
                 b2_rcf = queue_rcf.front();
-                b2_rcf.ConjugateRCF(*itf);
+                b2_rcf.conjugate_rcf(*itf);
 
                 uss.insert(trajectory(b2));
                 queue.push_back(b2);
@@ -587,7 +587,7 @@ BraidTemplate<F> tree_path(const BraidTemplate<F> &b,
                            const std::vector<sint16> &prev) {
     BraidTemplate<F> c = BraidTemplate<F>(b.get_parameter());
 
-    if (b.CanonicalLength() == 0) {
+    if (b.canonical_length() == 0) {
         return c;
     }
 
@@ -596,11 +596,11 @@ BraidTemplate<F> tree_path(const BraidTemplate<F> &b,
     for (typename std::vector<BraidTemplate<F>>::const_iterator itb =
              uss.orbits[current].begin();
          *itb != b; itb++) {
-        c.right_multiply((*itb).First().delta_conjugate(b.Delta));
+        c.right_multiply((*itb).first().delta_conjugate(b.inf()));
     }
 
     while (current != 0) {
-        c.LeftProduct(mins[current]);
+        c.left_multiply(mins[current]);
         current = prev[current];
     }
 
@@ -616,12 +616,12 @@ bool are_conjugate(const BraidTemplate<F> &b1, const BraidTemplate<F> &b2,
     BraidTemplate<F> bt1 = send_to_ultra_summit(b1, c1),
                      bt2 = send_to_ultra_summit(b2, c2);
 
-    if (bt1.CanonicalLength() != bt2.CanonicalLength() ||
-        bt1.Sup() != bt2.Sup()) {
+    if (bt1.canonical_length() != bt2.canonical_length() ||
+        bt1.sup() != bt2.sup()) {
         return false;
     }
 
-    if (bt1.CanonicalLength() == 0) {
+    if (bt1.canonical_length() == 0) {
         c = c1 * !c2;
         return true;
     }

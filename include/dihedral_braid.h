@@ -4,18 +4,19 @@ namespace cgarside::dihedral {
 
 class Underlying {
 
+  public:
+    using Parameter = sint16;
+
   protected:
-    sint16 PresentationParameter;
+    Parameter number_of_points;
 
     // 0 for identity, 1 for delta, 2 for a reflection.
-    sint16 Type;
+    sint16 type;
 
     // The point the reflection sends 0 on.
-    sint16 Point;
+    sint16 point;
 
-  public:
-    typedef sint16 Parameter;
-
+public:
     static Parameter parameter_of_string(const std::string &str);
 
     Parameter get_parameter() const;
@@ -28,7 +29,7 @@ class Underlying {
     void of_string(const std::string &str, size_t &pos);
 
     void debug(IndentedOStream &os) const {
-        os << "(" << Type << ", " << Point << ") ";
+        os << "(" << type << ", " << point << ") ";
     }
 
     // print to os.
@@ -68,7 +69,7 @@ class Underlying {
     Underlying delta_conjugate_mut(sint16 k) const;
 
     inline std::size_t hash() const {
-        std::size_t h = Point;
+        std::size_t h = point;
         return h;
     }
 };

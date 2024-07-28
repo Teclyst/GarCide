@@ -15,13 +15,13 @@ BraidTemplate<F> send_to_super_summit(const BraidTemplate<F> &b) {
 
     BraidTemplate<F> b2 = b, b3 = b;
 
-    sint16 p = b.Delta;
+    sint16 p = b.inf();
     sint16 j = 0;
 
     while (j <= k) {
-        b2.Cycling();
+        b2.cycling();
 
-        if (b2.Delta == p) {
+        if (b2.inf() == p) {
             j++;
         } else {
             b3 = b2;
@@ -32,11 +32,11 @@ BraidTemplate<F> send_to_super_summit(const BraidTemplate<F> &b) {
 
     j = 0;
     b2 = b3;
-    sint16 l = b2.Sup();
+    sint16 l = b2.sup();
     while (j <= k) {
-        b2.Decycling();
+        b2.decycling();
 
-        if (b2.Sup() == l) {
+        if (b2.sup() == l) {
             j++;
         } else {
             b3 = b2;
@@ -60,18 +60,18 @@ BraidTemplate<F> send_to_super_summit(const BraidTemplate<F> &b,
 
     c.identity();
 
-    sint16 p = b.Delta;
+    sint16 p = b.inf();
     sint16 j = 0;
 
     while (j <= k) {
-        if (b2.CanonicalLength() == 0) {
+        if (b2.canonical_length() == 0) {
             return b2;
         }
 
-        c2.right_multiply(b2.First().delta_conjugate(b2.Inf()));
-        b2.Cycling();
+        c2.right_multiply(b2.first().delta_conjugate(b2.inf()));
+        b2.cycling();
 
-        if (b2.Delta == p) {
+        if (b2.inf() == p) {
             j++;
         } else {
             b3 = b2;
@@ -84,20 +84,20 @@ BraidTemplate<F> send_to_super_summit(const BraidTemplate<F> &b,
 
     j = 0;
     b2 = b3;
-    sint16 l = b2.Sup();
+    sint16 l = b2.sup();
     c2.identity();
 
     while (j <= k) {
-        c2.LeftProduct(b2.Final());
-        b2.Decycling();
+        c2.left_multiply(b2.final());
+        b2.decycling();
 
-        if (b2.Sup() == l) {
+        if (b2.sup() == l) {
             j++;
         } else {
             b3 = b2;
             l--;
             j = 0;
-            c.RightDivide(c2);
+            c.right_divide(c2);
             c2.identity();
         }
     }
@@ -110,11 +110,11 @@ template <class F> F min_summit(const BraidTemplate<F> &b, const F &f) {
     r.identity();
 
     BraidTemplate<F> w = b;
-    w.Delta = 0;
+    w.set_delta(0);
 
     while (!r2.is_identity()) {
         r.right_multiply(r2);
-        r2 = (w * r).Remainder(r.delta_conjugate(b.Delta));
+        r2 = (w * r).remainder(r.delta_conjugate(b.inf()));
     }
 
     return r;
@@ -125,12 +125,12 @@ F min_super_summit(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf,
                    const F &f) {
     F r = min_summit(b, f);
     BraidTemplate<F> b2 = b_rcf;
-    b2.ConjugateRCF(r);
+    b2.conjugate_rcf(r);
 
-    while (b2.CanonicalLength() > b.CanonicalLength()) {
-        r.right_multiply(b2.FactorList.front());
+    while (b2.canonical_length() > b.canonical_length()) {
+        r.right_multiply(b2.first());
         b2 = b_rcf;
-        b2.ConjugateRCF(r);
+        b2.conjugate_rcf(r);
     }
     return r;
 }
@@ -272,7 +272,7 @@ SuperSummitSet<BraidTemplate<F>> super_summit_set(const BraidTemplate<F> &b) {
 
     BraidTemplate<F> b2 = send_to_super_summit(b);
     BraidTemplate<F> b2_rcf = b2;
-    b2_rcf.MakeRCFFromLCF();
+    b2_rcf.lcf_to_rcf();
 
     queue.push_back(b2);
     queue_rcf.push_back(b2_rcf);
@@ -285,11 +285,11 @@ SuperSummitSet<BraidTemplate<F>> super_summit_set(const BraidTemplate<F> &b) {
         for (typename std::vector<F>::iterator itf = min.begin();
              itf != min.end(); itf++) {
             b2 = queue.front();
-            b2.Conjugate(*itf);
+            b2.conjugate(*itf);
 
             if (!sss.mem(b2)) {
                 b2_rcf = queue_rcf.front();
-                b2_rcf.ConjugateRCF(*itf);
+                b2_rcf.conjugate_rcf(*itf);
 
                 sss.insert(b2);
                 queue.push_back(b2);

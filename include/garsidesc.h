@@ -11,7 +11,7 @@ std::vector<BraidTemplate<F>> trajectory(BraidTemplate<F> b) {
     while (t_set.find(b) == t_set.end()) {
         t.push_back(b);
         t_set.insert(b);
-        b.Sliding();
+        b.sliding();
     }
 
     return t;
@@ -29,28 +29,28 @@ std::vector<BraidTemplate<F>> trajectory(BraidTemplate<F> b,
     while (t_set.find(b) == t_set.end()) {
         t.push_back(b);
         t_set.insert(b);
-        c.right_multiply(b.PreferredPrefix());
-        b.Sliding();
+        c.right_multiply(b.preferred_prefix());
+        b.sliding();
         d++;
     }
 
     BraidTemplate<F> b2 = b;
-    BraidTemplate<F> c2 = BraidTemplate(b2.PreferredPrefix());
-    b2.Sliding();
+    BraidTemplate<F> c2 = BraidTemplate(b2.preferred_prefix());
+    b2.sliding();
     d--;
     while (b2 != b) {
-        c2.right_multiply(b2.PreferredPrefix());
-        b2.Sliding();
+        c2.right_multiply(b2.preferred_prefix());
+        b2.sliding();
         d--;
     }
-    c.RightDivide(c2);
+    c.right_divide(c2);
 
     return t;
 }
 
 template <class F> BraidTemplate<F> send_to_sliding_circuits(const BraidTemplate<F> &b) {
     BraidTemplate<F> b_sc = trajectory(b).back();
-    b_sc.Sliding();
+    b_sc.sliding();
     return b_sc;
 }
 
@@ -58,21 +58,21 @@ template <class F>
 BraidTemplate<F> send_to_sliding_circuits(const BraidTemplate<F> &b, BraidTemplate<F> &c) {
     sint16 d;
     BraidTemplate<F> b_sc = trajectory(b, c, d).back();
-    b_sc.Sliding();
+    b_sc.sliding();
     return b_sc;
 }
 
 template <class F> F transport(const BraidTemplate<F> &b, const F &f) {
     BraidTemplate<F> b2 = b;
-    b2.Conjugate(f);
+    b2.conjugate(f);
     BraidTemplate<F> b3 =
-        !BraidTemplate(b.PreferredPrefix()) * f * b2.PreferredPrefix();
+        !BraidTemplate(b.preferred_prefix()) * f * b2.preferred_prefix();
 
     F f2 = F(b.get_parameter());
 
-    if (b3.CanonicalLength() > 0) {
-        f2 = b3.FactorList.front();
-    } else if (b3.Delta == 1) {
+    if (b3.canonical_length() > 0) {
+        f2 = b3.first();
+    } else if (b3.inf() == 1) {
         f2.delta();
     } else {
         f2.identity();
@@ -89,11 +89,11 @@ template <class F> std::list<F> transports_sending_to_trajectory(const BraidTemp
     BraidTemplate<F> b1 = b;
     sint16 i, N = 1;
 
-    b1.Sliding();
+    b1.sliding();
 
     while (b1 != b) {
         N++;
-        b1.Sliding();
+        b1.sliding();
     }
 
     while (ret_set.find(g) == ret_set.end()) {
@@ -103,7 +103,7 @@ template <class F> std::list<F> transports_sending_to_trajectory(const BraidTemp
         b1 = b;
         for (i = 0; i < N; i++) {
             g = transport(b1, g);
-            b1.Sliding();
+            b1.sliding();
         }
     }
 
@@ -115,25 +115,25 @@ template <class F> std::list<F> transports_sending_to_trajectory(const BraidTemp
 }
 
 template <class F> F pullback(const BraidTemplate<F> &b, const F &f) {
-    BraidTemplate<F> b2 = BraidTemplate(b.PreferredPrefix());
+    BraidTemplate<F> b2 = BraidTemplate(b.preferred_prefix());
     b2.right_multiply(f);
     BraidTemplate<F> b3 = b;
-    b3.Sliding();
-    b3.Conjugate(f);
-    F f2 = b3.PreferredSuffix();
+    b3.sliding();
+    b3.conjugate(f);
+    F f2 = b3.preferred_suffix();
 
     BraidTemplate<F> c = b2.right_meet(f2);
 
-    b2.RightDivide(c);
+    b2.right_divide(c);
 
     if (b2.is_identity()) {
         f2.identity();
         return f2;
-    } else if (b2.CanonicalLength() == 0) {
+    } else if (b2.canonical_length() == 0) {
         f2.delta();
         return f2;
     } else {
-        return b2.FactorList.front();
+        return b2.first();
     }
 }
 
@@ -445,7 +445,7 @@ SlidingCircuitsSet<BraidTemplate<F>> sliding_circuits_set(const BraidTemplate<F>
 
     BraidTemplate<F> b2 = send_to_sliding_circuits(b);
     BraidTemplate<F> b2_rcf = b2;
-    b2_rcf.MakeRCFFromLCF();
+    b2_rcf.lcf_to_rcf();
 
     scs.insert(trajectory(b2));
     queue.push_back(b2);
@@ -454,10 +454,10 @@ SlidingCircuitsSet<BraidTemplate<F>> sliding_circuits_set(const BraidTemplate<F>
     F delta = F(b.get_parameter());
     delta.delta();
 
-    b2.Conjugate(delta);
+    b2.conjugate(delta);
 
     if (!scs.mem(b2)) {
-        b2_rcf.ConjugateRCF(delta);
+        b2_rcf.conjugate_rcf(delta);
 
         scs.insert(trajectory(b2));
         queue.push_back(b2);
@@ -471,19 +471,19 @@ SlidingCircuitsSet<BraidTemplate<F>> sliding_circuits_set(const BraidTemplate<F>
              itf != min.end(); itf++) {
             b2 = queue.front();
 
-            b2.Conjugate(*itf);
+            b2.conjugate(*itf);
 
             if (!scs.mem(b2)) {
                 b2_rcf = queue_rcf.front();
-                b2_rcf.ConjugateRCF(*itf);
+                b2_rcf.conjugate_rcf(*itf);
 
                 scs.insert(trajectory(b2));
                 queue.push_back(b2);
                 queue_rcf.push_back(b2_rcf);
 
-                b2.Conjugate(delta);
+                b2.conjugate(delta);
                 if (!scs.mem(b2)) {
-                    b2_rcf.ConjugateRCF(delta);
+                    b2_rcf.conjugate_rcf(delta);
 
                     scs.insert(trajectory(b2));
                     queue.push_back(b2);
@@ -513,7 +513,7 @@ SlidingCircuitsSet<BraidTemplate<F>> sliding_circuits_set(const BraidTemplate<F>
 
     BraidTemplate<F> b2 = send_to_sliding_circuits(b);
     BraidTemplate<F> b2_rcf = b2;
-    b2_rcf.MakeRCFFromLCF();
+    b2_rcf.lcf_to_rcf();
 
     scs.insert(trajectory(b2));
     queue.push_back(b2);
@@ -525,11 +525,11 @@ SlidingCircuitsSet<BraidTemplate<F>> sliding_circuits_set(const BraidTemplate<F>
         for (typename std::vector<F>::iterator itf = min.begin();
              itf != min.end(); itf++) {
             b2 = queue.front();
-            b2.Conjugate(*itf);
+            b2.conjugate(*itf);
 
             if (!scs.mem(b2)) {
                 b2_rcf = queue_rcf.front();
-                b2_rcf.ConjugateRCF(*itf);
+                b2_rcf.conjugate_rcf(*itf);
 
                 scs.insert(trajectory(b2));
                 queue.push_back(b2);
@@ -554,7 +554,7 @@ BraidTemplate<F> tree_path(const BraidTemplate<F> &b,
                           const std::vector<sint16> &prev) {
     BraidTemplate<F> c = BraidTemplate<F>(b.get_parameter());
 
-    if (b.CanonicalLength() == 0) {
+    if (b.canonical_length() == 0) {
         return c;
     }
 
@@ -563,11 +563,11 @@ BraidTemplate<F> tree_path(const BraidTemplate<F> &b,
     for (typename std::vector<BraidTemplate<F>>::const_iterator itb =
              scs.circuits[current].begin();
          *itb != b; itb++) {
-        c.right_multiply((*itb).PreferredPrefix());
+        c.right_multiply((*itb).preferred_prefix());
     }
 
     while (current != 0) {
-        c.LeftProduct(mins[current]);
+        c.left_multiply(mins[current]);
         current = prev[current];
     }
 
@@ -582,12 +582,12 @@ bool are_conjugate(const BraidTemplate<F> &b1, const BraidTemplate<F> &b2,
 
     BraidTemplate<F> bt1 = send_to_sliding_circuits(b1, c1), bt2 = send_to_sliding_circuits(b2, c2);
 
-    if (bt1.CanonicalLength() != bt2.CanonicalLength() ||
-        bt1.Sup() != bt2.Sup()) {
+    if (bt1.canonical_length() != bt2.canonical_length() ||
+        bt1.sup() != bt2.sup()) {
         return false;
     }
 
-    if (bt1.CanonicalLength() == 0) {
+    if (bt1.canonical_length() == 0) {
         c = c1 * !c2;
         return true;
     }

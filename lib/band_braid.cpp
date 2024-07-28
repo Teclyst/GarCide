@@ -4,7 +4,7 @@
 
 namespace cgarside::band {
 
-sint16 Underlying::get_parameter() const { return PresentationParameter; }
+sint16 Underlying::get_parameter() const { return number_of_strands; }
 
 sint16 Underlying::lattice_height() const { return get_parameter(); }
 
@@ -23,7 +23,7 @@ Underlying::parameter_of_string(const std::string &str) {
                                      match.str(1) +
                                      " can not be converted to a C++ integer.");
         }
-        if (((2 <= i) && (i <= MaxBraidIndex))) {
+        if (((2 <= i) && (i <= MAX_NUMBER_OF_STRANDS))) {
             return i;
         } else if (2 > i) {
             throw InvalidStringError("Number of strands should be at least 2!");
@@ -31,7 +31,7 @@ Underlying::parameter_of_string(const std::string &str) {
             throw InvalidStringError("Number of strands is too big!\n" +
                                      match.str(1) +
                                      " is strictly greater than " +
-                                     std::to_string(MaxBraidIndex) + ".");
+                                     std::to_string(MAX_NUMBER_OF_STRANDS) + ".");
         }
     } else {
         throw InvalidStringError(
@@ -40,7 +40,7 @@ Underlying::parameter_of_string(const std::string &str) {
 };
 
 Underlying::Underlying(sint16 n)
-    : PresentationParameter(n), permutation_table(n + 1) {}
+    : number_of_strands(n), permutation_table(n + 1) {}
 
 void Underlying::print(IndentedOStream &os) const {
     // Recall that a band braid is represented by decreasing cycles.
@@ -129,7 +129,7 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
 void Underlying::debug(IndentedOStream &os) const {
     os << "{   ";
     os.Indent(4);
-    os << "PresentationParameter:";
+    os << "number_of_strands:";
     os.Indent(4);
     os << EndLine() << get_parameter();
     os.Indent(-4);
@@ -148,7 +148,7 @@ void Underlying::debug(IndentedOStream &os) const {
     os << "}";
 }
 
-void Underlying::AssignDCDT(sint16 *x) const {
+void Underlying::assign_partition(sint16 *x) const {
     for (sint16 i = 1; i <= get_parameter(); ++i)
         x[i] = 0;
     for (sint16 i = 1; i <= get_parameter(); ++i) {
@@ -159,8 +159,8 @@ void Underlying::AssignDCDT(sint16 *x) const {
     }
 }
 
-void Underlying::OfDCDT(const sint16 *x) {
-    thread_local sint16 z[MaxBraidIndex];
+void Underlying::of_partition(const sint16 *x) {
+    thread_local sint16 z[MAX_NUMBER_OF_STRANDS];
 
     for (sint16 i = 1; i <= get_parameter(); ++i)
         z[i] = 0;
@@ -171,12 +171,12 @@ void Underlying::OfDCDT(const sint16 *x) {
 }
 
 Underlying Underlying::left_meet(const Underlying &b) const {
-    thread_local sint16 x[MaxBraidIndex], y[MaxBraidIndex], z[MaxBraidIndex];
+    thread_local sint16 x[MAX_NUMBER_OF_STRANDS], y[MAX_NUMBER_OF_STRANDS], z[MAX_NUMBER_OF_STRANDS];
 
-    AssignDCDT(x);
-    b.AssignDCDT(y);
+    assign_partition(x);
+    b.assign_partition(y);
 
-    thread_local sint16 P[MaxBraidIndex][MaxBraidIndex];
+    thread_local sint16 P[MAX_NUMBER_OF_STRANDS][MAX_NUMBER_OF_STRANDS];
 
     for (sint16 i = get_parameter(); i >= 1; i--) {
         P[x[i]][y[i]] = i;
@@ -188,7 +188,7 @@ Underlying Underlying::left_meet(const Underlying &b) const {
 
     Underlying c = Underlying(*this);
 
-    c.OfDCDT(z);
+    c.of_partition(z);
 
     return c;
 }
@@ -222,7 +222,7 @@ bool Underlying::compare(const Underlying &b) const {
     return true;
 };
 
-Underlying Underlying::Inverse() const {
+Underlying Underlying::inverse() const {
     Underlying f = Underlying(get_parameter());
     sint16 i;
     for (i = 1; i <= get_parameter(); i++) {
@@ -241,11 +241,11 @@ Underlying Underlying::product(const Underlying &b) const {
 };
 
 Underlying Underlying::left_complement(const Underlying &b) const {
-    return b.product(Inverse());
+    return b.product(inverse());
 };
 
 Underlying Underlying::right_complement(const Underlying &b) const {
-    return Inverse().product(b);
+    return inverse().product(b);
 };
 
 void Underlying::delta_conjugate_mut(sint16 k) {
@@ -261,9 +261,9 @@ void Underlying::delta_conjugate_mut(sint16 k) {
 
 void Underlying::randomize() {
 #ifdef USE_CLN
-    static sint8 s[2 * MaxBraidIndex + 1];
+    static sint8 s[2 * MAX_NUMBER_OF_STRANDS + 1];
     cln::cl_I k =
-        cln::random_I(cln::default_random_state, get_catalan_number(Index())) + 1;
+        cln::random_I(cln::default_random_state, get_catalan_number(get_parameter())) + 1;
     ballot_sequence(get_parameter(), k, s);
     of_ballot_sequence(s);
 #else
@@ -297,7 +297,7 @@ size_t Underlying::hash() const {
 }
 
 void Underlying::of_ballot_sequence(const sint8 *s) {
-    static sint16 stack[MaxBraidIndex];
+    static sint16 stack[MAX_NUMBER_OF_STRANDS];
     sint16 sp = 0;
 
     for (sint16 i = 1; i <= 2 * get_parameter(); ++i) {
@@ -344,29 +344,29 @@ void ballot_sequence(sint16 n, cln::cl_I k, sint8 *s) {
 }
 
 class _CatalanNumber {
-    friend const cln::cl_I &get_catalan_number(sint16);
+    friend const cln::cl_I &get_catalan_number(sint16 n);
 
   public:
     _CatalanNumber();
 
   private:
-    cln::cl_I table[MaxBraidIndex + 1];
-    cln::cl_I &C(sint16 n) { return table[n]; }
+    cln::cl_I table[Underlying::MAX_NUMBER_OF_STRANDS + 1];
+    cln::cl_I &c(sint16 n) { return table[n]; }
 };
 
 static _CatalanNumber CatalanNumber;
 
 _CatalanNumber::_CatalanNumber() {
-    C(0) = 1;
-    for (sint16 n = 1; n < MaxBraidIndex; ++n) {
-        C(n) = 0;
+    c(0) = 1;
+    for (sint16 n = 1; n < Underlying::MAX_NUMBER_OF_STRANDS; ++n) {
+        c(n) = 0;
         for (sint16 k = 0; k < n; ++k) {
-            C(n) = C(n) + C(k) * C(n - k - 1);
+            c(n) = c(n) + c(k) * c(n - k - 1);
         }
     }
 }
 
-const cln::cl_I &get_catalan_number(sint16 n) { return CatalanNumber.C(n); }
+const cln::cl_I &get_catalan_number(sint16 n) { return CatalanNumber.c(n); }
 
 #endif
 

@@ -6,7 +6,7 @@ struct NotBelow {};
 
 namespace cgarside::dihedral {
 
-sint16 Underlying::get_parameter() const { return PresentationParameter; }
+sint16 Underlying::get_parameter() const { return number_of_points; }
 
 Underlying::Parameter
 Underlying::parameter_of_string(const std::string &str) {
@@ -36,13 +36,13 @@ Underlying::parameter_of_string(const std::string &str) {
 sint16 Underlying::lattice_height() const { return 2; }
 
 Underlying::Underlying(sint16 n)
-    : PresentationParameter(n), Type(0), Point(0) {}
+    : number_of_points(n), type(0), point(0) {}
 
 void Underlying::print(IndentedOStream &os) const {
-    if (Type == 1) {
+    if (type == 1) {
         os << "D";
-    } else if (Type == 2) {
-        os << "s" << Point;
+    } else if (type == 2) {
+        os << "s" << point;
     }
 }
 
@@ -57,8 +57,8 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
                                  std::regex{"(s[\\s\\t]*_?)?[\\s\\t]*(" +
                                             number_regex + ")"},
                                  std::regex_constants::match_continuous)) {
-        Point = Rem(std::stoi(match[2]), get_parameter());
-        Type = 2;
+        point = Rem(std::stoi(match[2]), get_parameter());
+        type = 2;
         pos += match[0].length();
     } else {
         throw InvalidStringError(std::string(
@@ -69,11 +69,11 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
 }
 
 Underlying Underlying::left_meet(const Underlying &b) const {
-    if ((Type == 0) || (b.Type == 0) ||
-        ((Type == 2) && (b.Type == 2) && (Point != b.Point))) {
+    if ((type == 0) || (b.type == 0) ||
+        ((type == 2) && (b.type == 2) && (point != b.point))) {
         return Underlying(get_parameter());
     }
-    if (Type == 1) {
+    if (type == 1) {
         Underlying c = b;
         return c;
     }
@@ -85,22 +85,22 @@ Underlying Underlying::right_meet(const Underlying &b) const {
     return left_meet(b);
 }
 
-void Underlying::identity() { Type = 0; }
+void Underlying::identity() { type = 0; }
 
-void Underlying::delta() { Type = 1; }
+void Underlying::delta() { type = 1; }
 
 bool Underlying::compare(const Underlying &b) const {
-    return ((Type == b.Type) && ((Type != 2) || (Point == b.Point)));
+    return ((type == b.type) && ((type != 2) || (point == b.point)));
 }
 
 Underlying Underlying::product(const Underlying &b) const {
     Underlying f = Underlying(get_parameter());
-    if (Type == 0) {
+    if (type == 0) {
         f = b;
-    } else if (b.Type == 0) {
+    } else if (b.type == 0) {
         f = *this;
-    } else if ((Type == 2) && (b.Type == 2) &&
-               ((Point - b.Point + get_parameter()) % get_parameter() == 1)) {
+    } else if ((type == 2) && (b.type == 2) &&
+               ((point - b.point + get_parameter()) % get_parameter() == 1)) {
         f.delta();
     } else {
         throw NotBelow();
@@ -110,27 +110,27 @@ Underlying Underlying::product(const Underlying &b) const {
 
 Underlying Underlying::left_complement(const Underlying &b) const {
     Underlying f = Underlying(get_parameter());
-    if (b.Type == 1) {
-        if (Type == 0) {
+    if (b.type == 1) {
+        if (type == 0) {
             f.delta();
-        } else if (Type == 2) {
-            f.Type = 2;
-            if (Point == get_parameter() - 1) {
-                f.Point = 0;
+        } else if (type == 2) {
+            f.type = 2;
+            if (point == get_parameter() - 1) {
+                f.point = 0;
             } else {
-                f.Point = Point + 1;
+                f.point = point + 1;
             }
         }
-    } else if (b.Type == 2) {
-        if (Type == 0) {
+    } else if (b.type == 2) {
+        if (type == 0) {
             f = b;
-        } else if ((Type == 2) && (Point == b.Point)) {
+        } else if ((type == 2) && (point == b.point)) {
             f.identity();
         } else {
             throw NotBelow();
         }
     } else {
-        if (Type != 0) {
+        if (type != 0) {
             throw NotBelow();
         }
     }
@@ -139,27 +139,27 @@ Underlying Underlying::left_complement(const Underlying &b) const {
 
 Underlying Underlying::right_complement(const Underlying &b) const {
     Underlying f = Underlying(get_parameter());
-    if (b.Type == 1) {
-        if (Type == 0) {
+    if (b.type == 1) {
+        if (type == 0) {
             f.delta();
-        } else if (Type == 2) {
-            f.Type = 2;
-            if (Point == 0) {
-                f.Point = get_parameter() - 1;
+        } else if (type == 2) {
+            f.type = 2;
+            if (point == 0) {
+                f.point = get_parameter() - 1;
             } else {
-                f.Point = Point - 1;
+                f.point = point - 1;
             }
         }
-    } else if (b.Type == 2) {
-        if (Type == 0) {
+    } else if (b.type == 2) {
+        if (type == 0) {
             f = b;
-        } else if ((Type == 2) && (Point == b.Point)) {
+        } else if ((type == 2) && (point == b.point)) {
             f.identity();
         } else {
             throw NotBelow();
         }
     } else {
-        if (Type != 0) {
+        if (type != 0) {
             throw NotBelow();
         }
     }
@@ -169,14 +169,14 @@ Underlying Underlying::right_complement(const Underlying &b) const {
 Underlying Underlying::delta_conjugate_mut(sint16 k) const {
     Underlying under = Underlying(*this);
     sint16 n = get_parameter();
-    if (Type != 2) {
+    if (type != 2) {
         under = *this;
     } else {
         if (k > 0) {
             k = k - k * n;
         }
-        under.Type = 2;
-        under.Point = (Point - 2 * k) % n;
+        under.type = 2;
+        under.point = (point - 2 * k) % n;
     }
 
     return under;
@@ -185,22 +185,22 @@ Underlying Underlying::delta_conjugate_mut(sint16 k) const {
 void Underlying::randomize() {
     sint16 rand = std::rand() % (get_parameter() + 1);
     if (rand == get_parameter()) {
-        Type = 0;
+        type = 0;
     } else if (rand == get_parameter() + 1) {
-        Type = 1;
+        type = 1;
     } else {
-        Type = 2;
-        Point = rand;
+        type = 2;
+        point = rand;
     }
 }
 
 std::vector<Underlying> Underlying::atoms() const {
     sint16 n = get_parameter();
     Underlying atom = Underlying(n);
-    atom.Type = 2;
+    atom.type = 2;
     std::vector<Underlying> atoms;
     for (sint16 i = 0; i < n; i++) {
-        atom.Point = i;
+        atom.point = i;
         atoms.push_back(atom);
     }
     return atoms;

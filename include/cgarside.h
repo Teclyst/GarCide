@@ -169,7 +169,9 @@ template <class U> class FactorTemplate {
 
     // a.right_join(b) returns the right join of a and b.
     FactorTemplate right_join(const FactorTemplate &b) const {
-        return left_complement().left_meet(b.left_complement()).right_complement();
+        return left_complement()
+            .left_meet(b.left_complement())
+            .right_complement();
     }
 
     // a.is_left_weighted(b) returns true if a | b is left weighted, or false
@@ -178,9 +180,9 @@ template <class U> class FactorTemplate {
         return right_complement().left_meet(b).is_identity();
     }
 
-    // a.IsRightWeighted(b) returns true if a | b is right weighted, or false
+    // a.is_right_weighted(b) returns true if a | b is right weighted, or false
     // otherwise.
-    bool IsRightWeighted(const FactorTemplate &b) const {
+    bool is_right_weighted(const FactorTemplate &b) const {
         return left_meet(b.left_complement()).is_identity();
     }
 
@@ -293,18 +295,15 @@ template <class F> class BraidTemplate {
      */
     using Parameter = typename F::Parameter;
 
+  private:
     /**
      * @brief A (group) parameter.
      *
      * We often implement Garside structures for a series of groups, that
      * are distinguished one from another by some parameter (often, but not
      * always, an integer).
-     *
      */
-    Parameter Parameter;
-
-    // `Delta` is the number of Deltas on the left end of the word.
-
+    Parameter parameter;
     /**
      * @brief Infimum.
      *
@@ -312,7 +311,7 @@ template <class F> class BraidTemplate {
      * the right end in RCF).
      *
      */
-    sint32 Delta;
+    sint32 delta;
 
     /**
      * @brief The braid's canonical factors.
@@ -320,7 +319,7 @@ template <class F> class BraidTemplate {
      * A list of the braid's canonical factors, from left to right. It is
      * left weighted when in LCF, and right weighted when in RCF.
      */
-    std::list<F> FactorList;
+    std::list<F> factor_list;
 
   public:
     using FactorItr = typename std::list<F>::iterator;
@@ -328,49 +327,33 @@ template <class F> class BraidTemplate {
     using ConstFactorItr = typename std::list<F>::const_iterator;
     using ConstRevFactorItr = typename std::list<F>::const_reverse_iterator;
 
-    inline FactorItr begin() const {
-        return FactorList.begin();
-    }
+    inline FactorItr begin() { return factor_list.begin(); }
 
-    inline RevFactorItr rbegin() const {
-        return FactorList.rbegin();
-    }
+    inline RevFactorItr rbegin() { return factor_list.rbegin(); }
 
-    inline ConstFactorItr cbegin() const {
-        return FactorList.begin();
-    }
+    inline ConstFactorItr cbegin() const { return factor_list.begin(); }
 
-    inline ConstRevFactorItr crbegin() const {
-        return FactorList.rbegin();
-    }
+    inline ConstRevFactorItr crbegin() const { return factor_list.rbegin(); }
 
-    inline FactorItr end() const {
-        return FactorList.end();
-    }
+    inline FactorItr end() { return factor_list.end(); }
 
-    inline RevFactorItr rend() const {
-        return FactorList.rend();
-    }
+    inline RevFactorItr rend() { return factor_list.rend(); }
 
-    inline ConstFactorItr cend() const {
-        return FactorList.end();
-    }
+    inline ConstFactorItr cend() const { return factor_list.end(); }
 
-    inline ConstRevFactorItr crend() const {
-        return FactorList.rend();
-    }
+    inline ConstRevFactorItr crend() const { return factor_list.rend(); }
 
   public:
     /**
      * @brief Construct a new BraidTemplate, with a group parameter.
      *
-     * Construct a new BraidTemplate, with `Parameter = parameter`. It is
+     * Construct a new BraidTemplate, with `parameter = parameter`. It is
      * initialized as the identity braid.
      *
      * @param parameter Group parameter.
      */
     BraidTemplate(Parameter parameter)
-        : Parameter(parameter), Delta(0), FactorList() {}
+        : parameter(parameter), delta(0), factor_list() {}
 
     /**
      * @brief Construct a new BraidTemplate, from a factor.
@@ -380,11 +363,11 @@ template <class F> class BraidTemplate {
      * @param f FactorTemplate to be converted to a braid.
      */
     BraidTemplate(const F &f)
-        : Parameter(f.get_parameter()), Delta(0), FactorList() {
+        : parameter(f.get_parameter()), delta(0), factor_list() {
         if (f.is_delta()) {
-            Delta = 1;
+            delta = 1;
         } else if (!f.is_identity()) {
-            FactorList.push_back(f);
+            factor_list.push_back(f);
         }
     }
 
@@ -392,7 +375,16 @@ template <class F> class BraidTemplate {
         return F::parameter_of_string(str);
     }
 
-    Parameter get_parameter() const { return Parameter; }
+    Parameter get_parameter() const { return parameter; }
+
+    /**
+     * @brief Sets `delta` to `delta`.
+     *
+     * Sets `delta` field (which is private) to `delta`.
+     *
+     * @param delta The new value of `delta`.
+     */
+    inline void set_delta(sint16 delta) { (*this).delta = delta; }
 
     /**
      * @brief Prints `*this` to `os`.
@@ -403,15 +395,14 @@ template <class F> class BraidTemplate {
      * @param os The output stream it prints to.
      */
     void print(IndentedOStream &os = ind_cout) const {
-        if (Delta != 0 && Delta != 1) {
-            os << "D ^ " << Delta << (CanonicalLength() > 0 ? " . " : "");
-        } else if (Delta == 1) {
-            os << "D" << (CanonicalLength() > 0 ? " . " : "");
+        if (delta != 0 && delta != 1) {
+            os << "D ^ " << delta << (canonical_length() > 0 ? " . " : "");
+        } else if (delta == 1) {
+            os << "D" << (canonical_length() > 0 ? " . " : "");
         }
         ConstFactorItr it_end = cend();
         it_end--;
-        for (ConstFactorItr it = cbegin(); it != cend();
-             it++) {
+        for (ConstFactorItr it = cbegin(); it != cend(); it++) {
             (*it).print(os);
             if (it != it_end) {
                 os << " . ";
@@ -428,39 +419,38 @@ template <class F> class BraidTemplate {
      * @param os The output stream it prints to.
      */
     void print_rcf(IndentedOStream &os = ind_cout) const {
-        ConstFactorItr it_end = FactorList.end();
+        ConstFactorItr it_end = cend();
         it_end--;
-        for (ConstFactorItr it = FactorList.begin(); it != FactorList.end();
-             it++) {
+        for (ConstFactorItr it = cbegin(); it != cend(); it++) {
             (*it).print(os);
             if (it != it_end) {
                 os << " . ";
             }
         }
-        if (Delta != 0 && Delta != 1) {
-            os << (CanonicalLength() > 0 ? " . " : "") << "D ^ " << Delta;
-        } else if (Delta == 1) {
-            os << (CanonicalLength() > 0 ? " . " : "") << "D";
+        if (delta != 0 && delta != 1) {
+            os << (canonical_length() > 0 ? " . " : "") << "D ^ " << delta;
+        } else if (delta == 1) {
+            os << (canonical_length() > 0 ? " . " : "") << "D";
         }
     }
 
     // `w.identity()` sets w to the empty word.
     inline void identity() {
-        Delta = 0;
-        FactorList.clear();
+        delta = 0;
+        factor_list.clear();
     }
 
-    // `u.CanonicalLength` returns u's canonical length.
-    inline sint16 CanonicalLength() const { return FactorList.size(); }
+    // `u.canonical_length` returns u's canonical length.
+    inline size_t canonical_length() const { return factor_list.size(); }
 
-    inline sint16 Inf() const { return Delta; }
+    inline sint32 inf() const { return delta; }
 
-    inline sint16 Sup() const { return Inf() + CanonicalLength(); }
+    inline sint32 sup() const { return inf() + int(canonical_length()); }
 
     // `u.compare(v)` returns whether u and v have the same internal
     // representation.
     inline bool compare(const BraidTemplate &v) const {
-        return (Delta == v.Delta && FactorList == v.FactorList);
+        return (delta == v.delta && factor_list == v.factor_list);
     }
 
     // `u == v` returns whether u and v have the same internal
@@ -472,205 +462,213 @@ template <class F> class BraidTemplate {
     bool operator!=(const BraidTemplate &v) const { return !compare(v); }
 
     // `u.is_identity` returns whether u represents the identity element.
-    bool is_identity() const { return Delta == 0 && FactorList.empty(); }
+    bool is_identity() const { return delta == 0 && factor_list.empty(); }
 
-    // `u.Inverse()` returns the inverse of u.
+    // `u.inverse()` returns the inverse of u.
     //  See the ElRifai and Morton 1994 article for correction.
-    BraidTemplate Inverse() const {
+    BraidTemplate inverse() const {
         BraidTemplate b(get_parameter());
-        b.Delta = -Delta;
-        for (ConstFactorItr it = FactorList.begin(); it != FactorList.end();
-             it++) {
+        b.delta = -delta;
+        for (ConstFactorItr it = cbegin(); it != cend(); it++) {
             // Rewrite a_1 ... a_k (f)^(- 1) Delta^r as
             // a_1 ... a_k Delta ^ (r - 1) (Delta^(- r) d_L(f) Delta^r).
-            b.FactorList.push_front(
-                (*it).left_complement().delta_conjugate(b.Delta));
-            --b.Delta;
+            b.factor_list.push_front(
+                (*it).left_complement().delta_conjugate(b.delta));
+            --b.delta;
         }
         return b;
     }
 
-    // `u.Inverse()` returns the inverse of u.
+    // `u.inverse()` returns the inverse of u.
     //  See the ElRifai and Morton 1994 article for correction.
-    BraidTemplate InverseRCF() const {
+    BraidTemplate inverse_rcf() const {
         BraidTemplate b(get_parameter());
-        b.Delta = -Delta;
-        for (ConstRevFactorItr revit = FactorList.rbegin();
-             revit != FactorList.rend(); revit++) {
+        b.delta = -delta;
+        for (ConstRevFactorItr revit = crbegin(); revit != crend(); revit++) {
             // Rewrite Delta^r (f)^(- 1) a_1 ... a_k as
             // (Delta^r d_R(f) Delta^(- r)) Delta ^ (r - 1) a_1 ... a_k.
-            b.FactorList.push_back(
-                (*revit).right_complement().delta_conjugate(-b.Delta));
-            --b.Delta;
+            b.factor_list.push_back(
+                (*revit).right_complement().delta_conjugate(-b.delta));
+            --b.delta;
         }
         return b;
     }
 
     // `!u` returns the inverse of u.
-    // Syntactic sugar for `u.Inverse()`.
-    BraidTemplate operator!() const { return Inverse(); }
+    // Syntactic sugar for `u.inverse()`.
+    inline BraidTemplate operator!() const { return inverse(); }
 
-    // Clean gets rid of (factor) Deltas at the start, and identity elements
-    // at the end pf `FactorList`.
-    void Clean() {
-        FactorItr it = FactorList.begin();
-        while (it != FactorList.end() && (*it).is_delta()) {
+    // clean gets rid of (factor) Deltas at the start, and identity elements
+    // at the end pf `factor_list`.
+    void clean() {
+        FactorItr it = begin();
+        while (it != end() && (*it).is_delta()) {
             ++it;
-            ++Delta;
+            ++delta;
         }
-        FactorList.erase(FactorList.begin(), it);
-        RevFactorItr revit = FactorList.rbegin();
-        while (revit != FactorList.rend() && (*revit).is_identity()) {
+        factor_list.erase(begin(), it);
+        RevFactorItr revit = rbegin();
+        while (revit != rend() && (*revit).is_identity()) {
             ++revit;
         }
-        FactorList.erase(revit.base(), FactorList.end());
+        factor_list.erase(revit.base(), end());
     }
 
-    void CleanRCF() {
-        FactorItr it = FactorList.begin();
-        while (it != FactorList.end() && (*it).is_identity()) {
+    void clean_rcf() {
+        FactorItr it = begin();
+        while (it != end() && (*it).is_identity()) {
             ++it;
         }
-        FactorList.erase(FactorList.begin(), it);
-        RevFactorItr revit = FactorList.rbegin();
-        while (revit != FactorList.rend() && (*revit).is_delta()) {
+        factor_list.erase(begin(), it);
+        RevFactorItr revit = rbegin();
+        while (revit != rend() && (*revit).is_delta()) {
             ++revit;
-            ++Delta;
+            ++delta;
         }
-        FactorList.erase(revit.base(), FactorList.end());
+        factor_list.erase(revit.base(), end());
     }
 
-    // `u.LeftProduct(f)` assigns fu to u.
-    void LeftProduct(const F &f) {
-        FactorList.push_front(f.delta_conjugate(Delta));
-        apply_binfun(FactorList.begin(), FactorList.end(), make_left_weighted<F>);
-        Clean();
+    // `u.left_multiply(f)` assigns fu to u.
+    inline void left_multiply(const F &f) {
+        factor_list.push_front(f.delta_conjugate(delta));
+        apply_binfun(begin(), end(), make_left_weighted<F>);
+        clean();
     }
 
     // `u.right_multiply(f)` assigns uf to u.
-    void right_multiply(const F &f) {
-        FactorList.push_back(f);
-        reverse_apply_binfun(FactorList.begin(), FactorList.end(),
-                             make_left_weighted<F>);
-        Clean();
+    inline void right_multiply(const F &f) {
+        factor_list.push_back(f);
+        reverse_apply_binfun(begin(), end(), make_left_weighted<F>);
+        clean();
     }
 
-    // `u.LeftProduct(v)` assigns v u to u.
-    void LeftProduct(const BraidTemplate &v) {
-        for (ConstRevFactorItr it = v.FactorList.rbegin();
-             it != v.FactorList.rend(); it++) {
-            LeftProduct(*it);
+    // `u.left_multiply(v)` assigns v u to u.
+    void left_multiply(const BraidTemplate &v) {
+        for (ConstRevFactorItr it = v.crbegin(); it != v.crend(); it++) {
+            left_multiply(*it);
         }
-        Delta += v.Delta;
+        delta += v.delta;
     }
 
     // `u.right_multiply(v)` assigns u v to u.
-    // v's factors move directly to u - be careful.
     void right_multiply(const BraidTemplate &v) {
-        for (FactorItr it = FactorList.begin(); it != FactorList.end(); it++) {
-            (*it) = (*it).delta_conjugate(v.Delta);
+        for (FactorItr it = begin(); it != end(); it++) {
+            (*it).delta_conjugate_mut(v.delta);
         }
-        Delta += v.Delta;
-        for (ConstFactorItr it = v.FactorList.begin(); it != v.FactorList.end();
-             it++) {
+        delta += v.delta;
+        for (ConstFactorItr it = v.cbegin(); it != v.cend(); it++) {
             right_multiply((*it));
         }
     }
 
-    // `u.LeftDivide(v)` assigns v ^ (- 1) u to u.
-    inline void LeftDivide(const BraidTemplate &v) { LeftProduct(!v); }
+    // `u.left_divide(v)` assigns v ^ (- 1) u to u.
+    inline void left_divide(const BraidTemplate &v) { left_multiply(!v); }
 
-    // `u.RightDivide(v)` assigns u v ^ (- 1) to u.
-    inline void RightDivide(const BraidTemplate &v) { right_multiply(!v); }
+    // `u.right_divide(v)` assigns u v ^ (- 1) to u.
+    inline void right_divide(const BraidTemplate &v) { right_multiply(!v); }
 
-    // `u.LeftDivide(f)` assigns f ^ (- 1) u to u.
-    inline void LeftDivide(const F &f) { LeftProduct(!BraidTemplate(f)); }
+    // `u.left_divide(f)` assigns f ^ (- 1) u to u.
+    inline void left_divide(const F &f) { left_multiply(!BraidTemplate(f)); }
 
-    // `u.RightDivide(v)` assigns u v ^ (- 1) to u.
-    inline void RightDivide(const F &f) { right_multiply(!BraidTemplate(f)); }
+    // `u.right_divide(v)` assigns u v ^ (- 1) to u.
+    inline void right_divide(const F &f) { right_multiply(!BraidTemplate(f)); }
 
-    // `u.LeftProductRCF(f)` assigns fu to u.
-    void LeftProductRCF(const F &f) {
-        FactorList.push_front(f);
-        apply_binfun(FactorList.begin(), FactorList.end(),
-                     make_right_weighted<F>);
-        CleanRCF();
+    // `u.left_multiply_rcf(f)` assigns fu to u.
+    inline void left_multiply_rcf(const F &f) {
+        factor_list.push_front(f);
+        apply_binfun(begin(), end(), make_right_weighted<F>);
+        clean_rcf();
     }
 
     // `u.right_multiply(f)` assigns uf to u.
-    void RightProductRCF(const F &f) {
-        FactorList.push_back(f.delta_conjugate(-Delta));
-        reverse_apply_binfun(FactorList.begin(), FactorList.end(),
-                             make_right_weighted<F>);
-        CleanRCF();
+    inline void right_multiply_rcf(const F &f) {
+        factor_list.push_back(f.delta_conjugate(-delta));
+        reverse_apply_binfun(begin(), end(), make_right_weighted<F>);
+        clean_rcf();
     }
 
-    // `u.LeftProduct(v)` assigns v u to u.
-    void LeftProductRCF(const BraidTemplate &v) {
-        for (RevFactorItr it = FactorList.rbegin(); it != FactorList.rend();
-             it++) {
-            (*it) = (*it).delta_conjugate(-v.Delta);
+    // `u.left_multiply(v)` assigns v u to u.
+    void left_multiply_rcf(const BraidTemplate &v) {
+        for (RevFactorItr it = rbegin(); it != rend(); it++) {
+            (*it).delta_conjugate_mut(-v.delta);
         }
-        Delta += v.Delta;
-        for (ConstRevFactorItr it = v.FactorList.rbegin();
-             it != v.FactorList.rend(); it++) {
-            LeftProductRCF(*it);
+        delta += v.delta;
+        for (ConstRevFactorItr it = v.crbegin(); it != v.crend(); it++) {
+            left_multiply_rcf(*it);
         }
     }
 
     // `u.right_multiply(v)` assigns u v to u.
-    void RightProductRCF(const BraidTemplate &v) {
-        for (ConstFactorItr it = v.FactorList.begin(); it != v.FactorList.end();
-             it++) {
-            RightProductRCF(*it);
+    void right_multiply_rcf(const BraidTemplate &v) {
+        for (ConstFactorItr it = v.cbegin(); it != v.cend(); it++) {
+            right_multiply_rcf(*it);
         }
-        Delta += v.Delta;
+        delta += v.delta;
+    }
+
+    // `u.left_divide(v)` assigns v ^ (- 1) u to u.
+    inline void left_divide_rcf(const BraidTemplate &v) {
+        left_multiply_rcf(v.inverse_rcf());
+    }
+
+    // `u.right_divide(v)` assigns u v ^ (- 1) to u.
+    inline void right_divide_rcf(const BraidTemplate &v) {
+        right_multiply_rcf(v.inverse_rcf());
+    }
+
+    // `u.left_divide(f)` assigns f ^ (- 1) u to u.
+    inline void left_divide_rcf(const F &f) {
+        left_multiply_rcf(BraidTemplate(f).inverse_rcf());
+    }
+
+    // `u.right_divide(v)` assigns u v ^ (- 1) to u.
+    inline void right_divide_rcf(const F &f) {
+        right_multiply_rcf(BraidTemplate(f).inverse_rcf());
     }
 
     BraidTemplate left_meet(const BraidTemplate &v) const {
         sint16 shift = 0;
-        BraidTemplate b = BraidTemplate(get_parameter());
-        F f1 = F(get_parameter()), f2 = F(get_parameter()),
-          f = F(get_parameter());
-        f.Delta();
+        BraidTemplate b(get_parameter());
+        F f1(get_parameter()), f2(get_parameter()), f(get_parameter());
+        f.delta();
 
         BraidTemplate b1 = *this, b2 = v;
 
-        shift -= b1.Delta;
-        b2.Delta -= b1.Delta;
-        b1.Delta = 0;
+        shift -= b1.delta;
+        b2.delta -= b1.delta;
+        b1.delta = 0;
 
-        if (b2.Delta < 0) {
-            shift -= b2.Delta;
-            b1.Delta -= b2.Delta;
-            b2.Delta = 0;
+        if (b2.delta < 0) {
+            shift -= b2.delta;
+            b1.delta -= b2.delta;
+            b2.delta = 0;
         }
 
         while (!f.is_identity()) {
-            if (b1.Delta > 0) {
-                f1.Delta();
-            } else if (b1.CanonicalLength() == 0) {
+            if (b1.delta > 0) {
+                f1.delta();
+            } else if (b1.canonical_length() == 0) {
                 f1.identity();
             } else {
-                f1 = b1.FactorList.front();
+                f1 = b1.first();
             }
 
-            if (b2.Delta > 0) {
-                f2.Delta();
-            } else if (b2.CanonicalLength() == 0) {
+            if (b2.delta > 0) {
+                f2.delta();
+            } else if (b2.canonical_length() == 0) {
                 f2.identity();
             } else {
-                f2 = b2.FactorList.front();
+                f2 = b2.first();
             }
 
             f = f1 ^ f2;
 
             b.right_multiply(f);
-            b1.LeftDivide(f);
-            b2.LeftDivide(f);
+            b1.left_divide(f);
+            b2.left_divide(f);
         }
 
-        b.Delta -= shift;
+        b.delta -= shift;
         return b;
     }
 
@@ -688,40 +686,40 @@ template <class F> class BraidTemplate {
         sint16 shift = 0;
         BraidTemplate b = BraidTemplate(get_parameter());
         F f2 = F(get_parameter()), f = F(get_parameter());
-        f.Delta();
+        f.delta();
 
         BraidTemplate b1 = *this, b2 = v;
 
-        shift -= b1.Delta;
-        b2.Delta -= b1.Delta;
-        b1.Delta = 0;
+        shift -= b1.delta;
+        b2.delta -= b1.delta;
+        b1.delta = 0;
 
-        if (b2.Delta < 0) {
-            shift -= b2.Delta;
-            b1.Delta -= b2.Delta;
-            b2.Delta = 0;
+        if (b2.delta < 0) {
+            shift -= b2.delta;
+            b1.delta -= b2.delta;
+            b2.delta = 0;
         }
 
         b = b1;
 
         while (!b2.is_identity()) {
-            if (b2.Delta > 0) {
-                f2.Delta();
-            } else if (b2.CanonicalLength() == 0) {
+            if (b2.inf() > 0) {
+                f2.delta();
+            } else if (b2.canonical_length() == 0) {
                 f2.identity();
             } else {
-                f2 = b2.FactorList.front();
+                f2 = b2.first();
             }
 
-            f = b1.Remainder(f2);
+            f = b1.remainder(f2);
 
             b.right_multiply(f);
             b1.right_multiply(f);
-            b1.LeftDivide(f2);
-            b2.LeftDivide(f2);
+            b1.left_divide(f2);
+            b2.left_divide(f2);
         }
 
-        b.Delta -= shift;
+        b.delta -= shift;
         return b;
     }
 
@@ -745,139 +743,129 @@ template <class F> class BraidTemplate {
         return !((!(*this)).left_meet(!BraidTemplate(f)));
     }
 
-    // `u.LeftDivide(v)` assigns v ^ (- 1) u to u.
-    inline void LeftDivideRCF(const BraidTemplate &v) {
-        LeftProductRCF(v.InverseRCF());
-    }
-
-    // `u.RightDivide(v)` assigns u v ^ (- 1) to u.
-    inline void RightDivideRCF(const BraidTemplate &v) {
-        RightProductRCF(v.InverseRCF());
-    }
-
-    // `u.LeftDivide(f)` assigns f ^ (- 1) u to u.
-    inline void LeftDivideRCF(const F &f) {
-        LeftProductRCF(BraidTemplate(f).InverseRCF());
-    }
-
-    // `u.RightDivide(v)` assigns u v ^ (- 1) to u.
-    inline void RightDivideRCF(const F &f) {
-        RightProductRCF(BraidTemplate(f).InverseRCF());
-    }
-
-    inline void Conjugate(const F &f) {
-        LeftDivide(f);
+    inline void conjugate(const F &f) {
+        left_divide(f);
         right_multiply(f);
     }
 
-    inline void Conjugate(const BraidTemplate &v) {
-        LeftDivide(v);
+    inline void conjugate(const BraidTemplate &v) {
+        left_divide(v);
         right_multiply(v);
     }
 
-    inline void ConjugateRCF(const F &f) {
-        LeftDivideRCF(f);
-        RightProductRCF(f);
+    inline void conjugate_rcf(const F &f) {
+        left_divide_rcf(f);
+        right_multiply_rcf(f);
     }
 
-    inline void ConjugateRCF(const BraidTemplate &v) {
-        LeftDivideRCF(v);
-        RightProductRCF(v);
+    inline void conjugate_rcf(const BraidTemplate &v) {
+        left_divide_rcf(v);
+        right_multiply_rcf(v);
     }
 
-    // `u.Initial()` returns the initial factor of u, that is, if u = Delta
-    // ^ r u_1 ... u_k, Delta ^ r u_1 Delta ^ (- r). If u has canonical
-    // length zero, returns the identity factor instead.
-    inline F Initial() const {
-        if (CanonicalLength() == 0) {
-            F id = F(get_parameter());
+    /**
+     * @brief Returns the first (non-Delta) factor.
+     *
+     * Returns the first (non-Delta) factor. If canonical length is zero,
+     * returns the identity factor instead.
+     *
+     * @return The first (non-Delta) factor.
+     */
+    inline F first() const {
+        if (canonical_length() == 0) {
+            F id(get_parameter());
             id.identity();
             return id;
         } else {
-            return FactorList.front().delta_conjugate(-Delta);
+            return factor_list.front();
         }
     }
 
-    inline F First() const {
-        if (CanonicalLength() == 0) {
-            F id = F(get_parameter());
+    /**
+     * @brief Returns the initial factor.
+     *
+     * Returns the initial factor, which is the first factor conjugated by
+     * `-inf()`. If canonical length is zero, returns the identity factor
+     * instead.
+     *
+     * @return The first (non-Delta) factor.
+     */
+    inline F initial() const { return first().delta_conjugate(-inf()); }
+
+    /**
+     * @brief Returns the final factor.
+     *
+     * Returns the final factor, (i.e. the last one in `factor_list`). If
+     * canonical length is zero, returns the identity factor instead.
+     *
+     * @return The first (non-Delta) factor.
+     */
+    inline F final() const {
+        if (canonical_length() == 0) {
+            F id(get_parameter());
             id.identity();
             return id;
         } else {
-            return FactorList.front();
+            return factor_list.back();
         }
     }
 
-    // `u.Final()` returns the final factor of u, that is, if u = Delta ^ r
-    // u_1
-    // ... u_k, u_k. If u has canonical length zero, returns the identity
-    // factor instead.
-    inline F Final() const {
-        if (CanonicalLength() == 0) {
-            F id = F(get_parameter());
-            id.identity();
-            return id;
-        } else {
-            return FactorList.back();
-        }
-    }
-
-    // `u.PreferredPrefix()` returns the preferred prefix of u, that is, if
+    // `u.preferred_prefix()` returns the preferred prefix of u, that is, if
     // u = Delta ^ r u_1 ... u_k, p(u) = d_R(u_k) ^_L Delta ^ r u_1 Delta ^
     // (- r) If u has canonical length zero, returns the identity factor
     // instead.
-    inline F PreferredPrefix() const { return Initial() ^ ~Final(); }
+    inline F preferred_prefix() const { return initial() ^ ~final(); }
 
-    F PreferredSuffixRCF() const {
-        if (CanonicalLength() == 0) {
-            F id = F(get_parameter());
+    F preferred_suffix_rcf() const {
+        if (canonical_length() == 0) {
+            F id(get_parameter());
             id.identity();
             return id;
         } else {
-            return FactorList.back().delta_conjugate(Delta).right_meet(
-                FactorList.front().left_complement());
+            return factor_list.back().delta_conjugate(inf()).right_meet(
+                factor_list.front().left_complement());
         }
     };
 
-    F PreferredSuffix() const {
-        BraidTemplate right = BraidTemplate(*this);
-        right.MakeRCFFromLCF();
-        return right.PreferredSuffixRCF();
+    inline F preferred_suffix() const {
+        BraidTemplate right = *this;
+        right.lcf_to_rcf();
+        return right.preferred_suffix_rcf();
     };
 
-    // `u.Cycling()` cycles u: if u = Delta ^ r u_1 ... u_k, then after
+    // `u.cycling()` cycles u: if u = Delta ^ r u_1 ... u_k, then after
     // applying cycling u will contain (the LNF of) Delta ^ r u_2 ... u_k
     // (Delta ^ r u_1 Delta ^ (-r)).
-    inline void Cycling() {
-        if (CanonicalLength() == 0) {
+    inline void cycling() {
+        if (canonical_length() == 0) {
             return;
         }
-        F i = Initial();
-        FactorList.pop_front();
+        F i = initial();
+        factor_list.pop_front();
         right_multiply(i);
     }
 
-    // `u.Decycling()` decycles u: if u = Delta ^ r u_1 ... u_k, then after
+    // `u.decycling()` decycles u: if u = Delta ^ r u_1 ... u_k, then after
     // applying cycling u will contain (the LNF of) Delta ^ r u_2 ... u_k
     // (Delta ^ r u_1 Delta ^ (-r)).
-    inline void Decycling() {
-        if (CanonicalLength() == 0) {
+    inline void decycling() {
+        if (canonical_length() == 0) {
             return;
         }
-        F f = Final();
-        FactorList.pop_back();
-        LeftProduct(f);
+        F f = final();
+        factor_list.pop_back();
+        left_multiply(f);
     }
 
-    // `u.Sliding()` cyclically slides u: if u = Delta ^ r u_1 ... u_k, and
+    // `u.sliding()` cyclically slides u: if u = Delta ^ r u_1 ... u_k, and
     // Delta ^ r u_1 Delta ^ (-r) = p(u) u'_1, then after applying cycling u
     // will contain (the LNF of) Delta ^ r (Delta ^ r u'_1 Delta ^ (-r)) u_2
     // ... u_k p(u).
-    inline void Sliding() {
-        if (CanonicalLength() == 0) {
+    inline void sliding() {
+        if (canonical_length() == 0) {
             return;
         }
-        Conjugate(PreferredPrefix());
+        conjugate(preferred_prefix());
     }
 
     // `u.product(v)` returns uv.
@@ -887,20 +875,29 @@ template <class F> class BraidTemplate {
         return w;
     }
 
-    // `u.Power(k)` returns u raised to the power k.
+    // `u.power(k)` returns u raised to the power k.
     // Uses a fast exponentiation algorithm; the number of multiplications
     // is logarithmic in k.
-    BraidTemplate Power(const sint16 k) const {
+    /**
+     * @brief Raises to `k`-th power.
+     *
+     * Computes `*this` raised to the `k`-th power, using a fast exponentiation
+     * algorithm.
+     *
+     * @param k The exponent.
+     * @return `*this` raised to the `k`-th power.
+     */
+    BraidTemplate power(const sint16 k) const {
         if (k == 0) {
             return BraidTemplate(get_parameter());
         } else if (k % 2 == 0) {
-            BraidTemplate root = Power(k / 2);
+            BraidTemplate root = power(k / 2);
             return root * root;
         } else if (k > 0) {
-            BraidTemplate root = Power(k / 2);
+            BraidTemplate root = power(k / 2);
             return *this * root * root;
         } else {
-            BraidTemplate root = Power(k / 2);
+            BraidTemplate root = power(k / 2);
             return !*this * root * root;
         }
     }
@@ -909,61 +906,64 @@ template <class F> class BraidTemplate {
     // Syntactic sugar for `u.product(v)`.
     BraidTemplate operator*(const BraidTemplate &v) const { return product(v); }
 
-    // `u.Normalize()` turns u into LCF.
-    inline void Normalize() {
-        bubble_sort(FactorList.begin(), FactorList.end(), make_left_weighted<F>);
-        Clean();
+    // `u.normalize()` turns u into LCF.
+    inline void normalize() {
+        bubble_sort(begin(), end(), make_left_weighted<F>);
+        clean();
     }
 
-    // `u.LCFToRCF()` turns u, assumed to be in LCF (so that we may avoid
-    // having to clean up), into RCF. The result (r, [u_1, ..., u_k])
-    // represents u_1
-    // ... u_k Delta ^ r.
-    inline void MakeRCFFromLCF() {
-        for (FactorItr it = FactorList.begin(); it != FactorList.end(); ++it) {
-            *it = (*it).delta_conjugate(-Delta);
+    /**
+     * @brief Changes orientation to RCF.
+     *
+     * Changes convention: Deltas are now on the right. Also (right-)normalizes
+     * the braid.
+     */
+    inline void lcf_to_rcf() {
+        for (FactorItr it = begin(); it != end(); ++it) {
+            *it = (*it).delta_conjugate(-delta);
         };
-        bubble_sort(FactorList.begin(), FactorList.end(), make_right_weighted<F>);
+        bubble_sort(begin(), end(), make_right_weighted<F>);
     }
 
-    // `u.LCFToRCF()` turns u, assumed to be in LCF, into RCF (so that we
-    // may avoid having to clean up). The result (r, [u_1, ..., u_k])
-    // represents u_1
-    // ... u_k Delta ^ r.
-    inline void MakeLCFFromRCF() {
-        for (FactorItr it = FactorList.begin(); it != FactorList.end(); ++it) {
-            *it = (*it).delta_conjugate(Delta);
+    /**
+     * @brief Changes orientation to LCF.
+     *
+     * Changes convention: Deltas are now on the left. Also (left-)normalizes
+     * the braid.
+     */
+    inline void rcf_to_lcf() {
+        for (FactorItr it = begin(); it != end(); ++it) {
+            *it = (*it).delta_conjugate(delta);
         };
-        bubble_sort(FactorList.begin(), FactorList.end(), make_left_weighted<F>);
+        bubble_sort(begin(), end(), make_left_weighted<F>);
     }
 
-    // `b.Remainder(f)` computes, if b is positive, the simple factor s such
+    // `b.remainder(f)` computes, if b is positive, the simple factor s such
     // that bs is the left lcm of b and b and f.
-    F Remainder(const F &f) const {
+    F remainder(const F &f) const {
         F fi = f;
-        if (Delta != 0) {
+        if (delta != 0) {
             fi.identity();
         } else {
-            for (ConstFactorItr it = FactorList.begin(); it != FactorList.end();
-                 it++) {
+            for (ConstFactorItr it = cbegin(); it != cend(); it++) {
                 fi = (*it).left_join(fi) / *it;
             }
         }
         return fi;
     }
 
-    sint16 Rigidity() const {
+    sint16 rigidity() const {
         BraidTemplate b2 = *this;
         sint16 rigidity = 0;
 
-        if (CanonicalLength() == 0)
+        if (canonical_length() == 0)
             return rigidity;
 
-        b2.right_multiply(b2.Initial());
+        b2.right_multiply(b2.initial());
 
-        ConstFactorItr it2 = b2.FactorList.begin();
+        ConstFactorItr it2 = b2.cbegin();
 
-        for (ConstFactorItr it = FactorList.begin(); it != FactorList.end();
+        for (ConstFactorItr it = cbegin(); it != cend();
              it++, it2++, rigidity++) {
             if (*it != *it2) {
                 break;
@@ -973,42 +973,48 @@ template <class F> class BraidTemplate {
         return rigidity;
     }
 
-    // Randomizes the braid, setting it at a given length, using parameters
-    // extracted from FactorTemplate f. The result isn't in LCF.
+    // Randomizes the braid, setting it at a given length. The result isn't in
+    // LCF (so that it may be used to benchmark `normalize`).
+    /**
+     * @brief Randomizes the braid.
+     *
+     * Randomizes the braid, setting it at a given length. The result isn't in
+     * LCF (so that it may be used to benchmark `normalize`).
+     * @param canonical_length An upper bound on the braid's new canonical
+     * length (number of pushed factors).
+     */
     void randomize(sint16 canonical_length) {
-        FactorList.clear(); // Potential memory leak? To be checked.
-        Delta = 0;
+        identity();
+        F f(get_parameter());
         for (sint16 i = 0; i < canonical_length; i++) {
-            F f = F(get_parameter());
             f.randomize();
-            FactorList.push_back(f);
+            factor_list.push_back(f);
         }
     }
 
     void debug(IndentedOStream &os = ind_cout) const {
         os << "{   ";
         os.Indent(4);
-        os << "Parameter:";
+        os << "parameter:";
         os.Indent(4);
         os << EndLine();
-        os << Parameter;
+        os << parameter;
         os.Indent(-4);
         os << EndLine();
-        os << "Delta:";
+        os << "delta:";
         os.Indent(4);
         os << EndLine();
-        os << Delta;
+        os << delta;
         os.Indent(-4);
         os << EndLine();
-        os << "FactorList:";
+        os << "factor_list:";
         os.Indent(4);
         os << EndLine();
         os << "[   ";
         os.Indent(4);
-        ConstFactorItr it_end = FactorList.end();
+        ConstFactorItr it_end = cend();
         it_end--;
-        for (ConstFactorItr it = FactorList.begin(); it != FactorList.end();
-             it++) {
+        for (ConstFactorItr it = cbegin(); it != cend(); it++) {
             (*it).debug(os);
             if (it != it_end) {
                 os << "," << EndLine();
@@ -1021,9 +1027,8 @@ template <class F> class BraidTemplate {
     }
 
     std::size_t hash() const {
-        std::size_t h = Delta;
-        for (ConstFactorItr it = FactorList.begin(); it != FactorList.end();
-             it++) {
+        std::size_t h = inf();
+        for (ConstFactorItr it = cbegin(); it != cend(); it++) {
             h = h * 31 + (*it).hash();
         }
         return h;
@@ -1093,7 +1098,7 @@ template <class F> class BraidTemplate {
             } else {
                 pow = -pow;
                 for (sint16 _ = 0; _ < pow; _++) {
-                    b.RightDivide(fact);
+                    b.right_divide(fact);
                 }
             }
             std::regex_search(str.begin() + pos, str.end(), match, ignore,
@@ -1106,7 +1111,8 @@ template <class F> class BraidTemplate {
 
 // Overloading << for braid classes.
 template <class F>
-IndentedOStream &operator<<(IndentedOStream &os, const BraidTemplate<F> &b) {
+inline IndentedOStream &operator<<(IndentedOStream &os,
+                                   const BraidTemplate<F> &b) {
     b.print(os);
     return os;
 }

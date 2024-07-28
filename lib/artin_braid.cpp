@@ -19,7 +19,7 @@ Underlying::parameter_of_string(const std::string &str) {
                                      match.str(1) +
                                      " can not be converted to a C++ integer.");
         }
-        if (((2 <= i) && (i <= MaxBraidIndex))) {
+        if (((2 <= i) && (i <= MAX_NUMBER_OF_STRANDS))) {
             return i;
         } else if (2 > i) {
             throw InvalidStringError("Number of strands should be at least 2!");
@@ -27,7 +27,7 @@ Underlying::parameter_of_string(const std::string &str) {
             throw InvalidStringError("Number of strands is too big!\n" +
                                      match.str(1) +
                                      " is strictly greater than " +
-                                     std::to_string(MaxBraidIndex) + ".");
+                                     std::to_string(MAX_NUMBER_OF_STRANDS) + ".");
         }
     } else {
         throw InvalidStringError(
@@ -37,7 +37,7 @@ Underlying::parameter_of_string(const std::string &str) {
 
 void Underlying::MeetSub(const sint16 *a, const sint16 *b, sint16 *r, sint16 s,
                          sint16 t) {
-    thread_local sint16 u[MaxBraidIndex], v[MaxBraidIndex], w[MaxBraidIndex];
+    thread_local sint16 u[MAX_NUMBER_OF_STRANDS], v[MAX_NUMBER_OF_STRANDS], w[MAX_NUMBER_OF_STRANDS];
 
     if (s >= t)
         return;
@@ -71,13 +71,13 @@ void Underlying::MeetSub(const sint16 *a, const sint16 *b, sint16 *r, sint16 s,
         r[i] = w[i];
 }
 
-sint16 Underlying::get_parameter() const { return PresentationParameter; };
+sint16 Underlying::get_parameter() const { return number_of_strands; };
 
 Underlying::Underlying(sint16 n)
-    : PresentationParameter(n), permutation_table(n + 1) {}
+    : number_of_strands(n), permutation_table(n + 1) {}
 
 void Underlying::of_string(const std::string &str, size_t &pos) {
-    sint16 n = get_parameter();
+    Parameter n = get_parameter();
 
     std::smatch match;
 
@@ -115,7 +115,8 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
 };
 
 void Underlying::print(IndentedOStream &os) const {
-    sint16 i, j, k, n = get_parameter();
+    sint16 i, j, k;
+    Parameter n = get_parameter();
 
     Underlying c = Underlying(*this);
 
@@ -136,7 +137,7 @@ void Underlying::print(IndentedOStream &os) const {
 void Underlying::debug(IndentedOStream &os) const {
     os << "{   ";
     os.Indent(4);
-    os << "PresentationParameter:";
+    os << "number_of_strands:";
     os.Indent(4);
     os << EndLine() << get_parameter();
     os.Indent(-4);
@@ -156,26 +157,26 @@ void Underlying::debug(IndentedOStream &os) const {
 }
 
 sint16 Underlying::lattice_height() const {
-    sint16 n = get_parameter();
+    Parameter n = get_parameter();
     return n * (n - 1) / 2;
 }
 
 void Underlying::identity() {
-    sint16 i, n = get_parameter();
-    for (i = 1; i <= n; i++) {
+    Parameter n = get_parameter();
+    for (sint16 i = 1; i <= n; i++) {
         permutation_table[i] = i;
     }
 };
 
 void Underlying::delta() {
-    sint16 i, n = get_parameter();
-    for (i = 1; i <= n; i++) {
+    Parameter n = get_parameter();
+    for (sint16 i = 1; i <= n; i++) {
         permutation_table[i] = n + 1 - i;
     }
 };
 
 Underlying Underlying::left_meet(const Underlying &b) const {
-    thread_local sint16 s[MaxBraidIndex];
+    thread_local sint16 s[MAX_NUMBER_OF_STRANDS];
 
     Underlying f = Underlying(get_parameter());
 
@@ -190,7 +191,7 @@ Underlying Underlying::left_meet(const Underlying &b) const {
 };
 
 Underlying Underlying::right_meet(const Underlying &b) const {
-    thread_local sint16 u[MaxBraidIndex], v[MaxBraidIndex];
+    thread_local sint16 u[MAX_NUMBER_OF_STRANDS], v[MAX_NUMBER_OF_STRANDS];
 
     Underlying f = Underlying(get_parameter());
 
@@ -215,7 +216,7 @@ bool Underlying::compare(const Underlying &b) const {
     return true;
 };
 
-Underlying Underlying::Inverse() const {
+Underlying Underlying::inverse() const {
     Underlying f = Underlying(get_parameter());
     sint16 i;
     for (i = 1; i <= get_parameter(); i++) {
@@ -234,11 +235,11 @@ Underlying Underlying::product(const Underlying &b) const {
 };
 
 Underlying Underlying::left_complement(const Underlying &b) const {
-    return b.product(Inverse());
+    return b.product(inverse());
 };
 
 Underlying Underlying::right_complement(const Underlying &b) const {
-    return Inverse().product(b);
+    return inverse().product(b);
 };
 
 void Underlying::randomize() {
@@ -254,7 +255,8 @@ void Underlying::randomize() {
 };
 
 std::vector<Underlying> Underlying::atoms() const {
-    sint16 i, n = get_parameter();
+    sint16 i;
+    Parameter n = get_parameter();
     Underlying atom(n);
     std::vector<Underlying> atoms;
     for (i = 1; i <= n - 1; i++) {
@@ -267,7 +269,7 @@ std::vector<Underlying> Underlying::atoms() const {
 };
 
 void Underlying::delta_conjugate_mut(sint16 k) {
-    sint16 n = get_parameter();
+    Parameter n = get_parameter();
     if (k % 2 != 0) {
         for (sint16 i = 1; i <= n / 2; i++) {
             sint16 u = permutation_table[i];
@@ -290,7 +292,7 @@ size_t Underlying::hash() const {
 
 void Underlying::tableau(sint16 **&tab) const {
     sint16 i, j;
-    sint16 n = get_parameter();
+    Braid::Parameter n = get_parameter();
     for (i = 0; i < n; i++) {
         tab[i][i] = permutation_table[i + 1];
     }
@@ -314,23 +316,24 @@ void Underlying::tableau(sint16 **&tab) const {
 }
 
 bool preserves_circles(const Braid &b) {
-    sint16 j, k, t, d, n = b.get_parameter();
+    sint16 j, k, t, d;
+    Braid::Parameter n = b.get_parameter();
     sint16 *disj = new sint16[n + 1];
 
     Underlying delta_under(n);
     delta_under.delta();
 
-    sint16 cl = b.CanonicalLength();
+    sint16 cl = int(b.canonical_length());
     sint16 delta, itype = 0;
-    if (b.Inf() < 0)
-        delta = -b.Inf();
+    if (b.inf() < 0)
+        delta = -b.inf();
     else
-        delta = b.Inf();
+        delta = b.inf();
 
     delta = delta % 2;
 
     sint16 ***tabarray = new sint16 **[cl + delta];
-    Braid::ConstFactorItr it = b.FactorList.begin();
+    Braid::ConstFactorItr it = b.cbegin();
 
     for (j = 0; j < cl + delta; j++) {
         tabarray[j] = new sint16 *[n];
@@ -401,12 +404,12 @@ bool preserves_circles(const Braid &b) {
 ThurstonType
 thurston_type(const Braid &b,
               const ultra_summit::UltraSummitSet<Braid> &uss) {
-    sint16 n = b.get_parameter();
+    Braid::Parameter n = b.get_parameter();
 
     Braid pow = b;
 
     for (sint16 i = 0; i < n; i++) {
-        if (pow.CanonicalLength() == 0)
+        if (pow.canonical_length() == 0)
             return ThurstonType::Periodic;
         pow.right_multiply(b);
     }

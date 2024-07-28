@@ -450,7 +450,7 @@ void lcf_case() {
 void rcf_case() {
     Braid b(prompt_braid_parameter());
     prompt_braid(b);
-    b.MakeRCFFromLCF();
+    b.lcf_to_rcf();
     ind_cout << EndLine() << "Its right normal form is:" << EndLine(1);
     b.print_rcf();
     ind_cout << EndLine(1);
