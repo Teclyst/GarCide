@@ -13,10 +13,10 @@ void read_braid(Braid &b, std::istream &is) {
     if (std::regex_match(str, std::regex{"[\\s\\t]*[qQ][\\s\\t]*"})) {
         throw InterruptAskedFor();
     }
-    b.OfString(str);
+    b.of_string(str);
 }
 
-Braid::ParameterType read_braid_parameter(std::istream &is) {
+Braid::Parameter read_braid_parameter(std::istream &is) {
     std::string str;
     std::getline(is, str);
     if (std::regex_match(str, std::regex{"[\\s\\t]*\\?[\\s\\t]*"})) {
@@ -183,12 +183,12 @@ void prompt_braid(Braid &b) {
     }
 }
 
-Braid::ParameterType prompt_braid_parameter() {
+Braid::Parameter prompt_braid_parameter() {
     ind_cout << "Enter the parameter (? for help, q to abort): " << EndLine(1);
     while (true) {
         ind_cout << ">>> ";
         try {
-            Braid::ParameterType p = read_braid_parameter();
+            Braid::Parameter p = read_braid_parameter();
             ind_cout << EndLine();
             return p;
         } catch (cgarside::InvalidStringError inval) {
@@ -457,7 +457,7 @@ void rcf_case() {
 }
 
 void left_gcd_case() {
-    Braid::ParameterType p = prompt_braid_parameter();
+    Braid::Parameter p = prompt_braid_parameter();
     Braid b(p), c(p);
     prompt_braid(b);
     prompt_braid(c);
@@ -466,30 +466,30 @@ void left_gcd_case() {
 }
 
 void right_gcd_case() {
-    Braid::ParameterType p = prompt_braid_parameter();
+    Braid::Parameter p = prompt_braid_parameter();
     Braid b(p), c(p);
     prompt_braid(b);
     prompt_braid(c);
     ind_cout << EndLine() << "Their right gcd is:" << EndLine(1)
-             << b.RightMeet(c) << EndLine(1);
+             << b.right_meet(c) << EndLine(1);
 }
 
 void left_lcm_case() {
-    Braid::ParameterType p = prompt_braid_parameter();
+    Braid::Parameter p = prompt_braid_parameter();
     Braid b(p), c(p);
     prompt_braid(b);
     prompt_braid(c);
-    ind_cout << EndLine() << "Their left lcm is:" << EndLine(1) << b.LeftJoin(c)
+    ind_cout << EndLine() << "Their left lcm is:" << EndLine(1) << b.left_join(c)
              << EndLine(1);
 }
 
 void right_lcm_case() {
-    Braid::ParameterType p = prompt_braid_parameter();
+    Braid::Parameter p = prompt_braid_parameter();
     Braid b(p), c(p);
     prompt_braid(b);
     prompt_braid(c);
     ind_cout << EndLine() << "Their right lcm is:" << EndLine(1)
-             << b.RightJoin(c) << EndLine(1);
+             << b.right_join(c) << EndLine(1);
 }
 
 void sss_case() {
@@ -522,7 +522,7 @@ void centralizer_case() {
 }
 
 void conjugacy_case() {
-    Braid::ParameterType p = prompt_braid_parameter();
+    Braid::Parameter p = prompt_braid_parameter();
     Braid b(p), c(p), conj(p);
     prompt_braid(b);
     prompt_braid(c);

@@ -48,11 +48,11 @@ enum class Option {
  * @brief Reads a line from `is` as a braid.
  *
  * Reads a line from `is`, parses it as a braid and sets `b` to that braid using
- * `b.OfString`.
+ * `b.of_string`.
  *
  * @param b The braid that is to be set to what is read from `is`.
  * @param is The input stream we read from. Its default value is `std::cin`.
- * @exception `cgarside::InvalidStringError`: may be raised by `OfString`.
+ * @exception `cgarside::InvalidStringError`: may be raised by `of_string`.
  * @exception `HelpAskedFor`: raised when `"?"` is entered.
  * @exception `InterruptAskedFor`: raised when `"q"` or `"Q"` is entered.
  */
@@ -69,7 +69,7 @@ void read_braid(Braid &b, std::istream &is = std::cin);
  * @exception `HelpAskedFor`: raised when `"?"` is entered.
  * @exception `InterruptAskedFor`: raised when `"q"` or `"Q"` is entered.
  */
-Braid::ParameterType read_braid_parameter(std::istream &is = std::cin);
+Braid::Parameter read_braid_parameter(std::istream &is = std::cin);
 
 /**
  * @brief Prints a text that explains what a correct braid input is.
@@ -111,7 +111,7 @@ void prompt_braid(Braid &b);
  *
  * @exception `InterruptAskedFor`: raised when `"q"` or `"Q"` is entered.
  */
-Braid::ParameterType prompt_braid_parameter();
+Braid::Parameter prompt_braid_parameter();
 
 /**
  * @brief Prints a line.

@@ -39,7 +39,7 @@ template <class B> class Centralizer {
             } else {
                 is_first = false;
             }
-            (*it).Debug(os);
+            (*it).debug(os);
         }
         os.Indent(-4);
         os << EndLine();
@@ -76,7 +76,7 @@ template <class B> class Centralizer {
             }
             count++;
             os.Indent(4 * indent);
-            (*it).Print(os);
+            (*it).print(os);
             os.Indent(-4 * indent);
             os << EndLine();
         }
@@ -97,14 +97,14 @@ centralizer(const ultra_summit::UltraSummitSet<BraidTemplate<F>> &uss,
          orbit_index++) {
         BraidTemplate<F> d = ultra_summit::tree_path(
                              uss.at(orbit_index, (size_t)0), uss, mins, prev),
-                         c = d, b2(b.GetParameter());
+                         c = d, b2(b.get_parameter());
         for (size_t shift = 0; shift < uss.orbit_size(orbit_index); shift++) {
-            c.RightProduct(
-                uss.at(orbit_index, shift).First().DeltaConjugate(b.Inf()));
+            c.right_multiply(
+                uss.at(orbit_index, shift).First().delta_conjugate(b.Inf()));
         }
-        c.RightProduct(!d);
+        c.right_multiply(!d);
 
-        if ((!(c.IsIdentity())) && !centralizer.mem(c)) {
+        if ((!(c.is_identity())) && !centralizer.mem(c)) {
             centralizer.insert(c);
         }
 
@@ -120,7 +120,7 @@ centralizer(const ultra_summit::UltraSummitSet<BraidTemplate<F>> &uss,
             b2.Conjugate(*it);
             c = d * (*it) * !ultra_summit::tree_path(b2, uss, mins, prev);
 
-            if ((!(c.IsIdentity())) && !centralizer.mem(c)) {
+            if ((!(c.is_identity())) && !centralizer.mem(c)) {
                 centralizer.insert(c);
             }
         }
@@ -140,7 +140,7 @@ Centralizer<BraidTemplate<F>> centralizer(const BraidTemplate<F> &b) {
                                       mins, prev),
                                   centralizer;
 
-    BraidTemplate<F> c = BraidTemplate<F>(b.GetParameter()), d = c;
+    BraidTemplate<F> c = BraidTemplate<F>(b.get_parameter()), d = c;
     ultra_summit::send_to_ultra_summit(b, c);
     c = !c;
 

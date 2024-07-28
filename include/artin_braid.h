@@ -16,7 +16,7 @@ class Underlying {
   private:
     sint16 PresentationParameter;
 
-    std::vector<sint16> PermutationTable;
+    std::vector<sint16> permutation_table;
 
     /**
      * @brief Maximum braid index.
@@ -32,9 +32,9 @@ class Underlying {
     static const sint16 MaxBraidIndex = 256;
 
   public:
-    typedef sint16 ParameterType;
+    typedef sint16 Parameter;
 
-    static ParameterType parameter_of_string(const std::string &str);
+    static Parameter parameter_of_string(const std::string &str);
 
     /**
      * @brief Get the `PresentationParameter`.
@@ -43,10 +43,10 @@ class Underlying {
      *
      * @return `PresentationParameter`.
      */
-    ParameterType GetParameter() const;
+    Parameter get_parameter() const;
 
-    sint16 at(sint16 i) const { return PermutationTable[i]; }
-    sint16 &at(sint16 i) { return PermutationTable[i]; }
+    sint16 at(sint16 i) const { return permutation_table[i]; }
+    sint16 &at(sint16 i) { return permutation_table[i]; }
 
     /**
      * @brief Construct a new `Underlying`.
@@ -54,14 +54,14 @@ class Underlying {
      * Construct a new `Underlying`, with `n` as its
      * `PresentationParameter`.
      *
-     * Its `PermutationTable` will have length `n`, and will be filled with
-     * zeros (thus this is not a valid factor). Initialize it with `Identity`,
-     * `Delta`, or another similar method.
+     * Its `permutation_table` will have length `n`, and will be filled with
+     * zeros (thus this is not a valid factor). Initialize it with `identity`,
+     * `delta`, or another similar method.
      *
      * @param n The `PresentationParameter` of the factor (also the length of
-     * its `PermutationTable`).
+     * its `permutation_table`).
      */
-    Underlying(ParameterType n);
+    Underlying(Parameter n);
 
     /**
      * @brief Extraction from string.
@@ -80,19 +80,19 @@ class Underlying {
      * from `pos` that matches `Z`, or if there is one, if the corresponding
      * integer does not belong to [`1`, `Parameter`[.
      */
-    void OfString(const std::string &str, size_t &pos);
+    void of_string(const std::string &str, size_t &pos);
 
-    sint16 LatticeHeight() const;
+    sint16 lattice_height() const;
 
     /**
      * @brief Prints internal representation to `os`.
      *
-     * Prints the factor's `PermutationTable` to `os`, typically for debugging
+     * Prints the factor's `permutation_table` to `os`, typically for debugging
      * purposes.
      *
      * @param os The output stream it prints to.
      */
-    void Debug(IndentedOStream &os) const;
+    void debug(IndentedOStream &os) const;
 
     /**
      * @brief Prints the factor to `os`.
@@ -101,13 +101,13 @@ class Underlying {
      *
      * @param os The output stream it prints to.
      */
-    void Print(IndentedOStream &os) const;
+    void print(IndentedOStream &os) const;
 
-    // Set to the Identity element (here the identity).
-    void Identity();
+    // Set to the identity element (here the identity).
+    void identity();
 
     // Set to delta.
-    void Delta();
+    void delta();
 
     // Compute the meet r of the two factors a and b.  A factor is
     // given as the associated permutation, which is viewed as a
@@ -124,34 +124,34 @@ class Underlying {
     // Birman, Ko, and Lee, but different from that of the article of
     // Thurston (in Epstein's book).  Indeed, Thurston's is the
     // "right" meet in our sense.
-    Underlying LeftMeet(const Underlying &b) const;
+    Underlying left_meet(const Underlying &b) const;
 
-    Underlying RightMeet(const Underlying &b) const;
+    Underlying right_meet(const Underlying &b) const;
 
     // Equality check.
     // We check wether the underlying permutation table are (pointwise) equal.
-    bool Compare(const Underlying &b) const;
+    bool compare(const Underlying &b) const;
 
-    // Product under the hypothesis that it is still simple.
-    Underlying Product(const Underlying &b) const;
+    // product under the hypothesis that it is still simple.
+    Underlying product(const Underlying &b) const;
 
-    // Under the assumption a <= b, a.LeftComplement(b) computes
+    // Under the assumption a <= b, a.left_complement(b) computes
     // The factor c such that ac = b.
-    Underlying LeftComplement(const Underlying &b) const;
+    Underlying left_complement(const Underlying &b) const;
 
-    Underlying RightComplement(const Underlying &b) const;
+    Underlying right_complement(const Underlying &b) const;
 
     // Generate a random factor.
-    void Randomize();
+    void randomize();
 
     // List of atoms.
-    std::vector<Underlying> Atoms() const;
+    std::vector<Underlying> atoms() const;
 
-    // Conjugate by Delta^k.
+    // Conjugate by delta^k.
     // Used to speed up calculations compared to the default implementation.
-    void DeltaConjugate(sint16 k);
+    void delta_conjugate_mut(sint16 k);
 
-    size_t Hash() const;
+    size_t hash() const;
 
     /**
      * @brief Computes the tableau associated with a factor.
@@ -170,7 +170,7 @@ class Underlying {
     // Used to simplify complement operation.
     Underlying Inverse() const;
 
-    // Subroutine called by LeftMeet() and RightMeet().
+    // Subroutine called by left_meet() and right_meet().
     static void MeetSub(const sint16 *a, const sint16 *b, sint16 *r, sint16 s,
                         sint16 t);
 };

@@ -9,9 +9,9 @@ namespace cgarside::super_summit {
 
 template <class F>
 BraidTemplate<F> send_to_super_summit(const BraidTemplate<F> &b) {
-    typename F::ParameterType n = b.GetParameter();
+    typename F::Parameter n = b.get_parameter();
 
-    sint16 k = F(n).LatticeHeight();
+    sint16 k = F(n).lattice_height();
 
     BraidTemplate<F> b2 = b, b3 = b;
 
@@ -52,13 +52,13 @@ template <class F>
 BraidTemplate<F> send_to_super_summit(const BraidTemplate<F> &b,
                                       BraidTemplate<F> &c) {
 
-    typename F::ParameterType n = b.GetParameter();
+    typename F::Parameter n = b.get_parameter();
 
-    sint16 k = F(n).LatticeHeight();
+    sint16 k = F(n).lattice_height();
 
     BraidTemplate<F> b2 = b, b3 = b, c2 = BraidTemplate<F>(n);
 
-    c.Identity();
+    c.identity();
 
     sint16 p = b.Delta;
     sint16 j = 0;
@@ -68,7 +68,7 @@ BraidTemplate<F> send_to_super_summit(const BraidTemplate<F> &b,
             return b2;
         }
 
-        c2.RightProduct(b2.First().DeltaConjugate(b2.Inf()));
+        c2.right_multiply(b2.First().delta_conjugate(b2.Inf()));
         b2.Cycling();
 
         if (b2.Delta == p) {
@@ -77,15 +77,15 @@ BraidTemplate<F> send_to_super_summit(const BraidTemplate<F> &b,
             b3 = b2;
             p++;
             j = 0;
-            c.RightProduct(c2);
-            c2.Identity();
+            c.right_multiply(c2);
+            c2.identity();
         }
     }
 
     j = 0;
     b2 = b3;
     sint16 l = b2.Sup();
-    c2.Identity();
+    c2.identity();
 
     while (j <= k) {
         c2.LeftProduct(b2.Final());
@@ -98,7 +98,7 @@ BraidTemplate<F> send_to_super_summit(const BraidTemplate<F> &b,
             l--;
             j = 0;
             c.RightDivide(c2);
-            c2.Identity();
+            c2.identity();
         }
     }
 
@@ -106,15 +106,15 @@ BraidTemplate<F> send_to_super_summit(const BraidTemplate<F> &b,
 }
 
 template <class F> F min_summit(const BraidTemplate<F> &b, const F &f) {
-    F r2 = f, r = F(f.GetParameter());
-    r.Identity();
+    F r2 = f, r = F(f.get_parameter());
+    r.identity();
 
     BraidTemplate<F> w = b;
     w.Delta = 0;
 
-    while (!r2.IsIdentity()) {
-        r.RightProduct(r2);
-        r2 = (w * r).Remainder(r.DeltaConjugate(b.Delta));
+    while (!r2.is_identity()) {
+        r.right_multiply(r2);
+        r2 = (w * r).Remainder(r.delta_conjugate(b.Delta));
     }
 
     return r;
@@ -128,7 +128,7 @@ F min_super_summit(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf,
     b2.ConjugateRCF(r);
 
     while (b2.CanonicalLength() > b.CanonicalLength()) {
-        r.RightProduct(b2.FactorList.front());
+        r.right_multiply(b2.FactorList.front());
         b2 = b_rcf;
         b2.ConjugateRCF(r);
     }
@@ -138,8 +138,8 @@ F min_super_summit(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf,
 template <class F>
 std::vector<F> min_super_summit(const BraidTemplate<F> &b,
                                 const BraidTemplate<F> &b_rcf) {
-    F f = F(b.GetParameter());
-    std::vector<F> atoms = f.Atoms();
+    F f = F(b.get_parameter());
+    std::vector<F> atoms = f.atoms();
     std::vector<F> factors = atoms;
 
 #ifndef USE_PAR
@@ -231,7 +231,7 @@ template <class B> class SuperSummitSet {
             }
             count++;
             os.Indent(4 * indent);
-            (*it).Print(os);
+            (*it).print(os);
             os.Indent(-4 * indent);
             os << EndLine();
         }
@@ -254,7 +254,7 @@ template <class B> class SuperSummitSet {
             } else {
                 is_first = false;
             }
-            (*it).Debug(os);
+            (*it).debug(os);
         }
         os.Indent(-4);
         os << EndLine();

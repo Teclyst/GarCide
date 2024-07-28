@@ -12,7 +12,7 @@ namespace cgarside::z_n {
 class Underlying {
 
   public:
-    typedef size_t ParameterType;
+    typedef size_t Parameter;
 
   private:
     /**
@@ -21,7 +21,7 @@ class Underlying {
      * dimension. The n in Z ^ n, represented as a `size_t` (unsigned integer
      * type used for sizes).
      */
-    ParameterType dimension;
+    Parameter dimension;
 
     /**
      * @brief The factor's coordinates.
@@ -34,7 +34,7 @@ class Underlying {
     std::vector<bool> coordinates;
 
   public:
-    static ParameterType parameter_of_string(const std::string &str);
+    static Parameter parameter_of_string(const std::string &str);
 
     /**
      * @brief Get dimension.
@@ -43,7 +43,7 @@ class Underlying {
      *
      * @return `dimension`.
      */
-    ParameterType GetParameter() const;
+    Parameter get_parameter() const;
 
     /**
      * @brief Access i-th coordinate.
@@ -66,7 +66,7 @@ class Underlying {
      *
      * @param n The factor's `dimension`.
      */
-    Underlying(ParameterType n);
+    Underlying(Parameter n);
 
     /**
      * @brief Extraction from string.
@@ -88,17 +88,17 @@ class Underlying {
      * from `pos` that matches `Z`, or if there is one, if the corresponding
      * integer does not belong to [`1`, `Parameter`[.
      */
-    void OfString(const std::string &str, size_t &pos);
+    void of_string(const std::string &str, size_t &pos);
 
     /**
      * @brief Height of the lattice.
      *
-     * Height (i.e. `Delta`'s length as a word in the generators, here
+     * Height (i.e. `delta`'s length as a word in the generators, here
      * `dimension`).
      *
      * @return sint16
      */
-    sint16 LatticeHeight() const;
+    sint16 lattice_height() const;
 
     /**
      * @brief Prints internal data in `os`.
@@ -108,7 +108,7 @@ class Underlying {
      *
      * @param os The output stream it prints to.
      */
-    void Debug(IndentedOStream &os) const;
+    void debug(IndentedOStream &os) const;
 
     /**
      * @brief Prints the factor in `os`.
@@ -118,21 +118,21 @@ class Underlying {
      *
      * @param os The output stream it prints to.
      */
-    void Print(IndentedOStream &os) const;
+    void print(IndentedOStream &os) const;
 
     /**
      * @brief Sets the factor to the identity.
      *
      * Sets the factor to the identity (i.e. sets all coordinates to `false`).
      */
-    void Identity();
+    void identity();
 
     /**
      * @brief Sets the factor to delta.
      *
      * Sets the factor to delta (i.e. sets all coordinates to `true`).
      */
-    void Delta();
+    void delta();
 
     /**
      * @brief Computes meets.
@@ -143,7 +143,7 @@ class Underlying {
      * @param b Second argument.
      * @return The meet of `*this` and `b`.
      */
-    Underlying LeftMeet(const Underlying &b) const;
+    Underlying left_meet(const Underlying &b) const;
 
     /**
      * @brief Computes meets.
@@ -154,8 +154,8 @@ class Underlying {
      * @param b Second argument.
      * @return The meet of `*this` and `b`.
      */
-    inline Underlying RightMeet(const Underlying &b) const {
-        return LeftMeet(b);
+    inline Underlying right_meet(const Underlying &b) const {
+        return left_meet(b);
     };
 
     /**
@@ -167,10 +167,10 @@ class Underlying {
      * @param b Second argument.
      * @return If `*this` and `b` are equal.
      */
-    bool Compare(const Underlying &b) const;
+    bool compare(const Underlying &b) const;
 
     /**
-     * @brief Product computations.
+     * @brief product computations.
      *
      * Computes the product of `*this` and `b` (i.e. coordinate-wise xor), under
      * the assumption that it lies below delta (this is not actually checked).
@@ -178,7 +178,7 @@ class Underlying {
      * @param b Second argument.
      * @return The product of `*this` and `b`.
      */
-    Underlying Product(const Underlying &b) const;
+    Underlying product(const Underlying &b) const;
 
     /**
      * @brief Complement computations.
@@ -193,8 +193,8 @@ class Underlying {
      * @param b Second argument.
      * @return The complement of `*this` to `b`.
      */
-    inline Underlying LeftComplement(const Underlying &b) const {
-        return Product(b);
+    inline Underlying left_complement(const Underlying &b) const {
+        return product(b);
     };
 
     /**
@@ -210,8 +210,8 @@ class Underlying {
      * @param b Second argument.
      * @return The complement of `*this` to `b`.
      */
-    inline Underlying RightComplement(const Underlying &b) const {
-        return Product(b);
+    inline Underlying right_complement(const Underlying &b) const {
+        return product(b);
     };
 
     /**
@@ -220,7 +220,7 @@ class Underlying {
      * Sets `*this` to a random factor, following an uniform distribution other
      * factors.
      */
-    void Randomize();
+    void randomize();
 
     /**
      * @brief List of the atoms.
@@ -229,17 +229,17 @@ class Underlying {
      *
      * @return A vector containing the atoms.
      */
-    std::vector<Underlying> Atoms() const;
+    std::vector<Underlying> atoms() const;
 
     /**
-     * @brief Conjugates by Delta ^ k.
+     * @brief Conjugates by delta ^ k.
      *
-     * Conjugates `*this` by Delta ^ k (actually, does nothing as Z ^ n is
+     * Conjugates `*this` by delta ^ k (actually, does nothing as Z ^ n is
      * abelian).
      *
      * @param k The exponent.
      */
-    inline void DeltaConjugate(sint16 k) {};
+    inline void delta_conjugate_mut(sint16 k) {};
 
     /**
      * @brief Hashes the factor.
@@ -248,7 +248,7 @@ class Underlying {
      *
      * @return The hash.
      */
-    size_t Hash() const;
+    size_t hash() const;
 };
 
 /**

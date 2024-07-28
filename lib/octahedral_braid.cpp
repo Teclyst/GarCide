@@ -17,7 +17,7 @@ namespace cgarside::octahedral {
  */
 const sint16 MaxBraidIndex = 256;
 
-Underlying::ParameterType
+Underlying::Parameter
 Underlying::parameter_of_string(const std::string &str) {
     std::smatch match;
 
@@ -47,16 +47,16 @@ Underlying::parameter_of_string(const std::string &str) {
     }
 };
 
-sint16 Underlying::GetParameter() const { return PresentationParameter; }
+sint16 Underlying::get_parameter() const { return PresentationParameter; }
 
-sint16 Underlying::LatticeHeight() const { return GetParameter(); }
+sint16 Underlying::lattice_height() const { return get_parameter(); }
 
 Underlying::Underlying(sint16 n)
-    : PresentationParameter(n), PermutationTable(2 * n + 1) {}
+    : PresentationParameter(n), permutation_table(2 * n + 1) {}
 
-void Underlying::Print(IndentedOStream &os) const {
+void Underlying::print(IndentedOStream &os) const {
     // Recall that a band braid is represented by decreasing cycles.
-    sint16 i, j, n = GetParameter();
+    sint16 i, j, n = get_parameter();
     std::vector<sint16> curr_cycle;
     std::vector<bool> seen(n + 1, false);
     for (i = 1; i <= n; i++) {
@@ -72,7 +72,7 @@ void Underlying::Print(IndentedOStream &os) const {
             while (!seen[Rem(j - 1, n) + 1]) {
                 curr_cycle.push_back(j);
                 seen[Rem(j - 1, n) + 1] = true;
-                j = PermutationTable[j];
+                j = permutation_table[j];
             }
             if (!is_first && int(curr_cycle.size()) > 1) {
                 os << " ";
@@ -91,35 +91,35 @@ void Underlying::Print(IndentedOStream &os) const {
     }
 }
 
-void Underlying::Debug(IndentedOStream &os) const {
+void Underlying::debug(IndentedOStream &os) const {
     os << "{   ";
     os.Indent(4);
     os << "PresentationParameter:";
     os.Indent(4);
-    os << EndLine() << GetParameter();
+    os << EndLine() << get_parameter();
     os.Indent(-4);
     os << EndLine();
-    os << "PermutationTable:";
+    os << "permutation_table:";
     os.Indent(4);
     os << EndLine();
     os << "[";
-    for (sint16 i = 1; i < 2 * GetParameter(); i++) {
-        os << PermutationTable[i] << ", ";
+    for (sint16 i = 1; i < 2 * get_parameter(); i++) {
+        os << permutation_table[i] << ", ";
     }
-    os << PermutationTable[2 * GetParameter()];
+    os << permutation_table[2 * get_parameter()];
     os << "]";
     os.Indent(-8);
     os << EndLine();
     os << "}";
 }
 
-void Underlying::OfString(const std::string &str, size_t &pos) {
-    sint16 n = GetParameter();
+void Underlying::of_string(const std::string &str, size_t &pos) {
+    sint16 n = get_parameter();
     std::smatch match;
     if (std::regex_search(str.begin() + pos, str.end(), match, std::regex{"D"},
                           std::regex_constants::match_continuous)) {
         pos += match[0].length();
-        Delta();
+        delta();
     } else if (std::regex_search(str.begin() + pos, str.end(), match,
                                  std::regex{"\\([\\s\\t]*(" + number_regex +
                                             ")[\\s\\t]*,?[\\s\\t]*(" +
@@ -142,12 +142,12 @@ void Underlying::OfString(const std::string &str, size_t &pos) {
         j = Rem(j - 1, 2 * n) + 1;
         pos += match[0].length();
         if ((i != j) && (i != Rem(j + n - 1, 2 * n) + 1)) {
-            Identity();
-            PermutationTable[i] = j;
-            PermutationTable[j] = i;
-            PermutationTable[Rem(i + n - 1, 2 * n) + 1] =
+            identity();
+            permutation_table[i] = j;
+            permutation_table[j] = i;
+            permutation_table[Rem(i + n - 1, 2 * n) + 1] =
                 Rem(j + n - 1, 2 * n) + 1;
-            PermutationTable[Rem(j + n - 1, 2 * n) + 1] =
+            permutation_table[Rem(j + n - 1, 2 * n) + 1] =
                 Rem(i + n - 1, 2 * n) + 1;
         } else {
             throw InvalidStringError(
@@ -167,9 +167,9 @@ void Underlying::OfString(const std::string &str, size_t &pos) {
         }
         i = Rem(i - 1, 2 * n) + 1;
         pos += match[0].length();
-        Identity();
-        PermutationTable[i] = Rem(i + n - 1, 2 * n) + 1;
-        PermutationTable[Rem(i + n - 1, 2 * n) + 1] = i;
+        identity();
+        permutation_table[i] = Rem(i + n - 1, 2 * n) + 1;
+        permutation_table[Rem(i + n - 1, 2 * n) + 1] = i;
     } else {
         throw InvalidStringError(
             "Could not extract a factor from \"" + str.substr(pos) +
@@ -179,28 +179,28 @@ void Underlying::OfString(const std::string &str, size_t &pos) {
 }
 
 void Underlying::AssignDCDT(sint16 *x) const {
-    for (sint16 i = 1; i <= 2 * GetParameter(); ++i)
+    for (sint16 i = 1; i <= 2 * get_parameter(); ++i)
         x[i] = 0;
-    for (sint16 i = 1; i <= 2 * GetParameter(); ++i) {
+    for (sint16 i = 1; i <= 2 * get_parameter(); ++i) {
         if (x[i] == 0)
             x[i] = i;
-        if (PermutationTable[i] > i)
-            x[PermutationTable[i]] = x[i];
+        if (permutation_table[i] > i)
+            x[permutation_table[i]] = x[i];
     }
 }
 
 void Underlying::OfDCDT(const sint16 *x) {
     thread_local sint16 z[2 * MaxBraidIndex + 1];
 
-    for (sint16 i = 1; i <= 2 * GetParameter(); ++i)
+    for (sint16 i = 1; i <= 2 * get_parameter(); ++i)
         z[i] = 0;
-    for (sint16 i = 2 * GetParameter(); i >= 1; --i) {
-        PermutationTable[i] = (z[x[i]] == 0) ? x[i] : z[x[i]];
+    for (sint16 i = 2 * get_parameter(); i >= 1; --i) {
+        permutation_table[i] = (z[x[i]] == 0) ? x[i] : z[x[i]];
         z[x[i]] = i;
     }
 }
 
-Underlying Underlying::LeftMeet(const Underlying &b) const {
+Underlying Underlying::left_meet(const Underlying &b) const {
     thread_local sint16 x[2 * MaxBraidIndex + 1], y[2 * MaxBraidIndex + 1],
         z[2 * MaxBraidIndex + 1];
 
@@ -209,11 +209,11 @@ Underlying Underlying::LeftMeet(const Underlying &b) const {
 
     thread_local sint16 P[2 * MaxBraidIndex + 1][2 * MaxBraidIndex + 1];
 
-    for (sint16 i = 2 * GetParameter(); i >= 1; i--) {
+    for (sint16 i = 2 * get_parameter(); i >= 1; i--) {
         P[x[i]][y[i]] = i;
     }
 
-    for (sint16 i = 1; i <= 2 * GetParameter(); i++) {
+    for (sint16 i = 1; i <= 2 * get_parameter(); i++) {
         z[i] = P[x[i]][y[i]];
     }
 
@@ -224,28 +224,28 @@ Underlying Underlying::LeftMeet(const Underlying &b) const {
     return c;
 }
 
-Underlying Underlying::RightMeet(const Underlying &b) const {
-    return LeftMeet(b);
+Underlying Underlying::right_meet(const Underlying &b) const {
+    return left_meet(b);
 }
 
-void Underlying::Identity() {
-    for (sint16 i = 1; i <= 2 * GetParameter(); i++) {
-        PermutationTable[i] = i;
+void Underlying::identity() {
+    for (sint16 i = 1; i <= 2 * get_parameter(); i++) {
+        permutation_table[i] = i;
     }
 }
 
-void Underlying::Delta() {
-    sint16 i, n = GetParameter();
+void Underlying::delta() {
+    sint16 i, n = get_parameter();
     for (i = 1; i < 2 * n; i++) {
-        PermutationTable[i] = i + 1;
+        permutation_table[i] = i + 1;
     }
-    PermutationTable[2 * n] = 1;
+    permutation_table[2 * n] = 1;
 }
 
-bool Underlying::Compare(const Underlying &b) const {
+bool Underlying::compare(const Underlying &b) const {
     sint16 i;
-    for (i = 1; i <= GetParameter(); i++) {
-        if (PermutationTable[i] != b.PermutationTable[i]) {
+    for (i = 1; i <= get_parameter(); i++) {
+        if (permutation_table[i] != b.permutation_table[i]) {
             return false;
         }
     }
@@ -253,70 +253,70 @@ bool Underlying::Compare(const Underlying &b) const {
 };
 
 Underlying Underlying::Inverse() const {
-    Underlying f = Underlying(GetParameter());
+    Underlying f = Underlying(get_parameter());
     sint16 i;
-    for (i = 1; i <= 2 * GetParameter(); i++) {
-        f.PermutationTable[PermutationTable[i]] = i;
+    for (i = 1; i <= 2 * get_parameter(); i++) {
+        f.permutation_table[permutation_table[i]] = i;
     }
     return f;
 };
 
-Underlying Underlying::Product(const Underlying &b) const {
-    Underlying f = Underlying(GetParameter());
+Underlying Underlying::product(const Underlying &b) const {
+    Underlying f = Underlying(get_parameter());
     sint16 i;
-    for (i = 1; i <= 2 * GetParameter(); i++) {
-        f.PermutationTable[i] = b.PermutationTable[PermutationTable[i]];
+    for (i = 1; i <= 2 * get_parameter(); i++) {
+        f.permutation_table[i] = b.permutation_table[permutation_table[i]];
     }
     return f;
 };
 
-Underlying Underlying::LeftComplement(const Underlying &b) const {
-    return b.Product(Inverse());
+Underlying Underlying::left_complement(const Underlying &b) const {
+    return b.product(Inverse());
 };
 
-Underlying Underlying::RightComplement(const Underlying &b) const {
-    return Inverse().Product(b);
+Underlying Underlying::right_complement(const Underlying &b) const {
+    return Inverse().product(b);
 };
 
-void Underlying::DeltaConjugate(sint16 k) {
+void Underlying::delta_conjugate_mut(sint16 k) {
     Underlying under = *this;
-    sint16 i, n = GetParameter();
+    sint16 i, n = get_parameter();
 
     for (i = 1; i <= 2 * n; i++) {
-        under.PermutationTable[i] =
-            Rem(PermutationTable[Rem(i - k - 1, 2 * n) + 1] + k - 1, 2 * n) + 1;
+        under.permutation_table[i] =
+            Rem(permutation_table[Rem(i - k - 1, 2 * n) + 1] + k - 1, 2 * n) + 1;
     }
     *this = under;
 }
 
-void Underlying::Randomize() { throw NonRandomizable(); }
+void Underlying::randomize() { throw NonRandomizable(); }
 
-std::vector<Underlying> Underlying::Atoms() const {
-    sint16 n = GetParameter();
+std::vector<Underlying> Underlying::atoms() const {
+    sint16 n = get_parameter();
     std::vector<Underlying> atoms;
     for (sint16 i = 1; i <= n; i++) {
         for (sint16 j = i + 1; j <= n; j++) {
             Underlying atom = Underlying(n);
-            atom.Identity();
-            atom.PermutationTable[i] = j;
-            atom.PermutationTable[j] = i;
-            atom.PermutationTable[i + n] = j + n;
-            atom.PermutationTable[j + n] = i + n;
+            atom.identity();
+            atom.permutation_table[i] = j;
+            atom.permutation_table[j] = i;
+            atom.permutation_table[i + n] = j + n;
+            atom.permutation_table[j + n] = i + n;
             atoms.push_back(atom);
         }
         for (sint16 j = n + i + 1; j <= 2 * n; j++) {
             Underlying atom = Underlying(n);
-            atom.Identity();
-            atom.PermutationTable[i] = j;
-            atom.PermutationTable[j] = i;
-            atom.PermutationTable[i + n] = j - n;
-            atom.PermutationTable[j - n] = i + n;
+            atom.identity();
+            atom.permutation_table[i] = j;
+            atom.permutation_table[j] = i;
+            atom.permutation_table[i + n] = j - n;
+            atom.permutation_table[j - n] = i + n;
             atoms.push_back(atom);
         }
         Underlying atom = Underlying(n);
-        atom.Identity();
-        atom.PermutationTable[i] = n + i;
-        atom.PermutationTable[n + i] = i;
+        atom.identity();
+        atom.permutation_table[i] = n + i;
+        atom.permutation_table[n + i] = i;
         atoms.push_back(atom);
     }
     return atoms;

@@ -11,19 +11,19 @@ struct Parameter {
 
     Parameter(sint16 e, sint16 n) : e(e), n(n) {}
 
-    inline bool Compare(const Parameter &p) const {
+    inline bool compare(const Parameter &p) const {
         return ((e == p.e) && (n == p.n));
     }
 
     inline bool operator==(const Parameter &p) const {
-        return Compare(p);
+        return compare(p);
     }
 
     inline bool operator!=(const Parameter &p) const {
-        return !Compare(p);
+        return !compare(p);
     }
 
-    void Print(IndentedOStream &os) const;
+    void print(IndentedOStream &os) const;
 };
 
 // You may use Braids with parameter e, n such that e * n <= `MaxE` *
@@ -40,13 +40,13 @@ class Underlying {
     // next n coordinates represent the powers w ^ -i (with i ranging between 0
     // and n - 1) of an ne-th root of unity w. We use the same conventions as
     // before: letting sigma be the induced permutation, then
-    // PermutationTable[i] is sigma^(-1)(i).
-    std::vector<sint16> PermutationTable;
+    // permutation_table[i] is sigma^(-1)(i).
+    std::vector<sint16> permutation_table;
 
     // The multiplicating coefficients. These are e-th roots of unity, with the
     // added condition of their product's being one. They are represented by
     // integer ranging between 0 and e - 1, with i standing for w^(ei) (with w
-    // the same root as for the PermutationTable).
+    // the same root as for the permutation_table).
     std::vector<sint16> CoefficientTable;
 
   public:
@@ -78,73 +78,73 @@ class Underlying {
      */
     static const sint16 MaxE = 1;
 
-    typedef Parameter ParameterType;
+    typedef Parameter Parameter;
 
-    static ParameterType parameter_of_string(const std::string &str);
+    static Parameter parameter_of_string(const std::string &str);
 
-    ParameterType GetParameter() const;
+    Parameter get_parameter() const;
 
-    sint16 LatticeHeight() const;
+    sint16 lattice_height() const;
 
     // Constructor
     Underlying(Parameter p);
 
-    void OfString(const std::string &str, size_t &pos);
+    void of_string(const std::string &str, size_t &pos);
 
-    void Debug(IndentedOStream &os) const;
+    void debug(IndentedOStream &os) const;
 
     void AssignPartition(sint16 *x) const;
 
     void OfPartition(const sint16 *x);
 
-    // Print to os. Be wary, as it side-effects!
-    void Print(IndentedOStream &os) const;
+    // print to os. Be wary, as it side-effects!
+    void print(IndentedOStream &os) const;
 
-    // Set to the Identity element (here the identity).
-    void Identity();
+    // Set to the identity element (here the identity).
+    void identity();
 
     // Set to delta.
-    void Delta();
+    void delta();
 
     Underlying
-    LeftMeet(const Underlying &b) const;
+    left_meet(const Underlying &b) const;
 
     inline Underlying
-    RightMeet(const Underlying &b) const {
-        return LeftMeet(b);
+    right_meet(const Underlying &b) const {
+        return left_meet(b);
     };
 
     // Equality check.
     // We check whether the underlying permutation table are (pointwise) equal.
-    bool Compare(const Underlying &b) const;
+    bool compare(const Underlying &b) const;
 
     // Computes the factor corresponding to the inverse permutation.
     // Used to simplify complement operation.
     Underlying Inverse() const;
 
-    // Product under the hypothesis that it is still simple.
+    // product under the hypothesis that it is still simple.
     Underlying
-    Product(const Underlying &b) const;
+    product(const Underlying &b) const;
 
-    // Under the assumption a <= b, a.LeftComplement(b) computes
+    // Under the assumption a <= b, a.left_complement(b) computes
     // The factor c such that ac = b.
     Underlying
-    LeftComplement(const Underlying &b) const;
+    left_complement(const Underlying &b) const;
 
     Underlying
-    RightComplement(const Underlying &b) const;
+    right_complement(const Underlying &b) const;
 
     // Generate a random factor.
-    void Randomize();
+    void randomize();
 
     // List of atoms.
-    std::vector<Underlying> Atoms() const;
+    std::vector<Underlying> atoms() const;
 
-    // Conjugate by Delta^k.
+    // Conjugate by delta^k.
     // Used to speed up calculations compared to the default implementation.
-    void DeltaConjugate(sint16 k);
+    void delta_conjugate_mut(sint16 k);
 
-    std::size_t Hash() const;
+    std::size_t hash() const;
 };
 
 typedef FactorTemplate<Underlying> Factor;

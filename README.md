@@ -1,10 +1,10 @@
 ## GarCide (prerelease)
 
-This project (written in ![C++](https://img.shields.io/badge/c++-%2300599C.svg?style=for-the-badge&logo=c%2B%2B&logoColor=white)) contains two parts: on one side, the _GarCide_ library, that allows various computations on Garside groups (notably super summit, ultra summit and sliding circuits set calculations). The idea behind this project is that since algorithms for Garside groups are totally generic once base factor operations have been taken care of, it should be easy and fast to implement a Garside group.
+This project (written in C++) contains two parts: on one side, the _GarCide_ library, that allows various computations on Garside groups (notably super summit, ultra summit and sliding circuits set calculations). The idea behind this project is that since algorithms for Garside groups are totally generic once base factor operations have been taken care of, it should be easy and fast to implement a Garside group.
 
 The goal of _GarCide_ is to give anyone (even someone that does not have extensive programming experience) who wishes to do calculations in a Garside group a tool to do so, with (relatively) little work having to be done; it is the author's opinion that such a tool should focus on efficiency rather than stark minimality, and this reflects on the way things are implemented.
 
-For a guide on how to implement a Garside Group using _GarCide_, see `/doc`.
+For a guide on how to implement a Garside Group using _GarCide_, see `/doc` (when this will be done).
 
 The other (much smaller) part is the _Braiding 2_ executable. It provides a shell interface to easily run some calculations, and is easy to specialize for Garside group implementation based on _GarCide_ (see, again, `/doc`).
 

@@ -1,4 +1,13 @@
+#ifndef BAND
+#define BAND
+
 #include "cgarside.h"
+
+#ifdef USE_CLN
+
+#include <cln/integer.h>
+
+#endif
 
 namespace cgarside::band {
 
@@ -7,7 +16,7 @@ class Underlying {
   protected:
     sint16 PresentationParameter;
 
-    std::vector<sint16> PermutationTable;
+    std::vector<sint16> permutation_table;
 
   public:
     /**
@@ -23,19 +32,19 @@ class Underlying {
      */
     static const sint16 MaxBraidIndex = 256;
 
-    typedef sint16 ParameterType;
+    typedef sint16 Parameter;
 
-    static ParameterType parameter_of_string(const std::string &str);
+    static Parameter parameter_of_string(const std::string &str);
 
-    ParameterType GetParameter() const;
+    Parameter get_parameter() const;
 
-    sint16 LatticeHeight() const;
+    sint16 lattice_height() const;
 
     // Constructor
     Underlying(sint16 n);
 
-    sint16 at(sint16 i) const { return PermutationTable[i]; }
-    sint16 &at(sint16 i) { return PermutationTable[i]; }
+    sint16 at(sint16 i) const { return permutation_table[i]; }
+    sint16 &at(sint16 i) { return permutation_table[i]; }
 
     /**
      * @brief Extraction from string.
@@ -55,17 +64,17 @@ class Underlying {
      * from `pos` that matches `\(W Z W,? W Z W\)`, or if there is one, if
      * either integer does not belong to [`1`, `Parameter`], or both are equal.
      */
-    void OfString(const std::string &str, size_t &pos);
+    void of_string(const std::string &str, size_t &pos);
 
     /**
      * @brief Prints internal representation to `os`.
      *
-     * Prints the factor's `PermutationTable` to `os`, typically for debugging
+     * Prints the factor's `permutation_table` to `os`, typically for debugging
      * purposes.
      *
      * @param os The output stream it prints to.
      */
-    void Debug(IndentedOStream &os) const;
+    void debug(IndentedOStream &os) const;
 
     void AssignDCDT(sint16 *x) const;
 
@@ -78,50 +87,60 @@ class Underlying {
      *
      * @param os The output stream it prints to.
      */
-    void Print(IndentedOStream &os) const;
+    void print(IndentedOStream &os) const;
 
-    // Set to the Identity element (here the identity).
-    void Identity();
+    // Set to the identity element (here the identity).
+    void identity();
 
     // Set to delta.
-    void Delta();
+    void delta();
 
-    Underlying LeftMeet(const Underlying &b) const;
+    Underlying left_meet(const Underlying &b) const;
 
-    Underlying RightMeet(const Underlying &b) const;
+    Underlying right_meet(const Underlying &b) const;
 
     // Equality check.
     // We check wether the underlying permutation table are (pointwise) equal.
-    bool Compare(const Underlying &b) const;
+    bool compare(const Underlying &b) const;
 
     // Computes the factor corresponding to the inverse permutation.
     // Used to simplify complement operation.
     Underlying Inverse() const;
 
-    // Product under the hypothesis that it is still simple.
-    Underlying Product(const Underlying &b) const;
+    // product under the hypothesis that it is still simple.
+    Underlying product(const Underlying &b) const;
 
-    // Under the assumption a <= b, a.LeftComplement(b) computes
+    // Under the assumption a <= b, a.left_complement(b) computes
     // The factor c such that ac = b.
-    Underlying LeftComplement(const Underlying &b) const;
+    Underlying left_complement(const Underlying &b) const;
 
-    Underlying RightComplement(const Underlying &b) const;
+    Underlying right_complement(const Underlying &b) const;
 
     // Generate a random factor.
-    void Randomize();
+    void randomize();
 
     // List of atoms.
-    std::vector<Underlying> Atoms() const;
+    std::vector<Underlying> atoms() const;
 
-    // Conjugate by Delta^k.
+    // Conjugate by delta^k.
     // Used to speed up calculations compared to the default implementation.
-    void DeltaConjugate(sint16 k);
+    void delta_conjugate_mut(sint16 k);
 
-    size_t Hash() const;
+    size_t hash() const;
+
+    void of_ballot_sequence(const sint8 *s);
 };
 
 typedef FactorTemplate<Underlying> Factor;
 
 typedef BraidTemplate<Factor> Braid;
 
+#ifdef USE_CLN
+
+void ballot_sequence(sint16 n, cln::cl_I k, sint8 *s);
+
+#endif
+
 } // namespace cgarside::band
+
+#endif

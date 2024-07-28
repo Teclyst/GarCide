@@ -10,7 +10,7 @@ class Underlying {
   protected:
     sint16 PresentationParameter;
 
-    std::vector<sint16> PermutationTable;
+    std::vector<sint16> permutation_table;
 
   public:
 
@@ -27,13 +27,13 @@ class Underlying {
      */
     static const sint16 MaxBraidIndex = 256;
 
-    typedef sint16 ParameterType;
+    typedef sint16 Parameter;
 
-    static ParameterType parameter_of_string(const std::string &str);
+    static Parameter parameter_of_string(const std::string &str);
 
-    ParameterType GetParameter() const;
+    Parameter get_parameter() const;
 
-    sint16 LatticeHeight() const;
+    sint16 lattice_height() const;
 
     // Constructor
     Underlying(sint16 n);
@@ -61,58 +61,58 @@ class Underlying {
      * matches `\(W Z W,? W Z W\)`, and both integers are equal mod
      * `PresentationParameter'.
      */
-    void OfString(const std::string &str, size_t &pos);
+    void of_string(const std::string &str, size_t &pos);
 
-    void Debug(IndentedOStream &os) const;
+    void debug(IndentedOStream &os) const;
 
     void AssignDCDT(sint16 *x) const;
 
     void OfDCDT(const sint16 *x);
 
-    // Print to os. Be wary, as it side-effects!
-    void Print(IndentedOStream &os) const;
+    // print to os. Be wary, as it side-effects!
+    void print(IndentedOStream &os) const;
 
-    // Set to the Identity element (here the identity).
-    void Identity();
+    // Set to the identity element (here the identity).
+    void identity();
 
     // Set to delta.
-    void Delta();
+    void delta();
 
-    Underlying LeftMeet(const Underlying &b) const;
+    Underlying left_meet(const Underlying &b) const;
 
-    Underlying RightMeet(const Underlying &b) const;
+    Underlying right_meet(const Underlying &b) const;
 
     // Equality check.
     // We check wether the underlying permutation table are (pointwise) equal.
-    bool Compare(const Underlying &b) const;
+    bool compare(const Underlying &b) const;
 
     // Computes the factor corresponding to the inverse permutation.
     // Used to simplify complement operation.
     Underlying Inverse() const;
 
-    // Product under the hypothesis that it is still simple.
-    Underlying Product(const Underlying &b) const;
+    // product under the hypothesis that it is still simple.
+    Underlying product(const Underlying &b) const;
 
-    // Under the assumption a <= b, a.LeftComplement(b) computes
+    // Under the assumption a <= b, a.left_complement(b) computes
     // The factor c such that ac = b.
-    Underlying LeftComplement(const Underlying &b) const;
+    Underlying left_complement(const Underlying &b) const;
 
-    Underlying RightComplement(const Underlying &b) const;
+    Underlying right_complement(const Underlying &b) const;
 
     // Generate a random factor.
-    void Randomize();
+    void randomize();
 
     // List of atoms.
-    std::vector<Underlying> Atoms() const;
+    std::vector<Underlying> atoms() const;
 
-    // Conjugate by Delta^k.
+    // Conjugate by delta^k.
     // Used to speed up calculations compared to the default implementation.
-    void DeltaConjugate(sint16 k);
+    void delta_conjugate_mut(sint16 k);
 
-    std::size_t Hash() const {
+    std::size_t hash() const {
         std::size_t h = 0;
-        for (sint16 i = 1; i <= 2 * GetParameter(); i++) {
-            h = h * 31 + PermutationTable[i];
+        for (sint16 i = 1; i <= 2 * get_parameter(); i++) {
+            h = h * 31 + permutation_table[i];
         }
         return h;
     }

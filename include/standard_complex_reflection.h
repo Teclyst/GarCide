@@ -11,15 +11,15 @@ struct Parameter {
 
     Parameter(sint16 e, sint16 n) : e(e), n(n) {}
 
-    inline bool Compare(const Parameter &p) const {
+    inline bool compare(const Parameter &p) const {
         return ((e == p.e) && (n == p.n));
     }
 
-    inline bool operator==(const Parameter &p) const { return Compare(p); }
+    inline bool operator==(const Parameter &p) const { return compare(p); }
 
-    inline bool operator!=(const Parameter &p) const { return !Compare(p); }
+    inline bool operator!=(const Parameter &p) const { return !compare(p); }
 
-    void Print(IndentedOStream &os) const;
+    void print(IndentedOStream &os) const;
 };
 
 class Underlying {
@@ -40,7 +40,7 @@ class Underlying {
      * Structures for the Complex Braid Groups,
      * [arXiv:1707.06864](https://arxiv.org/abs/1707.06864)).
      */
-    std::vector<sint16> PermutationTable;
+    std::vector<sint16> permutation_table;
 
     /**
      * @brief The multiplicating coefficients.
@@ -53,7 +53,7 @@ class Underlying {
      * zeta an e-th root of unity).
      *
      * `CoefficientTable` is the diagonal coefficient matrix, when considering
-     * G(e, e, n) as the semi-direct product Delta(e, e, n) ⋊ S(n).
+     * G(e, e, n) as the semi-direct product delta(e, e, n) ⋊ S(n).
      */
     std::vector<sint16> CoefficientTable;
 
@@ -71,22 +71,22 @@ class Underlying {
      */
     static const sint16 MaxN = 256;
 
-    typedef Parameter ParameterType;
+    typedef Parameter Parameter;
 
-    static ParameterType parameter_of_string(const std::string &str);
+    static Parameter parameter_of_string(const std::string &str);
 
-    ParameterType GetParameter() const;
+    Parameter get_parameter() const;
 
-    sint16 LatticeHeight() const;
+    sint16 lattice_height() const;
 
     // Constructor
     Underlying(Parameter p);
 
-    void OfString(const std::string &str, size_t &pos);
+    void of_string(const std::string &str, size_t &pos);
 
     // Prints to `os` the internal representation of the factor.
     // @param os The `std::ostream` we are printing to.
-    void Debug(IndentedOStream &os) const;
+    void debug(IndentedOStream &os) const;
 
     /**
      * @brief Prints the factor to `os`.
@@ -98,13 +98,13 @@ class Underlying {
      *
      * @param os The output stream it prints to.
      */
-    void Print(IndentedOStream &os) const;
+    void print(IndentedOStream &os) const;
 
-    // Set to the Identity element (here the identity).
-    void Identity();
+    // Set to the identity element (here the identity).
+    void identity();
 
     // Set to delta.
-    void Delta();
+    void delta();
 
     // Gets the direct permutation table associated with the factor.
     // (i.e., perm[i] is the image of i by the permutation).
@@ -119,7 +119,7 @@ class Underlying {
     // induced by the factor.
     // @param i The integer i for which we check if s_i left divides the factor.
     inline bool IsSLeftDivisor(const sint16 *dir_perm, sint16 i) const {
-        return (PermutationTable[i - 1] > PermutationTable[i - 2])
+        return (permutation_table[i - 1] > permutation_table[i - 2])
                    ? (CoefficientTable[i - 1] != 0)
                    : (CoefficientTable[i - 2] == 0);
     };
@@ -131,10 +131,10 @@ class Underlying {
     // induced by the factor.
     // @param i The integer i for which we check if t_i left divides the factor.
     inline bool IsTLeftDivisor(const sint16 *dir_perm, sint16 i) const {
-        return (PermutationTable[1] > PermutationTable[0])
+        return (permutation_table[1] > permutation_table[0])
                    ? (CoefficientTable[1] != 0)
                    : (CoefficientTable[0] ==
-                      ((i == 0) ? 0 : GetParameter().e - i));
+                      ((i == 0) ? 0 : get_parameter().e - i));
     };
 
     // Left multiplies by s_i (or divides, which is the same as it has order 2).
@@ -144,9 +144,9 @@ class Underlying {
     // @param i The integer i for which we multiply by s_i the factor.
     inline void SLeftMultiply(sint16 *dir_perm, sint16 i) {
         std::swap(CoefficientTable[i - 1], CoefficientTable[i - 2]);
-        std::swap(PermutationTable[i - 1], PermutationTable[i - 2]);
-        std::swap(dir_perm[PermutationTable[i - 1]],
-                  dir_perm[PermutationTable[i - 2]]);
+        std::swap(permutation_table[i - 1], permutation_table[i - 2]);
+        std::swap(dir_perm[permutation_table[i - 1]],
+                  dir_perm[permutation_table[i - 2]]);
     };
 
     // Left multiplies by t_i (or divides, which is the same as it has order 2).
@@ -156,10 +156,10 @@ class Underlying {
     // @param i The integer i for which we multiply by t_i the factor.
     inline void TLeftMultiply(sint16 *dir_perm, sint16 i) {
         std::swap(CoefficientTable[0], CoefficientTable[1]);
-        std::swap(PermutationTable[0], PermutationTable[1]);
-        CoefficientTable[0] = Rem(CoefficientTable[0] - i, GetParameter().e);
-        CoefficientTable[1] = Rem(CoefficientTable[1] + i, GetParameter().e);
-        std::swap(dir_perm[PermutationTable[0]], dir_perm[PermutationTable[1]]);
+        std::swap(permutation_table[0], permutation_table[1]);
+        CoefficientTable[0] = Rem(CoefficientTable[0] - i, get_parameter().e);
+        CoefficientTable[1] = Rem(CoefficientTable[1] + i, get_parameter().e);
+        std::swap(dir_perm[permutation_table[0]], dir_perm[permutation_table[1]]);
     };
 
     // Right multiplies by s_i (or divides, which is the same as it has order
@@ -169,8 +169,8 @@ class Underlying {
     // date.
     // @param i The integer i for which we multiply by s_i the factor.
     inline void SRightMultiply(sint16 *dir_perm, sint16 i) {
-        std::swap(PermutationTable[dir_perm[i - 1]],
-                  PermutationTable[dir_perm[i - 2]]);
+        std::swap(permutation_table[dir_perm[i - 1]],
+                  permutation_table[dir_perm[i - 2]]);
         std::swap(dir_perm[i - 1], dir_perm[i - 2]);
     };
 
@@ -181,53 +181,53 @@ class Underlying {
     // date.
     // @param i The integer i for which we multiply by t_i the factor.
     inline void TRightMultiply(sint16 *dir_perm, sint16 i) {
-        std::swap(PermutationTable[dir_perm[0]], PermutationTable[dir_perm[1]]);
+        std::swap(permutation_table[dir_perm[0]], permutation_table[dir_perm[1]]);
         CoefficientTable[dir_perm[0]] =
-            Rem(CoefficientTable[dir_perm[0]] - i, GetParameter().e);
+            Rem(CoefficientTable[dir_perm[0]] - i, get_parameter().e);
         CoefficientTable[dir_perm[1]] =
-            Rem(CoefficientTable[dir_perm[1]] + i, GetParameter().e);
+            Rem(CoefficientTable[dir_perm[1]] + i, get_parameter().e);
         std::swap(dir_perm[0], dir_perm[1]);
     };
 
-    Underlying LeftMeet(const Underlying &b) const;
+    Underlying left_meet(const Underlying &b) const;
 
-    inline Underlying RightMeet(const Underlying &b) const {
-        return Inverse().LeftMeet(b.Inverse()).Inverse();
+    inline Underlying right_meet(const Underlying &b) const {
+        return Inverse().left_meet(b.Inverse()).Inverse();
     };
 
     // Equality check.
     // We check whether the underlying permutation table are (pointwise) equal.
-    bool Compare(const Underlying &b) const;
+    bool compare(const Underlying &b) const;
 
     // Computes the factor corresponding to the inverse permutation.
     // Used to simplify complement operation.
     Underlying Inverse() const;
 
-    // Product under the hypothesis that it is still simple.
-    Underlying Product(const Underlying &b) const;
+    // product under the hypothesis that it is still simple.
+    Underlying product(const Underlying &b) const;
 
-    // Under the assumption a <= b, a.LeftComplement(b) computes
+    // Under the assumption a <= b, a.left_complement(b) computes
     // The factor c such that ac = b.
-    Underlying LeftComplement(const Underlying &b) const;
+    Underlying left_complement(const Underlying &b) const;
 
-    Underlying RightComplement(const Underlying &b) const;
+    Underlying right_complement(const Underlying &b) const;
 
     // Generate a random factor.
-    void Randomize();
+    void randomize();
 
     // List of atoms.
-    std::vector<Underlying> Atoms() const;
+    std::vector<Underlying> atoms() const;
 
-    // Conjugate by Delta^k.
+    // Conjugate by delta^k.
     // Used to speed up calculations compared to the default implementation.
-    void DeltaConjugate(sint16 k);
+    void delta_conjugate_mut(sint16 k);
 
-    std::size_t Hash() const {
+    std::size_t hash() const {
         std::size_t h = 0;
-        for (sint16 i = 0; i < GetParameter().n; i++) {
-            h = h * 31 + PermutationTable[i];
+        for (sint16 i = 0; i < get_parameter().n; i++) {
+            h = h * 31 + permutation_table[i];
         }
-        for (sint16 i = 0; i < GetParameter().n; i++) {
+        for (sint16 i = 0; i < get_parameter().n; i++) {
             h = h * 31 + CoefficientTable[i];
         }
         return h;

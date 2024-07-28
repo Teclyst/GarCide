@@ -18,198 +18,207 @@ namespace cgarside {
 template <class U> class FactorTemplate {
 
   public:
-    typedef typename U::ParameterType ParameterType;
+    using Parameter = typename U::Parameter;
 
   private:
-    // Underlying is the data structure that actually represents the factor
+    // underlying is the data structure that actually represents the factor
     // (e.g., a permutation table for a braid canonical factor).
-    U Underlying;
+    U underlying;
 
   public:
-    // FactorTemplate(under) initializes a new factor, with underlying element under.
-    FactorTemplate(const U &under) : Underlying(under) {}
+    // FactorTemplate(under) initializes a new factor, with underlying element
+    // under.
+    FactorTemplate(const U &under) : underlying(under) {}
 
-    FactorTemplate(ParameterType parameter) : Underlying(parameter) {}
+    FactorTemplate(Parameter parameter) : underlying(parameter) {}
 
-    U GetUnderlying() const { return Underlying; }
+    inline U get_underlying() const { return underlying; }
 
-    inline static ParameterType parameter_of_string(const std::string &str) {
+    inline static Parameter parameter_of_string(const std::string &str) {
         return U::parameter_of_string(str);
     }
 
-    inline ParameterType GetParameter() const {
-        return Underlying.GetParameter();
+    inline Parameter get_parameter() const {
+        return underlying.get_parameter();
     }
 
-    inline sint16 LatticeHeight() const { return Underlying.LatticeHeight(); };
+    inline sint16 lattice_height() const {
+        return underlying.lattice_height();
+    };
 
-    // a.OfString sets a to the factor specified by str.
-    void OfString(const std::string &str, size_t &pos) {
-        Underlying.OfString(str, pos);
+    // a.of_string sets a to the factor specified by str.
+    void of_string(const std::string &str, size_t &pos) {
+        underlying.of_string(str, pos);
     }
 
-    // a.Debug(os) prints a's internal representation to os.
-    void Debug(IndentedOStream &os = ind_cout) const {
+    // a.debug(os) prints a's internal representation to os.
+    void debug(IndentedOStream &os = ind_cout) const {
         os << "{   Underlying:";
         os.Indent(8);
         os << EndLine();
-        Underlying.Debug(os);
+        underlying.debug(os);
         os.Indent(-8);
         os << EndLine() << "}";
     }
 
-    // a.Print(os) prints a to os.
-    void Print(IndentedOStream &os = ind_cout) const { Underlying.Print(os); }
+    // a.print(os) prints a to os.
+    void print(IndentedOStream &os = ind_cout) const { underlying.print(os); }
 
-    // a.Identity sets a to Identity.
-    void Identity() { Underlying.Identity(); }
+    // a.identity sets a to identity.
+    void identity() { underlying.identity(); }
 
-    // a.Delta() sets a to Delta.
-    void Delta() { Underlying.Delta(); }
+    // a.delta() sets a to delta.
+    void delta() { underlying.delta(); }
 
-    // a.Compare(b) returns true if a and b are equal, false otherwise.
-    bool Compare(const FactorTemplate &b) const {
-        return Underlying.Compare(b.Underlying);
+    // a.compare(b) returns true if a and b are equal, false otherwise.
+    bool compare(const FactorTemplate &b) const {
+        return underlying.compare(b.underlying);
     }
 
     // a == b returns true if a and b are equal, false otherwise.
-    // Syntactic sugar for a.Compare(b).
-    bool operator==(const FactorTemplate &b) const { return Compare(b); }
+    // Syntactic sugar for a.compare(b).
+    bool operator==(const FactorTemplate &b) const { return compare(b); }
 
     // a != b returns true if a and b are not equal, false otherwise.
-    bool operator!=(const FactorTemplate &b) const { return !Compare(b); }
+    bool operator!=(const FactorTemplate &b) const { return !compare(b); }
 
-    // a.IsDelta() returns whether a == e.
-    bool IsIdentity() const {
+    // a.is_delta() returns whether a == e.
+    bool is_identity() const {
         FactorTemplate e = FactorTemplate(*this);
-        e.Identity();
-        return Compare(e);
+        e.identity();
+        return compare(e);
     }
 
-    // a.IsDelta() returns whether a = Delta.
-    bool IsDelta() const {
+    // a.is_delta() returns whether a = delta.
+    bool is_delta() const {
         FactorTemplate delta = FactorTemplate(*this);
-        delta.Delta();
-        return Compare(delta);
+        delta.delta();
+        return compare(delta);
     }
 
-    // a.LeftComplement(b) returns (assuming that a right-divides b) the left
+    // a.left_complement(b) returns (assuming that a right-divides b) the left
     // complement of a under b, ba^{-1}.
-    FactorTemplate LeftComplement(const FactorTemplate &b) const {
-        return FactorTemplate(Underlying.LeftComplement(b.Underlying));
+    FactorTemplate left_complement(const FactorTemplate &b) const {
+        return FactorTemplate(underlying.left_complement(b.underlying));
     }
 
-    // a.LeftComplement() return a's left complement.
-    FactorTemplate LeftComplement() const {
+    // a.left_complement() return a's left complement.
+    FactorTemplate left_complement() const {
         FactorTemplate delta = FactorTemplate(*this);
-        delta.Delta();
-        return LeftComplement(delta);
+        delta.delta();
+        return left_complement(delta);
     }
 
-    // a.RightComplement(b) returns (assuming that a left-divides b) the right
+    // a.right_complement(b) returns (assuming that a left-divides b) the right
     // complement of a under b, a^{-1}b.
-    FactorTemplate RightComplement(const FactorTemplate &b) const {
-        return FactorTemplate(Underlying.RightComplement(b.Underlying));
+    FactorTemplate right_complement(const FactorTemplate &b) const {
+        return FactorTemplate(underlying.right_complement(b.underlying));
     }
 
-    // a.RightComplement() return a's right complement.
-    FactorTemplate RightComplement() const {
+    // a.right_complement() return a's right complement.
+    FactorTemplate right_complement() const {
         FactorTemplate delta = FactorTemplate(*this);
-        delta.Delta();
-        return RightComplement(delta);
+        delta.delta();
+        return right_complement(delta);
     }
 
     // ~a return a's right complement.
-    // Syntactic sugar for a.RightComplement().
-    FactorTemplate operator~() const { return RightComplement(); }
+    // Syntactic sugar for a.right_complement().
+    FactorTemplate operator~() const { return right_complement(); }
 
-    // Syntactic sugar for b.RightComplement(a).
-    FactorTemplate operator/(const FactorTemplate &b) const { return b.RightComplement(*this); }
+    // Syntactic sugar for b.right_complement(a).
+    FactorTemplate operator/(const FactorTemplate &b) const {
+        return b.right_complement(*this);
+    }
 
-    void DeltaConjugateMut(sint16 k) { Underlying.DeltaConjugate(k); }
+    void delta_conjugate_mut(sint16 k) { underlying.delta_conjugate_mut(k); }
 
-    // a.DeltaConjugate(k) returns a, conjugated by Delta ^ k.
+    // a.delta_conjugate(k) returns a, conjugated by Delta ^ k.
     // Makes 2 |k| complement calculations.
-    FactorTemplate DeltaConjugate(sint16 k) const {
+    FactorTemplate delta_conjugate(sint16 k) const {
         FactorTemplate conjugate = *this;
-        conjugate.DeltaConjugateMut(k);
+        conjugate.delta_conjugate_mut(k);
         return conjugate;
     }
 
-    // a.DeltaConjugate() returns a conjugated by Delta.
-    FactorTemplate DeltaConjugate() const { return DeltaConjugate(1); }
+    // a.delta_conjugate() returns a conjugated by Delta.
+    FactorTemplate delta_conjugate() const { return delta_conjugate(1); }
 
-    // a.LeftMeet(b) returns the left meet of a and b.
-    FactorTemplate LeftMeet(const FactorTemplate &b) const {
-        return FactorTemplate(Underlying.LeftMeet(b.Underlying));
+    // a.left_meet(b) returns the left meet of a and b.
+    FactorTemplate left_meet(const FactorTemplate &b) const {
+        return FactorTemplate(underlying.left_meet(b.underlying));
     }
 
     // a ^ b returns the left meet of a and b.
-    // Syntactic sugar for a.LeftMeet(b).
-    FactorTemplate operator^(const FactorTemplate &b) const { return LeftMeet(b); }
-
-    // a.RightMeet(b) returns the right meet of a and b.
-    FactorTemplate RightMeet(const FactorTemplate &b) const {
-        return FactorTemplate(Underlying.RightMeet(b.Underlying));
+    // Syntactic sugar for a.left_meet(b).
+    FactorTemplate operator^(const FactorTemplate &b) const {
+        return left_meet(b);
     }
 
-    // a.LeftJoin(b) returns the left join of a and b.
-    FactorTemplate LeftJoin(const FactorTemplate &b) const {
-        return RightComplement()
-            .RightMeet(b.RightComplement())
-            .LeftComplement();
+    // a.right_meet(b) returns the right meet of a and b.
+    FactorTemplate right_meet(const FactorTemplate &b) const {
+        return FactorTemplate(underlying.right_meet(b.underlying));
     }
 
-    // a.RightJoin(b) returns the right join of a and b.
-    FactorTemplate RightJoin(const FactorTemplate &b) const {
-        return LeftComplement().LeftMeet(b.LeftComplement()).RightComplement();
+    // a.left_join(b) returns the left join of a and b.
+    FactorTemplate left_join(const FactorTemplate &b) const {
+        return right_complement()
+            .right_meet(b.right_complement())
+            .left_complement();
     }
 
-    // a.IsLeftWeighted(b) returns true if a | b is left weighted, or false
+    // a.right_join(b) returns the right join of a and b.
+    FactorTemplate right_join(const FactorTemplate &b) const {
+        return left_complement().left_meet(b.left_complement()).right_complement();
+    }
+
+    // a.is_left_weighted(b) returns true if a | b is left weighted, or false
     // otherwise.
-    bool IsLeftWeighted(const FactorTemplate &b) const {
-        return RightComplement().LeftMeet(b).IsTrivial();
+    bool is_left_weighted(const FactorTemplate &b) const {
+        return right_complement().left_meet(b).is_identity();
     }
 
     // a.IsRightWeighted(b) returns true if a | b is right weighted, or false
     // otherwise.
     bool IsRightWeighted(const FactorTemplate &b) const {
-        return LeftMeet(b.LeftComplement()).IsTrivial();
+        return left_meet(b.left_complement()).is_identity();
     }
 
-    // a.Product(b) returns the product of two factors, under the assumption
+    // a.product(b) returns the product of two factors, under the assumption
     // that it lies below Delta.
-    FactorTemplate Product(const FactorTemplate &b) const {
-        return FactorTemplate(Underlying.Product(b.Underlying));
+    FactorTemplate product(const FactorTemplate &b) const {
+        return FactorTemplate(underlying.product(b.underlying));
     }
 
-    void RightProduct(const FactorTemplate &b) { *this = *this * b; }
+    void right_multiply(const FactorTemplate &b) { *this = *this * b; }
 
-    std::size_t Hash() const { return Underlying.Hash(); }
+    std::size_t hash() const { return underlying.hash(); }
 
     // a * b is the product of a and b, under the assumption that it lies below
-    // Delta. Syntactic sugar for a.Product(b).
-    FactorTemplate operator*(const FactorTemplate &b) const { return Product(b); }
+    // Delta. Syntactic sugar for a.product(b).
+    FactorTemplate operator*(const FactorTemplate &b) const {
+        return product(b);
+    }
 
-    // a.Randomize() sets a to a random factor.
-    void Randomize() {
+    // a.randomize() sets a to a random factor.
+    void randomize() {
 
 #ifdef RANDOMIZE_ON_ATOMS
 
-        std::vector<FactorTemplate> atoms = Atoms();
+        std::vector<FactorTemplate> atoms = atoms();
 
         *this = atoms[rand() % int(atoms.size())];
 
 #else
 
-        Underlying.Randomize();
+        underlying.randomize();
 
 #endif
     }
 
-    // a.Atoms() returns the list of the atoms.
-    std::vector<FactorTemplate> Atoms() const {
-        std::vector<U> atoms = Underlying.Atoms();
+    // a.atoms() returns the list of the atoms.
+    std::vector<FactorTemplate> atoms() const {
+        std::vector<U> atoms = underlying.atoms();
         typename std::vector<U>::iterator atoms_it;
         std::vector<FactorTemplate> factor_atoms;
         for (auto const &atoms_it : atoms) {
@@ -219,14 +228,14 @@ template <class U> class FactorTemplate {
     }
 };
 
-// MakeLeftWeighted(u, v) computes the left-weighted decomposition u' | v' =
+// make_left_weighted(u, v) computes the left-weighted decomposition u' | v' =
 // u | v, and sets u = u' and v = v'. It then returns true if something was
 // done (so that it may be used with `apply_binfun`). SHOULD NEVER BE CALLED
 // UPON u, v IF
 // `&u == &v`!
-template <class F> bool MakeLeftWeighted(F &u, F &v) {
+template <class F> bool make_left_weighted(F &u, F &v) {
     F t = (~u) ^ v;
-    if (t.IsIdentity()) {
+    if (t.is_identity()) {
         return false;
     } else {
         v = v / t;
@@ -235,17 +244,17 @@ template <class F> bool MakeLeftWeighted(F &u, F &v) {
     }
 }
 
-// MakeRightWeighted(u, v) computes the right-weighted decomposition u' | v'
+// make_right_weighted(u, v) computes the right-weighted decomposition u' | v'
 // = u | v, and sets u = u' and v = v'. It then returns true if something
 // was done (so that it may be used with `apply_binfun`). SHOULD NEVER BE
 // CALLED UPON u, v IF `&u == &v`!
-template <class F> bool MakeRightWeighted(F &u, F &v) {
-    F t = u.RightMeet(v.LeftComplement());
-    if (t.IsIdentity()) {
+template <class F> bool make_right_weighted(F &u, F &v) {
+    F t = u.right_meet(v.left_complement());
+    if (t.is_identity()) {
         return false;
     } else {
         v = t * v;
-        u = t.LeftComplement(u);
+        u = t.left_complement(u);
         return true;
     }
 }
@@ -253,7 +262,7 @@ template <class F> bool MakeRightWeighted(F &u, F &v) {
 // Overloading << for factor classes.
 template <class U>
 IndentedOStream &operator<<(IndentedOStream &os, const FactorTemplate<U> &f) {
-    f.Print(os);
+    f.print(os);
     return os;
 }
 
@@ -282,7 +291,7 @@ template <class F> class BraidTemplate {
      * always, an integer).
      *
      */
-    using ParameterType = typename F::ParameterType;
+    using Parameter = typename F::Parameter;
 
     /**
      * @brief A (group) parameter.
@@ -292,7 +301,7 @@ template <class F> class BraidTemplate {
      * always, an integer).
      *
      */
-    ParameterType Parameter;
+    Parameter Parameter;
 
     // `Delta` is the number of Deltas on the left end of the word.
 
@@ -314,10 +323,42 @@ template <class F> class BraidTemplate {
     std::list<F> FactorList;
 
   public:
-    typedef typename std::list<F>::iterator FactorItr;
-    typedef typename std::list<F>::const_iterator ConstFactorItr;
-    typedef typename std::list<F>::reverse_iterator RevFactorItr;
-    typedef typename std::list<F>::const_reverse_iterator ConstRevFactorItr;
+    using FactorItr = typename std::list<F>::iterator;
+    using RevFactorItr = typename std::list<F>::reverse_iterator;
+    using ConstFactorItr = typename std::list<F>::const_iterator;
+    using ConstRevFactorItr = typename std::list<F>::const_reverse_iterator;
+
+    inline FactorItr begin() const {
+        return FactorList.begin();
+    }
+
+    inline RevFactorItr rbegin() const {
+        return FactorList.rbegin();
+    }
+
+    inline ConstFactorItr cbegin() const {
+        return FactorList.begin();
+    }
+
+    inline ConstRevFactorItr crbegin() const {
+        return FactorList.rbegin();
+    }
+
+    inline FactorItr end() const {
+        return FactorList.end();
+    }
+
+    inline RevFactorItr rend() const {
+        return FactorList.rend();
+    }
+
+    inline ConstFactorItr cend() const {
+        return FactorList.end();
+    }
+
+    inline ConstRevFactorItr crend() const {
+        return FactorList.rend();
+    }
 
   public:
     /**
@@ -328,7 +369,7 @@ template <class F> class BraidTemplate {
      *
      * @param parameter Group parameter.
      */
-    BraidTemplate(ParameterType parameter)
+    BraidTemplate(Parameter parameter)
         : Parameter(parameter), Delta(0), FactorList() {}
 
     /**
@@ -338,39 +379,40 @@ template <class F> class BraidTemplate {
      *
      * @param f FactorTemplate to be converted to a braid.
      */
-    BraidTemplate(const F &f) : Parameter(f.GetParameter()), Delta(0), FactorList() {
-        if (f.IsDelta()) {
+    BraidTemplate(const F &f)
+        : Parameter(f.get_parameter()), Delta(0), FactorList() {
+        if (f.is_delta()) {
             Delta = 1;
-        } else if (!f.IsIdentity()) {
+        } else if (!f.is_identity()) {
             FactorList.push_back(f);
         }
     }
 
-    inline static ParameterType parameter_of_string(const std::string &str) {
+    inline static Parameter parameter_of_string(const std::string &str) {
         return F::parameter_of_string(str);
     }
 
-    ParameterType GetParameter() const { return Parameter; }
+    Parameter get_parameter() const { return Parameter; }
 
     /**
      * @brief Prints `*this` to `os`.
      *
      * Prints `*this` to `os`, in a format that is compatible with
-     * `OfString` (assuming that the same holds for `F`).
+     * `of_string` (assuming that the same holds for `F`).
      *
      * @param os The output stream it prints to.
      */
-    void Print(IndentedOStream &os = ind_cout) const {
+    void print(IndentedOStream &os = ind_cout) const {
         if (Delta != 0 && Delta != 1) {
             os << "D ^ " << Delta << (CanonicalLength() > 0 ? " . " : "");
         } else if (Delta == 1) {
             os << "D" << (CanonicalLength() > 0 ? " . " : "");
         }
-        ConstFactorItr it_end = FactorList.end();
+        ConstFactorItr it_end = cend();
         it_end--;
-        for (ConstFactorItr it = FactorList.begin(); it != FactorList.end();
+        for (ConstFactorItr it = cbegin(); it != cend();
              it++) {
-            (*it).Print(os);
+            (*it).print(os);
             if (it != it_end) {
                 os << " . ";
             }
@@ -381,7 +423,7 @@ template <class F> class BraidTemplate {
      * @brief Prints `*this` (in RCF) to `os`.
      *
      * Prints `*this` to `os`, in a format that is compatible with
-     * `OfString` (assuming that the same holds for `F`).
+     * `of_string` (assuming that the same holds for `F`).
      *
      * @param os The output stream it prints to.
      */
@@ -390,7 +432,7 @@ template <class F> class BraidTemplate {
         it_end--;
         for (ConstFactorItr it = FactorList.begin(); it != FactorList.end();
              it++) {
-            (*it).Print(os);
+            (*it).print(os);
             if (it != it_end) {
                 os << " . ";
             }
@@ -402,8 +444,8 @@ template <class F> class BraidTemplate {
         }
     }
 
-    // `w.Identity()` sets w to the empty word.
-    inline void Identity() {
+    // `w.identity()` sets w to the empty word.
+    inline void identity() {
         Delta = 0;
         FactorList.clear();
     }
@@ -415,34 +457,34 @@ template <class F> class BraidTemplate {
 
     inline sint16 Sup() const { return Inf() + CanonicalLength(); }
 
-    // `u.Compare(v)` returns whether u and v have the same internal
+    // `u.compare(v)` returns whether u and v have the same internal
     // representation.
-    inline bool Compare(const BraidTemplate &v) const {
+    inline bool compare(const BraidTemplate &v) const {
         return (Delta == v.Delta && FactorList == v.FactorList);
     }
 
     // `u == v` returns whether u and v have the same internal
-    // representation. Syntactic sugar for `u.Compare(v)`.
-    bool operator==(const BraidTemplate &v) const { return Compare(v); }
+    // representation. Syntactic sugar for `u.compare(v)`.
+    bool operator==(const BraidTemplate &v) const { return compare(v); }
 
     // `u != v` returns whether u and v do not have the same internal
     // representation.
-    bool operator!=(const BraidTemplate &v) const { return !Compare(v); }
+    bool operator!=(const BraidTemplate &v) const { return !compare(v); }
 
-    // `u.IsIdentity` returns whether u represents the Identity element.
-    bool IsIdentity() const { return Delta == 0 && FactorList.empty(); }
+    // `u.is_identity` returns whether u represents the identity element.
+    bool is_identity() const { return Delta == 0 && FactorList.empty(); }
 
     // `u.Inverse()` returns the inverse of u.
     //  See the ElRifai and Morton 1994 article for correction.
     BraidTemplate Inverse() const {
-        BraidTemplate b(GetParameter());
+        BraidTemplate b(get_parameter());
         b.Delta = -Delta;
         for (ConstFactorItr it = FactorList.begin(); it != FactorList.end();
              it++) {
             // Rewrite a_1 ... a_k (f)^(- 1) Delta^r as
             // a_1 ... a_k Delta ^ (r - 1) (Delta^(- r) d_L(f) Delta^r).
             b.FactorList.push_front(
-                (*it).LeftComplement().DeltaConjugate(b.Delta));
+                (*it).left_complement().delta_conjugate(b.Delta));
             --b.Delta;
         }
         return b;
@@ -451,14 +493,14 @@ template <class F> class BraidTemplate {
     // `u.Inverse()` returns the inverse of u.
     //  See the ElRifai and Morton 1994 article for correction.
     BraidTemplate InverseRCF() const {
-        BraidTemplate b(GetParameter());
+        BraidTemplate b(get_parameter());
         b.Delta = -Delta;
         for (ConstRevFactorItr revit = FactorList.rbegin();
              revit != FactorList.rend(); revit++) {
             // Rewrite Delta^r (f)^(- 1) a_1 ... a_k as
             // (Delta^r d_R(f) Delta^(- r)) Delta ^ (r - 1) a_1 ... a_k.
             b.FactorList.push_back(
-                (*revit).RightComplement().DeltaConjugate(-b.Delta));
+                (*revit).right_complement().delta_conjugate(-b.Delta));
             --b.Delta;
         }
         return b;
@@ -472,13 +514,13 @@ template <class F> class BraidTemplate {
     // at the end pf `FactorList`.
     void Clean() {
         FactorItr it = FactorList.begin();
-        while (it != FactorList.end() && (*it).IsDelta()) {
+        while (it != FactorList.end() && (*it).is_delta()) {
             ++it;
             ++Delta;
         }
         FactorList.erase(FactorList.begin(), it);
         RevFactorItr revit = FactorList.rbegin();
-        while (revit != FactorList.rend() && (*revit).IsIdentity()) {
+        while (revit != FactorList.rend() && (*revit).is_identity()) {
             ++revit;
         }
         FactorList.erase(revit.base(), FactorList.end());
@@ -486,12 +528,12 @@ template <class F> class BraidTemplate {
 
     void CleanRCF() {
         FactorItr it = FactorList.begin();
-        while (it != FactorList.end() && (*it).IsIdentity()) {
+        while (it != FactorList.end() && (*it).is_identity()) {
             ++it;
         }
         FactorList.erase(FactorList.begin(), it);
         RevFactorItr revit = FactorList.rbegin();
-        while (revit != FactorList.rend() && (*revit).IsDelta()) {
+        while (revit != FactorList.rend() && (*revit).is_delta()) {
             ++revit;
             ++Delta;
         }
@@ -500,16 +542,16 @@ template <class F> class BraidTemplate {
 
     // `u.LeftProduct(f)` assigns fu to u.
     void LeftProduct(const F &f) {
-        FactorList.push_front(f.DeltaConjugate(Delta));
-        apply_binfun(FactorList.begin(), FactorList.end(), MakeLeftWeighted<F>);
+        FactorList.push_front(f.delta_conjugate(Delta));
+        apply_binfun(FactorList.begin(), FactorList.end(), make_left_weighted<F>);
         Clean();
     }
 
-    // `u.RightProduct(f)` assigns uf to u.
-    void RightProduct(const F &f) {
+    // `u.right_multiply(f)` assigns uf to u.
+    void right_multiply(const F &f) {
         FactorList.push_back(f);
         reverse_apply_binfun(FactorList.begin(), FactorList.end(),
-                             MakeLeftWeighted<F>);
+                             make_left_weighted<F>);
         Clean();
     }
 
@@ -522,16 +564,16 @@ template <class F> class BraidTemplate {
         Delta += v.Delta;
     }
 
-    // `u.RightProduct(v)` assigns u v to u.
+    // `u.right_multiply(v)` assigns u v to u.
     // v's factors move directly to u - be careful.
-    void RightProduct(const BraidTemplate &v) {
+    void right_multiply(const BraidTemplate &v) {
         for (FactorItr it = FactorList.begin(); it != FactorList.end(); it++) {
-            (*it) = (*it).DeltaConjugate(v.Delta);
+            (*it) = (*it).delta_conjugate(v.Delta);
         }
         Delta += v.Delta;
         for (ConstFactorItr it = v.FactorList.begin(); it != v.FactorList.end();
              it++) {
-            RightProduct((*it));
+            right_multiply((*it));
         }
     }
 
@@ -539,27 +581,27 @@ template <class F> class BraidTemplate {
     inline void LeftDivide(const BraidTemplate &v) { LeftProduct(!v); }
 
     // `u.RightDivide(v)` assigns u v ^ (- 1) to u.
-    inline void RightDivide(const BraidTemplate &v) { RightProduct(!v); }
+    inline void RightDivide(const BraidTemplate &v) { right_multiply(!v); }
 
     // `u.LeftDivide(f)` assigns f ^ (- 1) u to u.
     inline void LeftDivide(const F &f) { LeftProduct(!BraidTemplate(f)); }
 
     // `u.RightDivide(v)` assigns u v ^ (- 1) to u.
-    inline void RightDivide(const F &f) { RightProduct(!BraidTemplate(f)); }
+    inline void RightDivide(const F &f) { right_multiply(!BraidTemplate(f)); }
 
     // `u.LeftProductRCF(f)` assigns fu to u.
     void LeftProductRCF(const F &f) {
         FactorList.push_front(f);
         apply_binfun(FactorList.begin(), FactorList.end(),
-                     MakeRightWeighted<F>);
+                     make_right_weighted<F>);
         CleanRCF();
     }
 
-    // `u.RightProduct(f)` assigns uf to u.
+    // `u.right_multiply(f)` assigns uf to u.
     void RightProductRCF(const F &f) {
-        FactorList.push_back(f.DeltaConjugate(-Delta));
+        FactorList.push_back(f.delta_conjugate(-Delta));
         reverse_apply_binfun(FactorList.begin(), FactorList.end(),
-                             MakeRightWeighted<F>);
+                             make_right_weighted<F>);
         CleanRCF();
     }
 
@@ -567,7 +609,7 @@ template <class F> class BraidTemplate {
     void LeftProductRCF(const BraidTemplate &v) {
         for (RevFactorItr it = FactorList.rbegin(); it != FactorList.rend();
              it++) {
-            (*it) = (*it).DeltaConjugate(-v.Delta);
+            (*it) = (*it).delta_conjugate(-v.Delta);
         }
         Delta += v.Delta;
         for (ConstRevFactorItr it = v.FactorList.rbegin();
@@ -576,7 +618,7 @@ template <class F> class BraidTemplate {
         }
     }
 
-    // `u.RightProduct(v)` assigns u v to u.
+    // `u.right_multiply(v)` assigns u v to u.
     void RightProductRCF(const BraidTemplate &v) {
         for (ConstFactorItr it = v.FactorList.begin(); it != v.FactorList.end();
              it++) {
@@ -585,10 +627,11 @@ template <class F> class BraidTemplate {
         Delta += v.Delta;
     }
 
-    BraidTemplate LeftMeet(const BraidTemplate &v) const {
+    BraidTemplate left_meet(const BraidTemplate &v) const {
         sint16 shift = 0;
-        BraidTemplate b = BraidTemplate(GetParameter());
-        F f1 = F(GetParameter()), f2 = F(GetParameter()), f = F(GetParameter());
+        BraidTemplate b = BraidTemplate(get_parameter());
+        F f1 = F(get_parameter()), f2 = F(get_parameter()),
+          f = F(get_parameter());
         f.Delta();
 
         BraidTemplate b1 = *this, b2 = v;
@@ -603,11 +646,11 @@ template <class F> class BraidTemplate {
             b2.Delta = 0;
         }
 
-        while (!f.IsIdentity()) {
+        while (!f.is_identity()) {
             if (b1.Delta > 0) {
                 f1.Delta();
             } else if (b1.CanonicalLength() == 0) {
-                f1.Identity();
+                f1.identity();
             } else {
                 f1 = b1.FactorList.front();
             }
@@ -615,14 +658,14 @@ template <class F> class BraidTemplate {
             if (b2.Delta > 0) {
                 f2.Delta();
             } else if (b2.CanonicalLength() == 0) {
-                f2.Identity();
+                f2.identity();
             } else {
                 f2 = b2.FactorList.front();
             }
 
             f = f1 ^ f2;
 
-            b.RightProduct(f);
+            b.right_multiply(f);
             b1.LeftDivide(f);
             b2.LeftDivide(f);
         }
@@ -631,16 +674,20 @@ template <class F> class BraidTemplate {
         return b;
     }
 
-    inline BraidTemplate LeftMeet(const F &f) { return LeftMeet(BraidTemplate(f)); }
+    inline BraidTemplate left_meet(const F &f) {
+        return left_meet(BraidTemplate(f));
+    }
 
-    inline BraidTemplate operator^(const BraidTemplate &v) { return LeftMeet(v); }
+    inline BraidTemplate operator^(const BraidTemplate &v) {
+        return left_meet(v);
+    }
 
-    inline BraidTemplate operator^(const F &f) { return LeftMeet(f); }
+    inline BraidTemplate operator^(const F &f) { return left_meet(f); }
 
-    BraidTemplate LeftJoin(const BraidTemplate &v) const {
+    BraidTemplate left_join(const BraidTemplate &v) const {
         sint16 shift = 0;
-        BraidTemplate b = BraidTemplate(GetParameter());
-        F f2 = F(GetParameter()), f = F(GetParameter());
+        BraidTemplate b = BraidTemplate(get_parameter());
+        F f2 = F(get_parameter()), f = F(get_parameter());
         f.Delta();
 
         BraidTemplate b1 = *this, b2 = v;
@@ -657,19 +704,19 @@ template <class F> class BraidTemplate {
 
         b = b1;
 
-        while (!b2.IsIdentity()) {
+        while (!b2.is_identity()) {
             if (b2.Delta > 0) {
                 f2.Delta();
             } else if (b2.CanonicalLength() == 0) {
-                f2.Identity();
+                f2.identity();
             } else {
                 f2 = b2.FactorList.front();
             }
 
             f = b1.Remainder(f2);
 
-            b.RightProduct(f);
-            b1.RightProduct(f);
+            b.right_multiply(f);
+            b1.right_multiply(f);
             b1.LeftDivide(f2);
             b2.LeftDivide(f2);
         }
@@ -678,22 +725,24 @@ template <class F> class BraidTemplate {
         return b;
     }
 
-    inline BraidTemplate LeftJoin(const F &f) const { return LeftJoin(BraidTemplate(f)); }
-
-    inline BraidTemplate RightMeet(const BraidTemplate &v) const {
-        return !((!(*this)).LeftJoin(!v));
+    inline BraidTemplate left_join(const F &f) const {
+        return left_join(BraidTemplate(f));
     }
 
-    inline BraidTemplate RightMeet(const F &f) const {
-        return !((!(*this)).LeftJoin(!BraidTemplate(f)));
+    inline BraidTemplate right_meet(const BraidTemplate &v) const {
+        return !((!(*this)).left_join(!v));
     }
 
-    inline BraidTemplate RightJoin(const BraidTemplate &v) const {
-        return !((!(*this)).LeftMeet(!v));
+    inline BraidTemplate right_meet(const F &f) const {
+        return !((!(*this)).left_join(!BraidTemplate(f)));
     }
 
-    inline BraidTemplate RightJoin(const F &f) const {
-        return !((!(*this)).LeftMeet(!BraidTemplate(f)));
+    inline BraidTemplate right_join(const BraidTemplate &v) const {
+        return !((!(*this)).left_meet(!v));
+    }
+
+    inline BraidTemplate right_join(const F &f) const {
+        return !((!(*this)).left_meet(!BraidTemplate(f)));
     }
 
     // `u.LeftDivide(v)` assigns v ^ (- 1) u to u.
@@ -718,12 +767,12 @@ template <class F> class BraidTemplate {
 
     inline void Conjugate(const F &f) {
         LeftDivide(f);
-        RightProduct(f);
+        right_multiply(f);
     }
 
     inline void Conjugate(const BraidTemplate &v) {
         LeftDivide(v);
-        RightProduct(v);
+        right_multiply(v);
     }
 
     inline void ConjugateRCF(const F &f) {
@@ -741,18 +790,18 @@ template <class F> class BraidTemplate {
     // length zero, returns the identity factor instead.
     inline F Initial() const {
         if (CanonicalLength() == 0) {
-            F id = F(GetParameter());
-            id.Identity();
+            F id = F(get_parameter());
+            id.identity();
             return id;
         } else {
-            return FactorList.front().DeltaConjugate(-Delta);
+            return FactorList.front().delta_conjugate(-Delta);
         }
     }
 
     inline F First() const {
         if (CanonicalLength() == 0) {
-            F id = F(GetParameter());
-            id.Identity();
+            F id = F(get_parameter());
+            id.identity();
             return id;
         } else {
             return FactorList.front();
@@ -765,8 +814,8 @@ template <class F> class BraidTemplate {
     // factor instead.
     inline F Final() const {
         if (CanonicalLength() == 0) {
-            F id = F(GetParameter());
-            id.Identity();
+            F id = F(get_parameter());
+            id.identity();
             return id;
         } else {
             return FactorList.back();
@@ -781,12 +830,12 @@ template <class F> class BraidTemplate {
 
     F PreferredSuffixRCF() const {
         if (CanonicalLength() == 0) {
-            F id = F(GetParameter());
-            id.Identity();
+            F id = F(get_parameter());
+            id.identity();
             return id;
         } else {
-            return FactorList.back().DeltaConjugate(Delta).RightMeet(
-                FactorList.front().LeftComplement());
+            return FactorList.back().delta_conjugate(Delta).right_meet(
+                FactorList.front().left_complement());
         }
     };
 
@@ -805,7 +854,7 @@ template <class F> class BraidTemplate {
         }
         F i = Initial();
         FactorList.pop_front();
-        RightProduct(i);
+        right_multiply(i);
     }
 
     // `u.Decycling()` decycles u: if u = Delta ^ r u_1 ... u_k, then after
@@ -831,10 +880,10 @@ template <class F> class BraidTemplate {
         Conjugate(PreferredPrefix());
     }
 
-    // `u.Product(v)` returns uv.
-    BraidTemplate Product(const BraidTemplate &v) const {
+    // `u.product(v)` returns uv.
+    BraidTemplate product(const BraidTemplate &v) const {
         BraidTemplate w(*this);
-        w.RightProduct(v);
+        w.right_multiply(v);
         return w;
     }
 
@@ -843,7 +892,7 @@ template <class F> class BraidTemplate {
     // is logarithmic in k.
     BraidTemplate Power(const sint16 k) const {
         if (k == 0) {
-            return BraidTemplate(GetParameter());
+            return BraidTemplate(get_parameter());
         } else if (k % 2 == 0) {
             BraidTemplate root = Power(k / 2);
             return root * root;
@@ -857,12 +906,12 @@ template <class F> class BraidTemplate {
     }
 
     // `u * v` returns uv.
-    // Syntactic sugar for `u.Product(v)`.
-    BraidTemplate operator*(const BraidTemplate &v) const { return Product(v); }
+    // Syntactic sugar for `u.product(v)`.
+    BraidTemplate operator*(const BraidTemplate &v) const { return product(v); }
 
     // `u.Normalize()` turns u into LCF.
     inline void Normalize() {
-        bubble_sort(FactorList.begin(), FactorList.end(), MakeLeftWeighted<F>);
+        bubble_sort(FactorList.begin(), FactorList.end(), make_left_weighted<F>);
         Clean();
     }
 
@@ -872,9 +921,9 @@ template <class F> class BraidTemplate {
     // ... u_k Delta ^ r.
     inline void MakeRCFFromLCF() {
         for (FactorItr it = FactorList.begin(); it != FactorList.end(); ++it) {
-            *it = (*it).DeltaConjugate(-Delta);
+            *it = (*it).delta_conjugate(-Delta);
         };
-        bubble_sort(FactorList.begin(), FactorList.end(), MakeRightWeighted<F>);
+        bubble_sort(FactorList.begin(), FactorList.end(), make_right_weighted<F>);
     }
 
     // `u.LCFToRCF()` turns u, assumed to be in LCF, into RCF (so that we
@@ -883,9 +932,9 @@ template <class F> class BraidTemplate {
     // ... u_k Delta ^ r.
     inline void MakeLCFFromRCF() {
         for (FactorItr it = FactorList.begin(); it != FactorList.end(); ++it) {
-            *it = (*it).DeltaConjugate(Delta);
+            *it = (*it).delta_conjugate(Delta);
         };
-        bubble_sort(FactorList.begin(), FactorList.end(), MakeLeftWeighted<F>);
+        bubble_sort(FactorList.begin(), FactorList.end(), make_left_weighted<F>);
     }
 
     // `b.Remainder(f)` computes, if b is positive, the simple factor s such
@@ -893,11 +942,11 @@ template <class F> class BraidTemplate {
     F Remainder(const F &f) const {
         F fi = f;
         if (Delta != 0) {
-            fi.Identity();
+            fi.identity();
         } else {
             for (ConstFactorItr it = FactorList.begin(); it != FactorList.end();
                  it++) {
-                fi = (*it).LeftJoin(fi) / *it;
+                fi = (*it).left_join(fi) / *it;
             }
         }
         return fi;
@@ -910,7 +959,7 @@ template <class F> class BraidTemplate {
         if (CanonicalLength() == 0)
             return rigidity;
 
-        b2.RightProduct(b2.Initial());
+        b2.right_multiply(b2.Initial());
 
         ConstFactorItr it2 = b2.FactorList.begin();
 
@@ -926,17 +975,17 @@ template <class F> class BraidTemplate {
 
     // Randomizes the braid, setting it at a given length, using parameters
     // extracted from FactorTemplate f. The result isn't in LCF.
-    void Randomize(sint16 canonical_length) {
+    void randomize(sint16 canonical_length) {
         FactorList.clear(); // Potential memory leak? To be checked.
         Delta = 0;
         for (sint16 i = 0; i < canonical_length; i++) {
-            F f = F(GetParameter());
-            f.Randomize();
+            F f = F(get_parameter());
+            f.randomize();
             FactorList.push_back(f);
         }
     }
 
-    void Debug(IndentedOStream &os = ind_cout) const {
+    void debug(IndentedOStream &os = ind_cout) const {
         os << "{   ";
         os.Indent(4);
         os << "Parameter:";
@@ -960,7 +1009,7 @@ template <class F> class BraidTemplate {
         it_end--;
         for (ConstFactorItr it = FactorList.begin(); it != FactorList.end();
              it++) {
-            (*it).Debug(os);
+            (*it).debug(os);
             if (it != it_end) {
                 os << "," << EndLine();
             }
@@ -971,11 +1020,11 @@ template <class F> class BraidTemplate {
         os << EndLine() << "}";
     }
 
-    std::size_t Hash() const {
+    std::size_t hash() const {
         std::size_t h = Delta;
         for (ConstFactorItr it = FactorList.begin(); it != FactorList.end();
              it++) {
-            h = h * 31 + (*it).Hash();
+            h = h * 31 + (*it).hash();
         }
         return h;
     }
@@ -999,7 +1048,7 @@ template <class F> class BraidTemplate {
      * does not exist (e.g. `4` isn't a legal factor for artin braids on 4
      * strands).
      */
-    void OfString(const std::string str) {
+    void of_string(const std::string str) {
         size_t pos = 0;
 
         // We use double backslashes, as we want to obtain escape sequences.
@@ -1015,11 +1064,11 @@ template <class F> class BraidTemplate {
         std::regex inverse{"![\\s\\t]*"};
 
         BraidTemplate b = *this;
-        b.Identity();
+        b.identity();
 
         std::smatch match;
 
-        F fact(GetParameter());
+        F fact(get_parameter());
 
         std::regex_search(str.begin() + pos, str.end(), match, ignore,
                           std::regex_constants::match_continuous);
@@ -1028,7 +1077,7 @@ template <class F> class BraidTemplate {
         while (pos != str.length()) {
             sint16 pow;
 
-            fact.OfString(str, pos);
+            fact.of_string(str, pos);
 
             if (std::regex_search(str.begin() + pos, str.end(), match, power,
                                   std::regex_constants::match_continuous)) {
@@ -1039,7 +1088,7 @@ template <class F> class BraidTemplate {
             }
             if (pow >= 0) {
                 for (sint16 _ = 0; _ < pow; _++) {
-                    b.RightProduct(fact);
+                    b.right_multiply(fact);
                 }
             } else {
                 pow = -pow;
@@ -1058,21 +1107,22 @@ template <class F> class BraidTemplate {
 // Overloading << for braid classes.
 template <class F>
 IndentedOStream &operator<<(IndentedOStream &os, const BraidTemplate<F> &b) {
-    b.Print(os);
+    b.print(os);
     return os;
 }
 
 } // namespace cgarside
 
 template <class U> struct std::hash<cgarside::FactorTemplate<U>> {
-    std::size_t operator()(cgarside::FactorTemplate<U> const &f) const noexcept {
-        return f.Hash();
+    std::size_t
+    operator()(cgarside::FactorTemplate<U> const &f) const noexcept {
+        return f.hash();
     }
 };
 
 template <class F> struct std::hash<cgarside::BraidTemplate<F>> {
     std::size_t operator()(cgarside::BraidTemplate<F> const &u) const noexcept {
-        return u.Hash();
+        return u.hash();
     }
 };
 
