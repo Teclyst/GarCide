@@ -30,7 +30,7 @@
 #ifndef GARCIDE
 #define GARCIDE
 
-#include "utility.h"
+#include "garcide/utility.h"
 #include <list>
 #include <unordered_map>
 #include <unordered_set>

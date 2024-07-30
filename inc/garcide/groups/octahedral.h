@@ -30,7 +30,7 @@
 #ifndef OCTAHEDRAL
 #define OCTAHEDRAL
 
-#include "garcide.h"
+#include "garcide/garcide.h"
 
 namespace garcide::octahedral {
 

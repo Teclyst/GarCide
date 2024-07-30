@@ -27,7 +27,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "braiding.h"
+#include "braiding/braiding.h"
 
 using namespace braiding;
 

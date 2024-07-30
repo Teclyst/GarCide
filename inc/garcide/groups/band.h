@@ -30,7 +30,7 @@
 #ifndef BAND
 #define BAND
 
-#include "garcide.h"
+#include "garcide/garcide.h"
 
 #ifdef USE_CLN
 

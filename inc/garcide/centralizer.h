@@ -30,7 +30,7 @@
 #ifndef CENTRALIZER
 #define CENTRALIZER
 
-#include "ultra_summit.h"
+#include "garcide/ultra_summit.h"
 
 namespace garcide::centralizer {
 

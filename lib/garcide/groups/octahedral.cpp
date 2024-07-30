@@ -27,7 +27,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "octahedral.h"
+#include "garcide/groups/octahedral.h"
 
 namespace garcide::octahedral {
 

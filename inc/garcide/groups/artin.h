@@ -30,8 +30,8 @@
 #ifndef ARTIN
 #define ARTIN
 
-#include "garcide.h"
-#include "ultra_summit.h"
+#include "garcide/garcide.h"
+#include "garcide/ultra_summit.h"
 
 namespace garcide {
 

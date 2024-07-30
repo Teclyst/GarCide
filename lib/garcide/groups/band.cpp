@@ -27,7 +27,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "band.h"
+#include "garcide/groups/band.h"
 
 namespace garcide::band {
 

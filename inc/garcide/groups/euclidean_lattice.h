@@ -30,7 +30,7 @@
 #ifndef Z_N
 #define Z_N
 
-#include "garcide.h"
+#include "garcide/garcide.h"
 
 namespace garcide::z_n {
 /**

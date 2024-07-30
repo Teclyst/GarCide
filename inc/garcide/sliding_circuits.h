@@ -30,8 +30,8 @@
 #ifndef SLIDING_CIRCUITS
 #define SLIDING_CIRCUITS
 
-#include "garcide.h"
-#include "super_summit.h"
+#include "garcide/garcide.h"
+#include "garcide/super_summit.h"
 
 namespace garcide::sliding_circuits {
 

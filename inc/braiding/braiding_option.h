@@ -32,27 +32,27 @@
 
 #if BRAIDING_CLASS == 0
 
-#include "artin.h"
+#include "garcide/groups/artin.h"
 
 #elif BRAIDING_CLASS == 1
 
-#include "band.h"
+#include "garcide/groups/band.h"
 
 #elif BRAIDING_CLASS == 2
 
-#include "octahedral.h"
+#include "garcide/groups/octahedral.h"
 
 #elif BRAIDING_CLASS == 3
 
-#include "dihedral.h"
+#include "garcide/groups/dihedral.h"
 
 #elif BRAIDING_CLASS == 4
 
-#include "dual_complex.h"
+#include "garcide/groups/dual_complex.h"
 
 #elif BRAIDING_CLASS == 5
 
-#include "standard_complex.h"
+#include "garcide/groups/standard_complex.h"
 
 #endif
 

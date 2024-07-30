@@ -27,9 +27,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "braiding.h"
-#include "centralizer.h"
-#include "sliding_circuits.h"
+#include "braiding/braiding.h"
+#include "garcide/centralizer.h"
+#include "garcide/sliding_circuits.h"
 
 namespace braiding {
 
