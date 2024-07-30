@@ -1,4 +1,6 @@
-## GarCide (prerelease)
+# GarCide (prerelease)
+
+## Overview
 
 This project (written in C++) contains two parts: on one side, the _GarCide_ library, that allows various computations on Garside groups (notably super summit, ultra summit and sliding circuits set calculations). The idea behind this project is that since algorithms for Garside groups are totally generic once base factor operations have been taken care of, it should be easy and fast to implement a Garside group.
 

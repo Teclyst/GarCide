@@ -257,7 +257,7 @@ void print_header(IndentedOStream &os) {
        << EndLine()
        << "││││││││  to redistribute it under certain conditions.  ││││││││"
        << EndLine()
-       << "││││││││   See GNU General Public License in LICENCE.   ││││││││"
+       << "││││││││  See GNU General Public License in LICENCE.md. ││││││││"
        << EndLine()
        << "├──────┴──┬──────────────────────────────────────────┬──┴──────┤"
 #if BRAIDING_CLASS == 0
