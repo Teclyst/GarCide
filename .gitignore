@@ -1,5 +1,10 @@
 .depends
-braiding
 *.o
 *.a
 .vscode/
+obj/*
+bin/*
+lib/static/*
+doc/*
+!doc/*.html
+!doc/*.pdf

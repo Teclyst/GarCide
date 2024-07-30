@@ -1,23 +1,20 @@
-# File names and directories
-SOURCES       = braiding_main.cpp 
+# File names and directories.
+SOURCES       = braiding_main.cpp
 PROGRAMS      = $(SOURCES:.cpp=)
 OBJS	      = $(SOURCES:.cpp=.o)
 CBRAID_LIBDIR = ../lib
-CBRAID_INCDIR = ../include
+CBRAID_INCDIR = ../inc
 CBRAID_LIB    = $(CBRAID_LIBDIR)/libcbraid.a
 DEPFILE       = .depends
 
-# Commands
+# Commands.
 CPP          = g++
 MAKEDEPCMD   = $(CPP)
 
 # Compile options.
 # Use make USE_CLN=1 to compile with the CLN library.
 
-# Use parallelism by default.
-USE_PAR = 1
-
-# Use Artin braids by default.
+# Use Artin braids by default for Braiding.
 USE_FOR_BRAIDING = ARTIN
 export BRAIDING_CLASS = 0
 
@@ -43,15 +40,21 @@ ifeq ($(USE_CLN),1)
 	CPPFLAGS_CLN = -DUSE_CLN
 	LIBFLAGS_CLN = -lcln
 endif
+
 # Compile with parallel algorithms.
 # To disable parallelism, compile with USE_PAR=0 (or anything else than 1).
+USE_PAR = 1
+
 ifeq ($(USE_PAR),1)
 	CPPFLAGS_PAR = -DUSE_PAR
 	LIBFLAGS_PAR = -ltbb
 endif
+
 ifeq ($(RANDOMIZE_ON_ATOMS),1)
 	CPPFLAGS_RAND = -DRANDOMIZE_ON_ATOMS
 endif
+
+# Compile options.
 CPPFLAGS = -Wall -I$(CBRAID_INCDIR) -L$(CBRAID_LIBDIR) $(CPPFLAGS_CLN) $(CPPFLAGS_RAND) $(CPPFLAGS_PAR) -DBRAIDING_CLASS=$(BRAIDING_CLASS) -g
 LIBFLAGS = -lcbraid $(LIBFLAGS_CLN) $(LIBFLAGS_PAR)
 MAKEDEPFLAGS = -M
@@ -78,13 +81,6 @@ $(PROGRAMS): $(DEPFILE) $(CBRAID_LIB)
 # Build library
 $(CBRAID_LIB):
 	cd $(CBRAID_LIBDIR); make libcbraid.a USE_$(USE_FOR_BRAIDING)=1
-
-# Sample programs.
-do-test: test
-	./test $(TEST_ARG)
-
-do-speedtest: speedtest
-	./speedtest $(SPEEDTEST_ARG)
 
 # Cleanup.
 clean:
