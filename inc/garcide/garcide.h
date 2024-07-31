@@ -228,7 +228,7 @@ template <class U> class FactorTemplate {
     // a.randomize() sets a to a random factor.
     void randomize() {
 
-#ifdef RANDOMIZE_ON_ATOMS
+#ifdef RANDOMIZE_AS_WORDS
 
         std::vector<FactorTemplate> atoms = atoms();
 

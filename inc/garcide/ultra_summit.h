@@ -32,11 +32,32 @@
 
 #include "garcide/super_summit.h"
 
-// An exception.
-struct NotInUSS {};
-
 namespace garcide::ultra_summit {
 
+/**
+ * @brief Exception thrown when a braid that should be ultra summit is not.
+ *
+ * Exception thrown when a braid that should be ultra summit is not. Used for
+ * some functions that may not return when called on non-ultra-summit braids.
+ *
+ * @tparam B A braid class.
+ */
+template <class B> struct NotUltraSummit {
+    B not_ultra_summit;
+
+    NotUltraSummit(const B &b) : not_ultra_summit(b) {}
+};
+
+/**
+ * @brief Computes `b`'s trajectory for cycling.
+ *
+ * Computes `b`'s trajectory for cycling. That is, cycles b until a repetition
+ * occurs, and then returns the list of the conjugates up to that point.
+ *
+ * @tparam F A class representing factors.
+ * @param b The braid whose trajectory is to be computed.
+ * @return `b`'s trajectory for cycling.
+ */
 template <class F>
 std::vector<BraidTemplate<F>> trajectory(BraidTemplate<F> b) {
     std::vector<BraidTemplate<F>> t;
@@ -51,6 +72,23 @@ std::vector<BraidTemplate<F>> trajectory(BraidTemplate<F> b) {
     return t;
 }
 
+/**
+ * @brief Computes `b`'s trajectory for cycling, in LCF and RCF.
+ *
+ * Computes `b`'s trajectory for cycling. That is, cycles b until a repetition
+ * occurs, and then returns the list of the conjugates up to that point.
+ *
+ * This is done in both LCF and RCF simulteanously (useful as going nack and
+ * forth is costly).
+ *
+ * It is assumed that initially `b_rcf` is `b` in RCF.
+ *
+ * @tparam F A class representing factors.
+ * @param b The braid whose trajectory is to be computed.
+ * @param b_rcf The braid whose trajectory is to be computed.
+ * @param t A vector that the function sets to `b`'s trajectory.
+ * @param t_rcf A vector that the function sets to `b`'s RCF trajectory.
+ */
 template <class F>
 void trajectory(BraidTemplate<F> b, BraidTemplate<F> b_rcf,
                 std::vector<BraidTemplate<F>> &t,
@@ -69,6 +107,16 @@ void trajectory(BraidTemplate<F> b, BraidTemplate<F> b_rcf,
     }
 }
 
+/**
+ * @brief Computes an ultra summit conjugate of `b`.
+ *
+ * Computes an ultra summit conjugate of `b`, by iterated cycling until the
+ * first repetition.
+ *
+ * @tparam F A class representing factors.
+ * @param b The braid of whom an ultra summit is computed.
+ * @return An ultra summit conjugate of `b`.
+ */
 template <class F>
 BraidTemplate<F> send_to_ultra_summit(const BraidTemplate<F> &b) {
     BraidTemplate<F> b_uss =
@@ -77,6 +125,18 @@ BraidTemplate<F> send_to_ultra_summit(const BraidTemplate<F> &b) {
     return b_uss;
 }
 
+/**
+ * Computes an ultra summit conjugate of `b`, with a conjugator.
+ *
+ * Computes an ultra summit conjugate of `b`, by iterated cycling until the
+ * first repetition. In the mean time, a conjugator is computed, and `c` is set
+ * to it.
+ *
+ * @tparam F A class representing factors.
+ * @param b The braid of whom an ultra summit is computed.
+ * @param c A braid that is set to a conjugator sending `b` to what is returned.
+ * @return An ultra summit conjugate of `b`.
+ */
 template <class F>
 BraidTemplate<F> send_to_ultra_summit(const BraidTemplate<F> &b,
                                       BraidTemplate<F> &c) {
@@ -243,7 +303,7 @@ F min_ultra_summit(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf,
         }
     }
 
-    throw NotInUSS();
+    throw NotUltraSummit<BraidTemplate<F>>(b);
 }
 
 template <class F>
@@ -668,6 +728,6 @@ bool are_conjugate(const BraidTemplate<F> &b1, const BraidTemplate<F> &b2,
 
     return true;
 }
-} // namespace cgarside::ultra_summit
+} // namespace garcide::ultra_summit
 
 #endif

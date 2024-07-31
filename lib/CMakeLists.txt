@@ -6,8 +6,10 @@ set(HEADERS_LIST utility.h
     groups/dihedral.h 
     groups/dual_complex.h 
     groups/standard_complex.h 
-    )
+)
 list(TRANSFORM HEADERS_LIST PREPEND ${HEADERS_PATH})
+
+set(RANDOMIZE_AS_WORD FALSE CACHE BOOL "If enabled, random braids are produced by taking random words in the atoms.")
 
 add_library(
     garcide
@@ -18,5 +20,15 @@ add_library(
     garcide/groups/dihedral.cpp
     garcide/groups/dual_complex.cpp
     garcide/groups/standard_complex.cpp
-    ${HEADERS_LIST})
+    ${HEADERS_LIST}
+)
 target_include_directories(garcide PRIVATE ../inc)
+
+if (${USE_PAR} AND ${TBB_FOUND})
+    target_compile_definitions(garcide PRIVATE -DUSE_PAR)
+    target_link_libraries(garcide PRIVATE TBB::tbb)
+endif()
+
+if (${RANDOMIZE_AS_WORD})
+    target_compile_definitions(garcide PRIVATE -DRANDOMIZE_AS_WORD)
+endif()
