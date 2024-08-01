@@ -20,16 +20,17 @@ Although names may suggest otherwise, _GarCide_ roughly corresponds to a merge o
 
 0)  You will need _CMake_ to compile the project.
 
-    If you don't have it, run for instance:
+    If you don't have it, you can get it with:
 
     ```
     sudo apt install cmake
     ```
 
-1)  Create a new folder called `build` where to run _cmake_ from.
+1)  Create a new directory called `build` where to run _CMake_ from.
     ```
     mkdir build; cd build
     ```
+    Henceforth only use _CMake_ from that `build` directory.
 
 2)  Create the _CMake_ binary tree with: 
     ```
@@ -83,3 +84,11 @@ Now for the available options (in bold are the values before any change is ever 
     * I-series Artin groups, dual Garside structure (`DIHEDRAL`)
     * Complex reflection braid groups B(e, e, n), dual Garside structure (`DUAL_COMPLEX`)
     * Complex reflection braid groups B(e, e, n), semi-classic Garside structure (`STANDARD_COMPLEX`), NOT FULLY WORKING AS OF NOW.
+
+## Implementing a Garside group using GarCide
+
+TODO
+
+## Generating documentation
+
+TODO
