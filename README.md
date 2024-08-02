@@ -73,7 +73,7 @@ Now for the available options (in bold are the values before any change is ever 
 
     You can ignore that option if you only care about _Braiding 2_.
 
-*   `USE_FOR_BRAIDING` (possible values __`ARTIN`__, `BAND`, `OCTAHEDRAL`, `DIHEDRAL`, `DUAL_COMPLEX`, `STANDARD_COMPLEX`) - Selects which group should be used for _Braiding 2_.
+*   `USE_FOR_BRAIDING` (possible values __`ARTIN`__, `BAND`, `OCTAHEDRAL`, `DIHEDRAL`, `DUAL_COMPLEX`, `STANDARD_COMPLEX`, `EUCLIDEAN_LATTICE`) - Selects which group should be used for _Braiding 2_.
 
     Currently supported: 
     * Regular braid groups (a.k.a. A-series Artin groups), classic Garside structure (`ARTIN`).
