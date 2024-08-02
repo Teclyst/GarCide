@@ -37,8 +37,6 @@ Although names may suggest otherwise, _GarCide_ roughly corresponds to a merge o
     cmake ..
     ```
 
-3)  Proceed to the general case.
-
 ### Building it
 
 1)  Set options (see next subsection) with:
@@ -82,12 +80,13 @@ Now for the available options (in bold are the values before any change is ever 
     * Regular braid groups, dual Garside structure (`BAND`).
     * B-series Artin groups, dual Garside structure (`OCTAHEDRAL`)
     * I-series Artin groups, dual Garside structure (`DIHEDRAL`)
-    * Complex reflection braid groups B(e, e, n), dual Garside structure (`DUAL_COMPLEX`)
-    * Complex reflection braid groups B(e, e, n), semi-classic Garside structure (`STANDARD_COMPLEX`), NOT FULLY WORKING AS OF NOW.
+    * Complex reflection braid groups $B(e, e, n)$, dual Garside structure (`DUAL_COMPLEX`)
+    * Complex reflection braid groups $B(e, e, n)$, semi-classic Garside structure (`STANDARD_COMPLEX`), NOT FULLY WORKING AS OF NOW.
+    * Euclidean lattices $\mathbb Z^n$ (`EUCLIDEAN_LATTICE`).
 
 ## Implementing a Garside group using GarCide
 
-TODO
+See `doc/implementing_garside_groups.md`.
 
 ## Generating documentation
 

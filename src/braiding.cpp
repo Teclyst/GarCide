@@ -72,6 +72,7 @@ void explain_braid_input() {
         << EndLine()
         << "Z = Z = '-'? (['1' - '9'] ['0' - '9']* | '0') matches integers,"
         << EndLine() << "And F matches (a subset) of factors." << EndLine(1);
+
 #if BRAIDING_CLASS == 0
 
     ind_cout
@@ -88,7 +89,7 @@ void explain_braid_input() {
 
     ind_cout << "For Artin dual braids, F = '(' Z ','? Z ')' | 'D'."
              << EndLine()
-             << "The couple of integers \"(i, j)\" (with an optional comma)"
+             << "The couple of integers \"(i, j)\" (optional comma)"
              << EndLine() << "stands for Birman-Ko-Lee's a_(i,j)." << EndLine()
              << "i and j must therefore be distinct and in [1, n]," << EndLine()
              << "where n is the number of strands." << EndLine()
@@ -161,13 +162,29 @@ void explain_braid_input() {
         << " \"t1 ^ 1 t_0 s_3 t1 t0 s3\" or \"D\" are two ways to enter Δ."
         << EndLine(1);
 
+#elif BRAIDING_CLASS == 6
+
+    ind_cout
+        << "For Artin braids, F = Z | 'D'." << EndLine()
+        << "\"e_i\" (optional \"e_\") represents base vector e_i."
+        << EndLine()
+        << "i must therefore be in [0, n[, with n the dimension."
+        << EndLine() << "\"D\" represents vector Δ = (1, ..., 1)." << EndLine(1)
+        << "For example, with n = 3," << EndLine()
+        << "\"1 ^ 1 0 2\",  \"0. 1 . 2\" or \"D\" are three ways to enter Δ."
+        << EndLine(1);
+
+#else
+
+    ind_cout << "Enter a braid (no more details for that group)." << EndLine(1);
+
 #endif
 }
 
 void explain_braid_parameter_input() {
 #if (BRAIDING_CLASS == 0 || BRAIDING_CLASS == 1)
 
-    ind_cout << "Enter the number of strands." << EndLine(1);
+    ind_cout << "Enter the number of strands (an integer)." << EndLine(1);
 
 #elif (BRAIDING_CLASS == 2 || BRAIDING_CLASS == 3)
 
@@ -183,9 +200,13 @@ void explain_braid_parameter_input() {
     ind_cout << "Enter a tuple '(' Z ','? Z ')' of integers." << EndLine()
              << "((e, n) for B(e, e, n).)" << EndLine(1);
 
+#elif (BRAIDING_CLASS == 6)
+
+    ind_cout << "Enter the dimension (an integer)." << EndLine(1);
+
 #else
 
-    ind_cout << "Enter the group parameter." << EndLine(1);
+    ind_cout << "Enter the group parameter (no more details for that group)." << EndLine(1);
 
 #endif
 }
@@ -350,6 +371,21 @@ void print_header(IndentedOStream &os) {
        << "│││││││││││              | 0 0 0 0 j |               │││││││││││"
        << EndLine()
        << "│││││││││││                                          │││││││││││"
+#elif (BRAIDING_CLASS == 6)
+       << EndLine()
+       << "│││││││││││   |    |    |    |    |    |    |    |   │││││││││││"
+       << EndLine()
+       << "│││││││││││---+----+----+----+----+----+----+----+---│││││││││││"
+       << EndLine()
+       << "│││││││││││   |    |    |    |    |    |    |    |   │││││││││││"
+       << EndLine()
+       << "│││││││││││---+----+----+----+----+----+----+----+---│││││││││││"
+       << EndLine()
+       << "│││││││││││   |    |    |    |    |    |    |    |   │││││││││││"
+       << EndLine()
+       << "│││││││││││---+----+----+----+----+----+----+----+---│││││││││││"
+       << EndLine()
+       << "│││││││││││   |    |    |    |    |    |    |    |   │││││││││││"
 #else
        << EndLine()
        << "│││││││││││                                          │││││││││││"

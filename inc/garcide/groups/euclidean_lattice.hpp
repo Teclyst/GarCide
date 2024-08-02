@@ -27,12 +27,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef Z_N
-#define Z_N
+#ifndef EUCLIDEAN_LATTICE
+#define EUCLIDEAN_LATTICE
 
 #include "garcide/garcide.h"
 
-namespace garcide::z_n {
+namespace garcide::euclidean_lattice {
 /**
  * @brief A class for Z ^ n canonical factors.
  *
@@ -41,17 +41,16 @@ namespace garcide::z_n {
 class Underlying {
 
   public:
-    typedef size_t Parameter;
+    /**
+     * @brief Parameter type.
+     *
+     * The type for group parameters. Here it is the dimension, which is also
+     * the size of the coordinates' vector, whence the use of `size_t` (type for
+     * sizes).
+     */
+    using Parameter = size_t;
 
   private:
-    /**
-     * @brief dimension.
-     *
-     * dimension. The n in Z ^ n, represented as a `size_t` (unsigned integer
-     * type used for sizes).
-     */
-    Parameter dimension;
-
     /**
      * @brief The factor's coordinates.
      *
@@ -63,14 +62,24 @@ class Underlying {
     std::vector<bool> coordinates;
 
   public:
+    /**
+     * @brief Converts a string to a parameter.
+     *
+     * Converts a string to a parameter by tring to parse it as an integer.
+     *
+     * In case of failure, `InvalidStringError` is raised.
+     *
+     * @param str The string to read.
+     * @return A parameter matching `str`.
+     */
     static Parameter parameter_of_string(const std::string &str);
 
     /**
-     * @brief Get dimension.
+     * @brief Gets the dimension.
      *
-     * Get `dimension` member (which is `private`).
+     * Gets the factor's dimension (a.k.a. the n in Z ^ n).
      *
-     * @return `dimension`.
+     * @return The factor's dimension
      */
     Parameter get_parameter() const;
 
@@ -81,7 +90,7 @@ class Underlying {
      * coordinates).
      *
      * @param i The index that is being accessed.
-     * @return sint16
+     * @return The `i`-th coordinate.
      */
     inline bool at(size_t i) const { return coordinates[i]; }
 
@@ -127,7 +136,7 @@ class Underlying {
      *
      * @return sint16
      */
-    sint16 lattice_height() const;
+    inline sint16 lattice_height() const { return int(get_parameter()); }
 
     /**
      * @brief Prints internal data in `os`.
@@ -196,7 +205,9 @@ class Underlying {
      * @param b Second argument.
      * @return If `*this` and `b` are equal.
      */
-    bool compare(const Underlying &b) const;
+    inline bool compare(const Underlying &b) const {
+        return coordinates == b.coordinates;
+    };
 
     /**
      * @brief product computations.
@@ -230,8 +241,8 @@ class Underlying {
      * @brief Complement computations.
      *
      * Computes the complement of `*this` to `b` (i.e. the factor `c` such
-     * that `ac=b`), under the assumption that `*this` is smaller than `b`. As Z
-     * ^ n is abelian, left and right variants are in fact the same.
+     * that `ac = b`), under the assumption that `*this` is smaller than `b`. As
+     * Z ^ n is abelian, left and right variants are in fact the same.
      *
      * In this case, this is actually the same (well, as an operation on bit
      * vectors) as product.
@@ -268,12 +279,13 @@ class Underlying {
      *
      * @param k The exponent.
      */
-    inline void delta_conjugate_mut(sint16 k) {};
+    inline void delta_conjugate_mut(__attribute__ ((unused)) sint16 k) {};
 
     /**
      * @brief Hashes the factor.
-     * 
-     * Hashes the factor. Done by interpreting it as a polynomial and evaluating it in 2 (yields a bijection between the set of factors, and [0, 2 ^ n[).
+     *
+     * Hashes the factor. Done by interpreting it as a polynomial and evaluating
+     * it in 2 (yields a bijection between the set of factors, and [0, 2 ^ n[).
      *
      * @return The hash.
      */
@@ -282,18 +294,18 @@ class Underlying {
 
 /**
  * @brief Class for canonical factors.
- * 
+ *
  * Class for canonical factors, will all corresponding methods.
  */
 typedef FactorTemplate<Underlying> Factor;
 
 /**
  * @brief Class for elements of Z ^ n.
- * 
+ *
  * Class for elements of Z ^ n, as a Garside group.
  */
 typedef BraidTemplate<Factor> Braid;
 
-} // namespace cgarside::z_n
+} // namespace garcide::euclidean_lattice
 
 #endif

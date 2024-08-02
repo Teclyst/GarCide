@@ -102,7 +102,7 @@ void Underlying::MeetSub(const sint16 *a, const sint16 *b, sint16 *r, sint16 s,
 
 sint16 Underlying::get_parameter() const { return number_of_strands; };
 
-Underlying::Underlying(sint16 n)
+Underlying::Underlying(Underlying::Parameter n)
     : number_of_strands(n), permutation_table(n + 1) {}
 
 void Underlying::of_string(const std::string &str, size_t &pos) {
@@ -141,7 +141,7 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
             "\"!\nA factor should match regex Z | 'D',\nwhere Z matches "
             "integers."));
     }
-};
+}
 
 void Underlying::print(IndentedOStream &os) const {
     sint16 i, j, k;
@@ -161,7 +161,7 @@ void Underlying::print(IndentedOStream &os) const {
             c.permutation_table[j - 1] = k;
         }
     }
-};
+}
 
 void Underlying::debug(IndentedOStream &os) const {
     os << "{   ";

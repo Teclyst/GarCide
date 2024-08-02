@@ -54,6 +54,10 @@
 
 #include "garcide/groups/standard_complex.h"
 
+#elif BRAIDING_CLASS == 6
+
+#include "garcide/groups/euclidean_lattice.hpp"
+
 #endif
 
 namespace braiding {
@@ -66,7 +70,6 @@ using Braid = garcide::artin::Braid;
 
 using Factor = garcide::band::Factor;
 using Braid = garcide::band::Braid;
-
 
 #elif BRAIDING_CLASS == 2
 
@@ -88,6 +91,10 @@ using Braid = garcide::dual_complex::Braid;
 using Factor = garcide::standard_complex::Factor;
 using Braid = garcide::standard_complex::Braid;
 
+#elif BRAIDING_CLASS == 6
+
+using Factor = garcide::euclidean_lattice::Factor;
+using Braid = garcide::euclidean_lattice::Braid;
 
 #endif
 

@@ -148,7 +148,7 @@ class Underlying {
     // @param dir_perm A table that holds the direct table of the permutation
     // induced by the factor.
     // @param i The integer i for which we check if s_i left divides the factor.
-    inline bool is_s_left_divisor(const sint16 *dir_perm, sint16 i) const {
+    inline bool is_s_left_divisor(sint16 i) const {
         return (permutation_table[i - 1] > permutation_table[i - 2])
                    ? (coefficient_table[i - 1] != 0)
                    : (coefficient_table[i - 2] == 0);
@@ -160,7 +160,7 @@ class Underlying {
     // @param dir_perm A table that holds the direct table of the permutation
     // induced by the factor.
     // @param i The integer i for which we check if t_i left divides the factor.
-    inline bool is_t_left_divisor(const sint16 *dir_perm, sint16 i) const {
+    inline bool is_t_left_divisor(sint16 i) const {
         return (permutation_table[1] > permutation_table[0])
                    ? (coefficient_table[1] != 0)
                    : (coefficient_table[0] ==

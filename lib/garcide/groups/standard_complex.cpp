@@ -129,7 +129,7 @@ void Underlying::print(IndentedOStream &os) const {
     bool is_first = true;
     for (sint16 i = 2; i <= n; i++) {
         for (sint16 j = i; j > 2; j--) {
-            if (copy.is_s_left_divisor(dir_perm, j)) {
+            if (copy.is_s_left_divisor(j)) {
                 if (is_first) {
                     is_first = false;
                 } else {
@@ -142,7 +142,7 @@ void Underlying::print(IndentedOStream &os) const {
             }
         }
 
-        if (copy.is_t_left_divisor(dir_perm, 1)) {
+        if (copy.is_t_left_divisor(1)) {
             if (is_first) {
                 is_first = false;
             } else {
@@ -151,12 +151,12 @@ void Underlying::print(IndentedOStream &os) const {
             copy.t_left_multiply(dir_perm, 1);
             os << "t" << 1;
 
-            if (copy.is_t_left_divisor(dir_perm, 0)) {
+            if (copy.is_t_left_divisor(0)) {
                 copy.t_left_multiply(dir_perm, 0);
                 os << " t" << 0;
 
                 for (sint16 j = 3; j < i + 1; j++) {
-                    if (copy.is_s_left_divisor(dir_perm, j)) {
+                    if (copy.is_s_left_divisor(j)) {
                         copy.s_left_multiply(dir_perm, j);
                         os << " s" << j;
                     } else {
@@ -168,7 +168,7 @@ void Underlying::print(IndentedOStream &os) const {
         }
 
         for (sint16 k = 0; k < e; k++) {
-            if (copy.is_t_left_divisor(dir_perm, k)) {
+            if (copy.is_t_left_divisor(k)) {
                 if (is_first) {
                     is_first = false;
                 } else {
@@ -244,8 +244,8 @@ Underlying Underlying::left_meet(const Underlying &b) const {
     sint16 n = get_parameter().n, e = get_parameter().e;
     for (sint16 i = 2; i <= n; i++) {
         for (sint16 j = i; j > 2; j--) {
-            if (a_copy.is_s_left_divisor(dir_perm_a, j) &&
-                b_copy.is_s_left_divisor(dir_perm_b, j)) {
+            if (a_copy.is_s_left_divisor(j) &&
+                b_copy.is_s_left_divisor(j)) {
                 meet.s_right_multiply(dir_perm_meet, j);
                 a_copy.s_left_multiply(dir_perm_a, j);
                 b_copy.s_left_multiply(dir_perm_b, j);
@@ -254,22 +254,22 @@ Underlying Underlying::left_meet(const Underlying &b) const {
             }
         }
 
-        if (a_copy.is_t_left_divisor(dir_perm_a, 0) &&
-            b_copy.is_t_left_divisor(dir_perm_b, 0)) {
+        if (a_copy.is_t_left_divisor(0) &&
+            b_copy.is_t_left_divisor(0)) {
 
             meet.t_right_multiply(dir_perm_meet, 0);
             a_copy.t_left_multiply(dir_perm_a, 0);
             b_copy.t_left_multiply(dir_perm_b, 0);
 
-            if (a_copy.is_t_left_divisor(dir_perm_a, e - 1) &&
-                b_copy.is_t_left_divisor(dir_perm_b, e - 1)) {
+            if (a_copy.is_t_left_divisor(e - 1) &&
+                b_copy.is_t_left_divisor(e - 1)) {
                 meet.t_right_multiply(dir_perm_meet, e - 1);
                 a_copy.t_left_multiply(dir_perm_a, e - 1);
                 b_copy.t_left_multiply(dir_perm_b, e - 1);
 
                 for (sint16 j = 3; j < i + 1; j++) {
-                    if (a_copy.is_s_left_divisor(dir_perm_a, j) &&
-                        b_copy.is_s_left_divisor(dir_perm_b, j)) {
+                    if (a_copy.is_s_left_divisor(j) &&
+                        b_copy.is_s_left_divisor(j)) {
                         meet.s_right_multiply(dir_perm_meet, j);
                         a_copy.s_left_multiply(dir_perm_a, j);
                         b_copy.s_left_multiply(dir_perm_b, j);
@@ -282,8 +282,8 @@ Underlying Underlying::left_meet(const Underlying &b) const {
         }
 
         for (sint16 k = 1; k < e; k++) {
-            if (a_copy.is_t_left_divisor(dir_perm_a, k) &&
-                b_copy.is_t_left_divisor(dir_perm_b, k)) {
+            if (a_copy.is_t_left_divisor(k) &&
+                b_copy.is_t_left_divisor(k)) {
                 meet.t_right_multiply(dir_perm_meet, k);
                 a_copy.t_left_multiply(dir_perm_a, k);
                 b_copy.t_left_multiply(dir_perm_b, k);
