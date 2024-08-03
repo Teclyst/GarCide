@@ -1,5 +1,1 @@
-doc/*
-!doc/*.md
-!doc/*.html
-!doc/*.pdf
 build/*

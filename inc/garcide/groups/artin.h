@@ -116,7 +116,7 @@ class Underlying {
     /**
      * @brief Prints internal representation to `os`.
      *
-     * Prints the factor's `permutation_table` to `os`, typically for debugging
+     * Prints the factor's `permutation_table` to output stream `os`, typically for debugging
      * purposes.
      *
      * @param os The output stream it prints to.
@@ -126,7 +126,7 @@ class Underlying {
     /**
      * @brief Prints the factor to `os`.
      *
-     * Prints the factor to `os` as a product of atoms.
+     * Prints the factor to output stream `os` as a product of atoms.
      *
      * @param os The output stream it prints to.
      */

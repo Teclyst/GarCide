@@ -1,4 +1,4 @@
-# How to implement a Garside Group with _GarCide_
+# How to implement a Garside group with _GarCide_
 
 ## The main idea
 
@@ -6,7 +6,7 @@ The idea behind GarCide is that algorithms for Garside groups are fairly generic
 
 Because of that, it is possible to abstract away a lot of implementation details, and write a lot of code at a high level of abstraction, while only requiring that a small amount of methods be implemented.
 
-## The way things work in GarCide
+## The way things work in _GarCide_
 
 in C++, this sort of things can be done using _templates_. Code is written using (abstract) class arguments, and when an instantiation of the object, for given (concrete) class arguments is given, the code is copied, substituting every occurence of the abstract argument by its concrete value.
 
@@ -26,7 +26,7 @@ BraidTemplate;
 
 The typical way to implement a Garside group is to write code for a class `Underlying`, and then get factor and braid classes from `FactorTemplate` and `BraidTemplate`.
 
-## Implementing a Garside Group
+## Implementing a Garside group
 
 ### Code Organization and naming conventions
 
@@ -188,7 +188,7 @@ You will need to make a bunch of other modifications to _Braiding 2_ files.
 
 ### Writing documentation
 
-This projects uses _Doxygen_ to generate its documentation. _Doxygen_ is integrated within C++, so you only need to add specific comments over your declarations, then build documentation, and _voilà_.
+This project uses _Doxygen_ to generate its documentation. _Doxygen_ is integrated within C++, so you only need to add specific comments over your declarations, then build documentation, and _voilà_.
 
 To look at what these comments should look like, go read _Doxygen_ documentation or look at what is already written. It is also likely that there exist _Doxygen_ extensions for your IDE.
 

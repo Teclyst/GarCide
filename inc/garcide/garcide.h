@@ -41,16 +41,31 @@ namespace garcide {
 template <class U> class FactorTemplate {
 
   public:
+    /**
+     * @brief Parameter type.
+     *
+     * Used to discriminate between the different
+     * groups in the family that is being implemented.
+     */
     using Parameter = typename U::Parameter;
 
   private:
-    // underlying is the data structure that actually represents the factor
-    // (e.g., a permutation table for a braid canonical factor).
+    /**
+     * @brief The actual data structure representing the factor.
+     *
+     * `*this` is basically a wrapper for `underlying` (but with more member
+     * functions).
+     */
     U underlying;
 
   public:
-    // FactorTemplate(under) initializes a new factor, with underlying element
-    // under.
+    /**
+     * @brief Construct a new `FactorTemplate`, from an underlying object.
+     *
+     * The resulting factor is a wrapper for `under`.
+     *
+     * @param under The underlying object this factor should wrap around.
+     */
     FactorTemplate(const U &under) : underlying(under) {}
 
     FactorTemplate(Parameter parameter) : underlying(parameter) {}
@@ -1143,8 +1158,7 @@ inline IndentedOStream &operator<<(IndentedOStream &os,
 } // namespace garcide
 
 template <class U> struct std::hash<garcide::FactorTemplate<U>> {
-    std::size_t
-    operator()(garcide::FactorTemplate<U> const &f) const noexcept {
+    std::size_t operator()(garcide::FactorTemplate<U> const &f) const noexcept {
         return f.hash();
     }
 };

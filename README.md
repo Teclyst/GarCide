@@ -1,4 +1,4 @@
-# GarCide (prerelease)
+# _GarCide_ (prerelease)
 
 ## Overview
 
@@ -43,6 +43,8 @@ Although names may suggest otherwise, _GarCide_ roughly corresponds to a merge o
     ```
     cmake [options] ..
     ```
+    To change an option, use `-D[OPTION_NAME]=[OPTION_VALUE]`.
+
     Skip if you don't need to change options.
 
 2)  Build with
@@ -59,7 +61,7 @@ Although names may suggest otherwise, _GarCide_ roughly corresponds to a merge o
 
 ### Options
 
-_CMake_ does not change its cached variables between runs. Therefore a binding will remain until explicitly changed: e.g. after running
+_CMake_ does not change its cached variables between runs. Therefore a binding will remain until explicitly changed: _e.g._ after running
 ```
 cmake -DUSE_PAR=FALSE ..
 ```
@@ -67,7 +69,9 @@ cmake -DUSE_PAR=FALSE ..
 
 Now for the available options (in bold are the values before any change is ever done):
 
-*   `USE_PAR` (possible values __`TRUE`__, `FALSE`) - Whether parallelism should be used. Notice that you need Intel's TBB for the parallel code to actually work, so this option will not do anything if you do not have TBB.
+*   `USE_PAR` (possible values __`TRUE`__, `FALSE`) - Whether parallelism should be used. Notice that you need Intel's TBB for the parallel code to actually work, so this option will not do anything if you do not. 
+
+    Parallelism should significantly speed up computations (for super summit, ultra summit and sliding circuits sets and centralizers) in most case, but may have the opposite effect for small cases (_e.g._ very small number of strands and very short braids) and depending on architecture.
 
 *   `RANDOMIZE_ON_WORDS` (possible values `TRUE`, __`FALSE`__) - Whether randomizing braids should be understood as taking a random word in the atoms of a given length. Notice that for many Garside groups it is hard to provide better polling methods.
 
@@ -76,18 +80,28 @@ Now for the available options (in bold are the values before any change is ever 
 *   `USE_FOR_BRAIDING` (possible values __`ARTIN`__, `BAND`, `OCTAHEDRAL`, `DIHEDRAL`, `DUAL_COMPLEX`, `STANDARD_COMPLEX`, `EUCLIDEAN_LATTICE`) - Selects which group should be used for _Braiding 2_.
 
     Currently supported: 
-    * Regular braid groups (a.k.a. A-series Artin groups), classic Garside structure (`ARTIN`).
+    * Regular braid groups (a.k.a. $\mathrm A$-series Artin groups), classic Garside structure (`ARTIN`).
     * Regular braid groups, dual Garside structure (`BAND`).
-    * B-series Artin groups, dual Garside structure (`OCTAHEDRAL`)
-    * I-series Artin groups, dual Garside structure (`DIHEDRAL`)
-    * Complex reflection braid groups $B(e, e, n)$, dual Garside structure (`DUAL_COMPLEX`)
-    * Complex reflection braid groups $B(e, e, n)$, semi-classic Garside structure (`STANDARD_COMPLEX`), NOT FULLY WORKING AS OF NOW.
+    * $\mathrm B$-series Artin groups, dual Garside structure (`OCTAHEDRAL`).
+    * $\mathrm I$-series Artin groups, dual Garside structure (`DIHEDRAL`).
+    * Complex reflection braid groups $\mathrm B(e, e, n)$, dual Garside structure (`DUAL_COMPLEX`).
+    * Complex reflection braid groups $\mathrm B(e, e, n)$, semi-classic Garside structure (`STANDARD_COMPLEX`), NOT FULLY WORKING AS OF NOW.
     * Euclidean lattices $\mathbb Z^n$ (`EUCLIDEAN_LATTICE`).
 
-## Implementing a Garside group using GarCide
+*   `GENERATE_DOC` (possible values __`TRUE`__, `FALSE`) - whether documentation should be generated when building the project.
+
+*   `CMAKE_BUILD_TYPE` (possible values `Debug`, __`Release`__) - whether the project should be built in debug mode (debug symbols, no compiler optimizations, better for development) or release mode (compiler optimizations, no debug symbols).
+
+    Build with the latter for benchmarking.
+
+## Implementing a Garside group using _GarCide_
 
 See `doc/implementing_garside_groups.md`.
 
 ## Generating documentation
 
-TODO
+This project uses _[Doxygen](https://www.doxygen.nl/index.html)_ to generate its documentation.
+
+If you have it, and assuming that `GENERATE_DOC` is set to `TRUE`, then documentation will be automatically generated when building the project.
+
+To read it, open `build/html/index.html`.

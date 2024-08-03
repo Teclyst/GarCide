@@ -1,5 +1,5 @@
 /**
- * @file euclidean_lattice.h
+ * @file euclidean_lattice.hpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
  * @brief Header file for Z ^ n.
  * @version 0.1

@@ -1,5 +1,5 @@
 /**
- * @file sliding_circuits.h
+ * @file super_summit.h
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
  * @brief Header (and implementation) file for super summit sets.
  * @version 0.1

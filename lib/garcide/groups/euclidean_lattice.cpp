@@ -1,3 +1,15 @@
+/**
+ * @file euclidean_lattice.cpp
+ * @author Matteo Wei (matteo.wei@ens.psl.eu)
+ * @brief Implementation file for Z ^ n.
+ * @version 0.1
+ * @date 2024-08-02
+ *
+ * @copyright Copyright (C) 2024. Distributed under the GNU General Public
+ * License, version 3.
+ *
+ */
+
 #include "garcide/groups/euclidean_lattice.hpp"
 
 namespace garcide::euclidean_lattice {
