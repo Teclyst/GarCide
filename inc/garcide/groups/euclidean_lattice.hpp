@@ -32,11 +32,15 @@
 
 #include "garcide/garcide.h"
 
+/**
+ * @brief Namespace for euclidian lattices $\mathbb Z^n$.
+ */
 namespace garcide::euclidean_lattice {
 /**
- * @brief A class for Z ^ n canonical factors.
+ * @brief A class for $Z^n$ canonical factors.
  *
- * A class for Z ^ n canonical factors (elements of (Z / 2Z) ^ n).
+ * A class for $Z^n$ canonical factors (elements of ${\mathbb Z / 2\mathbb
+ * Z}^n$).
  */
 class Underlying {
 
@@ -54,8 +58,8 @@ class Underlying {
     /**
      * @brief The factor's coordinates.
      *
-     * The factor's coordinates, in Z ^ n canonical basis.
-     * As these are all 0 or 1, we use booleans, as (depending on
+     * These are its coordinates in $\mathbb Z^n$ canonical basis.
+     * As these are all $0$ or $1$, we use booleans, as (depending on
      * implementation) it should be more space efficient (one bit vers one
      * byte).
      */
@@ -71,23 +75,24 @@ class Underlying {
      *
      * @param str The string to read.
      * @return A parameter matching `str`.
+     * @exception InvalidStringError Thrown in case of failure.
      */
     static Parameter parameter_of_string(const std::string &str);
 
     /**
-     * @brief Gets the dimension.
+     * @brief Gets the factor's dimension.
      *
-     * Gets the factor's dimension (a.k.a. the n in Z ^ n).
+     * (_I.e._ the $n$ in $\mathbb Z^n$.)
      *
-     * @return The factor's dimension
+     * @return The factor's dimension.
      */
     Parameter get_parameter() const;
 
     /**
      * @brief Access i-th coordinate.
      *
-     * Access i-th coordinate (so that non member functions may read
-     * coordinates).
+     * That way non-member functions may enjoy read read access to
+     * `coordinates`.
      *
      * @param i The index that is being accessed.
      * @return The `i`-th coordinate.
@@ -97,8 +102,7 @@ class Underlying {
     /**
      * @brief Construct a new `Underlying`.
      *
-     * Construct a new `Underlying`, with `n` as
-     * `dimension`.
+     * Its dimension will be `n`.
      *
      * `coordinates` will have length `n`, and will be filled with `false`.
      *
@@ -122,53 +126,53 @@ class Underlying {
      *
      * @param str The string to extract from.
      * @param pos The position to start from.
-     * @exception `InvalidStringError`: Thrown when there is no subword starting
+     * @exception InvalidStringError Thrown when there is no subword starting
      * from `pos` that matches `Z`, or if there is one, if the corresponding
-     * integer does not belong to [`1`, `Parameter`[.
+     * integer does not belong to [`0`, `get_parameter()`[.
      */
     void of_string(const std::string &str, size_t &pos);
 
     /**
      * @brief Height of the lattice.
      *
-     * Height (i.e. `delta`'s length as a word in the generators, here
-     * `dimension`).
+     * (_I.e._ `delta`'s length as a word in the generators, here
+     * `dimension`.)
      *
-     * @return sint16
+     * @return The height of the lattice.
      */
     inline sint16 lattice_height() const { return int(get_parameter()); }
 
     /**
      * @brief Prints internal data in `os`.
      *
-     * Prints the factor's `dimension` and `coordinates` to `os`, typically for
+     * Prints the factor's `coordinates` in `os`, typically for
      * debugging purposes.
      *
-     * @param os The output stream it prints to.
+     * @param os The output stream it is printed in.
      */
     void debug(IndentedOStream &os) const;
 
     /**
      * @brief Prints the factor in `os`.
      *
-     * Prints the factor in `os` as a product (multiplicative convention) of
+     * It is printed as a product (multiplicative convention) of
      * base vectors.
      *
-     * @param os The output stream it prints to.
+     * @param os The output stream it is printed in.
      */
     void print(IndentedOStream &os) const;
 
     /**
      * @brief Sets the factor to the identity.
      *
-     * Sets the factor to the identity (i.e. sets all coordinates to `false`).
+     * (_I.e._ sets all coordinates to `false`.)
      */
     void identity();
 
     /**
      * @brief Sets the factor to delta.
      *
-     * Sets the factor to delta (i.e. sets all coordinates to `true`).
+     * (_I.e._ sets all coordinates to `true`.)
      */
     void delta();
 
@@ -279,7 +283,7 @@ class Underlying {
      *
      * @param k The exponent.
      */
-    inline void delta_conjugate_mut(__attribute__ ((unused)) sint16 k) {};
+    inline void delta_conjugate_mut(__attribute__((unused)) sint16 k) {};
 
     /**
      * @brief Hashes the factor.

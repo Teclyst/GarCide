@@ -1,6 +1,6 @@
 set(HEADERS_PATH "${GarCide_SOURCE_DIR}/inc/garcide/")
 set(HEADERS_LIST
-    utility.h 
+    utility.hpp
     groups/artin.h 
     groups/band.h 
     groups/octahedral.h 
@@ -11,6 +11,7 @@ set(HEADERS_LIST
 )
 list(TRANSFORM HEADERS_LIST PREPEND ${HEADERS_PATH})
 
+set(DOXYGEN_USE_MATHJAX YES CACHE STRING "If enabled, compiled documentation will use MathJax.")
 set(RANDOMIZE_AS_WORD FALSE CACHE BOOL "If enabled, random braids are produced by taking random words in the atoms.")
 
 add_library(

@@ -1,5 +1,5 @@
 /**
- * @file octahedral_braid.cpp
+ * @file octahedral.cpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
  * @brief Implementation file for B-series Artin groups (dual Garside structure).
  * @version 0.1

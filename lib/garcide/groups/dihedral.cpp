@@ -1,5 +1,5 @@
 /**
- * @file dihedral_braid.cpp
+ * @file dihedral.cpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
  * @brief Implementation file for I-series Artin groups (dual Garside structure).
  * @version 0.1

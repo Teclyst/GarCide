@@ -30,12 +30,15 @@
 #ifndef GARCIDE
 #define GARCIDE
 
-#include "garcide/utility.h"
+#include "garcide/utility.hpp"
 #include <list>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
+/**
+ * @brief Namespace for the _GarCide_ library.
+ */
 namespace garcide {
 
 template <class U> class FactorTemplate {
@@ -1086,7 +1089,7 @@ template <class F> class BraidTemplate {
      * | .)*)*`
      *
      * @param str The string to convert from.
-     * @exception `InvalidStringError`: Thrown when it isn't possible to
+     * @exception InvalidStringError: Thrown when it isn't possible to
      * extract a factor from `str`, or when the factor we tried to extract
      * does not exist (e.g. `4` isn't a legal factor for artin braids on 4
      * strands).

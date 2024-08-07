@@ -88,7 +88,7 @@ class Underlying {
      *
      * @param str The string to extract from.
      * @param pos The position to start from.
-     * @exception `InvalidStringError`: Thrown when there is no subword starting
+     * @exception InvalidStringError Thrown when there is no subword starting
      * from `pos` that matches `\(W Z W,? W Z W\)`, or if there is one, if
      * either integer does not belong to [`1`, `Parameter`], or both are equal.
      */

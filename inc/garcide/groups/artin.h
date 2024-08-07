@@ -30,11 +30,15 @@
 #ifndef ARTIN
 #define ARTIN
 
-#include "garcide/garcide.h"
 #include "garcide/ultra_summit.h"
 
 namespace garcide {
 
+/**
+ * @brief Namespace for standard braid groups, classic Garside structure.
+ * 
+ * On top of the `Underlying` class, there are functions to compute Thurston types.
+ */
 namespace artin {
 
 /// A class for the underlying objects for canonical factors
@@ -105,7 +109,7 @@ class Underlying {
      *
      * @param str The string to extract from.
      * @param pos The position to start from.
-     * @exception `InvalidStringError`: Thrown when there is no subword starting
+     * @exception InvalidStringError Thrown when there is no subword starting
      * from `pos` that matches `Z`, or if there is one, if the corresponding
      * integer does not belong to [`1`, `Parameter`[.
      */
@@ -138,23 +142,20 @@ class Underlying {
     // Set to delta.
     void delta();
 
-    // Compute the meet r of the two factors a and b.  A factor is
-    // given as the associated permutation, which is viewed as a
-    // bijection on the set {1,...n} and represented as an array whose
-    // i-th entry is the image of i under the inverse of the
-    // permutation (this convention is different from that in the
-    // AsiaCrypt 2001 paper of the author).  The range of indices is
-    // [1,n], not [0,n[.  We use a C style array of size (n+1) to
-    // represent an n-permutation (the first entry is not used).
-
-    // We define the left meet of two factors a and b to be the
-    // longest factor r such that a=ra' and b=rb' for some factors a'
-    // and b'.  This coincides with the convention of the paper of
-    // Birman, Ko, and Lee, but different from that of the article of
-    // Thurston (in Epstein's book).  Indeed, Thurston's is the
-    // "right" meet in our sense.
+    /**
+     * @brief Computes the left meet of `*this` and `b`.
+     *
+     * @param b Second argument.
+     * @return The left meet of `*this` and `b`.
+     */
     Underlying left_meet(const Underlying &b) const;
 
+    /**
+     * @brief Computes the right meet of `*this` and `b`.
+     *
+     * @param b Second argument.
+     * @return The right meet of `*this` and `b`.
+     */
     Underlying right_meet(const Underlying &b) const;
 
     // Equality check.
@@ -218,8 +219,6 @@ enum class ThurstonType { Periodic, Reducible, PseudoAsonov };
 /**
  * @brief Determines if a braid preserves a family of circles.
  *
- * Determines if braid `b` preserves a family of circles.
- *
  * This was directly copied (mutatis mutandis) from Juan Gonzalez-Meneses' code.
  *
  * @param b The braid to be tested.
@@ -229,9 +228,6 @@ bool preserves_circles(const Braid &b);
 
 /**
  * @brief Computes the Thurston type of a braid whose USS was already computed.
- *
- * Computes the Thurston type of braid `b`, using its USS `uss`, in the case
- * where we have access to it.
  *
  * This was directly copied (mutatis mutandis) from Juan Gonzalez-Meneses' code.
  *
@@ -245,8 +241,6 @@ ThurstonType thurston_type(const Braid &b,
 /**
  * @brief Computes the Thurston type of a braid.
  *
- * Computes the Thurston type of braid `b`.
- *
  * This was directly copied (mutatis mutandis) from Juan Gonzalez-Meneses' code.
  *
  * @param b The braid whose Thurston type is to be computed.
@@ -257,10 +251,7 @@ ThurstonType thurston_type(const Braid &b);
 } // namespace artin
 
 /**
- * @brief Inserts a `ThurstonType` value in the stream.
- *
- * Inserts an `ThurstonType` value in the stream, with obvious conversion
- * conventions.
+ * @brief Inserts a `ThurstonType` value in the output stream.
  *
  * @param type A ThurstonType value.
  * @return A reference to `*this`, so that `<<` may be chained.

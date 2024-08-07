@@ -1,5 +1,5 @@
 /**
- * @file band_braid.cpp
+ * @file band.cpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
  * @brief Implementation file for standard braid groups (dual Garside structure).
  * @version 0.1

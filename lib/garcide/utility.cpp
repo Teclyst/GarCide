@@ -27,7 +27,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "garcide/utility.h"
+#include "garcide/utility.hpp"
 
 namespace garcide {
 

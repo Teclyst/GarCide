@@ -47,16 +47,17 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
 
     std::smatch match;
 
-    if (std::regex_search(str.begin() + pos, str.end(), match,
-                          std::regex{"(e_?)?(" + number_regex + ")"},
-                          std::regex_constants::match_continuous)) {
+    if (std::regex_search(
+            str.begin() + pos, str.end(), match,
+            std::regex{"(?:e[\\s\\t]*_?[\\s\\t]*)?(" + number_regex + ")"},
+            std::regex_constants::match_continuous)) {
         // Try to extract a substring starting at pos that matches the regex.
         sint16 i;
         try {
-            i = std::stoi(match[2]);
+            i = std::stoi(match[1]);
         } catch (std::out_of_range const &) {
-            throw InvalidStringError("Index is too big!\n" + match.str(2) +
-                                     " can not be converted to a C++ integer.");
+            throw InvalidStringError("Index is too big!\n" + match.str(1) +
+                                     " cannot be converted to a C++ integer.");
         }
         pos += match[0].length();
         if ((i >= 0) && (i < int(n))) {
@@ -64,7 +65,7 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
             coordinates[i] = true;
         } else {
             throw InvalidStringError(
-                "Invalid index for canonical base vector!\n" + match.str(2) +
+                "Invalid index for canonical base vector!\n" + match.str(1) +
                 " is not in [0, " + std::to_string(n) + "[.");
         }
     } else if (std::regex_search(str.begin() + pos, str.end(), match,
@@ -90,7 +91,7 @@ void Underlying::debug(IndentedOStream &os) const {
     os << EndLine();
     os << "[";
     for (size_t i = 0; i < get_parameter() - 1; i++) {
-        os << coordinates[i] << ", ";
+        os << (coordinates[i] ? "true" : "false") << ", ";
     }
     os << coordinates[get_parameter() - 1];
     os << "]";
@@ -102,7 +103,7 @@ void Underlying::debug(IndentedOStream &os) const {
 void Underlying::print(IndentedOStream &os) const {
     Parameter n = get_parameter();
 
-    Underlying c = Underlying(*this);
+    Underlying c = *this;
 
     bool is_first = true;
 

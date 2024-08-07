@@ -1,5 +1,5 @@
 /**
- * @file utility.h
+ * @file utility.hpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
  * @brief Header file a bunch of utility functions used everywhere.
  * @version 0.1
@@ -335,7 +335,7 @@ class IndentedOStream {
      *
      *  Set the `indent_level` field to `new_indent_level`.
      *
-     * @param indent_level New level of indentation.
+     * @param new_indent_level New level of indentation.
      */
     inline void SetIndentLevel(sint16 new_indent_level) {
         indent_level = new_indent_level;

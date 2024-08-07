@@ -258,7 +258,7 @@ Braid::Parameter prompt_braid_parameter() {
 void print_header(IndentedOStream &os) {
     os << "┌──────────────────┬────────────────────────┬──────────────────┐"
        << EndLine()
-       << "│──────────────────│   This is Braiding 2   │──────────────────│"
+       << "│──────────────────│   This is Braiding   │──────────────────│"
        << EndLine()
        << "│──────────────────│      Pre-release       │──────────────────│"
        << EndLine()
@@ -272,7 +272,7 @@ void print_header(IndentedOStream &os) {
        << EndLine()
        << "├───┴──┬────────────────────────────────────────────────┬──┴───┤"
        << EndLine()
-       << "││││││││  Braiding 2 comes with ABSOLUTELY NO WARRANTY; ││││││││"
+       << "││││││││  Braiding comes with ABSOLUTELY NO WARRANTY; ││││││││"
        << EndLine()
        << "││││││││   this is free software, and you are welcome   ││││││││"
        << EndLine()

@@ -1,5 +1,5 @@
 /**
- * @file artin_braid.cpp
+ * @file artin.cpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
  * @brief Implementation file for standard braid groups (classic Garside structure).
  * @version 0.1

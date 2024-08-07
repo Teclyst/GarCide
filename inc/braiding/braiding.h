@@ -32,6 +32,9 @@
 #ifndef BRAIDING
 #define BRAIDING
 
+/**
+ * @brief Namespace for everything related to the _Braiding_ executable.
+ */
 namespace braiding {
 using garcide::EndLine;
 using garcide::ind_cout;
@@ -154,7 +157,7 @@ void print_line(IndentedOStream &os = ind_cout);
 /**
  * @brief Prints Braiding's header.
  *
- * Prints Braiding 2.0's beautiful header (with real braid Unicode art!) in
+ * Prints Braiding.0's beautiful header (with real braid Unicode art!) in
  * `os`.
  *
  * Go admire it in braiding.cpp.
