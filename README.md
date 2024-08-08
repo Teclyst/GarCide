@@ -14,13 +14,29 @@ These two projects, maintained by **[Jean-Luc Thiffeault](http://www.math.wisc.e
 
 Although names may suggest otherwise, _GarCide_ roughly corresponds to a merge of _CBraid_ and computation-oriented parts of the original _Braiding_, with _Braiding_ only encompassing shell-handling parts.
 
+## Requirements
+
+* [_**CMake**_](https://cmake.org/), to compile the project. On Linux you can get it with
+
+    ```shell
+    sudo apt install cmake
+    ```
+
+* Intel's [_**TBB**_](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onetbb.html), needed for multithreading. Not strictly necessary, although using it often results in significant speedup. On Linux you can get it with
+
+    ```shell
+    sudo apt install libtbb-dev
+    ```
+
+* [_**Doxygen**_](https://www.doxygen.nl/index.html), to generate documentation. If you don't care about it, you can ignore it, but if you plan to play around with the code it is probably a good idea to get it. On Linux, you can do this with
+
+    ```shell
+    sudo apt install doxygen
+    ```
+
 ## Building the project
 
 ### The first time
-
-0) You will need [_CMake_](https://cmake.org/) to compile the project.
-
-    If you don't have it, you can get it with:
 
 1) Create a new directory called `build` where to run _CMake_ from.
 
@@ -74,7 +90,7 @@ cmake -DUSE_PAR=FALSE ..
 
 Now for the available options (in bold are the values before any change is ever done):
 
-* `USE_PAR` (possible values **`TRUE`**, `FALSE`) - Whether parallelism should be used. Notice that you need Intel's TBB for the parallel code to actually work, so this option will not do anything if you do not.
+* `USE_PAR` (possible values **`TRUE`**, `FALSE`) - Whether parallelism should be used. Notice that as you need Intel's _TBB_ for the parallel code to actually work, this option will not do anything if _TBB_ is not on your machine.
 
     Parallelism should significantly speed up computations (for super summit, ultra summit and sliding circuits sets and centralizers) in most case, but may have the opposite effect for small cases (_e.g._ very small number of strands and very short braids) and depending on architecture.
 
@@ -105,8 +121,6 @@ See `doc/implementing_garside_groups.md`.
 
 ## Generating documentation
 
-This project uses _[Doxygen](https://www.doxygen.nl/index.html)_ to generate its documentation.
-
-If you have it, and assuming that `GENERATE_DOC` is set to `TRUE`, then documentation will be automatically generated when building the project.
+If you have _Doxygen_, and assuming that `GENERATE_DOC` is set to `TRUE`, then documentation will be automatically generated when building the project.
 
 To read it, open `build/html/index.html`.
