@@ -6,7 +6,7 @@ _Garcide_ is a C++ library and application for computations in Garside groups. I
 
 The project contains two parts: on one side, the _GarCide_ library, that provides functions for various computations in Garside groups, and is meant to allow users to easily define classes for their own Garside groups.
 
-On the other side, the _Braiding_ executable, provides a shell interface to easily run some calculations..
+On the other side, the _Braiding_ executable provides a shell interface to easily run computations.
 
 This library is based on 2001 _CBraid_ by **[Jae Choon Cha](http://gt.postech.ac.kr/~jccha/)** and 2004 _Braiding_ by **[Juan Gonzalez-Meneses](http://personal.us.es/meneses/)**, with contributions from **[Maria Cumplido](https://personal.us.es/cumplido/)**.
 
