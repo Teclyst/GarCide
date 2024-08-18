@@ -258,7 +258,7 @@ Braid::Parameter prompt_braid_parameter() {
 void print_header(IndentedOStream &os) {
     os << "┌──────────────────┬────────────────────────┬──────────────────┐"
        << EndLine()
-       << "│──────────────────│   This is Braiding   │──────────────────│"
+       << "│──────────────────│    This is Braiding    │──────────────────│"
        << EndLine()
        << "│──────────────────│      Pre-release       │──────────────────│"
        << EndLine()
