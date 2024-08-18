@@ -272,7 +272,7 @@ void print_header(IndentedOStream &os) {
        << EndLine()
        << "├───┴──┬────────────────────────────────────────────────┬──┴───┤"
        << EndLine()
-       << "││││││││  Braiding comes with ABSOLUTELY NO WARRANTY; ││││││││"
+       << "││││││││   Braiding comes with ABSOLUTELY NO WARRANTY;  ││││││││"
        << EndLine()
        << "││││││││   this is free software, and you are welcome   ││││││││"
        << EndLine()
