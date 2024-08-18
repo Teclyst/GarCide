@@ -41,6 +41,12 @@
  */
 namespace garcide {
 
+/**
+ * @brief A class template for Garside group canonical factors.
+ *
+ * @tparam U A template class representing the internal data structure of
+ * factors.
+ */
 template <class U> class FactorTemplate {
 
   public:
@@ -71,28 +77,86 @@ template <class U> class FactorTemplate {
      */
     FactorTemplate(const U &under) : underlying(under) {}
 
+    /**
+     * @brief Construct a new `FactorTemplate`, from a `Parameter` value.
+     *
+     * The `Parameter` `parameter` will be passed to the corresponding `U`
+     * constructor.
+     *
+     * @param parameter The parameter the `factorTemplate` should have.
+     */
     FactorTemplate(Parameter parameter) : underlying(parameter) {}
 
+    /**
+     * @brief Gets the underlying representation of the factor.
+     *
+     * @return `this.underlying`.
+     */
     inline U get_underlying() const { return underlying; }
 
+    /**
+     * @brief Converts a string to a `Parameter`.
+     *
+     * This is a wrapper for the matching `U` static member function.
+     *
+     * @param str The string to be converted.
+     * @return A parameter matching `str`.
+     */
     inline static Parameter parameter_of_string(const std::string &str) {
         return U::parameter_of_string(str);
     }
 
+    /**
+     * @brief Returns the `Parameter` of the factor.
+     *
+     * This is a wrapper for the matching `U` member function.
+     *
+     * @return The `Parameter` of the factor.
+     */
     inline Parameter get_parameter() const {
         return underlying.get_parameter();
     }
 
+    /**
+     * @brief Computes the height of the factors lattice.
+     *
+     * That is to say, the maximum length of the Garside element as a product of
+     * atoms.
+     *
+     * This is a wrapper for the matching `U` member function.
+     *
+     * @return The height of the factors lattice.
+     */
     inline sint16 lattice_height() const {
         return underlying.lattice_height();
     };
 
-    // a.of_string sets a to the factor specified by str.
-    void of_string(const std::string &str, size_t &pos) {
+    /**
+     * @brief Sets this factor to one matching a substring.
+     *
+     * Tries to extract a substring matching a factor from `str`, starting at
+     * `pos`. If successful, `this` is set to the matching factor and `pos` is
+     * advanced by the length of the substring.
+     *
+     * This is a wrapper for the matching `U` member function.
+     *
+     * @param str The string a factor is to be extracted from.
+     * @param pos The position from which a substring should be searched.
+     *
+     * @exception InvalidStringError Thrown when no factor can be extracted
+     * starting at `pos`, or a factor can be extracted, but is not legal.
+     */
+    inline void of_string(const std::string &str, size_t &pos) {
         underlying.of_string(str, pos);
     }
 
-    // a.debug(os) prints a's internal representation to os.
+    /**
+     * @brief Prints the internal structure of the factor to output stream `os`.
+     *
+     * Typically used while debugging.
+     *
+     * @param os The `IndentedOStream` the factor should be printed in.
+     */
     void debug(IndentedOStream &os = ind_cout) const {
         os << "{   Underlying:";
         os.Indent(8);
@@ -102,88 +166,195 @@ template <class U> class FactorTemplate {
         os << EndLine() << "}";
     }
 
-    // a.print(os) prints a to os.
-    void print(IndentedOStream &os = ind_cout) const { underlying.print(os); }
+    /**
+     * @brief Prints the factor to output stream `os`.
+     *
+     * This is a wrapper for the matching `U` member function.
+     *
+     * @param os The `IndentedOStream` the factor should be printed in.
+     */
+    inline void print(IndentedOStream &os = ind_cout) const {
+        underlying.print(os);
+    }
 
-    // a.identity sets a to identity.
-    void identity() { underlying.identity(); }
+    /**
+     * @brief Sets the factor to the identity.
+     *
+     * This is a wrapper for the matching `U` member function.
+     */
+    inline void identity() { underlying.identity(); }
 
-    // a.delta() sets a to delta.
-    void delta() { underlying.delta(); }
+    /**
+     * @brief Sets the factor to the Garside element.
+     *
+     * This is a wrapper for the matching `U` member function.
+     */
+    inline void delta() { underlying.delta(); }
 
-    // a.compare(b) returns true if a and b are equal, false otherwise.
-    bool compare(const FactorTemplate &b) const {
+    /**
+     * @brief Equality test between two factors.
+     *
+     * This is a wrapper for the matching `U` member function.
+     *
+     * @param b The factor `*this` is compared to.
+     * @return if `*this` and `b` are equal.
+     */
+    inline bool compare(const FactorTemplate &b) const {
         return underlying.compare(b.underlying);
     }
 
-    // a == b returns true if a and b are equal, false otherwise.
-    // Syntactic sugar for a.compare(b).
-    bool operator==(const FactorTemplate &b) const { return compare(b); }
+    /**
+     * @brief Equality test between two factors.
+     *
+     * This is syntact sugar for `*this.compare(b)`.
+     *
+     * @param b The factor `*this` is compared to.
+     * @return if `*this` and `b` are equal.
+     */
+    inline bool operator==(const FactorTemplate &b) const { return compare(b); }
 
-    // a != b returns true if a and b are not equal, false otherwise.
-    bool operator!=(const FactorTemplate &b) const { return !compare(b); }
+    /**
+     * @brief Unequality test between two factors.
+     *
+     * This is syntact sugar for `!(this.compare(b))`.
+     *
+     * @param b The factor `*this` is compared to.
+     * @return if `*this` and `b` are not equal.
+     */
+    inline bool operator!=(const FactorTemplate &b) const {
+        return !compare(b);
+    }
 
-    // a.is_delta() returns whether a == e.
-    bool is_identity() const {
+    /**
+     * @brief Equality test with the identity.
+     *
+     * @return if `*this` is the identity.
+     */
+    inline bool is_identity() const {
         FactorTemplate e = FactorTemplate(*this);
         e.identity();
         return compare(e);
     }
 
-    // a.is_delta() returns whether a = delta.
-    bool is_delta() const {
+    /**
+     * @brief Equality test with the Garside element.
+     *
+     * @return if `*this` is the Garside element.
+     */
+    inline bool is_delta() const {
         FactorTemplate delta = FactorTemplate(*this);
         delta.delta();
         return compare(delta);
     }
 
-    // a.left_complement(b) returns (assuming that a right-divides b) the left
-    // complement of a under b, ba^{-1}.
-    FactorTemplate left_complement(const FactorTemplate &b) const {
+    /**
+     * @brief Computes the left complement of `*this` under `b`.
+     *
+     * It is assumed that `*this` right-divides `b`.
+     *
+     * Given two factors $a$ and $b$, with $a$ a right-divisor of $b$,
+     * the left complement of $a$ under $b$ is the factor $c$ such that $b=ca$.
+     *
+     * This is a wrapper for the matching `U` member function.
+     *
+     * @param b The factor under which we want to compute the complement.
+     * @return The left complement of `*this` under `b`.
+     */
+    inline FactorTemplate left_complement(const FactorTemplate &b) const {
         return FactorTemplate(underlying.left_complement(b.underlying));
     }
 
-    // a.left_complement() return a's left complement.
-    FactorTemplate left_complement() const {
+    /**
+     * @brief Computes the left complement of `*this` under the Garside element.
+     *
+     * @return The left complement of `*this` under the Garside element.
+     */
+    inline FactorTemplate left_complement() const {
         FactorTemplate delta = FactorTemplate(*this);
         delta.delta();
         return left_complement(delta);
     }
 
-    // a.right_complement(b) returns (assuming that a left-divides b) the right
-    // complement of a under b, a^{-1}b.
-    FactorTemplate right_complement(const FactorTemplate &b) const {
+    /**
+     * @brief Computes the right complement of `*this` under `b`.
+     *
+     * It is assumed that `*this` left-divides `b`.
+     *
+     * Given two factors $a$ and $b$, with $a$ a left-divisor of $b$,
+     * the right complement of $a$ under $b$ is the factor $c$ such that $b=ac$.
+     *
+     * This is a wrapper for the matching `U` member function.
+     *
+     * @param b The factor under which we want to compute the complement.
+     * @return The right complement of `*this` under `b`.
+     */
+    inline FactorTemplate right_complement(const FactorTemplate &b) const {
         return FactorTemplate(underlying.right_complement(b.underlying));
     }
 
-    // a.right_complement() return a's right complement.
-    FactorTemplate right_complement() const {
+    /**
+     * @brief Computes the right complement of `*this` under the Garside
+     * element.
+     *
+     * @return The right complement of `*this` under the Garside element.
+     */
+    inline FactorTemplate right_complement() const {
         FactorTemplate delta = FactorTemplate(*this);
         delta.delta();
         return right_complement(delta);
     }
 
-    // ~a return a's right complement.
-    // Syntactic sugar for a.right_complement().
-    FactorTemplate operator~() const { return right_complement(); }
+    /**
+     * @brief Computes the right complement of `*this` under the Garside
+     * element.
+     *
+     * Syntactic sugar for `*this.right_complement()`.
+     *
+     * @return The right complement of `*this` under the Garside element.
+     */
+    inline FactorTemplate operator~() const { return right_complement(); }
 
-    // Syntactic sugar for b.right_complement(a).
-    FactorTemplate operator/(const FactorTemplate &b) const {
+    /**
+     * @brief Computes the right complement of `*this` under `b`.
+     *
+     * It is assumed that `*this` left-divides `b`.
+     *
+     * Syntactic sugar for `*this.right_complement(b)`.
+     *
+     * @param b The factor under which we want to compute the complement.
+     * @return The right complement of `*this` under `b`.
+     */
+    inline FactorTemplate operator/(const FactorTemplate &b) const {
         return b.right_complement(*this);
     }
 
-    void delta_conjugate_mut(sint16 k) { underlying.delta_conjugate_mut(k); }
+    /**
+     * @brief Conjugates the factor by a power of the Garside element, modifying
+     * it.
+     *
+     * This is a wrapper for the matching `U` member function.
+     *
+     * @param k The power of the Garside element that the factor should be
+     * conjugated by.
+     */
+    inline void delta_conjugate_mut(sint16 k) {
+        underlying.delta_conjugate_mut(k);
+    }
 
-    // a.delta_conjugate(k) returns a, conjugated by Delta ^ k.
-    // Makes 2 |k| complement calculations.
-    FactorTemplate delta_conjugate(sint16 k) const {
+    /**
+     * @brief Computes the conjugate of the factor by a power of the Garside element.
+     *
+     * By default, conjugates by the Garside element.
+     * 
+     * @param k The power of the Garside element that the factor should be
+     * conjugated by.
+     * @return The conjugate.
+     */
+    FactorTemplate delta_conjugate(sint16 k = 1) const {
         FactorTemplate conjugate = *this;
         conjugate.delta_conjugate_mut(k);
         return conjugate;
     }
-
-    // a.delta_conjugate() returns a conjugated by Delta.
-    FactorTemplate delta_conjugate() const { return delta_conjugate(1); }
 
     // a.left_meet(b) returns the left meet of a and b.
     FactorTemplate left_meet(const FactorTemplate &b) const {
@@ -302,7 +473,17 @@ template <class F> bool make_right_weighted(F &u, F &v) {
     }
 }
 
-// Overloading << for factor classes.
+/**
+ * @brief Prints factor `f` to `IndentedOSTream` `os`.
+ *
+ * This partially specializes `<<` for `FactorTemplate` classes, as syntactic
+ * sugar for `FactorTemplate<U>::print()`.
+ *
+ * @tparam U A template class for the internal representation of factors.
+ * @param os The `IndentedOStream` the factor should be printed in.
+ * @param f The factor to be printed.
+ * @return A reference to `os`, so that `<<` may be chained.
+ */
 template <class U>
 IndentedOStream &operator<<(IndentedOStream &os, const FactorTemplate<U> &f) {
     f.print(os);
