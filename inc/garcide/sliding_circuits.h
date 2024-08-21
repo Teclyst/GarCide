@@ -32,8 +32,18 @@
 
 #include "garcide/super_summit.h"
 
+/**
+ * @brief Namespace for sliding circuits sets calculations.
+ */
 namespace garcide::sliding_circuits {
 
+/**
+ * @brief 
+ * 
+ * @tparam F 
+ * @param b 
+ * @return std::vector<BraidTemplate<F>> 
+ */
 template <class F>
 std::vector<BraidTemplate<F>> trajectory(BraidTemplate<F> b) {
     std::vector<BraidTemplate<F>> t;

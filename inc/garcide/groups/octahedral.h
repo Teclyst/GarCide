@@ -1,7 +1,7 @@
 /**
  * @file octahedral.h
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
- * @brief Header file for B-series Artin groups (dual Garside structure).
+ * @brief Header file for \f$\mathbf B\f$-series Artin groups (dual Garside structure).
  * @version 0.1
  * @date 2024-07-28
  *
@@ -32,6 +32,9 @@
 
 #include "garcide/garcide.h"
 
+/**
+ * @brief Namespace for \f$\mathbf B\f$-series Artin groups (dual Garside structure).
+ */
 namespace garcide::octahedral {
 
 class Underlying {
@@ -82,11 +85,13 @@ class Underlying {
      * The first case stands for short generators (double, symmetric,
      * transpositions), and the second one for long generators (transposition of
      * antipodals points).
+     * 
+     * "D" is also accepted and is parsed as \f$\Delta\f$.
      *
      * @param str The string to extract from.
      * @param pos The position to start from.
      * @exception `InvalidStringError`: Thrown when there is no subword starting
-     * from `pos` that matches `\(W Z W,? W Z W\) | Z`, or if there is one, it
+     * from `pos` that matches `\(W Z W,? W Z W\) | Z | D`, or if there is one, it
      * matches `\(W Z W,? W Z W\)`, and both integers are equal mod
      * `PresentationParameter'.
      */

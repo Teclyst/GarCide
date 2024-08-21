@@ -33,14 +33,15 @@
 #include "garcide/garcide.h"
 
 /**
- * @brief Namespace for euclidian lattices $\mathbb Z^n$.
+ * @brief Namespace for euclidian lattices \f$\mathbb Z^n\f$.
  */
 namespace garcide::euclidean_lattice {
+
 /**
- * @brief A class for $Z^n$ canonical factors.
+ * @brief A class for \f$\mathbb Z ^ n\f$ canonical factors.
  *
- * A class for $Z^n$ canonical factors (elements of ${\mathbb Z / 2\mathbb
- * Z}^n$).
+ * They are represented by elements of \f${\mathbb Z
+ * / 2\mathbb Z}^n\f$, as bitvectors.
  */
 class Underlying {
 
@@ -58,8 +59,8 @@ class Underlying {
     /**
      * @brief The factor's coordinates.
      *
-     * These are its coordinates in $\mathbb Z^n$ canonical basis.
-     * As these are all $0$ or $1$, we use booleans, as (depending on
+     * These are its coordinates in the canonical basis of \f$\mathbb Z^n\f$.
+     * As these are all \f$0\f$ or \f$1\f$, we use booleans, as (depending on
      * implementation) it should be more space efficient (one bit vers one
      * byte).
      */
@@ -82,17 +83,14 @@ class Underlying {
     /**
      * @brief Gets the factor's dimension.
      *
-     * (_I.e._ the $n$ in $\mathbb Z^n$.)
+     * (_I.e._ the \f$n\f$ in \f$\mathbb Z^n\f$.)
      *
      * @return The factor's dimension.
      */
     Parameter get_parameter() const;
 
     /**
-     * @brief Access i-th coordinate.
-     *
-     * That way non-member functions may enjoy read read access to
-     * `coordinates`.
+     * @brief Access i-th coordinate (read-only).
      *
      * @param i The index that is being accessed.
      * @return The `i`-th coordinate.
@@ -102,11 +100,9 @@ class Underlying {
     /**
      * @brief Construct a new `Underlying`.
      *
-     * Its dimension will be `n`.
+     * Its dimension will be `n`, and it will be initialized as a `n`-length vector filled with `false`.
      *
-     * `coordinates` will have length `n`, and will be filled with `false`.
-     *
-     * @param n The factor's `dimension`.
+     * @param n The dimension.
      */
     Underlying(Parameter n);
 
@@ -120,23 +116,26 @@ class Underlying {
      * Letting `Z = '-'? (['1' - '9'] ['0' - '9']* | '0')` be the language of
      * integers, accepted strings are those represented by regular expression
      * `('e' '_'?)? Z`, under the additional hypothesis that the integer they
-     * represent is in [`0`, `dimension`[, ignoring whitespaces.
+     * represent is in \f$[0, n[\f$, where $n$ is the dimension, and ignoring
+     * whitespaces.
      *
-     * "e_i" (with optional "e_") stands for base vector e_i.
+     * "e_i" (with optional "e_") stands for base vector \f$e_i\f$.
      *
+     * `D` is also accepted, and represents \f$\Delta\f$.
+     * 
      * @param str The string to extract from.
      * @param pos The position to start from.
      * @exception InvalidStringError Thrown when there is no subword starting
      * from `pos` that matches `Z`, or if there is one, if the corresponding
-     * integer does not belong to [`0`, `get_parameter()`[.
+     * integer does not belong to \f$[0, n[\f$.
      */
     void of_string(const std::string &str, size_t &pos);
 
     /**
      * @brief Height of the lattice.
      *
-     * (_I.e._ `delta`'s length as a word in the generators, here
-     * `dimension`.)
+     * (_I.e._ the length of \f$\Delta\f$ as a word in the generators, here
+     * the dimension.)
      *
      * @return The height of the lattice.
      */
@@ -145,8 +144,7 @@ class Underlying {
     /**
      * @brief Prints internal data in `os`.
      *
-     * Prints the factor's `coordinates` in `os`, typically for
-     * debugging purposes.
+     * Typically used for debugging.
      *
      * @param os The output stream it is printed in.
      */
@@ -170,7 +168,7 @@ class Underlying {
     void identity();
 
     /**
-     * @brief Sets the factor to delta.
+     * @brief Sets the factor to \f$\Delta\f$.
      *
      * (_I.e._ sets all coordinates to `true`.)
      */
@@ -179,8 +177,8 @@ class Underlying {
     /**
      * @brief Computes meets.
      *
-     * Computes the (left, although that does not matter here as Z ^ n is
-     * abelian) meet of `*this` and `b` (i.e., coordinates-wise `&&`).
+     * Computes the (left, although that does not matter here as \f$\mathbb Z ^
+     * n\f$ is abelian) meet of `*this` and `b` (_i.e._, coordinates-wise `&&`).
      *
      * @param b Second argument.
      * @return The meet of `*this` and `b`.
@@ -190,8 +188,8 @@ class Underlying {
     /**
      * @brief Computes meets.
      *
-     * Computes the (right, although that does not matter here as Z ^ n is
-     * abelian) meet of `*this` and `b` (i.e., coordinates-wise `&&`).
+     * Computes the (right, although that does not matter here as \f$\mathbb Z ^
+     * n\f$ is abelian) meet of `*this` and `b` (_i.e._, coordinates-wise `&&`).
      *
      * @param b Second argument.
      * @return The meet of `*this` and `b`.
@@ -203,7 +201,7 @@ class Underlying {
     /**
      * @brief Equality check.
      *
-     * Compares `*this` and `b`, returning `true` if they are equal (i.e.
+     * Compares `*this` and `b`, returning `true` if they are equal (_i.e._
      * coordinate-wise equal).
      *
      * @param b Second argument.
@@ -214,10 +212,10 @@ class Underlying {
     };
 
     /**
-     * @brief product computations.
+     * @brief Product computations.
      *
-     * Computes the product of `*this` and `b` (i.e. coordinate-wise xor), under
-     * the assumption that it lies below delta (this is not actually checked).
+     * Computes the product of `*this` and `b` (_i.e._ coordinate-wise xor), under
+     * the assumption that it lies below \f$\Delta\f$ (this is not actually checked).
      *
      * @param b Second argument.
      * @return The product of `*this` and `b`.
@@ -227,9 +225,10 @@ class Underlying {
     /**
      * @brief Complement computations.
      *
-     * Computes the complement of `*this` to `b` (i.e. the factor `c` such
-     * that `ac=b`), under the assumption that `*this` is smaller than `b`. As Z
-     * ^ n is abelian, left and right variants are in fact the same.
+     * Computes the complement of `*this` to `b` (_i.e._ the factor `c` such
+     * that `ac=b`), under the assumption that `*this` is smaller than `b`. As
+     * \f$\mathbb Z ^ n\f$ is abelian, left and right variants are in fact the
+     * same.
      *
      * In this case, this is actually the same (well, as an operation on bit
      * vectors) as product.
@@ -244,9 +243,10 @@ class Underlying {
     /**
      * @brief Complement computations.
      *
-     * Computes the complement of `*this` to `b` (i.e. the factor `c` such
+     * Computes the complement of `*this` to `b` (_i.e._ the factor `c` such
      * that `ac = b`), under the assumption that `*this` is smaller than `b`. As
-     * Z ^ n is abelian, left and right variants are in fact the same.
+     * \f$\mathbb Z ^ n\f$ is abelian, left and right variants are in fact the
+     * same.
      *
      * In this case, this is actually the same (well, as an operation on bit
      * vectors) as product.
@@ -261,8 +261,7 @@ class Underlying {
     /**
      * @brief Sets `*this` to a random factor.
      *
-     * Sets `*this` to a random factor, following an uniform distribution other
-     * factors.
+     * It is chosen uniformly other \f$(\mathbb Z/2\mathbb Z)^n\f$.
      */
     void randomize();
 
@@ -276,10 +275,10 @@ class Underlying {
     std::vector<Underlying> atoms() const;
 
     /**
-     * @brief Conjugates by delta ^ k.
+     * @brief Conjugates by  \f$\Delta^k\f$.
      *
-     * Conjugates `*this` by delta ^ k (actually, does nothing as Z ^ n is
-     * abelian).
+     * Actually, this does nothing as \f$\mathbb Z ^
+     * n\f$ is abelian.
      *
      * @param k The exponent.
      */
@@ -289,7 +288,8 @@ class Underlying {
      * @brief Hashes the factor.
      *
      * Hashes the factor. Done by interpreting it as a polynomial and evaluating
-     * it in 2 (yields a bijection between the set of factors, and [0, 2 ^ n[).
+     * it in \f$2\f$ (yields a bijection between the set of factors, and \f$[0,
+     * 2 ^ n[\f$).
      *
      * @return The hash.
      */
@@ -297,16 +297,12 @@ class Underlying {
 };
 
 /**
- * @brief Class for canonical factors.
- *
- * Class for canonical factors, will all corresponding methods.
+ * @brief Class for canonical factors of \f$\mathbb Z^n\f$.
  */
 typedef FactorTemplate<Underlying> Factor;
 
 /**
- * @brief Class for elements of Z ^ n.
- *
- * Class for elements of Z ^ n, as a Garside group.
+ * @brief Class for elements of \f$\mathbb Z ^ n\f$, as a Garside group.
  */
 typedef BraidTemplate<Factor> Braid;
 

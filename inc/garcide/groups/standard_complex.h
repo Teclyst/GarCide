@@ -1,7 +1,8 @@
 /**
  * @file standard_complex.h
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
- * @brief Header file for B(e, e, n) groups (semi-classic Garside structure).
+ * @brief Header file for \f$\mathrm B(e, e, n)\f$ groups (semi-classic Garside
+ * structure).
  * @version 0.1
  * @date 2024-07-28
  *
@@ -31,6 +32,10 @@
 
 namespace garcide {
 
+/**
+ * @brief Namespace for complex braid groups \f$\mathrm B(e,e,n)\f$
+ * (semi-classic presentation).
+ */
 namespace standard_complex {
 
 // We represent B(e, e, n).
@@ -51,6 +56,15 @@ struct EENParameter {
     void print(IndentedOStream &os) const;
 };
 
+/**
+ * @brief A class for \f$\mathrm B(e,e,n)\f$ semi-classic canonical factors.
+ *
+ * Their structure is described in Corran, Picantin, _A New Garside Structure
+ * for the Braid Groups of Type_ \f$(e, e, r)\f$, 2011, arXiv: [arxiv/0901.0645
+ * [math.GR]](https://arxiv.org/abs/0901.0645) and Neaime, _Interval Garside
+ * Structures for the Complex Braid Groups_ \f$B(e,e,n)\f$, 2019, arXiv:
+ * [arXiv:1707.06864 [math.GR]](https://arxiv.org/abs/1707.06864).
+ */
 class Underlying {
 
   public:
@@ -68,8 +82,8 @@ class Underlying {
      *
      * This permutation sends i to the j such that the i-th coordinate is the
      * j-th after multiplication. That is to say, j is the index such that the
-     * coefficient at (i, j) is non zero (c_i in George Neaime, Interval Garside
-     * Structures for the Complex Braid Groups,
+     * coefficient at (i, j) is non zero (c_i in George Neaime, _Interval
+     * Garside Structures for the Complex Braid Groups_ \f$B(e,e,n)\f$,
      * [arXiv:1707.06864](https://arxiv.org/abs/1707.06864)).
      */
     std::vector<sint16> permutation_table;
@@ -122,9 +136,9 @@ class Underlying {
      * @brief Prints the factor to `os`.
      *
      * Prints to `os` Neaime's shortest word representative in the
-     * Corran-Picantin generators (See George Neaime, Interval Garside
-     * Structures for the Complex Braid Groups,
-     * [arXiv:1707.06864](https://arxiv.org/abs/1707.06864)))
+     * Corran-Picantin generators (See George Neaime, _Interval Garside
+     * Structures for the Complex Braid Groups_ \f$B(e,e,n)\f$,
+     * [arXiv:1707.06864 [math.GR]](https://arxiv.org/abs/1707.06864))
      *
      * @param os The output stream it prints to.
      */
@@ -276,4 +290,4 @@ template <>
 IndentedOStream &IndentedOStream::operator<< <standard_complex::EENParameter>(
     const standard_complex::EENParameter &p);
 
-} // namespace cgarside
+} // namespace garcide

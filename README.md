@@ -101,10 +101,10 @@ Now for the available options (in bold are the values before any change is ever 
 * `USE_FOR_BRAIDING` (possible values **`ARTIN`**, `BAND`, `OCTAHEDRAL`, `DIHEDRAL`, `DUAL_COMPLEX`, `STANDARD_COMPLEX`, `EUCLIDEAN_LATTICE`) - Selects which group should be used for _Braiding_.
 
     Currently supported:
-  * Regular braid groups (a.k.a. $\mathrm A$-series Artin groups), classic Garside structure (`ARTIN`).
+  * Regular braid groups (a.k.a. $\mathbf A$-series Artin groups), classic Garside structure (`ARTIN`).
   * Regular braid groups, dual Garside structure (`BAND`).
-  * $\mathrm B$-series Artin groups, dual Garside structure (`OCTAHEDRAL`).
-  * $\mathrm I$-series Artin groups, dual Garside structure (`DIHEDRAL`).
+  * $\mathbf B$-series Artin groups, dual Garside structure (`OCTAHEDRAL`).
+  * $\mathbf I$-series Artin groups, dual Garside structure (`DIHEDRAL`).
   * Complex reflection braid groups $\mathrm B(e, e, n)$, dual Garside structure (`DUAL_COMPLEX`).
   * Complex reflection braid groups $\mathrm B(e, e, n)$, semi-classic Garside structure (`STANDARD_COMPLEX`), NOT FULLY WORKING AS OF NOW.
   * Euclidean lattices $\mathbb Z^n$ (`EUCLIDEAN_LATTICE`).

@@ -206,7 +206,7 @@ template <class U> class FactorTemplate {
     /**
      * @brief Equality test between two factors.
      *
-     * This is syntact sugar for `*this.compare(b)`.
+     * Syntactic sugar for `compare`.
      *
      * @param b The factor `*this` is compared to.
      * @return if `*this` and `b` are equal.
@@ -215,8 +215,6 @@ template <class U> class FactorTemplate {
 
     /**
      * @brief Unequality test between two factors.
-     *
-     * This is syntact sugar for `!(this.compare(b))`.
      *
      * @param b The factor `*this` is compared to.
      * @return if `*this` and `b` are not equal.
@@ -252,8 +250,9 @@ template <class U> class FactorTemplate {
      *
      * It is assumed that `*this` right-divides `b`.
      *
-     * Given two factors $a$ and $b$, with $a$ a right-divisor of $b$,
-     * the left complement of $a$ under $b$ is the factor $c$ such that $b=ca$.
+     * Given two factors \f$a\f$ and \f$b\f$, with \f$a\f$ a right-divisor of
+     * \f$b\f$, the left complement of \f$a\f$ under \f$b\f$ is the factor
+     * \f$c\f$ such that \f$b=ca\f$.
      *
      * This is a wrapper for the matching `U` member function.
      *
@@ -280,8 +279,9 @@ template <class U> class FactorTemplate {
      *
      * It is assumed that `*this` left-divides `b`.
      *
-     * Given two factors $a$ and $b$, with $a$ a left-divisor of $b$,
-     * the right complement of $a$ under $b$ is the factor $c$ such that $b=ac$.
+     * Given two factors \f$a\f$ and \f$b\f$, with \f$a\f$ a left-divisor of
+     * \f$b\f$, the right complement of \f$a\f$ under \f$b\f$ is the factor
+     * \f$c\f$ such that \f$b=ac\f$.
      *
      * This is a wrapper for the matching `U` member function.
      *
@@ -308,7 +308,7 @@ template <class U> class FactorTemplate {
      * @brief Computes the right complement of `*this` under the Garside
      * element.
      *
-     * Syntactic sugar for `*this.right_complement()`.
+     * Syntactic sugar for `right_complement` (the unary version).
      *
      * @return The right complement of `*this` under the Garside element.
      */
@@ -319,7 +319,7 @@ template <class U> class FactorTemplate {
      *
      * It is assumed that `*this` left-divides `b`.
      *
-     * Syntactic sugar for `*this.right_complement(b)`.
+     * Syntactic sugar for `right_complement` (the binary version).
      *
      * @param b The factor under which we want to compute the complement.
      * @return The right complement of `*this` under `b`.
@@ -342,10 +342,11 @@ template <class U> class FactorTemplate {
     }
 
     /**
-     * @brief Computes the conjugate of the factor by a power of the Garside element.
+     * @brief Computes the conjugate of the factor by a power of the Garside
+     * element.
      *
      * By default, conjugates by the Garside element.
-     * 
+     *
      * @param k The power of the Garside element that the factor should be
      * conjugated by.
      * @return The conjugate.
@@ -356,66 +357,150 @@ template <class U> class FactorTemplate {
         return conjugate;
     }
 
-    // a.left_meet(b) returns the left meet of a and b.
-    FactorTemplate left_meet(const FactorTemplate &b) const {
+    /**
+     * @brief Computes left meets.
+     *
+     * This is a wrapper for the matching `U` member function.
+     *
+     * @param b Second operand.
+     * @return The left meet of `*this` and `b`.
+     */
+    inline FactorTemplate left_meet(const FactorTemplate &b) const {
         return FactorTemplate(underlying.left_meet(b.underlying));
     }
 
-    // a ^ b returns the left meet of a and b.
-    // Syntactic sugar for a.left_meet(b).
-    FactorTemplate operator^(const FactorTemplate &b) const {
+    /**
+     * @brief Computes left meets.
+     *
+     * Syntactic sugar for `left_meet`.
+     *
+     * @param b Second operand.
+     * @return The left meet of `*this` and `b`.
+     */
+    inline FactorTemplate operator^(const FactorTemplate &b) const {
         return left_meet(b);
     }
 
-    // a.right_meet(b) returns the right meet of a and b.
-    FactorTemplate right_meet(const FactorTemplate &b) const {
+    /**
+     * @brief Computes right meets.
+     *
+     * This is a wrapper for the matching `U` member function.
+     *
+     * @param b Second operand.
+     * @return The right meet of `*this` and `b`.
+     */
+    inline FactorTemplate right_meet(const FactorTemplate &b) const {
         return FactorTemplate(underlying.right_meet(b.underlying));
     }
 
-    // a.left_join(b) returns the left join of a and b.
-    FactorTemplate left_join(const FactorTemplate &b) const {
+    /**
+     * @brief Computes left joins.
+     *
+     * @param b Second operand.
+     * @return The left join of `*this` and `b`.
+     */
+    inline FactorTemplate left_join(const FactorTemplate &b) const {
         return right_complement()
             .right_meet(b.right_complement())
             .left_complement();
     }
 
-    // a.right_join(b) returns the right join of a and b.
-    FactorTemplate right_join(const FactorTemplate &b) const {
+    /**
+     * @brief Computes right joins.
+     *
+     * @param b Second operand.
+     * @return The right join of `*this` and `b`.
+     */
+    inline FactorTemplate right_join(const FactorTemplate &b) const {
         return left_complement()
             .left_meet(b.left_complement())
             .right_complement();
     }
 
-    // a.is_left_weighted(b) returns true if a | b is left weighted, or false
-    // otherwise.
-    bool is_left_weighted(const FactorTemplate &b) const {
+    /**
+     * @brief Checks left-weightedness.
+     *
+     * @param b The second factor in the decomposition.
+     * @return If `*this`\f${}\mid{}\f$`b` is left-weighted.
+     */
+    inline bool is_left_weighted(const FactorTemplate &b) const {
         return right_complement().left_meet(b).is_identity();
     }
 
-    // a.is_right_weighted(b) returns true if a | b is right weighted, or false
-    // otherwise.
-    bool is_right_weighted(const FactorTemplate &b) const {
+    /**
+     * @brief Checks right-weightedness.
+     *
+     * @param b The second factor in the decomposition.
+     * @return If `*this`\f${}\mid{}\f$`b` is right-weighted.
+     */
+    inline bool is_right_weighted(const FactorTemplate &b) const {
         return left_meet(b.left_complement()).is_identity();
     }
 
-    // a.product(b) returns the product of two factors, under the assumption
-    // that it lies below Delta.
-    FactorTemplate product(const FactorTemplate &b) const {
+    /**
+     * @brief Computes products.
+     *
+     * It is assumed that the product is still a factor.
+     *
+     * @param b Second (right) operand.
+     * @return The product of `*this` and `b`.
+     */
+    inline FactorTemplate product(const FactorTemplate &b) const {
         return FactorTemplate(underlying.product(b.underlying));
     }
 
-    void right_multiply(const FactorTemplate &b) { *this = *this * b; }
+    /**
+     * @brief Mutably left-multiply.
+     *
+     * It is assumed that the product is still a factor.
+     *
+     * @param b The factor we left-multiply by.
+     */
+    inline void left_multiply(const FactorTemplate &b) { *this = b * *this; }
 
-    std::size_t hash() const { return underlying.hash(); }
+    /**
+     * @brief Mutably right-multiply.
+     *
+     * It is assumed that the product is still a factor.
+     *
+     * @param b The factor we right-multiply by.
+     */
+    inline void right_multiply(const FactorTemplate &b) { *this = *this * b; }
 
-    // a * b is the product of a and b, under the assumption that it lies below
-    // Delta. Syntactic sugar for a.product(b).
-    FactorTemplate operator*(const FactorTemplate &b) const {
+    /**
+     * @brief Computes products.
+     *
+     * It is assumed that the product is still a factor.
+     *
+     * Syntactic sugar for `product`.
+     *
+     * @param b Second (right) operand
+     * @return The product of `*this` and `b`.
+     */
+    inline FactorTemplate operator*(const FactorTemplate &b) const {
         return product(b);
     }
 
-    // a.randomize() sets a to a random factor.
-    void randomize() {
+    /**
+     * @brief Hashes the factor.
+     *
+     * This is a wrapper for the matching `U` member function.
+     *
+     * @return The hash.
+     */
+    inline std::size_t hash() const { return underlying.hash(); }
+
+    /**
+     * @brief Randomizes the factor.
+     *
+     * This is a wrapper for the matching `U` member function, unless
+     * preprocessor variable `RANDOMIZE_AS_WORDS` is defined. In that case,
+     * A random factor is polled instead.
+     *
+     * @exception NonRandomizable Thrown if `U` does not support uniform polling
+     * and `RANDOMIZE_AS_WORDS` is not defined.
+     */
+    inline void randomize() {
 
 #ifdef RANDOMIZE_AS_WORDS
 
@@ -430,7 +515,13 @@ template <class U> class FactorTemplate {
 #endif
     }
 
-    // a.atoms() returns the list of the atoms.
+    /**
+     * @brief Generates the atoms.
+     *
+     * This is a wrapper for the matching `U` member function.
+     *
+     * @return A vector that contains the atoms.
+     */
     std::vector<FactorTemplate> atoms() const {
         std::vector<U> atoms = underlying.atoms();
         typename std::vector<U>::iterator atoms_it;
@@ -442,11 +533,16 @@ template <class U> class FactorTemplate {
     }
 };
 
-// make_left_weighted(u, v) computes the left-weighted decomposition u' | v' =
-// u | v, and sets u = u' and v = v'. It then returns true if something was
-// done (so that it may be used with `apply_binfun`). SHOULD NEVER BE CALLED
-// UPON u, v IF
-// `&u == &v`!
+/**
+ * @brief Modifies two factors so that they form a left-weighted decomposition.
+ *
+ * Then returns if something was done.
+ *
+ * @tparam F A class representing canonical factors.
+ * @param u Left factor of the decomposition.
+ * @param v Right factor of the decomposition.
+ * @return If `u` and `v` were modified.
+ */
 template <class F> bool make_left_weighted(F &u, F &v) {
     F t = (~u) ^ v;
     if (t.is_identity()) {
@@ -458,10 +554,16 @@ template <class F> bool make_left_weighted(F &u, F &v) {
     }
 }
 
-// make_right_weighted(u, v) computes the right-weighted decomposition u' | v'
-// = u | v, and sets u = u' and v = v'. It then returns true if something
-// was done (so that it may be used with `apply_binfun`). SHOULD NEVER BE
-// CALLED UPON u, v IF `&u == &v`!
+/**
+ * @brief Modifies two factors so that they form a right-weighted decomposition.
+ *
+ * Then returns if something was done.
+ *
+ * @tparam F A class representing canonical factors.
+ * @param u Left factor of the decomposition.
+ * @param v Right factor of the decomposition.
+ * @return If `u` and `v` were modified.
+ */
 template <class F> bool make_right_weighted(F &u, F &v) {
     F t = u.right_meet(v.left_complement());
     if (t.is_identity()) {
@@ -477,7 +579,7 @@ template <class F> bool make_right_weighted(F &u, F &v) {
  * @brief Prints factor `f` to `IndentedOSTream` `os`.
  *
  * This partially specializes `<<` for `FactorTemplate` classes, as syntactic
- * sugar for `FactorTemplate<U>::print()`.
+ * sugar for `FactorTemplate::print()`.
  *
  * @tparam U A template class for the internal representation of factors.
  * @param os The `IndentedOStream` the factor should be printed in.
@@ -544,25 +646,96 @@ template <class F> class BraidTemplate {
     std::list<F> factor_list;
 
   public:
+    /**
+     * @brief Factor iterator.
+     */
     using FactorItr = typename std::list<F>::iterator;
+
+    /**
+     * @brief Reverse factor iterator.
+     */
     using RevFactorItr = typename std::list<F>::reverse_iterator;
+
+    /**
+     * @brief Constant factor iterator.
+     */
     using ConstFactorItr = typename std::list<F>::const_iterator;
+
+    /**
+     * @brief Constant reverse factor iterator.
+     */
     using ConstRevFactorItr = typename std::list<F>::const_reverse_iterator;
 
+    /**
+     * @brief Iterator to the first factor.
+     *
+     * Where the first factor is interpreted as the left-most one.
+     *
+     * @return An iterator to the first factor.
+     */
     inline FactorItr begin() { return factor_list.begin(); }
 
+    /**
+     * @brief Reverse iterator to the last factor.
+     *
+     * Where the last factor is interpreted as the right-most one.
+     *
+     * @return A reverse iterator to the last factor.
+     */
     inline RevFactorItr rbegin() { return factor_list.rbegin(); }
 
+    /**
+     * @brief Constant iterator to the first factor.
+     *
+     * Where the first factor is interpreted as the left-most one.
+     *
+     * @return A constant iterator to the first factor.
+     */
     inline ConstFactorItr cbegin() const { return factor_list.begin(); }
 
+    /**
+     * @brief Constant reverse iterator to the last factor.
+     *
+     * Where the last factor is interpreted as the right-most one.
+     *
+     * @return A constant reverse iterator to the last factor.
+     */
     inline ConstRevFactorItr crbegin() const { return factor_list.rbegin(); }
 
+    /**
+     * @brief Iterator to the after-last factor.
+     *
+     * Where the last factor is interpreted as the right-most one.
+     *
+     * @return An iterator to the after-last factor.
+     */
     inline FactorItr end() { return factor_list.end(); }
 
+    /**
+     * @brief Reverse iterator to the before-first factor.
+     *
+     * Where the first factor is interpreted as the left-most one.
+     *
+     * @return A reverse iterator to the before-first factor.
+     */
     inline RevFactorItr rend() { return factor_list.rend(); }
 
+    /**
+     * @brief Constant iterator to the after-last factor.
+     *
+     * Where the last factor is interpreted as the right-most one.
+     *
+     * @return A constant iterator to the after-last factor.
+     */
     inline ConstFactorItr cend() const { return factor_list.end(); }
 
+    /**
+     * @brief Constant reverse iterator to the before-first factor.
+     *
+     * Where the first factor is interpreted as the left-most one.
+     *
+     * @return A constant reverse iterator to the before-first factor.
+     */
     inline ConstRevFactorItr crend() const { return factor_list.rend(); }
 
   public:
@@ -656,17 +829,41 @@ template <class F> class BraidTemplate {
         }
     }
 
-    // `w.identity()` sets w to the empty word.
+    /**
+     * @brief Sets the braid to the identity.
+     */
     inline void identity() {
         delta = 0;
         factor_list.clear();
     }
 
-    // `u.canonical_length` returns u's canonical length.
+    /**
+     * @brief Returns the canonical length.
+     *
+     * _I.e._ the number of factors.
+     *
+     * @return The canonical length of `*this`.
+     */
     inline size_t canonical_length() const { return factor_list.size(); }
 
+    /**
+     * @brief Returns the infimum.
+     *
+     * _I.e._ the exponent of the greatest power of the Garside element that
+     * divides the braid.
+     *
+     * @return The infimum of `*this`.
+     */
     inline sint32 inf() const { return delta; }
 
+    /**
+     * @brief Returns the supremum.
+     *
+     * _I.e._ the exponent of the smallest power of the Garside element that
+     * the braid divides.
+     *
+     *  @return The supremum of `*this`.
+     */
     inline sint32 sup() const { return inf() + int(canonical_length()); }
 
     // `u.compare(v)` returns whether u and v have the same internal

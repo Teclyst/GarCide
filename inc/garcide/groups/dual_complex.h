@@ -1,7 +1,8 @@
 /**
  * @file dual_complex.h
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
- * @brief Header file for B(e, e, n) groups (dual Garside structure).
+ * @brief Header file for \f$\mathrm B(e,e,n+1)\f$ groups (dual Garside
+ * structure).
  * @version 0.1
  * @date 2024-07-28
  *
@@ -31,9 +32,12 @@
 
 namespace garcide {
 
+/**
+ * @brief Namespace for complex braid groups \f$\mathrm B(e,e,n+1)\f$ (dual
+ * presentation).
+ */
 namespace dual_complex {
 
-// We represent B(e, e, n + 1).
 struct EENParameter {
     sint16 e;
     sint16 n;
@@ -44,22 +48,20 @@ struct EENParameter {
         return ((e == p.e) && (n == p.n));
     }
 
-    inline bool operator==(const EENParameter &p) const {
-        return compare(p);
-    }
+    inline bool operator==(const EENParameter &p) const { return compare(p); }
 
-    inline bool operator!=(const EENParameter &p) const {
-        return !compare(p);
-    }
+    inline bool operator!=(const EENParameter &p) const { return !compare(p); }
 
     void print(IndentedOStream &os) const;
 };
 
-// You may use Braids with parameter e, n such that e * n <= `MAX_E` *
-// `MAX_N`. Note that `MAX_E` IS NOT a strict bound; rather, it is the
-// greatest possible e such that it is possible to have braids with parameter n
-// as great as `MAX_N`. To understand what we are doing, it is advised
-// to look at `arXiv:math/0403400v2` (Bessis, Corran, 2004).
+/**
+ * @brief A class for \f$\mathrm B(e,e,n+1)\f$ dual canonical factors.
+ *
+ * Their structure is described in Bessis, Corran, _Non-crossing partitions of
+ * type \f$(e, e, r)\f$_, 2004, arXiv: [math/0101158
+ * [math.GR]](https://arxiv.org/abs/math/0403400).
+ */
 class Underlying {
 
   public:
@@ -136,11 +138,9 @@ class Underlying {
     // Set to delta.
     void delta();
 
-    Underlying
-    left_meet(const Underlying &b) const;
+    Underlying left_meet(const Underlying &b) const;
 
-    inline Underlying
-    right_meet(const Underlying &b) const {
+    inline Underlying right_meet(const Underlying &b) const {
         return left_meet(b);
     };
 
@@ -153,16 +153,13 @@ class Underlying {
     Underlying inverse() const;
 
     // product under the hypothesis that it is still simple.
-    Underlying
-    product(const Underlying &b) const;
+    Underlying product(const Underlying &b) const;
 
     // Under the assumption a <= b, a.left_complement(b) computes
     // The factor c such that ac = b.
-    Underlying
-    left_complement(const Underlying &b) const;
+    Underlying left_complement(const Underlying &b) const;
 
-    Underlying
-    right_complement(const Underlying &b) const;
+    Underlying right_complement(const Underlying &b) const;
 
     // Generate a random factor.
     void randomize();
@@ -181,10 +178,10 @@ typedef FactorTemplate<Underlying> Factor;
 
 typedef BraidTemplate<Factor> Braid;
 
-} // namespace CGarside
+} // namespace dual_complex
 
 template <>
 IndentedOStream &IndentedOStream::operator<< <dual_complex::EENParameter>(
     const dual_complex::EENParameter &p);
 
-}
+} // namespace garcide

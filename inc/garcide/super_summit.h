@@ -34,6 +34,9 @@
 #include <cstddef>
 #include <iterator>
 
+/**
+ * @brief Namespace for super summit sets.
+ */
 namespace garcide::super_summit {
 
 template <class F>

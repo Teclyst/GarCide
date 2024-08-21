@@ -37,7 +37,7 @@ namespace garcide {
 /**
  * @brief Namespace for standard braid groups, classic Garside structure.
  * 
- * On top of the `Underlying` class, there are functions to compute Thurston types.
+ * Contains the usual `Underlying` class, as well as functions to compute Thurston types.
  */
 namespace artin {
 

@@ -7,7 +7,6 @@
  *
  * @copyright Copyright (C) 2024. Distributed under the GNU General Public
  * License, version 3.
- *
  */
 
 /*
@@ -32,6 +31,9 @@
 
 #include "garcide/super_summit.h"
 
+/**
+ * @brief Namespace for ultra summit sets.
+ */
 namespace garcide::ultra_summit {
 
 /**
@@ -40,18 +42,26 @@ namespace garcide::ultra_summit {
  * Exception thrown when a braid that should be ultra summit is not. Used for
  * some functions that may not return when called on non-ultra-summit braids.
  *
- * @tparam B A braid class.
+ * @tparam B A class representinf braids.
  */
 template <class B> struct NotUltraSummit {
+    /**
+     * @brief The braid that should have been in its ultra summit set.
+     */
     B not_ultra_summit;
 
+    /**
+     * @brief Construct a new `NotUltraSummit` exception.
+     * 
+     * @param b The braid that should have been in its ultra summit set.
+     */
     NotUltraSummit(const B &b) : not_ultra_summit(b) {}
 };
 
 /**
- * @brief Computes `b`'s trajectory for cycling.
+ * @brief Computes the trajectory of `b` for cycling.
  *
- * Computes `b`'s trajectory for cycling. That is, cycles b until a repetition
+ * That is, cycles b until a repetition
  * occurs, and then returns the list of the conjugates up to that point.
  *
  * @tparam F A class representing factors.
@@ -73,12 +83,12 @@ std::vector<BraidTemplate<F>> trajectory(BraidTemplate<F> b) {
 }
 
 /**
- * @brief Computes `b`'s trajectory for cycling, in LCF and RCF.
+ * @brief Computes the trajectory of `b` for cycling, in LCF and RCF.
  *
- * Computes `b`'s trajectory for cycling. That is, cycles b until a repetition
+ * That is, cycles b until a repetition
  * occurs, and then returns the list of the conjugates up to that point.
  *
- * This is done in both LCF and RCF simulteanously (useful as going nack and
+ * This is done in both LCF and RCF simulteanously (as going back and
  * forth is costly).
  *
  * It is assumed that initially `b_rcf` is `b` in RCF.
@@ -86,8 +96,8 @@ std::vector<BraidTemplate<F>> trajectory(BraidTemplate<F> b) {
  * @tparam F A class representing factors.
  * @param b The braid whose trajectory is to be computed.
  * @param b_rcf The braid whose trajectory is to be computed.
- * @param t A vector that the function sets to `b`'s trajectory.
- * @param t_rcf A vector that the function sets to `b`'s RCF trajectory.
+ * @param t A vector that the function sets to the trajectory of `b`.
+ * @param t_rcf A vector that the function sets to the RCF trajectory of `b`.
  */
 template <class F>
 void trajectory(BraidTemplate<F> b, BraidTemplate<F> b_rcf,
@@ -110,8 +120,7 @@ void trajectory(BraidTemplate<F> b, BraidTemplate<F> b_rcf,
 /**
  * @brief Computes an ultra summit conjugate of `b`.
  *
- * Computes an ultra summit conjugate of `b`, by iterated cycling until the
- * first repetition.
+ * This is done through iterated cycling until a repetition is found.
  *
  * @tparam F A class representing factors.
  * @param b The braid of whom an ultra summit is computed.
@@ -128,8 +137,8 @@ BraidTemplate<F> send_to_ultra_summit(const BraidTemplate<F> &b) {
 /**
  * Computes an ultra summit conjugate of `b`, with a conjugator.
  *
- * Computes an ultra summit conjugate of `b`, by iterated cycling until the
- * first repetition. In the mean time, a conjugator is computed, and `c` is set
+ * This is done through iterated cycling until a repetition is found.
+ * In the mean time, a conjugator is computed, and `c` is set
  * to it.
  *
  * @tparam F A class representing factors.
@@ -154,6 +163,17 @@ BraidTemplate<F> send_to_ultra_summit(const BraidTemplate<F> &b,
     return b_uss;
 }
 
+/**
+ * @brief Computes the transport of `f` at `b` for cycling.
+ *
+ * See Gebhardt, _A New Approach to the Conjugacy Problem in Garside Groups_,
+ * 2003, [arXiv:math/0306199 [math.GT]](https://arxiv.org/abs/math/0306199).
+ *
+ * @tparam F A class representing factors.
+ * @param b The braid where a transport is computed.
+ * @param f The factor whose transport is computed.
+ * @return The transport of `f` at `b`.
+ */
 template <class F>
 BraidTemplate<F> transport(const BraidTemplate<F> &b, const F &f) {
     BraidTemplate<F> b2 = b;
@@ -162,6 +182,19 @@ BraidTemplate<F> transport(const BraidTemplate<F> &b, const F &f) {
     return b3.first();
 }
 
+/**
+ * @brief Computes the iterated transport of `f` at `b` sending `b` to an
+ * element in the trajectory of `b.conjugate(f)`.
+ *
+ * It is assumed that `b` is in its ultra summit set, and that `f` conjugates it
+ * to its super summit set.
+ *
+ * @tparam F A class representing factors.
+ * @param b The braid where iterated transports are computed.
+ * @param f The factor whose iterated transports are computed.
+ * @return The list of the iterated transport of `f` at `b` sending `b` to an
+ * element in the trajectory of `b.conjugate(f)`.
+ */
 template <class F>
 std::list<F> transports_sending_to_trajectory(const BraidTemplate<F> &b,
                                               const F &f) {
@@ -210,6 +243,18 @@ std::list<F> transports_sending_to_trajectory(const BraidTemplate<F> &b,
     return ret;
 }
 
+/**
+ * @brief Computes the pullback for cycling of `f` at `b`.
+ *
+ * See Gebhardt, _A New Approach to the Conjugacy Problem in Garside Groups_,
+ * 2003, [arXiv:math/0306199 [math.GT]](https://arxiv.org/abs/math/0306199).
+ *
+ * @tparam F A class representing factors.
+ * @param b The braid where a pullback is computed.
+ * @param b_rcf `b`, in RCF.
+ * @param f The factor whose pullback is computed.
+ * @return The pullback of `f` at `b`.
+ */
 template <class F>
 F pullback(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf,
            const F &f) {
@@ -245,6 +290,18 @@ F pullback(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf,
     return super_summit::min_super_summit(b, b_rcf, f0.left_join(fi));
 }
 
+/**
+ * @brief Computes the main pullback for cycling of `f` at `b`.
+ *
+ * See Gebhardt, _A New Approach to the Conjugacy Problem in Garside Groups_,
+ * 2003, [arXiv:math/0306199 [math.GT]](https://arxiv.org/abs/math/0306199).
+ *
+ * @tparam F A class representing factors.
+ * @param b The braid where the main pullback is computed.
+ * @param b_rcf `b`, in RCF.
+ * @param f The factor whose main pullback is computed.
+ * @return The main pullback of `f` at `b`.
+ */
 template <class F>
 F main_pullback(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf,
                 const F &f) {
@@ -278,6 +335,20 @@ F main_pullback(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf,
     }
 }
 
+/**
+ * @brief Computes the smallest factor above `f` that conjugates `b` to an
+ * element of its ultra summit.
+ *
+ * `b` is assumed to be in its ultra summit set.
+ *
+ * @tparam F A class representing canonical factors.
+ * @param b A braid, assumed to be in its ultra summit set.
+ * @param b_rcf `b` in RCF.
+ * @param f A factor.
+ * @return The smallest factor above `f` that conjugates `b` to its ultra summit
+ * set.
+ * @exception NotUltraSummit Thrown if `b` is not in its ultra summit set.
+ */
 template <class F>
 F min_ultra_summit(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf,
                    const F &f) {
@@ -306,6 +377,19 @@ F min_ultra_summit(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf,
     throw NotUltraSummit<BraidTemplate<F>>(b);
 }
 
+/**
+ * @brief Computes the ultra summit indecomposable conjugators at `b`.
+ *
+ * `b` is assumed to be in its ultra summit set.
+ *
+ * The indecomosable conjugators at `b` are the minimal non-trivial simple
+ * factors that conjugate `b` to its ultra summit set.
+ *
+ * @tparam F A class representing canonical factors.
+ * @param b A braid, assumed to be in its ultra summit set.
+ * @param b_rcf `b` in RCF.
+ * @return The ultra summit indecomposable conjugators at `b`.
+ */
 template <class F>
 std::vector<F> min_ultra_summit(const BraidTemplate<F> &b,
                                 const BraidTemplate<F> &b_rcf) {
@@ -359,58 +443,140 @@ std::vector<F> min_ultra_summit(const BraidTemplate<F> &b,
     return min;
 }
 
+/**
+ * @brief Constant iterator class for ultra summit sets.
+ *
+ * @tparam B A class representing braids.
+ */
 template <class B> struct USSConstIterator {
 
   public:
+    /**
+     * @brief Iterator category.
+     */
     using iterator_category = std::forward_iterator_tag;
+
+    /**
+     * @brief Difference type.
+     */
     using difference_type = std::ptrdiff_t;
+
+    /**
+     * @brief Value type.
+     */
     using value_type = B;
+
+    /**
+     * @brief Pointer type.
+     */
     using pointer = typename std::unordered_map<B, int>::const_iterator;
+
+    /**
+     * @brief Reference type.
+     */
     using reference = const B &;
 
   private:
     pointer ptr;
 
   public:
+    /**
+     * @brief Constructs a new `USSConstIterator` from a pointer.
+     *
+     * @param ptr A pointer to an instance of `B`.
+     */
     USSConstIterator(pointer ptr) : ptr(ptr) {}
 
+    /**
+     * @brief Dereference operator.
+     *
+     * @return A reference to the instance of `B` the iterator points to.
+     */
     reference operator*() const { return std::get<0>(*ptr); }
+
+    /**
+     * @brief Structure dereference operator.
+     *
+     * @return The pointer that the iterator corresponds to.
+     */
     pointer operator->() { return ptr; }
 
-    // Prefix increment
+    /**
+     * @brief Prefix incrementation operator.
+     *
+     * @return A reference to `*this`, after having increased it.
+     */
     USSConstIterator &operator++() {
         ptr++;
         return *this;
     }
 
-    // Postfix increment
+    /**
+     * @brief Postfix incrementation operator.
+     *
+     * @return A reference to `*this`, before it was incremented.
+     */
     USSConstIterator operator++(int) {
         USSConstIterator tmp = *this;
         ++(*this);
         return tmp;
     }
 
+    /**
+     * @brief Equality check.
+     *
+     * @param b Second argument.
+     * @return If `*this` and `b` point to the same adress.
+     */
     bool operator==(const USSConstIterator &b) const { return ptr == b.ptr; }
+
+    /**
+     * @brief Unequality check.
+     *
+     * @param b Second argument.
+     * @return If `*this` and `b` do no point to the same adress.
+     */
     bool operator!=(const USSConstIterator &b) const { return ptr != b.ptr; }
 };
 
-// An USS is stored as, on one side, an union of (disjoint) trajectories, and on
-// the other side a set. The set is actually a map: for each key it stores the
-// orbit it belongs to (as an index referring to orbits). Both are built
-// concurrently; the set part is used to speed up membership tests.
+/**
+ * @brief A class for ultra summit sets.
+ *
+ * @tparam B A class representing braids.
+ */
 template <class B> class UltraSummitSet {
-  public:
+  private:
     std::vector<std::vector<B>> orbits;
     std::unordered_map<B, sint16> set;
 
+  public:
+    /**
+     * @brief Constant iterator type.
+     *
+     * Does not iterates through `*this` orbit by orbit.
+     */
     using ConstIterator = USSConstIterator<B>;
 
+    /**
+     * @brief Constant iterator to the first element of the ultra summit set.
+     *
+     * @return An iterator to the first element of `this`.
+     */
     inline ConstIterator begin() const { return ConstIterator(set.begin()); }
 
+    /**
+     * @brief Constant iterator to the after-last element of the ultra summit
+     * set.
+     *
+     * @return An iterator to the after-last element of `this`.
+     */
     inline ConstIterator end() const { return ConstIterator(set.end()); }
 
-    // Adds a trajectory to the USS.
-    // Linear in the trajectory's length.
+    /**
+     * @brief Pushes an orbit into the ultra summit set.
+     *
+     * @param t The orbit to be pushed.
+     */
     inline void insert(std::vector<B> t) {
         orbits.push_back(t);
         for (typename std::vector<B>::iterator it = t.begin(); it != t.end();
@@ -419,7 +585,12 @@ template <class B> class UltraSummitSet {
         }
     }
 
-    // Checks membership.
+    /**
+     * @brief Membership test.
+     *
+     * @param b The braid whose membership is tested
+     * @return If `b` is in `*this`.
+     */
     inline bool mem(const B &b) const { return set.find(b) != set.end(); }
 
     /**
@@ -434,33 +605,56 @@ template <class B> class UltraSummitSet {
     }
 
     /**
-     * @brief Access a braid in the USS with its position.
+     * @brief Finds the orbit of an element of the ultra summit set.
      *
-     * @param orbit_index Index of its orbit.
-     * @param shift Position within that orbit.
-     * @return B
+     * @param b The element whose orbit is searched.
+     * @return The index of its orbit.
      */
-    inline B at(sint16 orbit_index, sint16 shift) const {
-        return orbits[orbit_index][shift];
-    }
-
-    // Finds b's orbit.
     inline sint16 find_orbit(const B &b) const {
         return std::get<1>(*set.find(b));
     }
 
+    /**
+     * @brief Number of orbits.
+     *
+     * @return The number of orbits in `*this`.
+     */
     inline size_t number_of_orbits() const { return orbits.size(); }
 
+    /**
+     * @brief Cardinal of the ultra summit set.
+     *
+     * @return The cardinal of `*this`.
+     */
     inline size_t card() const { return set.size(); }
 
+    /**
+     * @brief Size of a given orbit.
+     *
+     * @param orbit_index The index of the orbit.
+     * @return The size of the orbit.
+     */
     inline size_t orbit_size(size_t orbit_index) const {
         return orbits[orbit_index].size();
     }
 
+    /**
+     * @brief Size of a given orbit.
+     *
+     * @param orbit_index The index of the orbit.
+     * @return The size of the orbit.
+     */
     inline size_t orbit_size(sint16 orbit_index) const {
         return orbits[orbit_index].size();
     }
 
+    /**
+     * @brief Prints the ultra summit set in output stream `os`.
+     *
+     * The sizes of the orbits are printed, as well as their contents.
+     *
+     * @param os The `IndentedOStream` `*this` is printed in.
+     */
     void print(IndentedOStream &os = ind_cout) const {
 
         os << "There " << (card() > 1 ? "are " : "is ") << card() << " element"
@@ -526,6 +720,14 @@ template <class B> class UltraSummitSet {
         }
     }
 
+    /**
+     * @brief Prints the internal data of the ultra summit set in output stream
+     * `os`.
+     *
+     * Private members `orbits` and `set` are printed.
+     *
+     * @param os The `IndentedOStream` `*this` is printed in.
+     */
     void debug(IndentedOStream &os) const {
         os << "{   ";
         os.Indent(4);
@@ -583,6 +785,13 @@ template <class B> class UltraSummitSet {
     }
 };
 
+/**
+ * @brief Computes the ultra summit set of `b`.
+ *
+ * @tparam F A class representing canonical factors.
+ * @param b The braid whose ultra summit set is computed.
+ * @return The ultra summit set of `b`.
+ */
 template <class F>
 UltraSummitSet<BraidTemplate<F>> ultra_summit_set(const BraidTemplate<F> &b) {
     UltraSummitSet<BraidTemplate<F>> uss;
@@ -619,6 +828,23 @@ UltraSummitSet<BraidTemplate<F>> ultra_summit_set(const BraidTemplate<F> &b) {
     return uss;
 }
 
+/**
+ * @brief Computes the ultra summit set of `b`, with extra internal structure.
+ *
+ * `mins` and `prev` are modified to be able to to retrieve conjugators:
+ * `prev[i]` is the coordinate of the orbit that is the predecessor the `i`-th
+ * one in the graph BFS of its ultra summit set, and `mins[i]` the corresponding
+ * conjugator.
+ *
+ * @tparam F A class representing canonical factors.
+ * @param b The braid whose ultra summit set is computed.
+ * @param mins A vector that is set to contain, for each `i`, an element that
+ * conjugates the base of orbit `prev[i]` to the base of orbit `i`.
+ * @param prev A vector that is set to contain integers, such that, for each
+ * `i`, `mins[i]` conjugates the base of orbit `prev[i]` to the base of orbit
+ * `i`.
+ * @return The ultra summit set of `b`.
+ */
 template <class F>
 UltraSummitSet<BraidTemplate<F>> ultra_summit_set(const BraidTemplate<F> &b,
                                                   std::vector<F> &mins,
@@ -669,6 +895,20 @@ UltraSummitSet<BraidTemplate<F>> ultra_summit_set(const BraidTemplate<F> &b,
     return uss;
 }
 
+/**
+ * @brief Computes a conjugator from the first element of `uss` to `b`.
+ *
+ * It is assumed that `b` is an element of `uss`.
+ *
+ * @tparam F A class representing canonical factors.
+ * @param b An element of `uss`.
+ * @param uss An ultra summit set.
+ * @param mins A vector that holds, for each `i`, an element that conjugates the
+ * base of orbit `prev[i]` to the base of orbit `i`.
+ * @param prev A vector that holds integers, such that, for each `i`, `mins[i]`
+ * conjugates the base of orbit `prev[i]` to the base of orbit `i`.
+ * @return A conjugator from the first element of `uss` to `b`.
+ */
 template <class F>
 BraidTemplate<F> tree_path(const BraidTemplate<F> &b,
                            const UltraSummitSet<BraidTemplate<F>> &uss,
@@ -680,12 +920,11 @@ BraidTemplate<F> tree_path(const BraidTemplate<F> &b,
         return c;
     }
 
-    sint16 current = uss.find_orbit(b);
+    size_t current = (size_t)uss.find_orbit(b);
 
-    for (typename std::vector<BraidTemplate<F>>::const_iterator itb =
-             uss.orbits[current].begin();
-         *itb != b; itb++) {
-        c.right_multiply((*itb).first().delta_conjugate(b.inf()));
+    for (size_t shift = 0; shift < uss.orbit_size(current); shift++) {
+        c.right_multiply(
+            uss.at(current, shift).first().delta_conjugate(b.inf()));
     }
 
     while (current != 0) {
@@ -696,6 +935,20 @@ BraidTemplate<F> tree_path(const BraidTemplate<F> &b,
     return c;
 }
 
+/**
+ * @brief Checks if two braids are conjugates, and computes a conjugator.
+ *
+ * `c` is not modified if `b1` and `b2` are not conjugates.
+ *
+ * This function uses ultra summit sets.
+ *
+ * @tparam F A class representinf factors.
+ * @param b1 A braid.
+ * @param b2 Another braid.
+ * @param c A braid, that is set by the function to the conjugator that takes
+ * `b1` to `b2`, if it exists.
+ * @return If `b1` and `b2` are conjugates.
+ */
 template <class F>
 bool are_conjugate(const BraidTemplate<F> &b1, const BraidTemplate<F> &b2,
                    BraidTemplate<F> &c) {

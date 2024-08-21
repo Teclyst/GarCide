@@ -57,6 +57,10 @@ struct HelpAskedFor {};
  */
 struct InterruptAskedFor {};
 
+/**
+ * @brief An `enum` that enumerates the options for _Braiding_'s menu.
+ * 
+ */
 enum class Option {
     LCF,
     RCF,
@@ -79,8 +83,7 @@ enum class Option {
 /**
  * @brief Reads a line from `is` as a braid.
  *
- * Reads a line from `is`, parses it as a braid and sets `b` to that braid using
- * `b.of_string`.
+ * Then sets `b` to that braid using `b.of_string`.
  *
  * @param b The braid that is to be set to what is read from `is`.
  * @param is The input stream we read from. Its default value is `std::cin`.
@@ -91,9 +94,7 @@ enum class Option {
 void read_braid(Braid &b, std::istream &is = std::cin);
 
 /**
- * @brief Reads a line from `is` as a parameter.
- *
- * Reads a line from `is`, parses it as a parameter and returns it.
+ * @brief Reads a line from `is` as a parameter and returns it.
  *
  * @param is The input stream we read from. Its default value is `std::cin`.
  * @exception `garcide::InvalidStringError`: may be raised by
@@ -106,15 +107,13 @@ Braid::Parameter read_braid_parameter(std::istream &is = std::cin);
 /**
  * @brief Prints a text that explains what a correct braid input is.
  *
- * Prints a text that explains what a correct braid input is. Typically used
- * when catching `HelpAskedFor`.
+ * Typically used when catching `HelpAskedFor`.
  */
 void explain_braid_input();
 
 /**
  * @brief Prints a text that explains what a correct braid parameter input is.
  *
- * Prints a text that explains what a correct braid parameter input is.
  * Typically used when catching `HelpAskedFor`.
  */
 void explain_braid_parameter_input();
@@ -122,8 +121,7 @@ void explain_braid_parameter_input();
 /**
  * @brief Prompts the user to enter a braid.
  *
- * Prompts the user to enter a braid in standard input,
- * then parses the input and sets `b` to that braid using
+ * Then parses the input and sets `b` to that braid using
  * `read_braid`.
  *
  * Keeps asking for braids until a valid one is entered.
@@ -136,8 +134,7 @@ void prompt_braid(Braid &b);
 /**
  * @brief Prompts the user to enter a braid parameter.
  *
- * Prompts the user to enter a braid parameter in standard input,
- * then parses the input and returns the parameters.
+ * Then parses the input and returns the parameters.
  *
  * Keeps asking for parameters until a valid one is entered.
  *
@@ -146,18 +143,18 @@ void prompt_braid(Braid &b);
 Braid::Parameter prompt_braid_parameter();
 
 /**
- * @brief Prints a line.
+ * @brief Prints a line in output stream `os`.
  *
- * Prints a line made of 64 `'─'` in `os`.
+ * It is made of 64 `'`─`'`.
  *
  * @param os The output stream it is printed in.
  */
 void print_line(IndentedOStream &os = ind_cout);
 
 /**
- * @brief Prints Braiding's header.
+ * @brief Prints _Braiding_'s header.
  *
- * Prints Braiding.0's beautiful header (with real braid Unicode art!) in
+ * Prints _Braiding_'s beautiful header (with real braid Unicode art!) in
  * `os`.
  *
  * Go admire it in braiding.cpp.
@@ -167,9 +164,7 @@ void print_line(IndentedOStream &os = ind_cout);
 void print_header(IndentedOStream &os = ind_cout);
 
 /**
- * @brief Prints Braiding's options.
- *
- * Prints the different options in `os`.
+ * @brief Prints _Braiding_'s options in output stream `os`.
  *
  * @param os The output stream it is printed in.
  */
@@ -178,17 +173,16 @@ void print_options(IndentedOStream &os = ind_cout);
 /**
  * @brief Prompts the user to enter an option.
  *
- * Prompts the user to enter an option in standard input,
- * then parses the input return the corresponding option.
+ * Then parses the input return the corresponding option.
  *
  * Keep asking for options until a valid one is entered.
  */
 Option prompt_option();
 
 /**
- * @brief Handles the lcf case.
+ * @brief Handles the LCF case.
  *
- * Prompts the user to enter a braid, put it in LCF, then prints it in standard
+ * Prompts the user to enter a braid, puts it in LCF, then prints it in standard
  * output.
  *
  * @exception `InterruptAskedFor`: raised when `"q"` or `"Q"` is entered on an
@@ -196,6 +190,15 @@ Option prompt_option();
  */
 void lcf_case();
 
+/**
+ * @brief Handles the RCF case.
+ *
+ * Prompts the user to enter a braid, puts it in RCF, then prints it in standard
+ * output.
+ *
+ * @exception `InterruptAskedFor`: raised when `"q"` or `"Q"` is entered on an
+ * input.
+ */
 void rcf_case();
 
 void left_gcd_case();
