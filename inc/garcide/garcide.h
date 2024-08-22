@@ -904,7 +904,7 @@ template <class F> class BraidTemplate {
      * @param v Second operand.
      * @return if `*this` and `v` are equal.
      */
-    bool operator==(const BraidTemplate &v) const { return compare(v); }
+    inline bool operator==(const BraidTemplate &v) const { return compare(v); }
 
     /**
      * @brief Unequality check.
@@ -914,7 +914,7 @@ template <class F> class BraidTemplate {
      * @param v Second operand.
      * @return if `*this` and `v` are not equal.
      */
-    bool operator!=(const BraidTemplate &v) const { return !compare(v); }
+    inline bool operator!=(const BraidTemplate &v) const { return !compare(v); }
 
     /**
      * @brief Triviality check.
@@ -923,10 +923,18 @@ template <class F> class BraidTemplate {
      *
      * @return If `*this` is the identity.
      */
-    bool is_identity() const { return delta == 0 && factor_list.empty(); }
+    inline bool is_identity() const {
+        return delta == 0 && factor_list.empty();
+    }
 
-    // `u.inverse()` returns the inverse of u.
-    //  See the ElRifai and Morton 1994 article for correction.
+    /**
+     * @brief Computes the inverse of the braid.
+     *
+     * It is linear in the canonical length (see Elrifai, Morton, _Algorithms
+     * for Positive Braids_, 1994, for a proof of correction).
+     *
+     * @return The inverse of `*this`.
+     */
     BraidTemplate inverse() const {
         BraidTemplate b(get_parameter());
         b.delta = -delta;
@@ -940,8 +948,14 @@ template <class F> class BraidTemplate {
         return b;
     }
 
-    // `u.inverse()` returns the inverse of u.
-    //  See the ElRifai and Morton 1994 article for correction.
+    /**
+     * @brief Computes the inverse of the braid, in RCF.
+     *
+     * It is linear in the canonical length (see Elrifai, Morton, _Algorithms
+     * for Positive Braids_, 1994, for a proof of correction).
+     *
+     * @return The inverse of `*this`, also in RCG.
+     */
     BraidTemplate inverse_rcf() const {
         BraidTemplate b(get_parameter());
         b.delta = -delta;
@@ -955,12 +969,23 @@ template <class F> class BraidTemplate {
         return b;
     }
 
-    // `!u` returns the inverse of u.
-    // Syntactic sugar for `u.inverse()`.
+    /**
+     * @brief Computes the inverse of the braid.
+     *
+     * It is linear in the canonical length (see Elrifai, Morton, _Algorithms
+     * for Positive Braids_, 1994, for a proof of correction).
+     *
+     * Syntactic sugar for `inverse()`.
+     *
+     * @return The inverse of `*this`.
+     */
     inline BraidTemplate operator!() const { return inverse(); }
 
-    // clean gets rid of (factor) Deltas at the start, and identity elements
-    // at the end pf `factor_list`.
+    /**
+     * @brief Gets rid of opening \f$\Delta\f$s and trailing identity elements.
+     *
+     * Typically used to get braids into LCF.
+     */
     void clean() {
         FactorItr it = begin();
         while (it != end() && (*it).is_delta()) {
@@ -975,6 +1000,11 @@ template <class F> class BraidTemplate {
         factor_list.erase(revit.base(), end());
     }
 
+    /**
+     * @brief Gets rid of opening identity elements and trailing \f$\Delta\f$s.
+     *
+     * Typically used to get braids into RCF.
+     */
     void clean_rcf() {
         FactorItr it = begin();
         while (it != end() && (*it).is_identity()) {
@@ -989,21 +1019,33 @@ template <class F> class BraidTemplate {
         factor_list.erase(revit.base(), end());
     }
 
-    // `u.left_multiply(f)` assigns fu to u.
+    /**
+     * @brief Left-multiplies the braid by a factor.
+     *
+     * @param f Second operand.
+     */
     inline void left_multiply(const F &f) {
         factor_list.push_front(f.delta_conjugate(delta));
         apply_binfun(begin(), end(), make_left_weighted<F>);
         clean();
     }
 
-    // `u.right_multiply(f)` assigns uf to u.
+    /**
+     * @brief Right-multiplies the braid by a factor.
+     *
+     * @param f Second operand.
+     */
     inline void right_multiply(const F &f) {
         factor_list.push_back(f);
         reverse_apply_binfun(begin(), end(), make_left_weighted<F>);
         clean();
     }
 
-    // `u.left_multiply(v)` assigns v u to u.
+    /**
+     * @brief Left-multiplies the braid by a braid.
+     *
+     * @param v Second operand.
+     */
     void left_multiply(const BraidTemplate &v) {
         for (ConstRevFactorItr it = v.crbegin(); it != v.crend(); it++) {
             left_multiply(*it);
@@ -1011,7 +1053,11 @@ template <class F> class BraidTemplate {
         delta += v.delta;
     }
 
-    // `u.right_multiply(v)` assigns u v to u.
+    /**
+     * @brief Right-multiplies the braid by a braid.
+     *
+     * @param v Second operand.
+     */
     void right_multiply(const BraidTemplate &v) {
         for (FactorItr it = begin(); it != end(); it++) {
             (*it).delta_conjugate_mut(v.delta);
@@ -1022,33 +1068,97 @@ template <class F> class BraidTemplate {
         }
     }
 
-    // `u.left_divide(v)` assigns v ^ (- 1) u to u.
+    /**
+     * @brief Computes the product of two braids.
+     *
+     * This is the non-mutating version of product computations.
+     *
+     * @param v Second (right) operand.
+     * @return The product of `*this` and `v`.
+     */
+    BraidTemplate product(const BraidTemplate &v) const {
+        BraidTemplate w(*this);
+        w.right_multiply(v);
+        return w;
+    }
+
+    /**
+     * @brief Computes the product of two braids.
+     *
+     * This is the non-mutating version of product computations.
+     *
+     * Syntactic sugar for `product()`.
+     *
+     * @param v Second (right) operand.
+     * @return The product of `*this` and `v`.
+     */
+    inline BraidTemplate operator*(const BraidTemplate &v) const {
+        return product(v);
+    }
+
+    /**
+     * @brief Left-divides a braid by a braid.
+     *
+     * _I.e._ left-multiplies by the inverse of the other braid.
+     *
+     * @param v Second operand.
+     */
     inline void left_divide(const BraidTemplate &v) { left_multiply(!v); }
 
-    // `u.right_divide(v)` assigns u v ^ (- 1) to u.
+    /**
+     * @brief Right-divides a braid by a braid.
+     *
+     * _I.e._ right-multiplies by the inverse of the other braid.
+     *
+     * @param v Second operand.
+     */
     inline void right_divide(const BraidTemplate &v) { right_multiply(!v); }
 
-    // `u.left_divide(f)` assigns f ^ (- 1) u to u.
+    /**
+     * @brief Left-divides a braid by a factor.
+     *
+     * _I.e._ left-multiplies by the inverse of the factor.
+     *
+     * @param f Second operand.
+     */
     inline void left_divide(const F &f) { left_multiply(!BraidTemplate(f)); }
 
-    // `u.right_divide(v)` assigns u v ^ (- 1) to u.
+    /**
+     * @brief Right-divides a braid by a factor.
+     *
+     * _I.e._ right-multiplies by the inverse of the factor.
+     *
+     * @param f Second operand.
+     */
     inline void right_divide(const F &f) { right_multiply(!BraidTemplate(f)); }
 
-    // `u.left_multiply_rcf(f)` assigns fu to u.
+    /**
+     * @brief Left-multiplies the braid by a factor, in RCF.
+     *
+     * @param f Second operand.
+     */
     inline void left_multiply_rcf(const F &f) {
         factor_list.push_front(f);
         apply_binfun(begin(), end(), make_right_weighted<F>);
         clean_rcf();
     }
 
-    // `u.right_multiply(f)` assigns uf to u.
+    /**
+     * @brief Right-multiplies the braid by a factor, in RCF.
+     *
+     * @param f Second operand.
+     */
     inline void right_multiply_rcf(const F &f) {
         factor_list.push_back(f.delta_conjugate(-delta));
         reverse_apply_binfun(begin(), end(), make_right_weighted<F>);
         clean_rcf();
     }
 
-    // `u.left_multiply(v)` assigns v u to u.
+    /**
+     * @brief Left-multiplies the braid by a braid, in RCF.
+     *
+     * @param v Second operand.
+     */
     void left_multiply_rcf(const BraidTemplate &v) {
         for (RevFactorItr it = rbegin(); it != rend(); it++) {
             (*it).delta_conjugate_mut(-v.delta);
@@ -1059,7 +1169,11 @@ template <class F> class BraidTemplate {
         }
     }
 
-    // `u.right_multiply(v)` assigns u v to u.
+    /**
+     * @brief Right-multiplies the braid by a braid, in RCF.
+     *
+     * @param v Second operand.
+     */
     void right_multiply_rcf(const BraidTemplate &v) {
         for (ConstFactorItr it = v.cbegin(); it != v.cend(); it++) {
             right_multiply_rcf(*it);
@@ -1067,22 +1181,46 @@ template <class F> class BraidTemplate {
         delta += v.delta;
     }
 
-    // `u.left_divide(v)` assigns v ^ (- 1) u to u.
+    /**
+     * @brief Left-divides a braid by a braid, in RCF.
+     *
+     * _I.e._ left-multiplies by the inverse of the other braid.
+     *
+     * @param v Second operand.
+     */
     inline void left_divide_rcf(const BraidTemplate &v) {
         left_multiply_rcf(v.inverse_rcf());
     }
 
-    // `u.right_divide(v)` assigns u v ^ (- 1) to u.
+    /**
+     * @brief Right-divides a braid by a braid, in RCF.
+     *
+     * _I.e._ right-multiplies by the inverse of the other braid.
+     *
+     * @param v Second operand.
+     */
     inline void right_divide_rcf(const BraidTemplate &v) {
         right_multiply_rcf(v.inverse_rcf());
     }
 
-    // `u.left_divide(f)` assigns f ^ (- 1) u to u.
+    /**
+     * @brief Left-divides a braid by a factor, in RCF.
+     *
+     * _I.e._ left-multiplies by the inverse of the factor.
+     *
+     * @param f Second operand.
+     */
     inline void left_divide_rcf(const F &f) {
         left_multiply_rcf(BraidTemplate(f).inverse_rcf());
     }
 
-    // `u.right_divide(v)` assigns u v ^ (- 1) to u.
+    /**
+     * @brief Right-divides a braid by a factor, in RCF.
+     *
+     * _I.e._ right-multiplies by the inverse of the factor.
+     *
+     * @param f Second operand.
+     */
     inline void right_divide_rcf(const F &f) {
         right_multiply_rcf(BraidTemplate(f).inverse_rcf());
     }
@@ -1164,8 +1302,8 @@ template <class F> class BraidTemplate {
     /**
      * @brief Computes left meets, with factors.
      *
-     * Syntactic sugar for `left_meet()`. Notice that the the factor should be the
-     * right operand.
+     * Syntactic sugar for `left_meet()`. Notice that the the factor should be
+     * the right operand.
      *
      * @param f Second operand (a factor).
      * @return The left meet of `*this` and `f`.
@@ -1249,7 +1387,7 @@ template <class F> class BraidTemplate {
         return !((!(*this)).left_join(!BraidTemplate(f)));
     }
 
-     /**
+    /**
      * @brief Computes right joins.
      *
      * @param v Second operand.
@@ -1271,8 +1409,8 @@ template <class F> class BraidTemplate {
 
     /**
      * @brief Conjugates by a factor.
-     * 
-     * @param f The conjugating factor. 
+     *
+     * @param f The conjugating factor.
      */
     inline void conjugate(const F &f) {
         left_divide(f);
@@ -1281,8 +1419,8 @@ template <class F> class BraidTemplate {
 
     /**
      * @brief Conjugates by a braid.
-     * 
-     * @param v The conjugating braid. 
+     *
+     * @param v The conjugating braid.
      */
     inline void conjugate(const BraidTemplate &v) {
         left_divide(v);
@@ -1291,8 +1429,8 @@ template <class F> class BraidTemplate {
 
     /**
      * @brief Conjugates by a factor in RCF.
-     * 
-     * @param f The conjugating factor. 
+     *
+     * @param f The conjugating factor.
      */
     inline void conjugate_rcf(const F &f) {
         left_divide_rcf(f);
@@ -1301,8 +1439,8 @@ template <class F> class BraidTemplate {
 
     /**
      * @brief Conjugates by a braid in RCF.
-     * 
-     * @param v The conjugating braid. 
+     *
+     * @param v The conjugating braid.
      */
     inline void conjugate_rcf(const BraidTemplate &v) {
         left_divide_rcf(v);
@@ -1314,6 +1452,8 @@ template <class F> class BraidTemplate {
      *
      * Returns the first (non-\f$\Delta\f$) factor. If canonical length is zero,
      * returns the identity factor instead.
+     *
+     * Internally, returns the first element of `private` member `factor_list`.
      *
      * @return The first (non-\f$\Delta\f$) factor.
      */
@@ -1341,8 +1481,9 @@ template <class F> class BraidTemplate {
     /**
      * @brief Returns the final factor.
      *
-     * Returns the final factor, (i.e. the last one in `factor_list`). If
-     * canonical length is zero, returns the identity factor instead.
+     * If canonical length is zero, returns the identity factor instead.
+     *
+     * Internally, returns the last element of `private` member `factor_list`.
      *
      * @return The final factor.
      */
@@ -1356,12 +1497,28 @@ template <class F> class BraidTemplate {
         }
     }
 
-    // `u.preferred_prefix()` returns the preferred prefix of u, that is, if
-    // u = Delta ^ r u_1 ... u_k, p(u) = d_R(u_k) ^_L Delta ^ r u_1 Delta ^
-    // (- r) If u has canonical length zero, returns the identity factor
-    // instead.
+    /**
+     * @brief Computes the preferred prefix of the braid.
+     *
+     * That is to say, the left meet of the initial factor and the right
+     * complement of the final factor.
+     *
+     * @return The preferred prefix.
+     */
     inline F preferred_prefix() const { return initial() ^ ~final(); }
 
+    /**
+     * @brief Computes the preferred suffix of the braid, given in RCF.
+     *
+     * The preferred suffix of a braid whose RCF is \f$u_0\cdots
+     * u_{m-1}\Delta^k\f$, $m\leqslant 1$ is defined as \f$ (\Delta
+     * u_0^{-1})\land_{\mathrm R}(\Delta^{-k}u_{m-1}\Delta^{k})\f$.
+     *
+     * For braid whose canonical length is \f$0\f$, it is simply defined as the
+     * identity.
+     *
+     * @return The preferred suffix.
+     */
     F preferred_suffix_rcf() const {
         if (canonical_length() == 0) {
             F id(get_parameter());
@@ -1373,15 +1530,33 @@ template <class F> class BraidTemplate {
         }
     };
 
+    /**
+     * @brief Computes the preferred suffix of the braid.
+     *
+     * The preferred suffix of a braid whose RCF is \f$u_0\cdots
+     * u_{m-1}\Delta^k\f$, $m\leqslant 1$ is defined as \f$ (\Delta
+     * u_0^{-1})\land_{\mathrm R}(\Delta^{-k}u_{m-1}\Delta^{k})\f$.
+     *
+     * For braid whose canonical length is \f$0\f$, it is simply defined as the
+     * identity.
+     *
+     * This involves converting the braid to RCF, therefore it is costly. If
+     * multiple preferred suffixes must be computed, it is a good idea to
+     * consider maintaining RCF versions of the manipulated braids.
+     *
+     * @return The preferred suffix.
+     */
     inline F preferred_suffix() const {
         BraidTemplate right = *this;
         right.lcf_to_rcf();
         return right.preferred_suffix_rcf();
     };
 
-    // `u.cycling()` cycles u: if u = Delta ^ r u_1 ... u_k, then after
-    // applying cycling u will contain (the LNF of) Delta ^ r u_2 ... u_k
-    // (Delta ^ r u_1 Delta ^ (-r)).
+    /**
+     * @brief Cycles the braid.
+     *
+     * That is to say, conjugates it by `initial()`.
+     */
     inline void cycling() {
         if (canonical_length() == 0) {
             return;
@@ -1391,9 +1566,11 @@ template <class F> class BraidTemplate {
         right_multiply(i);
     }
 
-    // `u.decycling()` decycles u: if u = Delta ^ r u_1 ... u_k, then after
-    // applying cycling u will contain (the LNF of) Delta ^ r u_2 ... u_k
-    // (Delta ^ r u_1 Delta ^ (-r)).
+    /**
+     * @brief Decycles the braid.
+     *
+     * That is to say, conjugates it by the inverse of `final()`.
+     */
     inline void decycling() {
         if (canonical_length() == 0) {
             return;
@@ -1403,10 +1580,11 @@ template <class F> class BraidTemplate {
         left_multiply(f);
     }
 
-    // `u.sliding()` cyclically slides u: if u = Delta ^ r u_1 ... u_k, and
-    // Delta ^ r u_1 Delta ^ (-r) = p(u) u'_1, then after applying cycling u
-    // will contain (the LNF of) Delta ^ r (Delta ^ r u'_1 Delta ^ (-r)) u_2
-    // ... u_k p(u).
+    /**
+     * @brief Cyclically slides the braid.
+     *
+     * That is to say, conjugates it by `preferred_prefix()`.
+     */
     inline void sliding() {
         if (canonical_length() == 0) {
             return;
@@ -1414,21 +1592,10 @@ template <class F> class BraidTemplate {
         conjugate(preferred_prefix());
     }
 
-    // `u.product(v)` returns uv.
-    BraidTemplate product(const BraidTemplate &v) const {
-        BraidTemplate w(*this);
-        w.right_multiply(v);
-        return w;
-    }
-
-    // `u.power(k)` returns u raised to the power k.
-    // Uses a fast exponentiation algorithm; the number of multiplications
-    // is logarithmic in k.
     /**
      * @brief Raises to `k`-th power.
      *
-     * Computes `*this` raised to the `k`-th power, using a fast exponentiation
-     * algorithm.
+     * A fast exponentiation algorithm is used.
      *
      * @param k The exponent.
      * @return `*this` raised to the `k`-th power.
@@ -1448,11 +1615,13 @@ template <class F> class BraidTemplate {
         }
     }
 
-    // `u * v` returns uv.
-    // Syntactic sugar for `u.product(v)`.
-    BraidTemplate operator*(const BraidTemplate &v) const { return product(v); }
-
-    // `u.normalize()` turns u into LCF.
+    /**
+     * @brief Puts a braid into LCF.
+     *
+     * The private `delta` member is assumed to represent a power of
+     * \f$\Delta\f$ on the left. Thus, this function cannot be used to
+     * get a RCF braid into LCF (`rcf_to_lcf()` should be used instead).
+     */
     inline void normalize() {
         bubble_sort(begin(), end(), make_left_weighted<F>);
         clean();
@@ -1484,8 +1653,15 @@ template <class F> class BraidTemplate {
         bubble_sort(begin(), end(), make_left_weighted<F>);
     }
 
-    // `b.remainder(f)` computes, if b is positive, the simple factor s such
-    // that bs is the left lcm of b and b and f.
+    /**
+     * @brief Computes the remainder of the braid and factor `f`.
+     *
+     * The remainder of a braid \f$b\f$ and a factor \f$f\f$ is the factor
+     * \f$s\f$ such that \f$bs\f$ is the left LCM of \f$b\f$ and \f$f\f$.
+     *
+     * @param f Factor operand.
+     * @return The remainder of `*this` and `f`.
+     */
     F remainder(const F &f) const {
         F fi = f;
         if (delta != 0) {
@@ -1498,6 +1674,11 @@ template <class F> class BraidTemplate {
         return fi;
     }
 
+    /**
+     * @brief Computes the rigidity of the braid.
+     *
+     * @return The rigidity of the braid.
+     */
     sint16 rigidity() const {
         BraidTemplate b2 = *this;
         sint16 rigidity = 0;
@@ -1519,25 +1700,32 @@ template <class F> class BraidTemplate {
         return rigidity;
     }
 
-    // Randomizes the braid, setting it at a given length. The result isn't in
-    // LCF (so that it may be used to benchmark `normalize`).
     /**
      * @brief Randomizes the braid.
      *
-     * Randomizes the braid, setting it at a given length. The result isn't in
-     * LCF (so that it may be used to benchmark `normalize`).
-     * @param canonical_length An upper bound on the braid's new canonical
-     * length (number of pushed factors).
+     * The result isn't in LCF (so that it may be used to benchmark
+     * `normalize`).
+     * @param length An upper bound on the braid's new canonical
+     * length (it is the number of pushed factors).
      */
-    void randomize(sint16 canonical_length) {
+    void randomize(sint16 length) {
         identity();
         F f(get_parameter());
-        for (sint16 i = 0; i < canonical_length; i++) {
+        for (sint16 i = 0; i < length; i++) {
             f.randomize();
             factor_list.push_back(f);
         }
     }
 
+    /**
+     * @brief Prints the internal structure of the braid to output stream `os`.
+     *
+     * This will print `private` members `delta` and `factor_list`.
+     *
+     * Typically used while debugging.
+     *
+     * @param os The `IndentedOStream` the braid should be printed in.
+     */
     void debug(IndentedOStream &os = ind_cout) const {
         os << "{   ";
         os.Indent(4);
@@ -1572,6 +1760,11 @@ template <class F> class BraidTemplate {
         os << EndLine() << "}";
     }
 
+    /**
+     * @brief Hashes the braid.
+     *
+     * @return The hash.
+     */
     std::size_t hash() const {
         std::size_t h = inf();
         for (ConstFactorItr it = cbegin(); it != cend(); it++) {
@@ -1586,11 +1779,11 @@ template <class F> class BraidTemplate {
      * Reads the string `str` and sets `this` to the corresponding braid, in
      * LCF.
      *
-     * Letting `L` be the language of (a generating subset of) the factors,
+     * Letting `F` be the language of (a generating subset of) the factors,
      * `W =
      * (\s | \t)*` be the language of whitespaces, and `Z = -? ([1 - 9] [0 -
      * 9]* | 0)` be the language of integers, accepted strings are those
-     * represented by regular expression `(W | .)* (((D | L) (W ^ W Z)?) (W
+     * represented by regular expression `(W | .)* ((F (W ^ W Z)?) (W
      * | .)*)*`
      *
      * @param str The string to convert from.
@@ -1677,16 +1870,16 @@ inline IndentedOStream &operator<<(IndentedOStream &os,
 
 /**
  * @brief Hash `struct` for `garcide::FactorTemplate`.
- * 
+ *
  * Partially specializes `std::hash` for a `garcide::FactorTemplate`.
- * 
+ *
  * @tparam U A template class representing the internal data structure of
  * factors.
  */
 template <class U> struct std::hash<garcide::FactorTemplate<U>> {
     /**
      * @brief Hash operator.
-     * 
+     *
      * @param f The factor to be hashed.
      * @return The hash.
      */
@@ -1697,15 +1890,15 @@ template <class U> struct std::hash<garcide::FactorTemplate<U>> {
 
 /**
  * @brief Hash `struct` for `garcide::BraidTemplate`.
- * 
+ *
  * Partially specializes `std::hash` for a `garcide::BraidTemplate`.
- * 
+ *
  * @tparam F A template class representing factors.
  */
 template <class F> struct std::hash<garcide::BraidTemplate<F>> {
     /**
      * @brief Hash operator.
-     * 
+     *
      * @param u the braid to be hashed.
      * @return The hash.
      */

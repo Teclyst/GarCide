@@ -1,7 +1,7 @@
 /**
  * @file utility.cpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
- * @brief Implementation file a bunch of utility functions used everywhere.
+ * @brief Implementation file for a bunch of utility functions used everywhere.
  * @version 0.1
  * @date 2024-07-28
  *

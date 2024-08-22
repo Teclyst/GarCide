@@ -1,7 +1,7 @@
 /**
  * @file utility.hpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
- * @brief Header file a bunch of utility functions used everywhere.
+ * @brief Header file a bunch for of utility functions used everywhere.
  * @version 0.1
  * @date 2024-07-28
  *
@@ -96,7 +96,6 @@ typedef unsigned long long uint64;
 /**
  * @brief Regex representing integers.
  *
- * A regular expression that matches well-formed integers.
  * It is a string because we often add it as a part of more complex regular
  * expressions, and there is no way to build them within `std::regex`.
  */
@@ -156,7 +155,7 @@ struct InvalidStringError {
     /**
      * @brief Construct a new `InvalidStringError` exception.
      *
-     * Construct a new `InvalidStringError`, which will hold `error_source` as
+     * It will hold `error_source` as
      * its error message.
      *
      * @param error_source Source of the error.
@@ -174,9 +173,6 @@ struct NonRandomizable {};
 
 /**
  * @brief Forward iterates applications of `f` on pairs of successive elements.
- *
- * Forward iterates applications of binary function `f` on pairs of successive
- * elements, between `first` and `last`.
  *
  * `f` must return a boolean, and `apply_binfun` will stop at the first pair for
  * which `f` returns `true`, returning an iterator to that position.
@@ -204,9 +200,6 @@ inline ForItr apply_binfun(ForItr first, ForItr last, BinFunc f) {
 
 /**
  * @brief Backward iterates applications of `f` on pairs of successive elements.
- *
- * Backward iterates applications of binary function `f` on pairs of successive
- * elements, between `first` and `last`.
  *
  * `f` must return a boolean, and `apply_binfun` will stop at the (backwardly)
  * first pair for which `f` returns `true`, returning an iterator to that
@@ -237,12 +230,12 @@ inline BiItr reverse_apply_binfun(BiItr first, BiItr last, BinFunc f) {
 /**
  * @brief Applies `f` on pairs following the bubble sort pattern.
  *
- * Applies `f` on pairs following the bubble sort pattern (i.e. (n - 2, n - 1);
- * (n - 3, n - 2), (n - 2, n - 1); ...; (0, 1), (1, 2), ..., (n - 2, n - 1)).
+ * _I.e._ \f[(n - 2, n - 1);
+ * (n - 3, n - 2), (n - 2, n - 1); ...; (0, 1), (1, 2), ..., (n - 2, n - 1).\f]
  *
  * For each subsequence, it breaks to the next one if `f` returns `true`.
  *
- * Quadratic in the sequence's length.
+ * Quadratic in the length of the sequence.
  *
  * @tparam ForItr A class of bidirectional iterators.
  * @tparam BinFun A class of binary functions of signature `bool _(&T, &T)`,
@@ -263,7 +256,7 @@ inline void bubble_sort(ForItr first, ForItr last, BinFun f) {
 /**
  * @brief A struct that represents a endline character.
  *
- * A struct that represents a endline character. Used as an equivalent for
+ * Used as an equivalent for
  * `std::endl` for `IndentedOStream`.
  *
  * You may pass an integer parameter to its constructor to specify the number of
@@ -272,18 +265,18 @@ inline void bubble_sort(ForItr first, ForItr last, BinFun f) {
 struct EndLine {
 
     /**
-     * @brief Number of lines to skip.
+     * @brief Number of lines to skip when this is inserted in
+     * `IndentedOStream`.
      *
-     * The number of lines that should be skipped when this is inserted in
-     * `IndentedOStream` (i.e., the number of fully white lines, inserting an
-     * `EndLine` will always result in a linebreak).
+     * _I.e._, the number of fully white lines, as inserting an
+     * `EndLine` will always result in a linebreak.
      */
     sint16 lines_to_skip;
 
     /**
      * @brief Constructs a new `EndLine`.
      *
-     * Constructs a new `Endline` object, whith `lines_to_skip` set to `skip`.
+     * `lines_to_skip` is set to `skip`.
      *
      * @param skip What `lines_to_skip` is to be set to. Default value is 0.
      */
@@ -293,7 +286,7 @@ struct EndLine {
 /**
  * @brief A class for output streams that keep track of indentation.
  *
- * A class for output streams that keep track of indentation. It is not a very
+ * It is not a very
  * smart implementation - the only thing it does is adding indentation after
  * seing a `Endline`. Otherwise it is just a wrapper for its `os` object.
  *
@@ -307,15 +300,13 @@ class IndentedOStream {
     /**
      * @brief Current level of indentation.
      *
-     * The current level of indentation. You should ensure that it never changes
+     * It should be ensured that it never changes
      * after a function call.
      */
     sint16 indent_level;
 
     /**
-     * @brief Output stream.
-     *
-     * The output stream `*this` is a wrapper for.
+     * @brief The output stream `*this` is a wrapper for.
      */
     std::ostream &os;
 
@@ -374,6 +365,6 @@ IndentedOStream &IndentedOStream::operator<< <EndLine>(const EndLine &el);
  */
 static IndentedOStream ind_cout(std::cout);
 
-} // namespace CGarside
+} // namespace garcide
 
 #endif
