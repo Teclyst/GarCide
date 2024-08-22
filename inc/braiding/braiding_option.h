@@ -63,7 +63,20 @@
 namespace braiding {
 #if BRAIDING_CLASS == 0
 
+/**
+ * @brief The factor class used for _Braiding_.
+ * 
+ * Depends on preprocessor variable `BRAIDING_CLASS`. Therefore, it isn't
+ * necessarily set to `garcide::artin::Factor`.
+ */
 using Factor = garcide::artin::Factor;
+
+/**
+ * @brief The braid class used for _Braiding_.
+ * 
+ * Depends on preprocessor variable `BRAIDING_CLASS`. Therefore, it isn't
+ * necessarily set to `garcide::artin::Braid`.
+ */
 using Braid = garcide::artin::Braid;
 
 #elif BRAIDING_CLASS == 1

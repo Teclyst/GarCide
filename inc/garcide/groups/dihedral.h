@@ -1,7 +1,7 @@
 /**
  * @file dihedral.h
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
- * @brief Header file for I-series Artin groups (dual Garside structure).
+ * @brief Header file for euclidian lattices \f$\mathbf I\f$-series Artin groups (dual Garside structure).
  * @version 0.1
  * @date 2024-07-28
  *

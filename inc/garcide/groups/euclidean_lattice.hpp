@@ -1,7 +1,7 @@
 /**
  * @file euclidean_lattice.hpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
- * @brief Header file for Z ^ n.
+ * @brief Header file for euclidian lattices \f$\mathbb Z^n\f$.
  * @version 0.1
  * @date 2024-07-28
  *

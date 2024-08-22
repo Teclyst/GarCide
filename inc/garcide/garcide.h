@@ -101,6 +101,8 @@ template <class U> class FactorTemplate {
      *
      * @param str The string to be converted.
      * @return A parameter matching `str`.
+     * @exception InvalidStringError Raised if `str` cannot be converted to a
+     * `Parameter`.
      */
     inline static Parameter parameter_of_string(const std::string &str) {
         return U::parameter_of_string(str);
@@ -576,7 +578,7 @@ template <class F> bool make_right_weighted(F &u, F &v) {
 }
 
 /**
- * @brief Prints factor `f` to `IndentedOSTream` `os`.
+ * @brief Prints factor `f` to output stream `os`.
  *
  * This partially specializes `<<` for `FactorTemplate` classes, as syntactic
  * sugar for `FactorTemplate::print()`.
@@ -738,12 +740,8 @@ template <class F> class BraidTemplate {
      */
     inline ConstRevFactorItr crend() const { return factor_list.rend(); }
 
-  public:
     /**
      * @brief Construct a new BraidTemplate, with a group parameter.
-     *
-     * Construct a new BraidTemplate, with `parameter = parameter`. It is
-     * initialized as the identity braid.
      *
      * @param parameter Group parameter.
      */
@@ -753,9 +751,7 @@ template <class F> class BraidTemplate {
     /**
      * @brief Construct a new BraidTemplate, from a factor.
      *
-     * Construct a new BraidTemplate whose only factor is `f`.
-     *
-     * @param f FactorTemplate to be converted to a braid.
+     * @param f Factor to be converted to a braid.
      */
     BraidTemplate(const F &f)
         : parameter(f.get_parameter()), delta(0), factor_list() {
@@ -766,18 +762,38 @@ template <class F> class BraidTemplate {
         }
     }
 
+    /**
+     * @brief Converts a string to a `Parameter`.
+     *
+     * This is a wrapper for the matching `F` static member function.
+     *
+     * @param str The string to be converted.
+     * @return A parameter matching `str`.
+     * @exception InvalidStringError Raised if `str` cannot be converted to a
+     * `Parameter`.
+     */
     inline static Parameter parameter_of_string(const std::string &str) {
         return F::parameter_of_string(str);
     }
 
-    Parameter get_parameter() const { return parameter; }
+    /**
+     * @brief Returns the `Parameter` of the braid.
+     *
+     * @return The `Parameter` of the braid.
+     */
+    inline Parameter get_parameter() const { return parameter; }
 
     /**
-     * @brief Sets `delta` to `delta`.
+     * @brief Left-multiplies by the `(delta - inf())`-th power of the Garside
+     * element.
      *
-     * Sets `delta` field (which is private) to `delta`.
+     * This is done internally by changing the `delta` member. Therefore, if the
+     * braid is in RCF, it corresponds to right multiplication instead.
      *
-     * @param delta The new value of `delta`.
+     * At any rates, if the braid is in a canonical form, `delta` will be its
+     * new infimum.
+     *
+     * @param delta The new infimum.
      */
     inline void set_delta(sint16 delta) { (*this).delta = delta; }
 
@@ -785,7 +801,7 @@ template <class F> class BraidTemplate {
      * @brief Prints `*this` to `os`.
      *
      * Prints `*this` to `os`, in a format that is compatible with
-     * `of_string` (assuming that the same holds for `F`).
+     * `of_string()` (assuming that the same holds for `F`).
      *
      * @param os The output stream it prints to.
      */
@@ -866,21 +882,47 @@ template <class F> class BraidTemplate {
      */
     inline sint32 sup() const { return inf() + int(canonical_length()); }
 
-    // `u.compare(v)` returns whether u and v have the same internal
-    // representation.
+    /**
+     * @brief Equality check.
+     *
+     * Assumes that both operands are in the same canonical form.
+     *
+     * @param v Second operand.
+     * @return if `*this` and `v` are equal.
+     */
     inline bool compare(const BraidTemplate &v) const {
         return (delta == v.delta && factor_list == v.factor_list);
     }
 
-    // `u == v` returns whether u and v have the same internal
-    // representation. Syntactic sugar for `u.compare(v)`.
+    /**
+     * @brief Equality check.
+     *
+     * Assumes that both operands are in the same canonical form.
+     *
+     * Syntactic sugar for `compare()`.
+     *
+     * @param v Second operand.
+     * @return if `*this` and `v` are equal.
+     */
     bool operator==(const BraidTemplate &v) const { return compare(v); }
 
-    // `u != v` returns whether u and v do not have the same internal
-    // representation.
+    /**
+     * @brief Unequality check.
+     *
+     * Assumes that both operands are in the same canonical form.
+     *
+     * @param v Second operand.
+     * @return if `*this` and `v` are not equal.
+     */
     bool operator!=(const BraidTemplate &v) const { return !compare(v); }
 
-    // `u.is_identity` returns whether u represents the identity element.
+    /**
+     * @brief Triviality check.
+     *
+     * Assumes that the braid is in a canonical form.
+     *
+     * @return If `*this` is the identity.
+     */
     bool is_identity() const { return delta == 0 && factor_list.empty(); }
 
     // `u.inverse()` returns the inverse of u.
@@ -1045,6 +1087,12 @@ template <class F> class BraidTemplate {
         right_multiply_rcf(BraidTemplate(f).inverse_rcf());
     }
 
+    /**
+     * @brief Computes left meets.
+     *
+     * @param v Second operand.
+     * @return The left meet of `*this` and `v`.
+     */
     BraidTemplate left_meet(const BraidTemplate &v) const {
         sint16 shift = 0;
         BraidTemplate b(get_parameter());
@@ -1091,16 +1139,45 @@ template <class F> class BraidTemplate {
         return b;
     }
 
+    /**
+     * @brief Computes left meets, with factors.
+     *
+     * @param f Second operand (a factor).
+     * @return The left meet of `*this` and `f`.
+     */
     inline BraidTemplate left_meet(const F &f) {
         return left_meet(BraidTemplate(f));
     }
 
+    /**
+     * @brief Computes left meets.
+     *
+     * Syntactic sugar for `left_meet()`.
+     *
+     * @param v Second operand.
+     * @return The left meet of `*this` and `v`.
+     */
     inline BraidTemplate operator^(const BraidTemplate &v) {
         return left_meet(v);
     }
 
+    /**
+     * @brief Computes left meets, with factors.
+     *
+     * Syntactic sugar for `left_meet()`. Notice that the the factor should be the
+     * right operand.
+     *
+     * @param f Second operand (a factor).
+     * @return The left meet of `*this` and `f`.
+     */
     inline BraidTemplate operator^(const F &f) { return left_meet(f); }
 
+    /**
+     * @brief Computes left joins.
+     *
+     * @param v Second operand.
+     * @return The left join of `*this` and `v`.
+     */
     BraidTemplate left_join(const BraidTemplate &v) const {
         sint16 shift = 0;
         BraidTemplate b = BraidTemplate(get_parameter());
@@ -1142,53 +1219,103 @@ template <class F> class BraidTemplate {
         return b;
     }
 
+    /**
+     * @brief Computes left joins, with factors.
+     *
+     * @param f Second operand (a factor).
+     * @return The left join of `*this` and `f`.
+     */
     inline BraidTemplate left_join(const F &f) const {
         return left_join(BraidTemplate(f));
     }
 
+    /**
+     * @brief Computes right meets.
+     *
+     * @param v Second operand.
+     * @return The right meet of `*this` and `v`.
+     */
     inline BraidTemplate right_meet(const BraidTemplate &v) const {
         return !((!(*this)).left_join(!v));
     }
 
+    /**
+     * @brief Computes right meets, with factors.
+     *
+     * @param f Second operand (a factor).
+     * @return The right meet of `*this` and `f`.
+     */
     inline BraidTemplate right_meet(const F &f) const {
         return !((!(*this)).left_join(!BraidTemplate(f)));
     }
 
+     /**
+     * @brief Computes right joins.
+     *
+     * @param v Second operand.
+     * @return The right join of `*this` and `v`.
+     */
     inline BraidTemplate right_join(const BraidTemplate &v) const {
         return !((!(*this)).left_meet(!v));
     }
 
+    /**
+     * @brief Computes right joins, with factors.
+     *
+     * @param f Second operand (a factor).
+     * @return The right join of `*this` and `f`.
+     */
     inline BraidTemplate right_join(const F &f) const {
         return !((!(*this)).left_meet(!BraidTemplate(f)));
     }
 
+    /**
+     * @brief Conjugates by a factor.
+     * 
+     * @param f The conjugating factor. 
+     */
     inline void conjugate(const F &f) {
         left_divide(f);
         right_multiply(f);
     }
 
+    /**
+     * @brief Conjugates by a braid.
+     * 
+     * @param v The conjugating braid. 
+     */
     inline void conjugate(const BraidTemplate &v) {
         left_divide(v);
         right_multiply(v);
     }
 
+    /**
+     * @brief Conjugates by a factor in RCF.
+     * 
+     * @param f The conjugating factor. 
+     */
     inline void conjugate_rcf(const F &f) {
         left_divide_rcf(f);
         right_multiply_rcf(f);
     }
 
+    /**
+     * @brief Conjugates by a braid in RCF.
+     * 
+     * @param v The conjugating braid. 
+     */
     inline void conjugate_rcf(const BraidTemplate &v) {
         left_divide_rcf(v);
         right_multiply_rcf(v);
     }
 
     /**
-     * @brief Returns the first (non-Delta) factor.
+     * @brief Returns the first (non-\f$\Delta\f$) factor.
      *
-     * Returns the first (non-Delta) factor. If canonical length is zero,
+     * Returns the first (non-\f$\Delta\f$) factor. If canonical length is zero,
      * returns the identity factor instead.
      *
-     * @return The first (non-Delta) factor.
+     * @return The first (non-\f$\Delta\f$) factor.
      */
     inline F first() const {
         if (canonical_length() == 0) {
@@ -1207,7 +1334,7 @@ template <class F> class BraidTemplate {
      * `-inf()`. If canonical length is zero, returns the identity factor
      * instead.
      *
-     * @return The first (non-Delta) factor.
+     * @return The initial factor.
      */
     inline F initial() const { return first().delta_conjugate(-inf()); }
 
@@ -1217,7 +1344,7 @@ template <class F> class BraidTemplate {
      * Returns the final factor, (i.e. the last one in `factor_list`). If
      * canonical length is zero, returns the identity factor instead.
      *
-     * @return The first (non-Delta) factor.
+     * @return The final factor.
      */
     inline F final() const {
         if (canonical_length() == 0) {
@@ -1528,7 +1655,17 @@ template <class F> class BraidTemplate {
     }
 };
 
-// Overloading << for braid classes.
+/**
+ * @brief Prints braid `b` to output stream `os`.
+ *
+ * This partially specializes `<<` for `BraidTemplate` classes, as syntactic
+ * sugar for `BraidTemplate::print()`.
+ *
+ * @tparam F A template class representing factors.
+ * @param os The `IndentedOStream` the braid should be printed in.
+ * @param b The braid to be printed.
+ * @return A reference to `os`, so that `<<` may be chained.
+ */
 template <class F>
 inline IndentedOStream &operator<<(IndentedOStream &os,
                                    const BraidTemplate<F> &b) {
@@ -1538,13 +1675,40 @@ inline IndentedOStream &operator<<(IndentedOStream &os,
 
 } // namespace garcide
 
+/**
+ * @brief Hash `struct` for `garcide::FactorTemplate`.
+ * 
+ * Partially specializes `std::hash` for a `garcide::FactorTemplate`.
+ * 
+ * @tparam U A template class representing the internal data structure of
+ * factors.
+ */
 template <class U> struct std::hash<garcide::FactorTemplate<U>> {
+    /**
+     * @brief Hash operator.
+     * 
+     * @param f The factor to be hashed.
+     * @return The hash.
+     */
     std::size_t operator()(garcide::FactorTemplate<U> const &f) const noexcept {
         return f.hash();
     }
 };
 
+/**
+ * @brief Hash `struct` for `garcide::BraidTemplate`.
+ * 
+ * Partially specializes `std::hash` for a `garcide::BraidTemplate`.
+ * 
+ * @tparam F A template class representing factors.
+ */
 template <class F> struct std::hash<garcide::BraidTemplate<F>> {
+    /**
+     * @brief Hash operator.
+     * 
+     * @param u the braid to be hashed.
+     * @return The hash.
+     */
     std::size_t operator()(garcide::BraidTemplate<F> const &u) const noexcept {
         return u.hash();
     }

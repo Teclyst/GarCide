@@ -1,7 +1,7 @@
 /**
  * @file octahedral.cpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
- * @brief Implementation file for B-series Artin groups (dual Garside structure).
+ * @brief Implementation file for \f$\mathbf B\f$-series Artin groups (dual Garside structure).
  * @version 0.1
  * @date 2024-07-28
  *

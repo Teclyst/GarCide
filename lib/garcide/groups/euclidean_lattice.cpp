@@ -1,7 +1,7 @@
 /**
  * @file euclidean_lattice.cpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
- * @brief Implementation file for Z ^ n.
+ * @brief Implementation file for euclidian lattices \f$\mathbb Z^n\f$.
  * @version 0.1
  * @date 2024-08-02
  *

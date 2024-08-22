@@ -323,17 +323,12 @@ class IndentedOStream {
     /**
      * @brief Constructs a new `IndentedOStream`.
      *
-     * Constructs a new `IndentedOStream`, from the output stream it wraps
-     * around.
-     *
-     * @param os The output stream `*this` is a wrapper for.
+     * @param os The output stream `*this` wraps around.
      */
     IndentedOStream(std::ostream &os);
 
     /**
-     * @brief Set `indent_level`.
-     *
-     *  Set the `indent_level` field to `new_indent_level`.
+     * @brief Changes indentation level.
      *
      * @param new_indent_level New level of indentation.
      */
@@ -342,18 +337,14 @@ class IndentedOStream {
     }
 
     /**
-     * @brief Increment `indent_level`.
-     *
-     * Increment the `indent_level` field by `indentation`.
+     * @brief Increment indentation level.
      *
      * @param indentation Variation of indentation.
      */
-    inline void Indent(sint16 indentation) { indent_level += indentation; }
+    inline void Indent(sint16 indentation = 1) { indent_level += indentation; }
 
     /**
      * @brief Inserts something in the stream.
-     *
-     * Inserts something in the stream, by inserting it in `os`.
      *
      * @tparam C A class, the only requirement is that `<<<std::ostream, C>` is
      * implemented.
@@ -369,19 +360,17 @@ class IndentedOStream {
 /**
  * @brief Inserts an `EndLine` in the stream.
  *
- * Inserts an `EndLine` in the stream, by going to the next line in `os`, then
- * flushing it and inserting the right amount of spaces.
+ * Pushes a linebreak in `os`, then
+ * flushes it and inserts the right number of spaces.
  *
- * @param el An EndLine value.
+ * @param el An `EndLine` value.
  * @return A reference to `*this`, so that `<<` may be chained.
  */
 template <>
 IndentedOStream &IndentedOStream::operator<< <EndLine>(const EndLine &el);
 
 /**
- * @brief Indented version of `std::cout`
- *
- * An `IndentedOStream` that wraps around `std::cout`.
+ * @brief Indented version of `std::cout`.
  */
 static IndentedOStream ind_cout(std::cout);
 

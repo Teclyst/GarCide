@@ -1,7 +1,8 @@
 /**
  * @file dihedral.cpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
- * @brief Implementation file for I-series Artin groups (dual Garside structure).
+ * @brief Implementation file for \f$\mathbf I\f$-series Artin groups (dual
+ * Garside structure).
  * @version 0.1
  * @date 2024-07-28
  *
@@ -35,8 +36,7 @@ namespace garcide::dihedral {
 
 sint16 Underlying::get_parameter() const { return number_of_points; }
 
-Underlying::Parameter
-Underlying::parameter_of_string(const std::string &str) {
+Underlying::Parameter Underlying::parameter_of_string(const std::string &str) {
     std::smatch match;
 
     if (std::regex_match(str, match,
@@ -62,8 +62,7 @@ Underlying::parameter_of_string(const std::string &str) {
 
 sint16 Underlying::lattice_height() const { return 2; }
 
-Underlying::Underlying(sint16 n)
-    : number_of_points(n), type(0), point(0) {}
+Underlying::Underlying(sint16 n) : number_of_points(n), type(0), point(0) {}
 
 void Underlying::print(IndentedOStream &os) const {
     if (type == 1) {
@@ -80,10 +79,10 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
                           std::regex_constants::match_continuous)) {
         pos += match[0].length();
         delta();
-    } else if (std::regex_search(str.begin() + pos, str.end(), match,
-                                 std::regex{"(s[\\s\\t]*_?)?[\\s\\t]*(" +
-                                            number_regex + ")"},
-                                 std::regex_constants::match_continuous)) {
+    } else if (std::regex_search(
+                   str.begin() + pos, str.end(), match,
+                   std::regex{"(s[\\s\\t]*_?)?[\\s\\t]*(" + number_regex + ")"},
+                   std::regex_constants::match_continuous)) {
         point = Rem(std::stoi(match[2]), get_parameter());
         type = 2;
         pos += match[0].length();
@@ -233,4 +232,4 @@ std::vector<Underlying> Underlying::atoms() const {
     return atoms;
 }
 
-} // namespace cgarside::dihedral
+} // namespace garcide::dihedral

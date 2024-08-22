@@ -1,7 +1,8 @@
 /**
  * @file standard_complex.cpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
- * @brief Implementation file for B(e, e, n) groups (semi-classic Garside structure).
+ * @brief Implementation file for \f$\mathrm B(e, e, n)\f$ groups (semi-classic
+ * Garside structure).
  * @version 0.1
  * @date 2024-07-28
  *
@@ -72,8 +73,7 @@ void Underlying::debug(IndentedOStream &os) const {
 
 EENParameter Underlying::get_parameter() const { return een_index; }
 
-Underlying::Parameter
-Underlying::parameter_of_string(const std::string &str) {
+Underlying::Parameter Underlying::parameter_of_string(const std::string &str) {
     std::smatch match;
 
     if (std::regex_match(str, match,
@@ -233,7 +233,8 @@ void Underlying::direct(sint16 *dir_perm) const {
 };
 
 Underlying Underlying::left_meet(const Underlying &b) const {
-    thread_local sint16 dir_perm_a[MAX_N], dir_perm_b[MAX_N], dir_perm_meet[MAX_N];
+    thread_local sint16 dir_perm_a[MAX_N], dir_perm_b[MAX_N],
+        dir_perm_meet[MAX_N];
     Underlying a_copy = *this;
     Underlying b_copy = b;
     Underlying meet(get_parameter());
@@ -244,8 +245,7 @@ Underlying Underlying::left_meet(const Underlying &b) const {
     sint16 n = get_parameter().n, e = get_parameter().e;
     for (sint16 i = 2; i <= n; i++) {
         for (sint16 j = i; j > 2; j--) {
-            if (a_copy.is_s_left_divisor(j) &&
-                b_copy.is_s_left_divisor(j)) {
+            if (a_copy.is_s_left_divisor(j) && b_copy.is_s_left_divisor(j)) {
                 meet.s_right_multiply(dir_perm_meet, j);
                 a_copy.s_left_multiply(dir_perm_a, j);
                 b_copy.s_left_multiply(dir_perm_b, j);
@@ -254,8 +254,7 @@ Underlying Underlying::left_meet(const Underlying &b) const {
             }
         }
 
-        if (a_copy.is_t_left_divisor(0) &&
-            b_copy.is_t_left_divisor(0)) {
+        if (a_copy.is_t_left_divisor(0) && b_copy.is_t_left_divisor(0)) {
 
             meet.t_right_multiply(dir_perm_meet, 0);
             a_copy.t_left_multiply(dir_perm_a, 0);
@@ -282,8 +281,7 @@ Underlying Underlying::left_meet(const Underlying &b) const {
         }
 
         for (sint16 k = 1; k < e; k++) {
-            if (a_copy.is_t_left_divisor(k) &&
-                b_copy.is_t_left_divisor(k)) {
+            if (a_copy.is_t_left_divisor(k) && b_copy.is_t_left_divisor(k)) {
                 meet.t_right_multiply(dir_perm_meet, k);
                 a_copy.t_left_multiply(dir_perm_a, k);
                 b_copy.t_left_multiply(dir_perm_b, k);
@@ -339,8 +337,9 @@ Underlying Underlying::product(const Underlying &b) const {
     sint16 i, n = get_parameter().n, e = get_parameter().e;
     for (i = 0; i < n; i++) {
         f.permutation_table[i] = b.permutation_table[permutation_table[i]];
-        f.coefficient_table[i] = Rem(
-            b.coefficient_table[permutation_table[i]] + coefficient_table[i], e);
+        f.coefficient_table[i] = Rem(b.coefficient_table[permutation_table[i]] +
+                                         coefficient_table[i],
+                                     e);
     }
     return f;
 };
@@ -410,4 +409,4 @@ IndentedOStream &IndentedOStream::operator<< <standard_complex::EENParameter>(
     return *this;
 };
 
-} // namespace cgarside
+} // namespace garcide

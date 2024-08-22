@@ -42,24 +42,18 @@ using garcide::IndentedOStream;
 using garcide::sint16;
 
 /**
- * @brief Exception raised when asking for help.
- *
- * An exception that is raised when asking for help (e.g., to ask what a legal
- * factor is).
+ * @brief Exception raised to ask for help.
  */
 struct HelpAskedFor {};
 
 /**
- * @brief Exception raised when asking to return to option selection.
- *
- * An exception that is raised when asking to abort the current task and return
- * to option selection.
+ * @brief Exception raised to return to option selection.
  */
 struct InterruptAskedFor {};
 
 /**
  * @brief An `enum` that enumerates the options for _Braiding_'s menu.
- * 
+ *
  */
 enum class Option {
     LCF,
@@ -89,7 +83,7 @@ enum class Option {
  * @param is The input stream we read from. Its default value is `std::cin`.
  * @exception `garcide::InvalidStringError`: may be raised by `of_string`.
  * @exception `HelpAskedFor`: raised when `"?"` is entered.
- * @exception `InterruptAskedFor`: raised when `"q"` or `"Q"` is entered.
+ * @exception InterruptAskedFor Raised when `"q"` or `"Q"` is entered.
  */
 void read_braid(Braid &b, std::istream &is = std::cin);
 
@@ -100,7 +94,7 @@ void read_braid(Braid &b, std::istream &is = std::cin);
  * @exception `garcide::InvalidStringError`: may be raised by
  * `parameter_of_string`.
  * @exception `HelpAskedFor`: raised when `"?"` is entered.
- * @exception `InterruptAskedFor`: raised when `"q"` or `"Q"` is entered.
+ * @exception InterruptAskedFor Raised when `"q"` or `"Q"` is entered.
  */
 Braid::Parameter read_braid_parameter(std::istream &is = std::cin);
 
@@ -127,7 +121,7 @@ void explain_braid_parameter_input();
  * Keeps asking for braids until a valid one is entered.
  *
  * @param b The braid that is to be set to what is received.
- * @exception `InterruptAskedFor`: raised when `"q"` or `"Q"` is entered.
+ * @exception InterruptAskedFor Raised when `"q"` or `"Q"` is entered.
  */
 void prompt_braid(Braid &b);
 
@@ -138,7 +132,7 @@ void prompt_braid(Braid &b);
  *
  * Keeps asking for parameters until a valid one is entered.
  *
- * @exception `InterruptAskedFor`: raised when `"q"` or `"Q"` is entered.
+  * @exception InterruptAskedFor Raised when `"q"` or `"Q"` is entered.
  */
 Braid::Parameter prompt_braid_parameter();
 
@@ -185,8 +179,7 @@ Option prompt_option();
  * Prompts the user to enter a braid, puts it in LCF, then prints it in standard
  * output.
  *
- * @exception `InterruptAskedFor`: raised when `"q"` or `"Q"` is entered on an
- * input.
+ * @exception InterruptAskedFor Raised when `"q"` or `"Q"` is entered.
  */
 void lcf_case();
 
@@ -196,31 +189,113 @@ void lcf_case();
  * Prompts the user to enter a braid, puts it in RCF, then prints it in standard
  * output.
  *
- * @exception `InterruptAskedFor`: raised when `"q"` or `"Q"` is entered on an
- * input.
+ * @exception InterruptAskedFor Raised when `"q"` or `"Q"` is entered.
  */
 void rcf_case();
 
+/**
+ * @brief Handles the left GCD case.
+ *
+ * Prompts the user to enter two braids, computes their left GCD, then prints it
+ * in standard output.
+ *
+ * @exception InterruptAskedFor Raised when `"q"` or `"Q"` is entered.
+ */
 void left_gcd_case();
 
+/**
+ * @brief Handles the right GCD case.
+ *
+ * Prompts the user to enter two braids, computes their right GCD, then prints
+ * it in standard output.
+ *
+ * @exception InterruptAskedFor Raised when `"q"` or `"Q"` is entered.
+ */
 void right_gcd_case();
 
+/**
+ * @brief Handles the left LCM case.
+ *
+ * Prompts the user to enter two braids, computes their left LCM, then prints it
+ * in standard output.
+ *
+ * @exception InterruptAskedFor Raised when `"q"` or `"Q"` is entered.
+ */
 void left_lcm_case();
 
+/**
+ * @brief Handles the right LCM case.
+ *
+ * Prompts the user to enter two braids, computes their right LCM, then prints
+ * it in standard output.
+ *
+ * @exception InterruptAskedFor Raised when `"q"` or `"Q"` is entered.
+ */
 void right_lcm_case();
 
+/**
+ * @brief Handles the \f$\mathrm{SSS}\f$ case.
+ *
+ * Prompts the user to enter a braid, computes its super summit set, then prints
+ * it in standard output.
+ *
+ * @exception InterruptAskedFor Raised when `"q"` or `"Q"` is entered.
+ */
 void sss_case();
 
+/**
+ * @brief Handles the \f$\mathrm{USS}\f$ case.
+ *
+ * Prompts the user to enter a braid, computes its ultra summit set, then prints
+ * it in standard output.
+ *
+ * @exception InterruptAskedFor Raised when `"q"` or `"Q"` is entered.
+ */
 void uss_case();
 
+/**
+ * @brief Handles the \f$\mathrm{SCS}\f$ case.
+ *
+ * Prompts the user to enter a braid, computes its sliding circuits set, then
+ * prints it in standard output.
+ *
+ * @exception InterruptAskedFor Raised when `"q"` or `"Q"` is entered.
+ */
 void scs_case();
 
+/**
+ * @brief Handles the centralizer case.
+ *
+ * Prompts the user to enter a braid, computes its centralizer, then prints
+ * it in standard output.
+ *
+ * @exception InterruptAskedFor Raised when `"q"` or `"Q"` is entered.
+ */
 void centralizer_case();
 
+/**
+ * @brief Handles the conjugacy check case.
+ *
+ * Prompts the user to enter two braids, then checks if they are conjugates, and
+ * prints the result. If they are conjugate, also prints a conjugator in
+ * standard output.
+ *
+ * @exception InterruptAskedFor Raised when `"q"` or `"Q"` is entered.
+ */
 void conjugacy_case();
 
 #if BRAIDING_CLASS == 0
 
+/**
+ * @brief Handles the Thurston type case.
+ *
+ * Prompts the user to enter an Artin braid, then computes its Thurston type and
+ * prints it in standard output.
+ *
+ * Only defined if preprocessor variable `BRAIDING_CLASS` is set to `0`.
+ * 
+ * @exception InterruptAskedFor Raised when `"q"` or `"Q"` is entered.
+ */
 void thurston_type_case();
 
 #endif
