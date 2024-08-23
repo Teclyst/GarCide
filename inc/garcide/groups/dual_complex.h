@@ -33,8 +33,8 @@
 namespace garcide {
 
 /**
- * @brief Namespace for complex braid groups \f$\mathrm B(e,e,n+1)\f$ (dual
- * presentation).
+ * @brief Namespace for complex braid groups \f$\mathrm B(e,e,n+1)\f$, dual
+ * Garside structure.
  */
 namespace dual_complex {
 

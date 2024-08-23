@@ -1534,7 +1534,7 @@ template <class F> class BraidTemplate {
      * @brief Computes the preferred suffix of the braid.
      *
      * The preferred suffix of a braid whose RCF is \f$u_0\cdots
-     * u_{m-1}\Delta^k\f$, $m\leqslant 1$ is defined as \f$ (\Delta
+     * u_{m-1}\Delta^k\f$, \f$m\leqslant 1\f$ is defined as \f$ (\Delta
      * u_0^{-1})\land_{\mathrm R}(\Delta^{-k}u_{m-1}\Delta^{k})\f$.
      *
      * For braid whose canonical length is \f$0\f$, it is simply defined as the

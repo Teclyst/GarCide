@@ -52,7 +52,7 @@ template <class B> struct NotUltraSummit {
 
     /**
      * @brief Construct a new `NotUltraSummit` exception.
-     * 
+     *
      * @param b The braid that should have been in its ultra summit set.
      */
     NotUltraSummit(const B &b) : not_ultra_summit(b) {}
@@ -66,7 +66,7 @@ template <class B> struct NotUltraSummit {
  *
  * @tparam F A class representing factors.
  * @param b The braid whose trajectory is to be computed.
- * @return `b`'s trajectory for cycling.
+ * @return The trajectory of `b` for cycling.
  */
 template <class F>
 std::vector<BraidTemplate<F>> trajectory(BraidTemplate<F> b) {
@@ -123,7 +123,7 @@ void trajectory(BraidTemplate<F> b, BraidTemplate<F> b_rcf,
  * This is done through iterated cycling until a repetition is found.
  *
  * @tparam F A class representing factors.
- * @param b The braid of whom an ultra summit is computed.
+ * @param b The braid of whom an ultra summit conjugate is computed.
  * @return An ultra summit conjugate of `b`.
  */
 template <class F>
@@ -142,8 +142,9 @@ BraidTemplate<F> send_to_ultra_summit(const BraidTemplate<F> &b) {
  * to it.
  *
  * @tparam F A class representing factors.
- * @param b The braid of whom an ultra summit is computed.
- * @param c A braid that is set to a conjugator sending `b` to what is returned.
+ * @param b The braid of whom an ultra summit conjugate is computed.
+ * @param c A braid that is set by the function to a conjugator sending `b` to
+ * what is returned.
  * @return An ultra summit conjugate of `b`.
  */
 template <class F>
@@ -337,11 +338,11 @@ F main_pullback(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf,
 
 /**
  * @brief Computes the smallest factor above `f` that conjugates `b` to an
- * element of its ultra summit.
+ * element of its ultra summit set.
  *
  * `b` is assumed to be in its ultra summit set.
  *
- * @tparam F A class representing canonical factors.
+ * @tparam F A class representing factors.
  * @param b A braid, assumed to be in its ultra summit set.
  * @param b_rcf `b` in RCF.
  * @param f A factor.
@@ -382,10 +383,10 @@ F min_ultra_summit(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf,
  *
  * `b` is assumed to be in its ultra summit set.
  *
- * The indecomosable conjugators at `b` are the minimal non-trivial simple
+ * The indecomposable conjugators at `b` are the minimal non-trivial simple
  * factors that conjugate `b` to its ultra summit set.
  *
- * @tparam F A class representing canonical factors.
+ * @tparam F A class representing factors.
  * @param b A braid, assumed to be in its ultra summit set.
  * @param b_rcf `b` in RCF.
  * @return The ultra summit indecomposable conjugators at `b`.
@@ -448,7 +449,7 @@ std::vector<F> min_ultra_summit(const BraidTemplate<F> &b,
  *
  * @tparam B A class representing braids.
  */
-template <class B> struct USSConstIterator {
+template <class B> struct UltraSummitConstIterator {
 
   public:
     /**
@@ -481,11 +482,11 @@ template <class B> struct USSConstIterator {
 
   public:
     /**
-     * @brief Constructs a new `USSConstIterator` from a pointer.
+     * @brief Constructs a new `UltraSummitConstIterator` from a pointer.
      *
      * @param ptr A pointer to an instance of `B`.
      */
-    USSConstIterator(pointer ptr) : ptr(ptr) {}
+    UltraSummitConstIterator(pointer ptr) : ptr(ptr) {}
 
     /**
      * @brief Dereference operator.
@@ -506,7 +507,7 @@ template <class B> struct USSConstIterator {
      *
      * @return A reference to `*this`, after having increased it.
      */
-    USSConstIterator &operator++() {
+    UltraSummitConstIterator &operator++() {
         ptr++;
         return *this;
     }
@@ -516,8 +517,8 @@ template <class B> struct USSConstIterator {
      *
      * @return A reference to `*this`, before it was incremented.
      */
-    USSConstIterator operator++(int) {
-        USSConstIterator tmp = *this;
+    UltraSummitConstIterator operator++(int) {
+        UltraSummitConstIterator tmp = *this;
         ++(*this);
         return tmp;
     }
@@ -528,7 +529,9 @@ template <class B> struct USSConstIterator {
      * @param b Second argument.
      * @return If `*this` and `b` point to the same adress.
      */
-    bool operator==(const USSConstIterator &b) const { return ptr == b.ptr; }
+    bool operator==(const UltraSummitConstIterator &b) const {
+        return ptr == b.ptr;
+    }
 
     /**
      * @brief Unequality check.
@@ -536,7 +539,9 @@ template <class B> struct USSConstIterator {
      * @param b Second argument.
      * @return If `*this` and `b` do no point to the same adress.
      */
-    bool operator!=(const USSConstIterator &b) const { return ptr != b.ptr; }
+    bool operator!=(const UltraSummitConstIterator &b) const {
+        return ptr != b.ptr;
+    }
 };
 
 /**
@@ -546,7 +551,16 @@ template <class B> struct USSConstIterator {
  */
 template <class B> class UltraSummitSet {
   private:
+    /**
+     * @brief Orbits for cycling.
+     */
     std::vector<std::vector<B>> orbits;
+
+    /**
+     * @brief Set of the elements.
+     *
+     * It maps a braid to the index of the orbit it belongs to.
+     */
     std::unordered_map<B, sint16> set;
 
   public:
@@ -555,7 +569,7 @@ template <class B> class UltraSummitSet {
      *
      * Does not iterates through `*this` orbit by orbit.
      */
-    using ConstIterator = USSConstIterator<B>;
+    using ConstIterator = UltraSummitConstIterator<B>;
 
     /**
      * @brief Constant iterator to the first element of the ultra summit set.
@@ -594,11 +608,11 @@ template <class B> class UltraSummitSet {
     inline bool mem(const B &b) const { return set.find(b) != set.end(); }
 
     /**
-     * @brief Access a braid in the USS with its position.
+     * @brief Access a braid in the ultra summit set with its position.
      *
      * @param orbit_index Index of its orbit.
      * @param shift Position within that orbit.
-     * @return B
+     * @return The braid at that position
      */
     inline B at(size_t orbit_index, size_t shift) const {
         return orbits[orbit_index][shift];
@@ -788,7 +802,7 @@ template <class B> class UltraSummitSet {
 /**
  * @brief Computes the ultra summit set of `b`.
  *
- * @tparam F A class representing canonical factors.
+ * @tparam F A class representing factors.
  * @param b The braid whose ultra summit set is computed.
  * @return The ultra summit set of `b`.
  */
@@ -836,7 +850,7 @@ UltraSummitSet<BraidTemplate<F>> ultra_summit_set(const BraidTemplate<F> &b) {
  * one in the graph BFS of its ultra summit set, and `mins[i]` the corresponding
  * conjugator.
  *
- * @tparam F A class representing canonical factors.
+ * @tparam F A class representing factors.
  * @param b The braid whose ultra summit set is computed.
  * @param mins A vector that is set to contain, for each `i`, an element that
  * conjugates the base of orbit `prev[i]` to the base of orbit `i`.
@@ -900,7 +914,7 @@ UltraSummitSet<BraidTemplate<F>> ultra_summit_set(const BraidTemplate<F> &b,
  *
  * It is assumed that `b` is an element of `uss`.
  *
- * @tparam F A class representing canonical factors.
+ * @tparam F A class representing factors.
  * @param b An element of `uss`.
  * @param uss An ultra summit set.
  * @param mins A vector that holds, for each `i`, an element that conjugates the
@@ -923,8 +937,7 @@ BraidTemplate<F> tree_path(const BraidTemplate<F> &b,
     size_t current = (size_t)uss.find_orbit(b);
 
     for (size_t shift = 0; shift < uss.orbit_size(current); shift++) {
-        c.right_multiply(
-            uss.at(current, shift).first().delta_conjugate(b.inf()));
+        c.right_multiply(uss.at(current, shift).initial());
     }
 
     while (current != 0) {
@@ -942,7 +955,7 @@ BraidTemplate<F> tree_path(const BraidTemplate<F> &b,
  *
  * This function uses ultra summit sets.
  *
- * @tparam F A class representinf factors.
+ * @tparam F A class representing factors.
  * @param b1 A braid.
  * @param b2 Another braid.
  * @param c A braid, that is set by the function to the conjugator that takes

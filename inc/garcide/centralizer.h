@@ -32,6 +32,9 @@
 
 #include "garcide/ultra_summit.h"
 
+/**
+ * @brief Namespace for centralizers.
+ */
 namespace garcide::centralizer {
 
 /**
@@ -248,7 +251,7 @@ centralizer(const ultra_summit::UltraSummitSet<BraidTemplate<F>> &uss,
 
 /**
  * @brief Computes `b`'s centralizer.
- * 
+ *
  * @tparam F A class representing factors.
  * @param b The braid whose centralizer is to be computed.
  * @return `b`'s centralizer.

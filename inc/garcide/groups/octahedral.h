@@ -33,7 +33,7 @@
 #include "garcide/garcide.h"
 
 /**
- * @brief Namespace for \f$\mathbf B\f$-series Artin groups (dual Garside structure).
+ * @brief Namespace for \f$\mathbf B\f$-series Artin groups, dual Garside structure.
  */
 namespace garcide::octahedral {
 

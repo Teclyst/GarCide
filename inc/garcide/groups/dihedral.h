@@ -29,6 +29,9 @@
 
 #include "garcide/garcide.h"
 
+/**
+ * @brief Namespace for \f$\mathbf I\f$-series Artin groups, dual Garside structure.
+ */
 namespace garcide::dihedral {
 
 class Underlying {

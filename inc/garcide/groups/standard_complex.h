@@ -33,8 +33,8 @@
 namespace garcide {
 
 /**
- * @brief Namespace for complex braid groups \f$\mathrm B(e,e,n)\f$
- * (semi-classic presentation).
+ * @brief Namespace for complex braid groups \f$\mathrm B(e,e,n)\f$,
+ * semi-classic Garside structure.
  */
 namespace standard_complex {
 

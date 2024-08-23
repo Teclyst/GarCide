@@ -38,6 +38,9 @@
 
 #endif
 
+/**
+ * @brief Namespace for standard braid groups, classic Garside structure.
+ */
 namespace garcide::band {
 
 class Underlying {
