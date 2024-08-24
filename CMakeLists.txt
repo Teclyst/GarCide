@@ -23,6 +23,7 @@ if (${GENERATE_DOC})
             ${PROJECT_SOURCE_DIR}/inc
             ${PROJECT_SOURCE_DIR}/lib
             ${PROJECT_SOURCE_DIR}/src
+            ${PROJECT_SOURCE_DIR}/doc/main_page.dox
             ALL
             COMMENT "Generate documentation."
         )
