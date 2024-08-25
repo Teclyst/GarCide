@@ -38,7 +38,7 @@ Underlying::Parameter Underlying::parameter_of_string(const std::string &str) {
     if (std::regex_match(str, match,
                          std::regex{"[\\s\\t]*(" + number_regex + ")[\\s\\t]*"},
                          std::regex_constants::match_continuous)) {
-        sint16 i;
+        i16 i;
         try {
             i = std::stoi(match[1]);
         } catch (std::out_of_range const &) {
@@ -62,12 +62,12 @@ Underlying::Parameter Underlying::parameter_of_string(const std::string &str) {
     }
 }
 
-Underlying::Underlying(sint16 n) : permutation_table(n + 1) {}
+Underlying::Underlying(i16 n) : permutation_table(n + 1) {}
 
 void Underlying::print(IndentedOStream &os) const {
     // Recall that a band braid is represented by decreasing cycles.
-    sint16 i, j, n = get_parameter();
-    std::vector<sint16> curr_cycle;
+    i16 i, j, n = get_parameter();
+    std::vector<i16> curr_cycle;
     std::vector<bool> seen(n + 1, false);
     bool is_first = true;
     for (i = 1; i <= n; ++i) {
@@ -95,7 +95,7 @@ void Underlying::print(IndentedOStream &os) const {
 }
 
 void Underlying::of_string(const std::string &str, size_t &pos) {
-    sint16 n = get_parameter();
+    i16 n = get_parameter();
 
     std::smatch match;
 
@@ -109,7 +109,7 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
                                             number_regex + ")[\\s\\t]*\\)"},
                                  std::regex_constants::match_continuous)) {
         pos += match[0].length();
-        sint16 i, j;
+        i16 i, j;
         try {
             i = std::stoi(match[1]);
         } catch (std::out_of_range const &) {
@@ -160,7 +160,7 @@ void Underlying::debug(IndentedOStream &os) const {
     os.Indent(4);
     os << EndLine();
     os << "[";
-    for (sint16 i = 1; i < get_parameter(); i++) {
+    for (i16 i = 1; i < get_parameter(); i++) {
         os << permutation_table[i] << ", ";
     }
     os << permutation_table[get_parameter()];
@@ -170,10 +170,10 @@ void Underlying::debug(IndentedOStream &os) const {
     os << "}";
 }
 
-void Underlying::assign_partition(sint16 *x) const {
-    for (sint16 i = 1; i <= get_parameter(); ++i)
+void Underlying::assign_partition(i16 *x) const {
+    for (i16 i = 1; i <= get_parameter(); ++i)
         x[i] = 0;
-    for (sint16 i = 1; i <= get_parameter(); ++i) {
+    for (i16 i = 1; i <= get_parameter(); ++i) {
         if (x[i] == 0)
             x[i] = i;
         if (permutation_table[i] > i)
@@ -181,31 +181,31 @@ void Underlying::assign_partition(sint16 *x) const {
     }
 }
 
-void Underlying::of_partition(const sint16 *x) {
-    thread_local sint16 z[MAX_NUMBER_OF_STRANDS];
+void Underlying::of_partition(const i16 *x) {
+    thread_local i16 z[MAX_NUMBER_OF_STRANDS];
 
-    for (sint16 i = 1; i <= get_parameter(); ++i)
+    for (i16 i = 1; i <= get_parameter(); ++i)
         z[i] = 0;
-    for (sint16 i = get_parameter(); i >= 1; --i) {
+    for (i16 i = get_parameter(); i >= 1; --i) {
         permutation_table[i] = (z[x[i]] == 0) ? x[i] : z[x[i]];
         z[x[i]] = i;
     }
 }
 
 Underlying Underlying::left_meet(const Underlying &b) const {
-    thread_local sint16 x[MAX_NUMBER_OF_STRANDS], y[MAX_NUMBER_OF_STRANDS],
+    thread_local i16 x[MAX_NUMBER_OF_STRANDS], y[MAX_NUMBER_OF_STRANDS],
         z[MAX_NUMBER_OF_STRANDS];
 
     assign_partition(x);
     b.assign_partition(y);
 
-    thread_local sint16 P[MAX_NUMBER_OF_STRANDS][MAX_NUMBER_OF_STRANDS];
+    thread_local i16 P[MAX_NUMBER_OF_STRANDS][MAX_NUMBER_OF_STRANDS];
 
-    for (sint16 i = get_parameter(); i >= 1; i--) {
+    for (i16 i = get_parameter(); i >= 1; i--) {
         P[x[i]][y[i]] = i;
     }
 
-    for (sint16 i = 1; i <= get_parameter(); i++) {
+    for (i16 i = 1; i <= get_parameter(); i++) {
         z[i] = P[x[i]][y[i]];
     }
 
@@ -217,14 +217,14 @@ Underlying Underlying::left_meet(const Underlying &b) const {
 }
 
 void Underlying::identity() {
-    sint16 i, n = get_parameter();
+    i16 i, n = get_parameter();
     for (i = 1; i <= n; i++) {
         permutation_table[i] = i;
     }
 }
 
 void Underlying::delta() {
-    sint16 i, n = get_parameter();
+    i16 i, n = get_parameter();
     for (i = 1; i < n; i++) {
         permutation_table[i] = i + 1;
     }
@@ -233,7 +233,7 @@ void Underlying::delta() {
 
 Underlying Underlying::inverse() const {
     Underlying f = Underlying(get_parameter());
-    sint16 i;
+    i16 i;
     for (i = 1; i <= get_parameter(); i++) {
         f.permutation_table[permutation_table[i]] = i;
     }
@@ -242,7 +242,7 @@ Underlying Underlying::inverse() const {
 
 Underlying Underlying::product(const Underlying &b) const {
     Underlying f = Underlying(get_parameter());
-    sint16 i;
+    i16 i;
     for (i = 1; i <= get_parameter(); i++) {
         f.permutation_table[i] = b.permutation_table[permutation_table[i]];
     }
@@ -257,9 +257,9 @@ Underlying Underlying::right_complement(const Underlying &b) const {
     return inverse().product(b);
 }
 
-void Underlying::delta_conjugate_mut(sint16 k) {
+void Underlying::delta_conjugate_mut(i16 k) {
     Underlying under = *this;
-    sint16 i, n = get_parameter();
+    i16 i, n = get_parameter();
 
     for (i = 1; i <= n; i++) {
         under.permutation_table[i] =
@@ -270,7 +270,7 @@ void Underlying::delta_conjugate_mut(sint16 k) {
 
 void Underlying::randomize() {
 #ifdef USE_CLN
-    static sint8 s[2 * MAX_NUMBER_OF_STRANDS + 1];
+    static i8 s[2 * MAX_NUMBER_OF_STRANDS + 1];
     cln::cl_I k = cln::random_I(cln::default_random_state,
                                 get_catalan_number(get_parameter())) +
                   1;
@@ -282,12 +282,12 @@ void Underlying::randomize() {
 }
 
 std::vector<Underlying> Underlying::atoms() const {
-    sint16 n = get_parameter();
+    i16 n = get_parameter();
     Underlying atom(n);
     atom.identity();
     std::vector<Underlying> atoms;
-    for (sint16 i = 1; i <= n; i++) {
-        for (sint16 j = 1; j < i; j++) {
+    for (i16 i = 1; i <= n; i++) {
+        for (i16 j = 1; j < i; j++) {
             atom.permutation_table[i] = j;
             atom.permutation_table[j] = i;
             atoms.push_back(atom);
@@ -300,21 +300,21 @@ std::vector<Underlying> Underlying::atoms() const {
 
 size_t Underlying::hash() const {
     std::size_t h = 0;
-    for (sint16 i = 1; i <= get_parameter(); i++) {
+    for (i16 i = 1; i <= get_parameter(); i++) {
         h = h * 31 + permutation_table[i];
     }
     return h;
 }
 
-void Underlying::of_ballot_sequence(const sint8 *s) {
-    static sint16 stack[MAX_NUMBER_OF_STRANDS];
-    sint16 sp = 0;
+void Underlying::of_ballot_sequence(const i8 *s) {
+    static i16 stack[MAX_NUMBER_OF_STRANDS];
+    i16 sp = 0;
 
-    for (sint16 i = 1; i <= 2 * get_parameter(); ++i) {
+    for (i16 i = 1; i <= 2 * get_parameter(); ++i) {
         if (s[i] == 1) {
             stack[sp++] = i;
         } else {
-            sint16 j = stack[--sp];
+            i16 j = stack[--sp];
             if ((i / 2) * 2 != i)
                 permutation_table[j / 2] = (i + 1) / 2;
             else
@@ -325,8 +325,8 @@ void Underlying::of_ballot_sequence(const sint8 *s) {
 
 #ifdef USE_CLN
 
-void ballot_sequence(sint16 n, cln::cl_I k, sint8 *s) {
-    sint16 i;
+void ballot_sequence(i16 n, cln::cl_I k, i8 *s) {
+    i16 i;
     cln::cl_I r;
 
     if (k <= (r = get_catalan_number(n - 1) * get_catalan_number(0)))
@@ -355,29 +355,29 @@ void ballot_sequence(sint16 n, cln::cl_I k, sint8 *s) {
 }
 
 class _CatalanNumber {
-    friend const cln::cl_I &get_catalan_number(sint16 n);
+    friend const cln::cl_I &get_catalan_number(i16 n);
 
   public:
     _CatalanNumber();
 
   private:
     cln::cl_I table[Underlying::MAX_NUMBER_OF_STRANDS + 1];
-    cln::cl_I &c(sint16 n) { return table[n]; }
+    cln::cl_I &c(i16 n) { return table[n]; }
 }
 
 static _CatalanNumber CatalanNumber;
 
 _CatalanNumber::_CatalanNumber() {
     c(0) = 1;
-    for (sint16 n = 1; n < Underlying::MAX_NUMBER_OF_STRANDS; ++n) {
+    for (i16 n = 1; n < Underlying::MAX_NUMBER_OF_STRANDS; ++n) {
         c(n) = 0;
-        for (sint16 k = 0; k < n; ++k) {
+        for (i16 k = 0; k < n; ++k) {
             c(n) = c(n) + c(k) * c(n - k - 1);
         }
     }
 }
 
-const cln::cl_I &get_catalan_number(sint16 n) { return CatalanNumber.c(n); }
+const cln::cl_I &get_catalan_number(i16 n) { return CatalanNumber.c(n); }
 
 #endif
 

@@ -40,7 +40,7 @@ Underlying::Parameter Underlying::parameter_of_string(const std::string &str) {
     if (std::regex_match(str, match,
                          std::regex{"[\\s\\t]*(" + number_regex + ")[\\s\\t]*"},
                          std::regex_constants::match_continuous)) {
-        sint16 i;
+        i16 i;
         try {
             i = std::stoi(match[1]);
         } catch (std::out_of_range const &) {
@@ -64,21 +64,21 @@ Underlying::Parameter Underlying::parameter_of_string(const std::string &str) {
     }
 }
 
-void Underlying::MeetSub(const sint16 *a, const sint16 *b, sint16 *r, sint16 s,
-                         sint16 t) {
-    thread_local sint16 u[MAX_NUMBER_OF_STRANDS], v[MAX_NUMBER_OF_STRANDS],
+void Underlying::MeetSub(const i16 *a, const i16 *b, i16 *r, i16 s,
+                         i16 t) {
+    thread_local i16 u[MAX_NUMBER_OF_STRANDS], v[MAX_NUMBER_OF_STRANDS],
         w[MAX_NUMBER_OF_STRANDS];
 
     if (s >= t)
         return;
-    sint16 m = (s + t) / 2;
+    i16 m = (s + t) / 2;
     MeetSub(a, b, r, s, m);
     MeetSub(a, b, r, m + 1, t);
 
     u[m] = a[r[m]];
     v[m] = b[r[m]];
     if (s < m) {
-        for (sint16 i = m - 1; i >= s; --i) {
+        for (i16 i = m - 1; i >= s; --i) {
             u[i] = std::min(a[r[i]], u[i + 1]);
             v[i] = std::min(b[r[i]], v[i + 1]);
         }
@@ -86,18 +86,18 @@ void Underlying::MeetSub(const sint16 *a, const sint16 *b, sint16 *r, sint16 s,
     u[m + 1] = a[r[m + 1]];
     v[m + 1] = b[r[m + 1]];
     if (t > m + 1) {
-        for (sint16 i = m + 2; i <= t; ++i) {
+        for (i16 i = m + 2; i <= t; ++i) {
             u[i] = std::max(a[r[i]], u[i - 1]);
             v[i] = std::max(b[r[i]], v[i - 1]);
         }
     }
 
-    sint16 p = s;
-    sint16 q = m + 1;
-    for (sint16 i = s; i <= t; ++i)
+    i16 p = s;
+    i16 q = m + 1;
+    for (i16 i = s; i <= t; ++i)
         w[i] = ((p > m) || (q <= t && u[p] > u[q] && v[p] > v[q])) ? r[q++]
                                                                    : r[p++];
-    for (sint16 i = s; i <= t; ++i)
+    for (i16 i = s; i <= t; ++i)
         r[i] = w[i];
 }
 
@@ -112,7 +112,7 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
             str.begin() + pos, str.end(), match,
             std::regex{"(?:s[\\s\\t]*_?[\\s\\t]*)?(" + number_regex + ")"},
             std::regex_constants::match_continuous)) {
-        sint16 i;
+        i16 i;
         try {
             i = std::stoi(match[1]);
         } catch (std::out_of_range const &) {
@@ -143,7 +143,7 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
 }
 
 void Underlying::print(IndentedOStream &os) const {
-    sint16 i, j, k;
+    i16 i, j, k;
     Parameter n = get_parameter();
 
     Underlying c = Underlying(*this);
@@ -170,7 +170,7 @@ void Underlying::debug(IndentedOStream &os) const {
     os.Indent(4);
     os << EndLine();
     os << "[";
-    for (sint16 i = 1; i < get_parameter(); i++) {
+    for (i16 i = 1; i < get_parameter(); i++) {
         os << permutation_table[i] << ", ";
     }
     os << permutation_table[get_parameter()];
@@ -182,43 +182,43 @@ void Underlying::debug(IndentedOStream &os) const {
 
 void Underlying::identity() {
     Parameter n = get_parameter();
-    for (sint16 i = 1; i <= n; i++) {
+    for (i16 i = 1; i <= n; i++) {
         permutation_table[i] = i;
     }
 }
 
 void Underlying::delta() {
     Parameter n = get_parameter();
-    for (sint16 i = 1; i <= n; i++) {
+    for (i16 i = 1; i <= n; i++) {
         permutation_table[i] = n + 1 - i;
     }
 }
 
 Underlying Underlying::left_meet(const Underlying &b) const {
-    thread_local sint16 s[MAX_NUMBER_OF_STRANDS];
+    thread_local i16 s[MAX_NUMBER_OF_STRANDS];
 
     Underlying f = Underlying(get_parameter());
 
-    for (sint16 i = 1; i <= get_parameter(); ++i)
+    for (i16 i = 1; i <= get_parameter(); ++i)
         s[i] = i;
     MeetSub(permutation_table.data(), b.permutation_table.data(), s, 1,
             get_parameter());
-    for (sint16 i = 1; i <= get_parameter(); ++i)
+    for (i16 i = 1; i <= get_parameter(); ++i)
         f.permutation_table[s[i]] = i;
 
     return f;
 }
 
 Underlying Underlying::right_meet(const Underlying &b) const {
-    thread_local sint16 u[MAX_NUMBER_OF_STRANDS], v[MAX_NUMBER_OF_STRANDS];
+    thread_local i16 u[MAX_NUMBER_OF_STRANDS], v[MAX_NUMBER_OF_STRANDS];
 
     Underlying f = Underlying(get_parameter());
 
-    for (sint16 i = 1; i <= get_parameter(); ++i) {
+    for (i16 i = 1; i <= get_parameter(); ++i) {
         u[permutation_table[i]] = i;
         v[b.permutation_table[i]] = i;
     }
-    for (sint16 i = 1; i <= get_parameter(); ++i)
+    for (i16 i = 1; i <= get_parameter(); ++i)
         f.permutation_table[i] = i;
     MeetSub(u, v, f.permutation_table.data(), 1, get_parameter());
 
@@ -227,7 +227,7 @@ Underlying Underlying::right_meet(const Underlying &b) const {
 
 Underlying Underlying::inverse() const {
     Underlying f = Underlying(get_parameter());
-    sint16 i;
+    i16 i;
     for (i = 1; i <= get_parameter(); i++) {
         f.permutation_table[permutation_table[i]] = i;
     }
@@ -236,7 +236,7 @@ Underlying Underlying::inverse() const {
 
 Underlying Underlying::product(const Underlying &b) const {
     Underlying f = Underlying(get_parameter());
-    sint16 i;
+    i16 i;
     for (i = 1; i <= get_parameter(); i++) {
         f.permutation_table[i] = b.permutation_table[permutation_table[i]];
     }
@@ -252,19 +252,19 @@ Underlying Underlying::right_complement(const Underlying &b) const {
 }
 
 void Underlying::randomize() {
-    for (sint16 i = 1; i <= get_parameter(); ++i)
+    for (i16 i = 1; i <= get_parameter(); ++i)
         permutation_table[i] = i;
-    for (sint16 i = 1; i < get_parameter(); ++i) {
-        sint16 j = i + sint16(std::rand() / (RAND_MAX + 1.0) *
+    for (i16 i = 1; i < get_parameter(); ++i) {
+        i16 j = i + i16(std::rand() / (RAND_MAX + 1.0) *
                               (get_parameter() - i + 1));
-        sint16 z = permutation_table[i];
+        i16 z = permutation_table[i];
         permutation_table[i] = permutation_table[j];
         permutation_table[j] = z;
     }
 }
 
 std::vector<Underlying> Underlying::atoms() const {
-    sint16 i;
+    i16 i;
     Parameter n = get_parameter();
     Underlying atom(n);
     std::vector<Underlying> atoms;
@@ -277,11 +277,11 @@ std::vector<Underlying> Underlying::atoms() const {
     return atoms;
 }
 
-void Underlying::delta_conjugate_mut(sint16 k) {
+void Underlying::delta_conjugate_mut(i16 k) {
     Parameter n = get_parameter();
     if (k % 2 != 0) {
-        for (sint16 i = 1; i <= n / 2; i++) {
-            sint16 u = permutation_table[i];
+        for (i16 i = 1; i <= n / 2; i++) {
+            i16 u = permutation_table[i];
             permutation_table[i] = n - permutation_table[n - i + 1] + 1;
             permutation_table[n - i + 1] = n - u + 1;
         }
@@ -293,14 +293,14 @@ void Underlying::delta_conjugate_mut(sint16 k) {
 
 size_t Underlying::hash() const {
     size_t h = 0;
-    for (sint16 i = 1; i <= get_parameter(); i++) {
+    for (i16 i = 1; i <= get_parameter(); i++) {
         h = h * 31 + permutation_table[i];
     }
     return h;
 }
 
-void Underlying::tableau(sint16 **&tab) const {
-    sint16 i, j;
+void Underlying::tableau(i16 **&tab) const {
+    i16 i, j;
     Braid::Parameter n = get_parameter();
     for (i = 0; i < n; i++) {
         tab[i][i] = permutation_table[i + 1];
@@ -325,15 +325,15 @@ void Underlying::tableau(sint16 **&tab) const {
 }
 
 bool preserves_circles(const Braid &b) {
-    sint16 j, k, t, d;
+    i16 j, k, t, d;
     Braid::Parameter n = b.get_parameter();
-    sint16 *disj = new sint16[n + 1];
+    i16 *disj = new i16[n + 1];
 
     Underlying delta_under(n);
     delta_under.delta();
 
-    sint16 cl = int(b.canonical_length());
-    sint16 delta, itype = 0;
+    i16 cl = int(b.canonical_length());
+    i16 delta, itype = 0;
     if (b.inf() < 0)
         delta = -b.inf();
     else
@@ -341,13 +341,13 @@ bool preserves_circles(const Braid &b) {
 
     delta = delta % 2;
 
-    sint16 ***tabarray = new sint16 **[cl + delta];
+    i16 ***tabarray = new i16 **[cl + delta];
     Braid::ConstFactorItr it = b.cbegin();
 
     for (j = 0; j < cl + delta; j++) {
-        tabarray[j] = new sint16 *[n];
+        tabarray[j] = new i16 *[n];
         for (k = 0; k < n; k++) {
-            tabarray[j][k] = new sint16[n];
+            tabarray[j][k] = new i16[n];
         }
         if (delta && j == 0)
             delta_under.tableau(tabarray[j]);
@@ -357,8 +357,8 @@ bool preserves_circles(const Braid &b) {
         }
     }
 
-    sint16 *bkmove = new sint16[n];
-    sint16 bk;
+    i16 *bkmove = new i16[n];
+    i16 bk;
     for (j = 2; j < n; j++) {
         for (k = 1; k <= n - j + 1; k++) {
             bk = k;
@@ -416,7 +416,7 @@ ThurstonType thurston_type(const Braid &b,
 
     Braid pow = b;
 
-    for (sint16 i = 0; i < n; i++) {
+    for (i16 i = 0; i < n; i++) {
         if (pow.canonical_length() == 0)
             return ThurstonType::Periodic;
         pow.right_multiply(b);

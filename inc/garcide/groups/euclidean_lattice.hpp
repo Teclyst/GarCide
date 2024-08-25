@@ -141,7 +141,7 @@ class Underlying {
      *
      * @return The height of the lattice.
      */
-    inline sint16 lattice_height() const { return int(get_parameter()); }
+    inline i16 lattice_height() const { return int(get_parameter()); }
 
     /**
      * @brief Prints internal data in `os`.
@@ -301,7 +301,7 @@ class Underlying {
      *
      * @param k The exponent.
      */
-    inline void delta_conjugate_mut(__attribute__((unused)) sint16 k) {};
+    inline void delta_conjugate_mut(__attribute__((unused)) i16 k) {};
 
     /**
      * @brief Hashes the factor.

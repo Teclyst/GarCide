@@ -39,10 +39,10 @@ namespace garcide {
 namespace dual_complex {
 
 struct EENParameter {
-    sint16 e;
-    sint16 n;
+    i16 e;
+    i16 n;
 
-    EENParameter(sint16 e, sint16 n) : e(e), n(n) {}
+    EENParameter(i16 e, i16 n) : e(e), n(n) {}
 
     inline bool compare(const EENParameter &p) const {
         return ((e == p.e) && (n == p.n));
@@ -75,13 +75,13 @@ class Underlying {
     // and n - 1) of an ne-th root of unity w. We use the same conventions as
     // before: letting sigma be the induced permutation, then
     // permutation_table[i] is sigma^(-1)(i).
-    std::vector<sint16> permutation_table;
+    std::vector<i16> permutation_table;
 
     // The multiplicating coefficients. These are e-th roots of unity, with the
     // added condition of their product's being one. They are represented by
     // integer ranging between 0 and e - 1, with i standing for w^(ei) (with w
     // the same root as for the permutation_table).
-    std::vector<sint16> coefficient_table;
+    std::vector<i16> coefficient_table;
 
   public:
     /**
@@ -95,7 +95,7 @@ class Underlying {
      * Having too big `thread_local` objects might cause some issue with thread
      * spawning.
      */
-    static const sint16 MAX_N = 256;
+    static const i16 MAX_N = 256;
 
     /**
      * @brief Maximum value for `een_index.e`.
@@ -110,13 +110,13 @@ class Underlying {
      * Having too big `thread_local` objects might cause some issue with thread
      * spawning.
      */
-    static const sint16 MAX_E = 1;
+    static const i16 MAX_E = 1;
 
     static Parameter parameter_of_string(const std::string &str);
 
     Parameter get_parameter() const;
 
-    sint16 lattice_height() const;
+    i16 lattice_height() const;
 
     // Constructor
     Underlying(Parameter p);
@@ -125,9 +125,9 @@ class Underlying {
 
     void debug(IndentedOStream &os) const;
 
-    void assign_partition(sint16 *x) const;
+    void assign_partition(i16 *x) const;
 
-    void of_partition(const sint16 *x);
+    void of_partition(const i16 *x);
 
     // print to os. Be wary, as it side-effects!
     void print(IndentedOStream &os) const;
@@ -169,7 +169,7 @@ class Underlying {
 
     // Conjugate by delta^k.
     // Used to speed up calculations compared to the default implementation.
-    void delta_conjugate_mut(sint16 k);
+    void delta_conjugate_mut(i16 k);
 
     std::size_t hash() const;
 };

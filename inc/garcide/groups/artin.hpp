@@ -55,7 +55,7 @@ class Underlying {
      *
      * Here its elements represent positive integers.
      */
-    using Parameter = sint16;
+    using Parameter = i16;
 
   private:
     /**
@@ -67,7 +67,7 @@ class Underlying {
      *
      * Indexes start at \f$1\f$.
      */
-    std::vector<sint16> permutation_table;
+    std::vector<i16> permutation_table;
 
   public:
     /**
@@ -81,7 +81,7 @@ class Underlying {
      * Having too big `thread_local` objects might cause some issue with thread
      * spawning.
      */
-    static const sint16 MAX_NUMBER_OF_STRANDS = 256;
+    static const i16 MAX_NUMBER_OF_STRANDS = 256;
 
     /**
      * @brief Converts a string to a parameter.
@@ -130,7 +130,7 @@ class Underlying {
      * @param i The index that is being accessed.
      * @return The `i`-th element of the permutation table.
      */
-    inline sint16 at(size_t i) const { return permutation_table[i]; }
+    inline i16 at(size_t i) const { return permutation_table[i]; }
 
     /**
      * @brief Extraction from string.
@@ -167,7 +167,7 @@ class Underlying {
      *
      * @return The height of the lattice.
      */
-    inline sint16 lattice_height() const {
+    inline i16 lattice_height() const {
         Parameter n = get_parameter();
         return n * (n - 1) / 2;
     }
@@ -323,7 +323,7 @@ class Underlying {
      * @param k The exponent.
      * @return Underlying
      */
-    void delta_conjugate_mut(sint16 k);
+    void delta_conjugate_mut(i16 k);
 
     /**
      * @brief Hashes the factor.
@@ -344,7 +344,7 @@ class Underlying {
      *
      * @param tab A matrix where the tableau is to be stored.
      */
-    void tableau(sint16 **&tab) const;
+    void tableau(i16 **&tab) const;
 
   private:
     /**
@@ -359,8 +359,8 @@ class Underlying {
     Underlying inverse() const;
 
     // Subroutine called by left_meet() and right_meet().
-    static void MeetSub(const sint16 *a, const sint16 *b, sint16 *r, sint16 s,
-                        sint16 t);
+    static void MeetSub(const i16 *a, const i16 *b, i16 *r, i16 s,
+                        i16 t);
 };
 
 /**

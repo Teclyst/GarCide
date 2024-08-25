@@ -61,7 +61,7 @@ class Underlying {
      *
      * Here its elements represent positive integers.
      */
-    using Parameter = sint16;
+    using Parameter = i16;
 
   private:
     /**
@@ -73,7 +73,7 @@ class Underlying {
      *
      * Indexes start at \f$1\f$.
      */
-    std::vector<sint16> permutation_table;
+    std::vector<i16> permutation_table;
 
   public:
     /**
@@ -122,7 +122,7 @@ class Underlying {
      *
      * @return The height of the lattice.
      */
-    inline sint16 lattice_height() const { return get_parameter() - 1; }
+    inline i16 lattice_height() const { return get_parameter() - 1; }
 
     /**
      * @brief Construct a new `Underlying`.
@@ -137,7 +137,7 @@ class Underlying {
      * @param n The number of strands of the factor (also the length of
      * its permutation table).
      */
-    Underlying(sint16 n);
+    Underlying(i16 n);
 
     /**
      * @brief Access the `i`-th element of the permutation table (read-only).
@@ -147,7 +147,7 @@ class Underlying {
      * @param i The index that is being accessed.
      * @return The `i`-th element of the permutation table.
      */
-    inline sint16 at(size_t i) const { return permutation_table[i]; }
+    inline i16 at(size_t i) const { return permutation_table[i]; }
 
     /**
      * @brief Extraction from string.
@@ -204,16 +204,16 @@ class Underlying {
     /**
      * @brief Computes the partition associated with the factor.
      *
-     * It is then written in `sint16` array `x`.
+     * It is then written in `i16` array `x`.
      *
      * A partition is represented by an integer array,
      * with the following convention: given an array \f$\mathrm A\f$
      * representing a partition, then for all \f$i\in[\![1,n]\!]\f$, \f$\mathrm
      * A[i]\f$ is the minimum of the cell \f$i\f$ belongs to.
      *
-     * @param x A `sint16` array.
+     * @param x A `i16` array.
      */
-    void assign_partition(sint16 *x) const;
+    void assign_partition(i16 *x) const;
 
     /**
      * @brief Sets the factor to one that corresponds to the partition stored in
@@ -224,9 +224,9 @@ class Underlying {
      * representing a partition, then for all \f$i\in[\![1,n]\!]\f$, \f$\mathrm
      * A[i]\f$ is the minimum of the cell \f$i\f$ belongs to.
      *
-     * @param x A `sint16` array.
+     * @param x A `i16` array.
      */
-    void of_partition(const sint16 *x);
+    void of_partition(const i16 *x);
 
     /**
      * @brief Sets the factor to the identity.
@@ -377,7 +377,7 @@ class Underlying {
      * @param k The exponent.
      * @return Underlying
      */
-    void delta_conjugate_mut(sint16 k);
+    void delta_conjugate_mut(i16 k);
 
     /**
      * @brief Hashes the factor.
@@ -393,7 +393,7 @@ class Underlying {
      * 
      * @param s The ballot sequence.
      */
-    void of_ballot_sequence(const sint8 *s);
+    void of_ballot_sequence(const i8 *s);
 
   private:
     /**
@@ -430,7 +430,7 @@ using Braid = BraidTemplate<Factor>;
  * @param k Rank of the ballot sequence.
  * @param s Integer array to be set to the ballot sequence.
  */
-void ballot_sequence(sint16 n, cln::cl_I k, sint8 *s);
+void ballot_sequence(i16 n, cln::cl_I k, i8 *s);
 
 /**
  * @brief Returns the `n`-th Catalan number.
@@ -440,7 +440,7 @@ void ballot_sequence(sint16 n, cln::cl_I k, sint8 *s);
  * @param n Rank of the Catalan number.
  * @return The `n`-th Catalan number.
  */
-const cln::cl_I &get_catalan_number(sint16 n);
+const cln::cl_I &get_catalan_number(i16 n);
 
 #endif
 

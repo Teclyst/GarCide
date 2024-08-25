@@ -42,7 +42,7 @@ namespace garcide::octahedral {
  * Having too big `thread_local` objects might cause some issue with thread
  * spawning.
  */
-const sint16 MaxBraidIndex = 256;
+const i16 MaxBraidIndex = 256;
 
 Underlying::Parameter
 Underlying::parameter_of_string(const std::string &str) {
@@ -51,7 +51,7 @@ Underlying::parameter_of_string(const std::string &str) {
     if (std::regex_match(str, match,
                          std::regex{"[\\s\\t]*(" + number_regex + ")[\\s\\t]*"},
                          std::regex_constants::match_continuous)) {
-        sint16 i;
+        i16 i;
         try {
             i = std::stoi(match[1]);
         } catch (std::out_of_range const &) {
@@ -74,17 +74,17 @@ Underlying::parameter_of_string(const std::string &str) {
     }
 };
 
-sint16 Underlying::get_parameter() const { return PresentationParameter; }
+i16 Underlying::get_parameter() const { return PresentationParameter; }
 
-sint16 Underlying::lattice_height() const { return get_parameter(); }
+i16 Underlying::lattice_height() const { return get_parameter(); }
 
-Underlying::Underlying(sint16 n)
+Underlying::Underlying(i16 n)
     : PresentationParameter(n), permutation_table(2 * n + 1) {}
 
 void Underlying::print(IndentedOStream &os) const {
     // Recall that a band braid is represented by decreasing cycles.
-    sint16 i, j, n = get_parameter();
-    std::vector<sint16> curr_cycle;
+    i16 i, j, n = get_parameter();
+    std::vector<i16> curr_cycle;
     std::vector<bool> seen(n + 1, false);
     for (i = 1; i <= n; i++) {
         seen[i] = false;
@@ -106,7 +106,7 @@ void Underlying::print(IndentedOStream &os) const {
             } else if (int(curr_cycle.size()) > 1) {
                 is_first = false;
             }
-            for (sint16 l = int(curr_cycle.size()) - 1; l >= 1; --l) {
+            for (i16 l = int(curr_cycle.size()) - 1; l >= 1; --l) {
                 os << "(" << curr_cycle[l] << ", " << curr_cycle[l - 1] << ")"
                    << ((l == 1) ? "" : " ");
             }
@@ -130,7 +130,7 @@ void Underlying::debug(IndentedOStream &os) const {
     os.Indent(4);
     os << EndLine();
     os << "[";
-    for (sint16 i = 1; i < 2 * get_parameter(); i++) {
+    for (i16 i = 1; i < 2 * get_parameter(); i++) {
         os << permutation_table[i] << ", ";
     }
     os << permutation_table[2 * get_parameter()];
@@ -141,7 +141,7 @@ void Underlying::debug(IndentedOStream &os) const {
 }
 
 void Underlying::of_string(const std::string &str, size_t &pos) {
-    sint16 n = get_parameter();
+    i16 n = get_parameter();
     std::smatch match;
     if (std::regex_search(str.begin() + pos, str.end(), match, std::regex{"D"},
                           std::regex_constants::match_continuous)) {
@@ -152,7 +152,7 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
                                             ")[\\s\\t]*,?[\\s\\t]*(" +
                                             number_regex + ")[\\s\\t]*\\)"},
                                  std::regex_constants::match_continuous)) {
-        sint16 i, j;
+        i16 i, j;
         try {
             i = std::stoi(match[1]);
         } catch (std::out_of_range const &) {
@@ -185,7 +185,7 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
     } else if (std::regex_search(str.begin() + pos, str.end(), match,
                                  std::regex{"(" + number_regex + ")"},
                                  std::regex_constants::match_continuous)) {
-        sint16 i;
+        i16 i;
         try {
             i = std::stoi(match[1]);
         } catch (std::out_of_range const &) {
@@ -205,10 +205,10 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
     }
 }
 
-void Underlying::assign_partition(sint16 *x) const {
-    for (sint16 i = 1; i <= 2 * get_parameter(); ++i)
+void Underlying::assign_partition(i16 *x) const {
+    for (i16 i = 1; i <= 2 * get_parameter(); ++i)
         x[i] = 0;
-    for (sint16 i = 1; i <= 2 * get_parameter(); ++i) {
+    for (i16 i = 1; i <= 2 * get_parameter(); ++i) {
         if (x[i] == 0)
             x[i] = i;
         if (permutation_table[i] > i)
@@ -216,31 +216,31 @@ void Underlying::assign_partition(sint16 *x) const {
     }
 }
 
-void Underlying::of_partition(const sint16 *x) {
-    thread_local sint16 z[2 * MaxBraidIndex + 1];
+void Underlying::of_partition(const i16 *x) {
+    thread_local i16 z[2 * MaxBraidIndex + 1];
 
-    for (sint16 i = 1; i <= 2 * get_parameter(); ++i)
+    for (i16 i = 1; i <= 2 * get_parameter(); ++i)
         z[i] = 0;
-    for (sint16 i = 2 * get_parameter(); i >= 1; --i) {
+    for (i16 i = 2 * get_parameter(); i >= 1; --i) {
         permutation_table[i] = (z[x[i]] == 0) ? x[i] : z[x[i]];
         z[x[i]] = i;
     }
 }
 
 Underlying Underlying::left_meet(const Underlying &b) const {
-    thread_local sint16 x[2 * MaxBraidIndex + 1], y[2 * MaxBraidIndex + 1],
+    thread_local i16 x[2 * MaxBraidIndex + 1], y[2 * MaxBraidIndex + 1],
         z[2 * MaxBraidIndex + 1];
 
     assign_partition(x);
     b.assign_partition(y);
 
-    thread_local sint16 P[2 * MaxBraidIndex + 1][2 * MaxBraidIndex + 1];
+    thread_local i16 P[2 * MaxBraidIndex + 1][2 * MaxBraidIndex + 1];
 
-    for (sint16 i = 2 * get_parameter(); i >= 1; i--) {
+    for (i16 i = 2 * get_parameter(); i >= 1; i--) {
         P[x[i]][y[i]] = i;
     }
 
-    for (sint16 i = 1; i <= 2 * get_parameter(); i++) {
+    for (i16 i = 1; i <= 2 * get_parameter(); i++) {
         z[i] = P[x[i]][y[i]];
     }
 
@@ -256,13 +256,13 @@ Underlying Underlying::right_meet(const Underlying &b) const {
 }
 
 void Underlying::identity() {
-    for (sint16 i = 1; i <= 2 * get_parameter(); i++) {
+    for (i16 i = 1; i <= 2 * get_parameter(); i++) {
         permutation_table[i] = i;
     }
 }
 
 void Underlying::delta() {
-    sint16 i, n = get_parameter();
+    i16 i, n = get_parameter();
     for (i = 1; i < 2 * n; i++) {
         permutation_table[i] = i + 1;
     }
@@ -270,7 +270,7 @@ void Underlying::delta() {
 }
 
 bool Underlying::compare(const Underlying &b) const {
-    sint16 i;
+    i16 i;
     for (i = 1; i <= get_parameter(); i++) {
         if (permutation_table[i] != b.permutation_table[i]) {
             return false;
@@ -281,7 +281,7 @@ bool Underlying::compare(const Underlying &b) const {
 
 Underlying Underlying::inverse() const {
     Underlying f = Underlying(get_parameter());
-    sint16 i;
+    i16 i;
     for (i = 1; i <= 2 * get_parameter(); i++) {
         f.permutation_table[permutation_table[i]] = i;
     }
@@ -290,7 +290,7 @@ Underlying Underlying::inverse() const {
 
 Underlying Underlying::product(const Underlying &b) const {
     Underlying f = Underlying(get_parameter());
-    sint16 i;
+    i16 i;
     for (i = 1; i <= 2 * get_parameter(); i++) {
         f.permutation_table[i] = b.permutation_table[permutation_table[i]];
     }
@@ -305,9 +305,9 @@ Underlying Underlying::right_complement(const Underlying &b) const {
     return inverse().product(b);
 };
 
-void Underlying::delta_conjugate_mut(sint16 k) {
+void Underlying::delta_conjugate_mut(i16 k) {
     Underlying under = *this;
-    sint16 i, n = get_parameter();
+    i16 i, n = get_parameter();
 
     for (i = 1; i <= 2 * n; i++) {
         under.permutation_table[i] =
@@ -319,10 +319,10 @@ void Underlying::delta_conjugate_mut(sint16 k) {
 void Underlying::randomize() { throw NonRandomizable(); }
 
 std::vector<Underlying> Underlying::atoms() const {
-    sint16 n = get_parameter();
+    i16 n = get_parameter();
     std::vector<Underlying> atoms;
-    for (sint16 i = 1; i <= n; i++) {
-        for (sint16 j = i + 1; j <= n; j++) {
+    for (i16 i = 1; i <= n; i++) {
+        for (i16 j = i + 1; j <= n; j++) {
             Underlying atom = Underlying(n);
             atom.identity();
             atom.permutation_table[i] = j;
@@ -331,7 +331,7 @@ std::vector<Underlying> Underlying::atoms() const {
             atom.permutation_table[j + n] = i + n;
             atoms.push_back(atom);
         }
-        for (sint16 j = n + i + 1; j <= 2 * n; j++) {
+        for (i16 j = n + i + 1; j <= 2 * n; j++) {
             Underlying atom = Underlying(n);
             atom.identity();
             atom.permutation_table[i] = j;

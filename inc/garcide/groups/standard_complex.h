@@ -40,10 +40,10 @@ namespace standard_complex {
 
 // We represent B(e, e, n).
 struct EENParameter {
-    sint16 e;
-    sint16 n;
+    i16 e;
+    i16 n;
 
-    EENParameter(sint16 e, sint16 n) : e(e), n(n) {}
+    EENParameter(i16 e, i16 n) : e(e), n(n) {}
 
     inline bool compare(const EENParameter &p) const {
         return ((e == p.e) && (n == p.n));
@@ -86,7 +86,7 @@ class Underlying {
      * Garside Structures for the Complex Braid Groups_ \f$B(e,e,n)\f$,
      * [arXiv:1707.06864](https://arxiv.org/abs/1707.06864)).
      */
-    std::vector<sint16> permutation_table;
+    std::vector<i16> permutation_table;
 
     /**
      * @brief The multiplicating coefficients.
@@ -101,7 +101,7 @@ class Underlying {
      * `coefficient_table` is the diagonal coefficient matrix, when considering
      * G(e, e, n) as the semi-direct product delta(e, e, n) ⋊ S(n).
      */
-    std::vector<sint16> coefficient_table;
+    std::vector<i16> coefficient_table;
 
   public:
     /**
@@ -115,13 +115,13 @@ class Underlying {
      * Having too big `thread_local` objects might cause some issue with thread
      * spawning.
      */
-    static const sint16 MAX_N = 256;
+    static const i16 MAX_N = 256;
 
     static Parameter parameter_of_string(const std::string &str);
 
     Parameter get_parameter() const;
 
-    sint16 lattice_height() const;
+    i16 lattice_height() const;
 
     // Constructor
     Underlying(Parameter p);
@@ -154,7 +154,7 @@ class Underlying {
     // (i.e., perm[i] is the image of i by the permutation).
     // Used as dividing by atoms requires columns to be easily findable.
     // @param dir_perm The table that is to be filled.
-    void direct(sint16 *dir_perm) const;
+    void direct(i16 *dir_perm) const;
 
     // Checks if s_i left divides `*this`. (See George Neaime, Interval Garside
     // Structures for the Complex Braid Groups, Proposition 3.13,
@@ -162,7 +162,7 @@ class Underlying {
     // @param dir_perm A table that holds the direct table of the permutation
     // induced by the factor.
     // @param i The integer i for which we check if s_i left divides the factor.
-    inline bool is_s_left_divisor(sint16 i) const {
+    inline bool is_s_left_divisor(i16 i) const {
         return (permutation_table[i - 1] > permutation_table[i - 2])
                    ? (coefficient_table[i - 1] != 0)
                    : (coefficient_table[i - 2] == 0);
@@ -174,7 +174,7 @@ class Underlying {
     // @param dir_perm A table that holds the direct table of the permutation
     // induced by the factor.
     // @param i The integer i for which we check if t_i left divides the factor.
-    inline bool is_t_left_divisor(sint16 i) const {
+    inline bool is_t_left_divisor(i16 i) const {
         return (permutation_table[1] > permutation_table[0])
                    ? (coefficient_table[1] != 0)
                    : (coefficient_table[0] ==
@@ -186,7 +186,7 @@ class Underlying {
     // induced by the factor. Modified by this function so that it remains up to
     // date.
     // @param i The integer i for which we multiply by s_i the factor.
-    inline void s_left_multiply(sint16 *dir_perm, sint16 i) {
+    inline void s_left_multiply(i16 *dir_perm, i16 i) {
         std::swap(coefficient_table[i - 1], coefficient_table[i - 2]);
         std::swap(permutation_table[i - 1], permutation_table[i - 2]);
         std::swap(dir_perm[permutation_table[i - 1]],
@@ -198,7 +198,7 @@ class Underlying {
     // induced by the factor. Modified by this function so that it remains up to
     // date.
     // @param i The integer i for which we multiply by t_i the factor.
-    inline void t_left_multiply(sint16 *dir_perm, sint16 i) {
+    inline void t_left_multiply(i16 *dir_perm, i16 i) {
         std::swap(coefficient_table[0], coefficient_table[1]);
         std::swap(permutation_table[0], permutation_table[1]);
         coefficient_table[0] = Rem(coefficient_table[0] - i, get_parameter().e);
@@ -213,7 +213,7 @@ class Underlying {
     // induced by the factor. Modified by this function so that it remains up to
     // date.
     // @param i The integer i for which we multiply by s_i the factor.
-    inline void s_right_multiply(sint16 *dir_perm, sint16 i) {
+    inline void s_right_multiply(i16 *dir_perm, i16 i) {
         std::swap(permutation_table[dir_perm[i - 1]],
                   permutation_table[dir_perm[i - 2]]);
         std::swap(dir_perm[i - 1], dir_perm[i - 2]);
@@ -225,7 +225,7 @@ class Underlying {
     // induced by the factor. Modified by this function so that it remains up to
     // date.
     // @param i The integer i for which we multiply by t_i the factor.
-    inline void t_right_multiply(sint16 *dir_perm, sint16 i) {
+    inline void t_right_multiply(i16 *dir_perm, i16 i) {
         std::swap(permutation_table[dir_perm[0]],
                   permutation_table[dir_perm[1]]);
         coefficient_table[dir_perm[0]] =
@@ -266,14 +266,14 @@ class Underlying {
 
     // Conjugate by delta^k.
     // Used to speed up calculations compared to the default implementation.
-    void delta_conjugate_mut(sint16 k);
+    void delta_conjugate_mut(i16 k);
 
     std::size_t hash() const {
         std::size_t h = 0;
-        for (sint16 i = 0; i < get_parameter().n; i++) {
+        for (i16 i = 0; i < get_parameter().n; i++) {
             h = h * 31 + permutation_table[i];
         }
-        for (sint16 i = 0; i < get_parameter().n; i++) {
+        for (i16 i = 0; i < get_parameter().n; i++) {
             h = h * 31 + coefficient_table[i];
         }
         return h;

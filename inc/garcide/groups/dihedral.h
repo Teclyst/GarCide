@@ -37,26 +37,26 @@ namespace garcide::dihedral {
 class Underlying {
 
   public:
-    using Parameter = sint16;
+    using Parameter = i16;
 
   protected:
     Parameter number_of_points;
 
     // 0 for identity, 1 for delta, 2 for a reflection.
-    sint16 type;
+    i16 type;
 
     // The point the reflection sends 0 on.
-    sint16 point;
+    i16 point;
 
 public:
     static Parameter parameter_of_string(const std::string &str);
 
     Parameter get_parameter() const;
 
-    sint16 lattice_height() const;
+    i16 lattice_height() const;
 
     // Constructor
-    Underlying(sint16 n);
+    Underlying(i16 n);
 
     void of_string(const std::string &str, size_t &pos);
 
@@ -98,7 +98,7 @@ public:
 
     // Conjugate by delta^k.
     // Used to speed up calculations compared to default implementation.
-    Underlying delta_conjugate_mut(sint16 k) const;
+    Underlying delta_conjugate_mut(i16 k) const;
 
     inline std::size_t hash() const {
         std::size_t h = point;

@@ -39,7 +39,7 @@ namespace braiding {
 using garcide::EndLine;
 using garcide::ind_cout;
 using garcide::IndentedOStream;
-using garcide::sint16;
+using garcide::i16;
 
 /**
  * @brief Exception raised to ask for help.

@@ -165,10 +165,10 @@ template <class B> class Centralizer {
 
         os << EndLine(1);
 
-        sint16 indent =
+        i16 indent =
             (int(std::to_string(number_of_generators() - 1).length()) + 1) / 4 +
             1;
-        sint16 count = 0;
+        i16 count = 0;
         for (ConstIterator it = begin(); it != end(); it++) {
             os << count << ":";
             for (size_t _ = 0;
@@ -208,7 +208,7 @@ template <class B> class Centralizer {
 template <class F>
 Centralizer<BraidTemplate<F>>
 centralizer(const ultra_summit::UltraSummitSet<BraidTemplate<F>> &uss,
-            const std::vector<F> &mins, const std::vector<sint16> &prev) {
+            const std::vector<F> &mins, const std::vector<i16> &prev) {
     BraidTemplate<F> b = uss.at(0, 0);
 
     Centralizer<BraidTemplate<F>> centralizer;
@@ -259,7 +259,7 @@ centralizer(const ultra_summit::UltraSummitSet<BraidTemplate<F>> &uss,
 template <class F>
 Centralizer<BraidTemplate<F>> centralizer(const BraidTemplate<F> &b) {
     std::vector<F> mins;
-    std::vector<sint16> prev;
+    std::vector<i16> prev;
 
     Centralizer<BraidTemplate<F>> centralizer_uss = centralizer(
                                       ultra_summit::ultra_summit_set(b, mins,

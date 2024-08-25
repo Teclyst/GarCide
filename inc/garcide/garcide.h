@@ -129,7 +129,7 @@ template <class U> class FactorTemplate {
      *
      * @return The height of the factors lattice.
      */
-    inline sint16 lattice_height() const {
+    inline i16 lattice_height() const {
         return underlying.lattice_height();
     };
 
@@ -339,7 +339,7 @@ template <class U> class FactorTemplate {
      * @param k The power of the Garside element that the factor should be
      * conjugated by.
      */
-    inline void delta_conjugate_mut(sint16 k) {
+    inline void delta_conjugate_mut(i16 k) {
         underlying.delta_conjugate_mut(k);
     }
 
@@ -353,7 +353,7 @@ template <class U> class FactorTemplate {
      * conjugated by.
      * @return The conjugate.
      */
-    FactorTemplate delta_conjugate(sint16 k = 1) const {
+    FactorTemplate delta_conjugate(i16 k = 1) const {
         FactorTemplate conjugate = *this;
         conjugate.delta_conjugate_mut(k);
         return conjugate;
@@ -637,7 +637,7 @@ template <class F> class BraidTemplate {
      * the right end in RCF).
      *
      */
-    sint32 delta;
+    i32 delta;
 
     /**
      * @brief The braid's canonical factors.
@@ -795,7 +795,7 @@ template <class F> class BraidTemplate {
      *
      * @param delta The new infimum.
      */
-    inline void set_delta(sint16 delta) { (*this).delta = delta; }
+    inline void set_delta(i16 delta) { (*this).delta = delta; }
 
     /**
      * @brief Prints `*this` to `os`.
@@ -870,7 +870,7 @@ template <class F> class BraidTemplate {
      *
      * @return The infimum of `*this`.
      */
-    inline sint32 inf() const { return delta; }
+    inline i32 inf() const { return delta; }
 
     /**
      * @brief Returns the supremum.
@@ -880,7 +880,7 @@ template <class F> class BraidTemplate {
      *
      *  @return The supremum of `*this`.
      */
-    inline sint32 sup() const { return inf() + int(canonical_length()); }
+    inline i32 sup() const { return inf() + int(canonical_length()); }
 
     /**
      * @brief Equality check.
@@ -1232,7 +1232,7 @@ template <class F> class BraidTemplate {
      * @return The left meet of `*this` and `v`.
      */
     BraidTemplate left_meet(const BraidTemplate &v) const {
-        sint16 shift = 0;
+        i16 shift = 0;
         BraidTemplate b(get_parameter());
         F f1(get_parameter()), f2(get_parameter()), f(get_parameter());
         f.delta();
@@ -1317,7 +1317,7 @@ template <class F> class BraidTemplate {
      * @return The left join of `*this` and `v`.
      */
     BraidTemplate left_join(const BraidTemplate &v) const {
-        sint16 shift = 0;
+        i16 shift = 0;
         BraidTemplate b = BraidTemplate(get_parameter());
         F f2 = F(get_parameter()), f = F(get_parameter());
         f.delta();
@@ -1600,7 +1600,7 @@ template <class F> class BraidTemplate {
      * @param k The exponent.
      * @return `*this` raised to the `k`-th power.
      */
-    BraidTemplate power(const sint16 k) const {
+    BraidTemplate power(const i16 k) const {
         if (k == 0) {
             return BraidTemplate(get_parameter());
         } else if (k % 2 == 0) {
@@ -1679,9 +1679,9 @@ template <class F> class BraidTemplate {
      *
      * @return The rigidity of the braid.
      */
-    sint16 rigidity() const {
+    i16 rigidity() const {
         BraidTemplate b2 = *this;
-        sint16 rigidity = 0;
+        i16 rigidity = 0;
 
         if (canonical_length() == 0)
             return rigidity;
@@ -1708,10 +1708,10 @@ template <class F> class BraidTemplate {
      * @param length An upper bound on the braid's new canonical
      * length (it is the number of pushed factors).
      */
-    void randomize(sint16 length) {
+    void randomize(i16 length) {
         identity();
         F f(get_parameter());
-        for (sint16 i = 0; i < length; i++) {
+        for (i16 i = 0; i < length; i++) {
             f.randomize();
             factor_list.push_back(f);
         }
@@ -1819,7 +1819,7 @@ template <class F> class BraidTemplate {
         pos += match[0].length();
 
         while (pos != str.length()) {
-            sint16 pow;
+            i16 pow;
 
             fact.of_string(str, pos);
 
@@ -1831,12 +1831,12 @@ template <class F> class BraidTemplate {
                 pow = 1;
             }
             if (pow >= 0) {
-                for (sint16 _ = 0; _ < pow; _++) {
+                for (i16 _ = 0; _ < pow; _++) {
                     b.right_multiply(fact);
                 }
             } else {
                 pow = -pow;
-                for (sint16 _ = 0; _ < pow; _++) {
+                for (i16 _ = 0; _ < pow; _++) {
                     b.right_divide(fact);
                 }
             }

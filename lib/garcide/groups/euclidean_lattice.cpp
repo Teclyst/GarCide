@@ -52,7 +52,7 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
             std::regex{"(?:e[\\s\\t]*_?[\\s\\t]*)?(" + number_regex + ")"},
             std::regex_constants::match_continuous)) {
         // Try to extract a substring starting at pos that matches the regex.
-        sint16 i;
+        i16 i;
         try {
             i = std::stoi(match[1]);
         } catch (std::out_of_range const &) {

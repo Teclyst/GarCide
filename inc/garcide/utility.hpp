@@ -49,56 +49,56 @@ namespace garcide {
  *
  * We use our own types for portability.
  */
-using sint8 = char;
+using i8 = char;
 
 /**
  * @brief Alias for `unsigned char`.
  *
  * We use our own types for portability.
  */
-using uint8 = unsigned char;
+using u8 = unsigned char;
 
 /**
  * @brief Alias for `int`.
  *
  * We use our own types for portability.
  */
-using sint16 = int;
+using i16 = int;
 
 /**
  * @brief Alias for `unsigned int`.
  *
  * We use our own types for portability.
  */
-using uint16 = unsigned int;
+using u16 = unsigned int;
 
 /**
  * @brief Alias for `long`.
  *
  * We use our own types for portability.
  */
-using sint32 = long;
+using i32 = long;
 
 /**
  * @brief Alias for `unsigned long`.
  *
  * We use our own types for portability.
  */
-using uint32 = unsigned long;
+using u32 = unsigned long;
 
 /**
  * @brief Alias for `long long`.
  *
  * We use our own types for portability.
  */
-using sint64 = long long;
+using i64 = long long;
 
 /**
  * @brief Alias for `unsigned long long`.
  *
  * We use our own types for portability.
  */
-using uint64 = unsigned long long;
+using u64 = unsigned long long;
 
 /**
  * @brief Regex representing integers.
@@ -121,9 +121,9 @@ const std::string number_regex{"-?[1-9][0-9]*|0"};
  * @exception Dividing by zero is undefined behaviour.
  * @return The euclidian quotient of `a` by `b`.
  */
-inline sint16 Quot(sint16 a, sint16 b) {
-    sint16 r = a % b;
-    sint16 q = a / b;
+inline i16 Quot(i16 a, i16 b) {
+    i16 r = a % b;
+    i16 q = a / b;
     return r >= 0 ? q : q + (b >= 0 ? -1 : 1);
 };
 
@@ -140,8 +140,8 @@ inline sint16 Quot(sint16 a, sint16 b) {
  * @exception Dividing by zero is undefined behaviour.
  * @return The euclidian remainder of `a` by `b`.
  */
-inline sint16 Rem(sint16 a, sint16 b) {
-    sint16 r = a % b;
+inline i16 Rem(i16 a, i16 b) {
+    i16 r = a % b;
     return r >= 0 ? r : r + (b >= 0 ? b : -b);
 };
 
@@ -278,7 +278,7 @@ struct EndLine {
      * _I.e._, the number of fully white lines, as inserting an
      * `EndLine` will always result in a linebreak.
      */
-    sint16 lines_to_skip;
+    i16 lines_to_skip;
 
     /**
      * @brief Constructs a new `EndLine`.
@@ -287,7 +287,7 @@ struct EndLine {
      *
      * @param skip What `lines_to_skip` is to be set to. Default value is 0.
      */
-    EndLine(sint16 skip = 0);
+    EndLine(i16 skip = 0);
 };
 
 /**
@@ -310,7 +310,7 @@ class IndentedOStream {
      * It should be ensured that it never changes
      * after a function call.
      */
-    sint16 indent_level;
+    i16 indent_level;
 
     /**
      * @brief The output stream `*this` is a wrapper for.
@@ -330,7 +330,7 @@ class IndentedOStream {
      *
      * @param new_indent_level New level of indentation.
      */
-    inline void SetIndentLevel(sint16 new_indent_level) {
+    inline void SetIndentLevel(i16 new_indent_level) {
         indent_level = new_indent_level;
     }
 
@@ -339,7 +339,7 @@ class IndentedOStream {
      *
      * @param indentation Variation of indentation.
      */
-    inline void Indent(sint16 indentation = 1) { indent_level += indentation; }
+    inline void Indent(i16 indentation = 1) { indent_level += indentation; }
 
     /**
      * @brief Inserts something in the stream.

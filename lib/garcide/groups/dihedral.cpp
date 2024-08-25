@@ -34,7 +34,7 @@ struct NotBelow {};
 
 namespace garcide::dihedral {
 
-sint16 Underlying::get_parameter() const { return number_of_points; }
+i16 Underlying::get_parameter() const { return number_of_points; }
 
 Underlying::Parameter Underlying::parameter_of_string(const std::string &str) {
     std::smatch match;
@@ -42,7 +42,7 @@ Underlying::Parameter Underlying::parameter_of_string(const std::string &str) {
     if (std::regex_match(str, match,
                          std::regex{"[\\s\\t]*(" + number_regex + ")[\\s\\t]*"},
                          std::regex_constants::match_continuous)) {
-        sint16 i;
+        i16 i;
         try {
             i = std::stoi(match[1]);
         } catch (std::out_of_range const &) {
@@ -60,9 +60,9 @@ Underlying::Parameter Underlying::parameter_of_string(const std::string &str) {
     }
 };
 
-sint16 Underlying::lattice_height() const { return 2; }
+i16 Underlying::lattice_height() const { return 2; }
 
-Underlying::Underlying(sint16 n) : number_of_points(n), type(0), point(0) {}
+Underlying::Underlying(i16 n) : number_of_points(n), type(0), point(0) {}
 
 void Underlying::print(IndentedOStream &os) const {
     if (type == 1) {
@@ -192,9 +192,9 @@ Underlying Underlying::right_complement(const Underlying &b) const {
     return f;
 };
 
-Underlying Underlying::delta_conjugate_mut(sint16 k) const {
+Underlying Underlying::delta_conjugate_mut(i16 k) const {
     Underlying under = Underlying(*this);
-    sint16 n = get_parameter();
+    i16 n = get_parameter();
     if (type != 2) {
         under = *this;
     } else {
@@ -209,7 +209,7 @@ Underlying Underlying::delta_conjugate_mut(sint16 k) const {
 }
 
 void Underlying::randomize() {
-    sint16 rand = std::rand() % (get_parameter() + 1);
+    i16 rand = std::rand() % (get_parameter() + 1);
     if (rand == get_parameter()) {
         type = 0;
     } else if (rand == get_parameter() + 1) {
@@ -221,11 +221,11 @@ void Underlying::randomize() {
 }
 
 std::vector<Underlying> Underlying::atoms() const {
-    sint16 n = get_parameter();
+    i16 n = get_parameter();
     Underlying atom = Underlying(n);
     atom.type = 2;
     std::vector<Underlying> atoms;
-    for (sint16 i = 0; i < n; i++) {
+    for (i16 i = 0; i < n; i++) {
         atom.point = i;
         atoms.push_back(atom);
     }

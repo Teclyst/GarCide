@@ -40,9 +40,9 @@ namespace garcide::octahedral {
 class Underlying {
 
   protected:
-    sint16 PresentationParameter;
+    i16 PresentationParameter;
 
-    std::vector<sint16> permutation_table;
+    std::vector<i16> permutation_table;
 
   public:
 
@@ -57,18 +57,18 @@ class Underlying {
      * Having too big `thread_local` objects might cause some issue with thread
      * spawning.
      */
-    static const sint16 MaxBraidIndex = 256;
+    static const i16 MaxBraidIndex = 256;
 
-    typedef sint16 Parameter;
+    typedef i16 Parameter;
 
     static Parameter parameter_of_string(const std::string &str);
 
     Parameter get_parameter() const;
 
-    sint16 lattice_height() const;
+    i16 lattice_height() const;
 
     // Constructor
-    Underlying(sint16 n);
+    Underlying(i16 n);
 
     /**
      * @brief Extraction from string.
@@ -99,9 +99,9 @@ class Underlying {
 
     void debug(IndentedOStream &os) const;
 
-    void assign_partition(sint16 *x) const;
+    void assign_partition(i16 *x) const;
 
-    void of_partition(const sint16 *x);
+    void of_partition(const i16 *x);
 
     // print to os. Be wary, as it side-effects!
     void print(IndentedOStream &os) const;
@@ -141,11 +141,11 @@ class Underlying {
 
     // Conjugate by delta^k.
     // Used to speed up calculations compared to the default implementation.
-    void delta_conjugate_mut(sint16 k);
+    void delta_conjugate_mut(i16 k);
 
     std::size_t hash() const {
         std::size_t h = 0;
-        for (sint16 i = 1; i <= 2 * get_parameter(); i++) {
+        for (i16 i = 1; i <= 2 * get_parameter(); i++) {
             h = h * 31 + permutation_table[i];
         }
         return h;
