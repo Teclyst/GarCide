@@ -1,8 +1,8 @@
 set(HEADERS_PATH "${GarCide_SOURCE_DIR}/inc/garcide/")
 set(HEADERS_LIST
     utility.hpp
-    groups/artin.h 
-    groups/band.h 
+    groups/artin.hpp 
+    groups/band.hpp 
     groups/octahedral.h 
     groups/dihedral.h 
     groups/dual_complex.h 

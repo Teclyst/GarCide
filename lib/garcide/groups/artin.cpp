@@ -1,7 +1,8 @@
 /**
  * @file artin.cpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
- * @brief Implementation file for standard braid groups (classic Garside structure).
+ * @brief Implementation file for standard braid groups (classic Garside
+ * structure).
  * @version 0.1
  * @date 2024-07-28
  *
@@ -27,14 +28,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "garcide/groups/artin.h"
+#include "garcide/groups/artin.hpp"
 
 namespace garcide {
 
 namespace artin {
 
-Underlying::Parameter
-Underlying::parameter_of_string(const std::string &str) {
+Underlying::Parameter Underlying::parameter_of_string(const std::string &str) {
     std::smatch match;
 
     if (std::regex_match(str, match,
@@ -53,20 +53,21 @@ Underlying::parameter_of_string(const std::string &str) {
         } else if (2 > i) {
             throw InvalidStringError("Number of strands should be at least 2!");
         } else {
-            throw InvalidStringError("Number of strands is too big!\n" +
-                                     match.str(1) +
-                                     " is strictly greater than " +
-                                     std::to_string(MAX_NUMBER_OF_STRANDS) + ".");
+            throw InvalidStringError(
+                "Number of strands is too big!\n" + match.str(1) +
+                " is strictly greater than " +
+                std::to_string(MAX_NUMBER_OF_STRANDS) + ".");
         }
     } else {
         throw InvalidStringError(
             std::string("Could not extract an integer from \"str\"!"));
     }
-};
+}
 
 void Underlying::MeetSub(const sint16 *a, const sint16 *b, sint16 *r, sint16 s,
                          sint16 t) {
-    thread_local sint16 u[MAX_NUMBER_OF_STRANDS], v[MAX_NUMBER_OF_STRANDS], w[MAX_NUMBER_OF_STRANDS];
+    thread_local sint16 u[MAX_NUMBER_OF_STRANDS], v[MAX_NUMBER_OF_STRANDS],
+        w[MAX_NUMBER_OF_STRANDS];
 
     if (s >= t)
         return;
@@ -100,19 +101,17 @@ void Underlying::MeetSub(const sint16 *a, const sint16 *b, sint16 *r, sint16 s,
         r[i] = w[i];
 }
 
-sint16 Underlying::get_parameter() const { return number_of_strands; };
-
-Underlying::Underlying(Underlying::Parameter n)
-    : number_of_strands(n), permutation_table(n + 1) {}
+Underlying::Underlying(Underlying::Parameter n) : permutation_table(n + 1) {}
 
 void Underlying::of_string(const std::string &str, size_t &pos) {
     Parameter n = get_parameter();
 
     std::smatch match;
 
-    if (std::regex_search(str.begin() + pos, str.end(), match,
-                          std::regex{"(" + number_regex + ")"},
-                          std::regex_constants::match_continuous)) {
+    if (std::regex_search(
+            str.begin() + pos, str.end(), match,
+            std::regex{"(?:s[\\s\\t]*_?[\\s\\t]*)?(" + number_regex + ")"},
+            std::regex_constants::match_continuous)) {
         sint16 i;
         try {
             i = std::stoi(match[1]);
@@ -152,9 +151,10 @@ void Underlying::print(IndentedOStream &os) const {
     bool is_first = true;
 
     for (i = 2; i <= n; i++) {
-        for (j = i; j > 1 && c.permutation_table[j] < c.permutation_table[j - 1];
+        for (j = i;
+             j > 1 && c.permutation_table[j] < c.permutation_table[j - 1];
              j--) {
-            os << (is_first ? "" : " ") << j - 1;
+            os << (is_first ? "s" : " s") << j - 1;
             is_first = false;
             k = c.permutation_table[j];
             c.permutation_table[j] = c.permutation_table[j - 1];
@@ -166,11 +166,6 @@ void Underlying::print(IndentedOStream &os) const {
 void Underlying::debug(IndentedOStream &os) const {
     os << "{   ";
     os.Indent(4);
-    os << "number_of_strands:";
-    os.Indent(4);
-    os << EndLine() << get_parameter();
-    os.Indent(-4);
-    os << EndLine();
     os << "permutation_table:";
     os.Indent(4);
     os << EndLine();
@@ -185,24 +180,19 @@ void Underlying::debug(IndentedOStream &os) const {
     os << "}";
 }
 
-sint16 Underlying::lattice_height() const {
-    Parameter n = get_parameter();
-    return n * (n - 1) / 2;
-}
-
 void Underlying::identity() {
     Parameter n = get_parameter();
     for (sint16 i = 1; i <= n; i++) {
         permutation_table[i] = i;
     }
-};
+}
 
 void Underlying::delta() {
     Parameter n = get_parameter();
     for (sint16 i = 1; i <= n; i++) {
         permutation_table[i] = n + 1 - i;
     }
-};
+}
 
 Underlying Underlying::left_meet(const Underlying &b) const {
     thread_local sint16 s[MAX_NUMBER_OF_STRANDS];
@@ -217,7 +207,7 @@ Underlying Underlying::left_meet(const Underlying &b) const {
         f.permutation_table[s[i]] = i;
 
     return f;
-};
+}
 
 Underlying Underlying::right_meet(const Underlying &b) const {
     thread_local sint16 u[MAX_NUMBER_OF_STRANDS], v[MAX_NUMBER_OF_STRANDS];
@@ -233,17 +223,7 @@ Underlying Underlying::right_meet(const Underlying &b) const {
     MeetSub(u, v, f.permutation_table.data(), 1, get_parameter());
 
     return f;
-};
-
-bool Underlying::compare(const Underlying &b) const {
-    sint16 i;
-    for (i = 1; i <= get_parameter(); i++) {
-        if (permutation_table[i] != b.permutation_table[i]) {
-            return false;
-        }
-    }
-    return true;
-};
+}
 
 Underlying Underlying::inverse() const {
     Underlying f = Underlying(get_parameter());
@@ -252,7 +232,7 @@ Underlying Underlying::inverse() const {
         f.permutation_table[permutation_table[i]] = i;
     }
     return f;
-};
+}
 
 Underlying Underlying::product(const Underlying &b) const {
     Underlying f = Underlying(get_parameter());
@@ -261,15 +241,15 @@ Underlying Underlying::product(const Underlying &b) const {
         f.permutation_table[i] = b.permutation_table[permutation_table[i]];
     }
     return f;
-};
+}
 
 Underlying Underlying::left_complement(const Underlying &b) const {
     return b.product(inverse());
-};
+}
 
 Underlying Underlying::right_complement(const Underlying &b) const {
     return inverse().product(b);
-};
+}
 
 void Underlying::randomize() {
     for (sint16 i = 1; i <= get_parameter(); ++i)
@@ -281,7 +261,7 @@ void Underlying::randomize() {
         permutation_table[i] = permutation_table[j];
         permutation_table[j] = z;
     }
-};
+}
 
 std::vector<Underlying> Underlying::atoms() const {
     sint16 i;
@@ -295,7 +275,7 @@ std::vector<Underlying> Underlying::atoms() const {
         atoms.push_back(atom);
     }
     return atoms;
-};
+}
 
 void Underlying::delta_conjugate_mut(sint16 k) {
     Parameter n = get_parameter();
@@ -430,9 +410,8 @@ bool preserves_circles(const Braid &b) {
         return false;
 }
 
-ThurstonType
-thurston_type(const Braid &b,
-              const ultra_summit::UltraSummitSet<Braid> &uss) {
+ThurstonType thurston_type(const Braid &b,
+                           const ultra_summit::UltraSummitSet<Braid> &uss) {
     Braid::Parameter n = b.get_parameter();
 
     Braid pow = b;
@@ -475,6 +454,6 @@ IndentedOStream &IndentedOStream::operator<< <artin::ThurstonType>(
         break;
     }
     return *this;
-};
+}
 
-} // namespace cgarside
+} // namespace garcide

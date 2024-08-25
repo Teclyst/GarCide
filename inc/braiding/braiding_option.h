@@ -32,11 +32,11 @@
 
 #if BRAIDING_CLASS == 0
 
-#include "garcide/groups/artin.h"
+#include "garcide/groups/artin.hpp"
 
 #elif BRAIDING_CLASS == 1
 
-#include "garcide/groups/band.h"
+#include "garcide/groups/band.hpp"
 
 #elif BRAIDING_CLASS == 2
 

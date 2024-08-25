@@ -36,24 +36,40 @@ namespace garcide {
 
 /**
  * @brief Namespace for standard braid groups, classic Garside structure.
- * 
- * Contains the usual `Underlying` class, as well as functions to compute Thurston types.
+ *
+ * Contains the usual `Underlying` class, as well as functions to compute
+ * Thurston types.
  */
 namespace artin {
 
-/// A class for the underlying objects for canonical factors
-/// in the Artin presentation braid group case.
-/// In this case, permutations.
+/**
+ * @brief A class for classic Garside structure braid group canonical factors.
+ *
+ * They are represented by permutations, stored as inverse permutation tables.
+ */
 class Underlying {
 
   public:
+    /**
+     * @brief Parameter type.
+     *
+     * Here its elements represent positive integers.
+     */
     using Parameter = sint16;
 
   private:
-    Parameter number_of_strands;
-
+    /**
+     * @brief Inverse table of the permutation that corresponds to the factor.
+     *
+     * Given a permutation \f$\sigma\in\mathfrak S_n\f$, the inverse permutation
+     * table of \f$\sigma\f$ is the table $\f\mathrm T_\sigma\f$ such that
+     * $\forall i\in[\![1,n]\!],\mathrm T_\sigma\f[\sigma(i)]=i\f$.
+     *
+     * Indexes start at \f$1\f$.
+     */
     std::vector<sint16> permutation_table;
 
+  public:
     /**
      * @brief Maximum braid index.
      *
@@ -67,34 +83,54 @@ class Underlying {
      */
     static const sint16 MAX_NUMBER_OF_STRANDS = 256;
 
-  public:
+    /**
+     * @brief Converts a string to a parameter.
+     *
+     * Converts a string to a parameter by tring to parse it as an integer.
+     *
+     * In case of failure, `InvalidStringError` is raised.
+     *
+     * @param str The string to read.
+     * @return A parameter matching `str`.
+     * @exception InvalidStringError Thrown in case of failure.
+     */
     static Parameter parameter_of_string(const std::string &str);
 
     /**
-     * @brief Get the `number_of_strands`.
+     * @brief Gets the number of strands.
      *
-     * Get the `number_of_strands` (which is `private`).
+     * That is to say, the \f$n\f$ in \f$B_n\f$.
      *
-     * @return `number_of_strands`.
+     * @return The number of strands.
      */
-    Parameter get_parameter() const;
-
-    sint16 at(size_t i) const { return permutation_table[i]; }
+    inline Parameter get_parameter() const {
+        return int(permutation_table.size() - 1);
+    }
 
     /**
      * @brief Construct a new `Underlying`.
      *
      * Construct a new `Underlying`, with `n` as its
-     * `number_of_strands`.
+     * number of strands.
      *
-     * Its `permutation_table` will have length `n`, and will be filled with
-     * zeros (thus this is not a valid factor). Initialize it with `identity`,
-     * `delta`, or another similar method.
+     * Its permutation table will have length `n`, and will be filled with
+     * zeros (thus this is not a valid factor). It should be initialized it with
+     * `identity()`, `delta()`, or another similar member.
      *
-     * @param n The `number_of_strands` of the factor (also the length of
-     * its `permutation_table`).
+     * @param n The number of strands of the factor (also the length of
+     * its permutation table).
      */
     Underlying(Parameter n);
+
+    /**
+     * @brief Access the `i`-th element of the permutation table (read-only).
+     *
+     * `i` should be between `1` and the number of strands.
+     *
+     * @param i The index that is being accessed.
+     * @return The `i`-th element of the permutation table.
+     */
+    inline sint16 at(size_t i) const { return permutation_table[i]; }
 
     /**
      * @brief Extraction from string.
@@ -102,50 +138,90 @@ class Underlying {
      * Reads the string `str`, starting at position `pos`, and sets `this` to
      * the corresponding atom.
      *
-     * Letting `Z = -? ([1 - 9] [0 - 9]* | 0)` be the language of integers,
-     * accepted strings are those represented by regular expression `Z`, under
-     * the additional hypothesis that the integer they represent is in [`1`,
-     * `Parameter`[.
+     * Letting \f$Z = \texttt{-}? ([\texttt{1} - \texttt{9}] [\texttt{0} -
+     * \texttt{9}]^* \mid \texttt{0})\f$ be a regular expression representing
+     * integers, accepted strings are those represented by regular expression
+     * \f$(\texttt{s} \texttt{_}?)? Z\mid \texttt{D}\f$, under the additional
+     * hypothesis that the integer they represent is in \f$[1, n[\f$, where
+     * \f$n\f$ is the number of strands, and ignoring whitespaces.
+     *
+     * \f$\texttt{s_}i\f$, \f$\texttt{s}i\f$ and \f$i\f$ all stand for
+     * Artin generator \f$\sigma_i\f$.
+     *
+     * \f$\texttt{D}\f$ represents \f$\Delta\f$.
      *
      * @param str The string to extract from.
      * @param pos The position to start from.
      * @exception InvalidStringError Thrown when there is no subword starting
-     * from `pos` that matches `Z`, or if there is one, if the corresponding
-     * integer does not belong to [`1`, `Parameter`[.
+     * from `pos` that matches the expression, or if there is one, if the
+     * corresponding integer does not belong to \f$[1,n[\f$.
      */
     void of_string(const std::string &str, size_t &pos);
 
-    sint16 lattice_height() const;
+    /**
+     * @brief Height of the lattice.
+     *
+     * (_I.e._, letting `n` be the number of of strands, the length of
+     * \f$\Delta_n\f$ as a word in the generators, which is
+     * \f$\frac{n(n-1)}2\f$.)
+     *
+     * @return The height of the lattice.
+     */
+    inline sint16 lattice_height() const {
+        Parameter n = get_parameter();
+        return n * (n - 1) / 2;
+    }
 
     /**
-     * @brief Prints internal representation to `os`.
+     * @brief Prints internal representation in `os`.
      *
-     * Prints the factor's `permutation_table` to output stream `os`, typically for debugging
-     * purposes.
+     * Prints private member `permutation_table`, typically for debugging.
      *
-     * @param os The output stream it prints to.
+     * @param os The output stream it is printed in.
      */
     void debug(IndentedOStream &os) const;
 
     /**
      * @brief Prints the factor to `os`.
      *
-     * Prints the factor to output stream `os` as a product of atoms.
+     * It is printed as a product in the Artin generators.
      *
      * @param os The output stream it prints to.
      */
     void print(IndentedOStream &os) const;
 
-    // Set to the identity element (here the identity).
+    /**
+     * @brief Sets the factor to the identity.
+     *
+     * (_I.e._ sets the permutation table to the one of the identity
+     * permutation.)
+     *
+     * Linear in the number of strands.
+     */
     void identity();
 
-    // Set to delta.
+    /**
+     * @brief Sets the factor to the Garside element.
+     *
+     * (_I.e._ sets the permutation table to the one of \f$\Delta_n\f$,
+     * where \f$n\f$ is the number of strands. This is the table \f$\mathrm
+     * T_{\Delta_n}\f$ such that \f$\forall
+     * i\in[\![1,n]\!],T_{\Delta_n}[i]=n-i+1\f$.)
+     *
+     * Linear in the number of strands.
+     */
     void delta();
 
     /**
      * @brief Computes the left meet of `*this` and `b`.
      *
-     * @param b Second argument.
+     * Uses a recursive algorithm by Thurston, that is presented in
+     * Cha, Ko, Lee, Han, Cheon, _An Efficient Implementation of Braid Groups_,
+     * 2001.
+     *
+     * Quasilinear in the number of strands.
+     *
+     * @param b Second operand.
      * @return The left meet of `*this` and `b`.
      */
     Underlying left_meet(const Underlying &b) const;
@@ -153,34 +229,109 @@ class Underlying {
     /**
      * @brief Computes the right meet of `*this` and `b`.
      *
-     * @param b Second argument.
+     * Uses a recursive algorithm by Thurston, that is presented in
+     * Cha, Ko, Lee, Han, Cheon, _An Efficient Implementation of Braid Groups_,
+     * 2001.
+     *
+     * Quasilinear in the number of strands.
+     *
+     * @param b Second operand.
      * @return The right meet of `*this` and `b`.
      */
     Underlying right_meet(const Underlying &b) const;
 
-    // Equality check.
-    // We check wether the underlying permutation table are (pointwise) equal.
-    bool compare(const Underlying &b) const;
+    /**
+     * @brief Equality check.
+     *
+     * Compares `*this` and `b`, returning `true` if they are equal (_i.e._
+     * they represent the same permutation).
+     *
+     * Linear in the number of strands.
+     *
+     * @param b Second operand.
+     * @return If `*this` and `b` are equal.
+     */
+    inline bool compare(const Underlying &b) const {
+        return permutation_table == b.permutation_table;
+    }
 
-    // product under the hypothesis that it is still simple.
+    /**
+     * @brief Product computations.
+     *
+     * Computes the product of `*this` and `b` (_i.e._ composition of
+     * permutations), under the assumption that it is a factor.
+     *
+     * Linear in the number of strands.
+     *
+     * @param b Second (right) operand.
+     * @return The product of `*this` and `b`.
+     */
     Underlying product(const Underlying &b) const;
 
-    // Under the assumption a <= b, a.left_complement(b) computes
-    // The factor c such that ac = b.
+    /**
+     * @brief Left complement computations.
+     *
+     * Computes the left complement of `*this` to `b`, under the assumption that
+     * `*this` left-divides `b`.
+     *
+     * Linear in the number of strands.
+     *
+     * @param b Second operand.
+     * @return The left complement of `*this` to `b`.
+     */
     Underlying left_complement(const Underlying &b) const;
 
+    /**
+     * @brief Right complement computations.
+     *
+     * Computes the right complement of `*this` to `b`, under the assumption
+     * that `*this` right-divides `b`.
+     *
+     * Linear in the number of strands.
+     *
+     * @param b Second operand.
+     * @return The right complement of `*this` to `b`.
+     */
     Underlying right_complement(const Underlying &b) const;
 
-    // Generate a random factor.
+    /**
+     * @brief Sets `*this` to a random factor.
+     *
+     * It is chosen uniformly other \f$\mathfrak S_n\f$, where \f$n\f$ is the
+     * dimension, using Knuth's shuffle algorithm.
+     *
+     * Linear in the number of strands.
+     */
     void randomize();
 
-    // List of atoms.
+    /**
+     * @brief List of the atoms.
+     *
+     * Returns the list of the atoms (_i.e._ the Artin generators).
+     *
+     * @return A vector containing the atoms.
+     */
     std::vector<Underlying> atoms() const;
 
-    // Conjugate by delta^k.
-    // Used to speed up calculations compared to the default implementation.
+    /**
+     * @brief Conjugates by \f$\Delta_n^k\f$.
+     *
+     * Here \f$n\f$ denotes the number of strands.
+     *
+     * Linear in the number of strands (but does nothing if `k` is even).
+     *
+     * @param k The exponent.
+     * @return Underlying
+     */
     void delta_conjugate_mut(sint16 k);
 
+    /**
+     * @brief Hashes the factor.
+     *
+     * Linear in the number of strands.
+     *
+     * @return The hash.
+     */
     size_t hash() const;
 
     /**
@@ -196,8 +347,15 @@ class Underlying {
     void tableau(sint16 **&tab) const;
 
   private:
-    // Computes the factor corresponding to the inverse permutation.
-    // Used to simplify complement operation.
+    /**
+     * @brief Computes the factor associated with the inverse of the permutation
+     * of this factor.
+     *
+     * Linear in the number of strands.
+     *
+     * @return The factor associated with the inverse of the permutation of
+     * `*this`.
+     */
     Underlying inverse() const;
 
     // Subroutine called by left_meet() and right_meet().
@@ -205,14 +363,20 @@ class Underlying {
                         sint16 t);
 };
 
-typedef FactorTemplate<Underlying> Factor;
-
-typedef BraidTemplate<Factor> Braid;
+/**
+ * @brief Class for classic Garside structure braid groups canonical factors.
+ */
+using Factor = FactorTemplate<Underlying>;
 
 /**
- * @brief Enum for Thurston types.
+ * @brief Class for classic Garside structure braid groups elements.
+ */
+using Braid = BraidTemplate<Factor>;
+
+/**
+ * @brief `enum` for Thurston types.
  *
- * An enum whose elements represent the three Thurston types.
+ * An `enum` whose elements represent the three Thurston types.
  */
 enum class ThurstonType { Periodic, Reducible, PseudoAsonov };
 
@@ -232,8 +396,8 @@ bool preserves_circles(const Braid &b);
  * This was directly copied (mutatis mutandis) from Juan Gonzalez-Meneses' code.
  *
  * @param b The braid whose Thurston type is to be computed.
- * @param uss `b`'s USS.
- * @return `b`'s Thurston type.
+ * @param uss The ultra summit set of `b`.
+ * @return The Thurston type of `b`.
  */
 ThurstonType thurston_type(const Braid &b,
                            const ultra_summit::UltraSummitSet<Braid> &uss);
@@ -244,7 +408,7 @@ ThurstonType thurston_type(const Braid &b,
  * This was directly copied (mutatis mutandis) from Juan Gonzalez-Meneses' code.
  *
  * @param b The braid whose Thurston type is to be computed.
- * @return `b`'s Thurston type.
+ * @return the Thurston type of `b`.
  */
 ThurstonType thurston_type(const Braid &b);
 
@@ -253,7 +417,7 @@ ThurstonType thurston_type(const Braid &b);
 /**
  * @brief Inserts a `ThurstonType` value in the output stream.
  *
- * @param type A ThurstonType value.
+ * @param type A `ThurstonType` value.
  * @return A reference to `*this`, so that `<<` may be chained.
  */
 template <>

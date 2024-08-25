@@ -49,49 +49,56 @@ namespace garcide {
  *
  * We use our own types for portability.
  */
-typedef char sint8;
+using sint8 = char;
+
 /**
  * @brief Alias for `unsigned char`.
  *
  * We use our own types for portability.
  */
-typedef unsigned char uint8;
+using uint8 = unsigned char;
+
 /**
  * @brief Alias for `int`.
  *
  * We use our own types for portability.
  */
-typedef int sint16;
+using sint16 = int;
+
 /**
  * @brief Alias for `unsigned int`.
  *
  * We use our own types for portability.
  */
-typedef unsigned int uint16;
+using uint16 = unsigned int;
+
 /**
  * @brief Alias for `long`.
  *
  * We use our own types for portability.
  */
-typedef long sint32;
+using sint32 = long;
+
 /**
  * @brief Alias for `unsigned long`.
  *
  * We use our own types for portability.
  */
-typedef unsigned long uint32;
+using uint32 = unsigned long;
+
 /**
  * @brief Alias for `long long`.
  *
  * We use our own types for portability.
  */
-typedef long long sint64;
+using sint64 = long long;
+
 /**
  * @brief Alias for `unsigned long long`.
  *
  * We use our own types for portability.
  */
-typedef unsigned long long uint64;
+using uint64 = unsigned long long;
 
 /**
  * @brief Regex representing integers.

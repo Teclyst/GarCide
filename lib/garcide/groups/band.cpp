@@ -1,7 +1,8 @@
 /**
  * @file band.cpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
- * @brief Implementation file for standard braid groups (dual Garside structure).
+ * @brief Implementation file for standard braid groups (dual Garside
+ * structure).
  * @version 0.1
  * @date 2024-07-28
  *
@@ -27,16 +28,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "garcide/groups/band.h"
+#include "garcide/groups/band.hpp"
 
 namespace garcide::band {
 
-sint16 Underlying::get_parameter() const { return number_of_strands; }
-
-sint16 Underlying::lattice_height() const { return get_parameter(); }
-
-Underlying::Parameter
-Underlying::parameter_of_string(const std::string &str) {
+Underlying::Parameter Underlying::parameter_of_string(const std::string &str) {
     std::smatch match;
 
     if (std::regex_match(str, match,
@@ -55,19 +51,18 @@ Underlying::parameter_of_string(const std::string &str) {
         } else if (2 > i) {
             throw InvalidStringError("Number of strands should be at least 2!");
         } else {
-            throw InvalidStringError("Number of strands is too big!\n" +
-                                     match.str(1) +
-                                     " is strictly greater than " +
-                                     std::to_string(MAX_NUMBER_OF_STRANDS) + ".");
+            throw InvalidStringError(
+                "Number of strands is too big!\n" + match.str(1) +
+                " is strictly greater than " +
+                std::to_string(MAX_NUMBER_OF_STRANDS) + ".");
         }
     } else {
         throw InvalidStringError(
             std::string("Could not extract an integer from \"str\"!"));
     }
-};
+}
 
-Underlying::Underlying(sint16 n)
-    : number_of_strands(n), permutation_table(n + 1) {}
+Underlying::Underlying(sint16 n) : permutation_table(n + 1) {}
 
 void Underlying::print(IndentedOStream &os) const {
     // Recall that a band braid is represented by decreasing cycles.
@@ -198,7 +193,8 @@ void Underlying::of_partition(const sint16 *x) {
 }
 
 Underlying Underlying::left_meet(const Underlying &b) const {
-    thread_local sint16 x[MAX_NUMBER_OF_STRANDS], y[MAX_NUMBER_OF_STRANDS], z[MAX_NUMBER_OF_STRANDS];
+    thread_local sint16 x[MAX_NUMBER_OF_STRANDS], y[MAX_NUMBER_OF_STRANDS],
+        z[MAX_NUMBER_OF_STRANDS];
 
     assign_partition(x);
     b.assign_partition(y);
@@ -220,10 +216,6 @@ Underlying Underlying::left_meet(const Underlying &b) const {
     return c;
 }
 
-Underlying Underlying::right_meet(const Underlying &b) const {
-    return left_meet(b);
-}
-
 void Underlying::identity() {
     sint16 i, n = get_parameter();
     for (i = 1; i <= n; i++) {
@@ -239,16 +231,6 @@ void Underlying::delta() {
     permutation_table[n] = 1;
 }
 
-bool Underlying::compare(const Underlying &b) const {
-    sint16 i;
-    for (i = 1; i <= get_parameter(); i++) {
-        if (permutation_table[i] != b.permutation_table[i]) {
-            return false;
-        }
-    }
-    return true;
-};
-
 Underlying Underlying::inverse() const {
     Underlying f = Underlying(get_parameter());
     sint16 i;
@@ -256,7 +238,7 @@ Underlying Underlying::inverse() const {
         f.permutation_table[permutation_table[i]] = i;
     }
     return f;
-};
+}
 
 Underlying Underlying::product(const Underlying &b) const {
     Underlying f = Underlying(get_parameter());
@@ -265,15 +247,15 @@ Underlying Underlying::product(const Underlying &b) const {
         f.permutation_table[i] = b.permutation_table[permutation_table[i]];
     }
     return f;
-};
+}
 
 Underlying Underlying::left_complement(const Underlying &b) const {
     return b.product(inverse());
-};
+}
 
 Underlying Underlying::right_complement(const Underlying &b) const {
     return inverse().product(b);
-};
+}
 
 void Underlying::delta_conjugate_mut(sint16 k) {
     Underlying under = *this;
@@ -289,8 +271,9 @@ void Underlying::delta_conjugate_mut(sint16 k) {
 void Underlying::randomize() {
 #ifdef USE_CLN
     static sint8 s[2 * MAX_NUMBER_OF_STRANDS + 1];
-    cln::cl_I k =
-        cln::random_I(cln::default_random_state, get_catalan_number(get_parameter())) + 1;
+    cln::cl_I k = cln::random_I(cln::default_random_state,
+                                get_catalan_number(get_parameter())) +
+                  1;
     ballot_sequence(get_parameter(), k, s);
     of_ballot_sequence(s);
 #else
@@ -353,7 +336,8 @@ void ballot_sequence(sint16 n, cln::cl_I k, sint8 *s) {
         k = k - r;
     } else {
         for (i = 1; i <= n; ++i) {
-            if (k <= (r = get_catalan_number(i - 1) * get_catalan_number(n - i)))
+            if (k <=
+                (r = get_catalan_number(i - 1) * get_catalan_number(n - i)))
                 break;
             else
                 k = k - r;
@@ -379,7 +363,7 @@ class _CatalanNumber {
   private:
     cln::cl_I table[Underlying::MAX_NUMBER_OF_STRANDS + 1];
     cln::cl_I &c(sint16 n) { return table[n]; }
-};
+}
 
 static _CatalanNumber CatalanNumber;
 
@@ -397,4 +381,4 @@ const cln::cl_I &get_catalan_number(sint16 n) { return CatalanNumber.c(n); }
 
 #endif
 
-} // namespace cgarside::band
+} // namespace garcide::band
