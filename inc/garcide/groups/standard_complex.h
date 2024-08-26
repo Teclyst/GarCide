@@ -115,7 +115,7 @@ class Underlying {
      * Having too big `thread_local` objects might cause some issue with thread
      * spawning.
      */
-    static const i16 MAX_N = 256;
+    static const i16 MAX_N_PARAMETER = 256;
 
     static Parameter parameter_of_string(const std::string &str);
 
@@ -286,8 +286,20 @@ using Braid = BraidTemplate<Factor>;
 
 } // namespace standard_complex
 
+/**
+ * @brief Inserts a parameter in the output stream.
+ *
+ * Syntactic sugar for `standard_complex::EENParameter.print()`.
+ *
+ * @param p The parameter to be inserted.
+ * @return A reference to `*this`, so that `<<` may be chained.
+ */
 template <>
-IndentedOStream &IndentedOStream::operator<< <standard_complex::EENParameter>(
-    const standard_complex::EENParameter &p);
+inline IndentedOStream &
+    IndentedOStream::operator<< <standard_complex::EENParameter>(
+        const standard_complex::EENParameter &p) {
+    p.print(*this);
+    return *this;
+}
 
 } // namespace garcide

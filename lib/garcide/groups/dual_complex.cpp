@@ -30,18 +30,13 @@
 
 #include "garcide/groups/dual_complex.h"
 
-namespace garcide {
-
-namespace dual_complex {
+namespace garcide::dual_complex {
 
 void EENParameter::print(IndentedOStream &os) const {
     os << "(e: " << e << ", n: " << n << ")";
 }
 
-EENParameter Underlying::get_parameter() const { return een_index; }
-
-Underlying::Parameter
-Underlying::parameter_of_string(const std::string &str) {
+Underlying::Parameter Underlying::parameter_of_string(const std::string &str) {
     std::smatch match;
 
     if (std::regex_match(str, match,
@@ -64,22 +59,22 @@ Underlying::parameter_of_string(const std::string &str) {
                                      match.str(2) +
                                      " can not be converted to a C++ integer.");
         }
-        if ((2 <= e) && (2 <= n) && (n <= MAX_N) && (e * n <= MAX_E * MAX_N)) {
+        if ((2 <= e) && (2 <= n) && (n <= MAX_N_PARAMETER) &&
+            (e * n <= MAX_E_PARAMETER * MAX_N_PARAMETER)) {
             return EENParameter(e, n);
         } else if (2 > e) {
             throw InvalidStringError("e should be at least 2!");
-            } else if (2 > n) {
+        } else if (2 > n) {
             throw InvalidStringError("n should be at least 2!");
-        } else if (n > MAX_N) {
-            throw InvalidStringError("n is too big!\n" +
-                                     match.str(1) +
+        } else if (n > MAX_N_PARAMETER) {
+            throw InvalidStringError("n is too big!\n" + match.str(1) +
                                      " is strictly greater than " +
-                                     std::to_string(MAX_N) + ".");
+                                     std::to_string(MAX_N_PARAMETER) + ".");
         } else {
-            throw InvalidStringError("e * n is too big!\n" +
-                                     match.str(1) + " * " + match.str(2) + " = " + std::to_string(e * n) +
-                                     " is strictly greater than " +
-                                     std::to_string(MAX_N * MAX_E) + ".");
+            throw InvalidStringError(
+                "e * n is too big!\n" + match.str(1) + " * " + match.str(2) +
+                " = " + std::to_string(e * n) + " is strictly greater than " +
+                std::to_string(MAX_N_PARAMETER * MAX_E_PARAMETER) + ".");
         }
     } else {
         throw InvalidStringError(
@@ -87,11 +82,8 @@ Underlying::parameter_of_string(const std::string &str) {
     }
 }
 
-i16 Underlying::lattice_height() const { return get_parameter().n + 1; }
-
 Underlying::Underlying(Parameter p)
-    : een_index(p), permutation_table(p.n + 1),
-      coefficient_table(p.n + 1) {}
+    : een_index(p), permutation_table(p.n + 1), coefficient_table(p.n + 1) {}
 
 void Underlying::debug(IndentedOStream &os) const {
     os << "{   ";
@@ -159,7 +151,8 @@ void Underlying::print(IndentedOStream &os) const {
                        : curr_cycle[i] + coefficient_table[0] * n)
                << ", "
                << ((i >= other_smallest + 1)
-                       ? curr_cycle[i - 1] + Rem(coefficient_table[0] + 1, e) * n
+                       ? curr_cycle[i - 1] +
+                             Rem(coefficient_table[0] + 1, e) * n
                        : curr_cycle[i - 1] + coefficient_table[0] * n)
                << ") ";
         }
@@ -238,16 +231,15 @@ void Underlying::print(IndentedOStream &os) const {
 void Underlying::of_string(const std::string &str, size_t &pos) {
     i16 n = get_parameter().n, e = get_parameter().e;
     std::smatch match;
-    if (std::regex_search(str.begin() + pos, str.end(), match,
-                                 std::regex{"D"},
-                                 std::regex_constants::match_continuous)) {
+    if (std::regex_search(str.begin() + pos, str.end(), match, std::regex{"D"},
+                          std::regex_constants::match_continuous)) {
         pos += match[0].length();
         delta();
     } else if (std::regex_search(str.begin() + pos, str.end(), match,
-                          std::regex{"\\([\\s\\t]*(" + number_regex +
-                                     ")[\\s\\t]*,?[\\s\\t]*(" + number_regex +
-                                     ")[\\s\\t]*\\)"},
-                          std::regex_constants::match_continuous)) {
+                                 std::regex{"\\([\\s\\t]*(" + number_regex +
+                                            ")[\\s\\t]*,?[\\s\\t]*(" +
+                                            number_regex + ")[\\s\\t]*\\)"},
+                                 std::regex_constants::match_continuous)) {
         i16 i = std::stoi(match[1]);
         i16 j = std::stoi(match[2]);
         pos += match[0].length();
@@ -414,7 +406,7 @@ void Underlying::assign_partition(i16 *x) const {
 
 // We assume e > 1.
 void Underlying::of_partition(const i16 *x) {
-    thread_local i16 z[MAX_N + 1];
+    thread_local i16 z[MAX_N_PARAMETER + 1];
     i16 min_cycle_0 = 0, max_cycle_0 = 0;
     i16 n = get_parameter().n, e = get_parameter().e, r;
 
@@ -499,7 +491,7 @@ void Underlying::of_partition(const i16 *x) {
                 }
             }
             i16 q_min = Quot(min_cycle_0 - 1, n),
-                   q_max = Quot(max_cycle_0 - 1, n);
+                q_max = Quot(max_cycle_0 - 1, n);
             i16 r_min = Rem(min_cycle_0 - 1, n) + 1;
             z[0] = 0;
             coefficient_table[0] = q_min;
@@ -539,13 +531,15 @@ void Underlying::of_partition(const i16 *x) {
 }
 
 Underlying Underlying::left_meet(const Underlying &b) const {
-    thread_local i16 x[MAX_E * MAX_N + 1], y[MAX_E * MAX_N + 1],
-        z[MAX_E * MAX_N + 1];
+    thread_local i16 x[MAX_E_PARAMETER * MAX_N_PARAMETER + 1],
+        y[MAX_E_PARAMETER * MAX_N_PARAMETER + 1],
+        z[MAX_E_PARAMETER * MAX_N_PARAMETER + 1];
 
     assign_partition(x);
     b.assign_partition(y);
 
-    thread_local i16 P[MAX_E * MAX_N + 1][MAX_E * MAX_N + 1];
+    thread_local i16 P[MAX_E_PARAMETER * MAX_N_PARAMETER + 1]
+                      [MAX_E_PARAMETER * MAX_N_PARAMETER + 1];
 
     for (i16 i = get_parameter().e * get_parameter().n; i >= 0; i--) {
         P[x[i]][y[i]] = i;
@@ -590,7 +584,7 @@ bool Underlying::compare(const Underlying &b) const {
         }
     }
     return true;
-};
+}
 
 Underlying Underlying::inverse() const {
     Underlying f = Underlying(get_parameter());
@@ -605,26 +599,27 @@ Underlying Underlying::inverse() const {
             coefficient_table[i] == 0 ? 0 : e - coefficient_table[i];
     }
     return f;
-};
+}
 
 Underlying Underlying::product(const Underlying &b) const {
     Underlying f = Underlying(get_parameter());
     i16 i, n = get_parameter().n, e = get_parameter().e;
     for (i = 0; i <= n; i++) {
         f.permutation_table[i] = b.permutation_table[permutation_table[i]];
-        f.coefficient_table[i] = Rem(
-            b.coefficient_table[permutation_table[i]] + coefficient_table[i], e);
+        f.coefficient_table[i] = Rem(b.coefficient_table[permutation_table[i]] +
+                                         coefficient_table[i],
+                                     e);
     }
     return f;
-};
+}
 
 Underlying Underlying::left_complement(const Underlying &b) const {
     return b.product(inverse());
-};
+}
 
 Underlying Underlying::right_complement(const Underlying &b) const {
     return inverse().product(b);
-};
+}
 
 void Underlying::delta_conjugate_mut(i16 k) {
     i16 i, n = get_parameter().n, e = get_parameter().e;
@@ -703,13 +698,4 @@ std::size_t Underlying::hash() const {
     return h;
 }
 
-} // namespace dual_complex
-
-template <>
-IndentedOStream &
-    IndentedOStream::operator<< <dual_complex::EENParameter>(const dual_complex::EENParameter &p) {
-    p.print(*this);
-    return *this;
-};
-
-} // namespace cgarside
+} // namespace garcide::dual_complex

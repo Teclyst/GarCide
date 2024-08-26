@@ -414,9 +414,9 @@ ThurstonType thurston_type(const Braid &b);
 } // namespace artin
 
 /**
- * @brief Inserts a `ThurstonType` value in the output stream.
+ * @brief Inserts a Thurston type in the output stream.
  *
- * @param type A `ThurstonType` value.
+ * @param type The Thurston type to be inserted.
  * @return A reference to `*this`, so that `<<` may be chained.
  */
 template <>

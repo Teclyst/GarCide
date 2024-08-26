@@ -296,6 +296,13 @@ class Underlying {
      */
     void delta_conjugate_mut(i16 k);
 
+    /**
+     * @brief Hashes the factor.
+     * 
+     * Constant time.
+     * 
+     * @return The hash. 
+     */
     inline std::size_t hash() const { return (size_t)vertex; }
 };
 
@@ -306,8 +313,7 @@ class Underlying {
 using Factor = FactorTemplate<Underlying>;
 
 /**
- * @brief Class for dual Garside structure \f$\mathbf I\f$-series Artin groups
- * canonical factors.
+ * @brief Class for dual Garside structure \f$\mathbf I\f$-series Artin groups elements.
  */
 using Braid = BraidTemplate<Factor>;
 

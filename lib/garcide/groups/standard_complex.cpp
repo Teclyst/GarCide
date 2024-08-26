@@ -30,9 +30,7 @@
 
 #include "garcide/groups/standard_complex.h"
 
-namespace garcide {
-
-namespace standard_complex {
+namespace garcide::standard_complex {
 
 void EENParameter::print(IndentedOStream &os) const {
     os << "(e: " << e << ", n: " << n << ")";
@@ -96,7 +94,7 @@ Underlying::Parameter Underlying::parameter_of_string(const std::string &str) {
                                      match.str(2) +
                                      " can not be converted to a C++ integer.");
         }
-        if ((2 <= e) && (2 <= n) && (n <= MAX_N)) {
+        if ((2 <= e) && (2 <= n) && (n <= MAX_N_PARAMETER)) {
             return EENParameter(e, n);
         } else if (2 > e) {
             throw InvalidStringError("e should be at least 2!");
@@ -105,13 +103,13 @@ Underlying::Parameter Underlying::parameter_of_string(const std::string &str) {
         } else {
             throw InvalidStringError("n is too big!\n" + match.str(1) +
                                      " is strictly greater than " +
-                                     std::to_string(MAX_N) + ".");
+                                     std::to_string(MAX_N_PARAMETER) + ".");
         }
     } else {
         throw InvalidStringError(
             std::string("Could not extract an integer from \"str\"!"));
     }
-};
+}
 
 i16 Underlying::lattice_height() const {
     i16 n = get_parameter().n;
@@ -122,7 +120,7 @@ Underlying::Underlying(Parameter p)
     : een_index(p), permutation_table(p.n), coefficient_table(p.n) {}
 
 void Underlying::print(IndentedOStream &os) const {
-    thread_local i16 dir_perm[MAX_N];
+    thread_local i16 dir_perm[MAX_N_PARAMETER];
     Underlying copy = *this;
     copy.direct(dir_perm);
     i16 n = get_parameter().n, e = get_parameter().e;
@@ -230,11 +228,11 @@ void Underlying::direct(i16 *dir_perm) const {
     for (i16 i = 0; i < get_parameter().n; i++) {
         dir_perm[permutation_table[i]] = i;
     }
-};
+}
 
 Underlying Underlying::left_meet(const Underlying &b) const {
-    thread_local i16 dir_perm_a[MAX_N], dir_perm_b[MAX_N],
-        dir_perm_meet[MAX_N];
+    thread_local i16 dir_perm_a[MAX_N_PARAMETER], dir_perm_b[MAX_N_PARAMETER],
+        dir_perm_meet[MAX_N_PARAMETER];
     Underlying a_copy = *this;
     Underlying b_copy = b;
     Underlying meet(get_parameter());
@@ -319,7 +317,7 @@ bool Underlying::compare(const Underlying &b) const {
         }
     }
     return true;
-};
+}
 
 Underlying Underlying::inverse() const {
     Underlying f = Underlying(get_parameter());
@@ -330,7 +328,7 @@ Underlying Underlying::inverse() const {
             coefficient_table[i] == 0 ? 0 : e - coefficient_table[i];
     }
     return f;
-};
+}
 
 Underlying Underlying::product(const Underlying &b) const {
     Underlying f = Underlying(get_parameter());
@@ -342,7 +340,7 @@ Underlying Underlying::product(const Underlying &b) const {
                                      e);
     }
     return f;
-};
+}
 
 Underlying Underlying::left_complement(const Underlying &b) const {
     return b.product(inverse());
@@ -400,13 +398,4 @@ std::vector<Underlying> Underlying::atoms() const {
     return atoms;
 }
 
-} // namespace standard_complex
-
-template <>
-IndentedOStream &IndentedOStream::operator<< <standard_complex::EENParameter>(
-    const standard_complex::EENParameter &p) {
-    p.print(*this);
-    return *this;
-};
-
-} // namespace garcide
+} // namespace garcide::standard_complex
