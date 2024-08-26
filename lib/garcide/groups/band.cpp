@@ -87,7 +87,7 @@ void Underlying::print(IndentedOStream &os) const {
                 is_first = false;
             }
             for (j = int(curr_cycle.size()) - 1; j >= 1; --j) {
-                os << "(" << curr_cycle[j] << ", " << curr_cycle[j - 1] << ")"
+                os << "a(" << curr_cycle[j] << ", " << curr_cycle[j - 1] << ")"
                    << ((j == 1) ? "" : " ");
             }
         }
@@ -152,11 +152,6 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
 void Underlying::debug(IndentedOStream &os) const {
     os << "{   ";
     os.Indent(4);
-    os << "number_of_strands:";
-    os.Indent(4);
-    os << EndLine() << get_parameter();
-    os.Indent(-4);
-    os << EndLine();
     os << "permutation_table:";
     os.Indent(4);
     os << EndLine();

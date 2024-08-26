@@ -44,7 +44,7 @@
 
 #elif BRAIDING_CLASS == 3
 
-#include "garcide/groups/dihedral.h"
+#include "garcide/groups/dihedral.hpp"
 
 #elif BRAIDING_CLASS == 4
 

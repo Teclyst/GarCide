@@ -321,7 +321,6 @@ class Underlying {
      * Linear in the number of strands (but does nothing if `k` is even).
      *
      * @param k The exponent.
-     * @return Underlying
      */
     void delta_conjugate_mut(i16 k);
 

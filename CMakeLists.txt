@@ -8,6 +8,7 @@ set(USE_PAR TRUE CACHE BOOL "Enable parallelism.")
 set(GENERATE_DOC TRUE CACHE BOOL "Generate documentation.")
 set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose between release and debug.")
 
+# Doxygen configuration.
 set(DOXYGEN_HTML_EXTRA_STYLESHEET "doxygen-awesome-css/doxygen-awesome.css")
 set(DOXYGEN_GENERATE_TREEVIEW YES)
 set(DOXYGEN_DISABLE_INDEX NO)
@@ -15,6 +16,8 @@ set(DOXYGEN_FULL_SIDEBAR NO)
 set(DOXYGEN_HTML_COLORSTYLE LIGHT)
 set(DOXYGEN_HTML_HEADER "doc/header.html")
 set(DOXYGEN_HTML_EXTRA_FILES "doxygen-awesome-css/doxygen-awesome-darkmode-toggle.js" "doxygen-awesome-css/doxygen-awesome-interactive-toc.js")
+set(DOXYGEN_SORT_MEMBER_DOCS YES)
+set(DOXYGEN_SORT_BRIEF_DOCS YES)
 
 if (${USE_PAR})
     if (${TBB_FOUND})

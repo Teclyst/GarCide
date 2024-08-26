@@ -45,56 +45,72 @@
 namespace garcide {
 
 /**
- * @brief Alias for `char`.
- *
+ * @brief Signed 8-bits integer type.
+ * 
+ * Alias for `char`.
+ * 
  * We use our own types for portability.
  */
 using i8 = char;
 
 /**
- * @brief Alias for `unsigned char`.
+ * @brief Unsigned 8-bits integer type.
+ * 
+ * Alias for `unsigned char`.
  *
  * We use our own types for portability.
  */
 using u8 = unsigned char;
 
 /**
- * @brief Alias for `int`.
+ * @brief Signed 16-bits integer type. 
+ * 
+ * Alias for `int`.
  *
  * We use our own types for portability.
  */
 using i16 = int;
 
 /**
- * @brief Alias for `unsigned int`.
+ * @brief Unsigned 16-bits integer type.
+ * 
+ * Alias for `unsigned int`.
  *
  * We use our own types for portability.
  */
 using u16 = unsigned int;
 
 /**
- * @brief Alias for `long`.
+ * @brief Signed 32-bits integer type. 
+ * 
+ * Alias for `long`.
  *
  * We use our own types for portability.
  */
 using i32 = long;
 
 /**
- * @brief Alias for `unsigned long`.
+ * @brief Unsigned 32-bits integer type.
+ * 
+ * Alias for `unsigned long`.
  *
  * We use our own types for portability.
  */
 using u32 = unsigned long;
 
 /**
- * @brief Alias for `long long`.
+ * @brief Signed 64-bits integer type. 
+ * 
+ * Alias for `long long`.
  *
  * We use our own types for portability.
  */
 using i64 = long long;
 
 /**
- * @brief Alias for `unsigned long long`.
+ * @brief Unsigned 64-bits integer type. 
+ * 
+ * Alias for `unsigned long long`.
  *
  * We use our own types for portability.
  */

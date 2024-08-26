@@ -89,12 +89,12 @@ void Underlying::print(IndentedOStream &os) const {
                 is_first = false;
             }
             for (i16 l = int(curr_cycle.size()) - 1; l >= 1; --l) {
-                os << "(" << curr_cycle[l] << ", " << curr_cycle[l - 1] << ")"
+                os << "s(" << curr_cycle[l] << ", " << curr_cycle[l - 1] << ")"
                    << ((l == 1) ? "" : " ");
             }
             // Long cycle.
             if (j > n) {
-                os << (is_first ? "" : " ") << j - n;
+                os << (is_first ? "l" : " l") << j - n;
             }
         }
     }

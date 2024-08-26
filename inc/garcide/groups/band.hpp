@@ -320,7 +320,7 @@ class Underlying {
      * @brief Left complement computations.
      *
      * Computes the left complement of `*this` to `b`, under the assumption that
-     * `*this` left-divides `b`.
+     * `*this` divides `b`.
      *
      * Linear in the number of strands.
      *
@@ -333,7 +333,7 @@ class Underlying {
      * @brief Right complement computations.
      *
      * Computes the right complement of `*this` to `b`, under the assumption
-     * that `*this` right-divides `b`.
+     * that `*this` divides `b`.
      *
      * Linear in the number of strands.
      *
@@ -379,7 +379,6 @@ class Underlying {
      * Linear in the number of strands (in particular, does not depend on `k`).
      *
      * @param k The exponent.
-     * @return Underlying
      */
     void delta_conjugate_mut(i16 k);
 

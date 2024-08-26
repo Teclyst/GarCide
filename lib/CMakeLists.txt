@@ -4,7 +4,7 @@ set(HEADERS_LIST
     groups/artin.hpp 
     groups/band.hpp 
     groups/octahedral.hpp 
-    groups/dihedral.h 
+    groups/dihedral.hpp 
     groups/dual_complex.h 
     groups/standard_complex.h
     groups/euclidean_lattice.hpp

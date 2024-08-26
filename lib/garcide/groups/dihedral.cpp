@@ -28,13 +28,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "garcide/groups/dihedral.h"
-
-struct NotBelow {};
+#include "garcide/groups/dihedral.hpp"
 
 namespace garcide::dihedral {
-
-i16 Underlying::get_parameter() const { return number_of_points; }
 
 Underlying::Parameter Underlying::parameter_of_string(const std::string &str) {
     std::smatch match;
@@ -58,17 +54,15 @@ Underlying::Parameter Underlying::parameter_of_string(const std::string &str) {
         throw InvalidStringError(
             std::string("Could not extract an integer from \"str\"!"));
     }
-};
+}
 
-i16 Underlying::lattice_height() const { return 2; }
-
-Underlying::Underlying(i16 n) : number_of_points(n), type(0), point(0) {}
+Underlying::Underlying(i16 n) : number_of_vertices(n), type(0), vertex(0) {}
 
 void Underlying::print(IndentedOStream &os) const {
     if (type == 1) {
         os << "D";
     } else if (type == 2) {
-        os << "s" << point;
+        os << "s" << vertex;
     }
 }
 
@@ -79,11 +73,11 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
                           std::regex_constants::match_continuous)) {
         pos += match[0].length();
         delta();
-    } else if (std::regex_search(
-                   str.begin() + pos, str.end(), match,
-                   std::regex{"(s[\\s\\t]*_?)?[\\s\\t]*(" + number_regex + ")"},
-                   std::regex_constants::match_continuous)) {
-        point = Rem(std::stoi(match[2]), get_parameter());
+    } else if (std::regex_search(str.begin() + pos, str.end(), match,
+                                 std::regex{"(:?s[\\s\\t]*_?)?[\\s\\t]*(" +
+                                            number_regex + ")"},
+                                 std::regex_constants::match_continuous)) {
+        vertex = Rem(std::stoi(match[1]), get_parameter());
         type = 2;
         pos += match[0].length();
     } else {
@@ -94,9 +88,32 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
     }
 }
 
+void Underlying::debug(IndentedOStream &os) const {
+    os << "{   ";
+    os.Indent(4);
+    os << "number_of_vertices:";
+    os.Indent(4);
+    os << EndLine() << number_of_vertices;
+    os.Indent(-4);
+    os << EndLine();
+    os << "type:";
+    os.Indent(4);
+    os << EndLine();
+    os << type;
+    os.Indent(-4);
+    os << EndLine();
+    os << "vertex:";
+    os.Indent(4);
+    os << EndLine();
+    os << vertex;
+    os.Indent(-8);
+    os << EndLine();
+    os << "}";
+}
+
 Underlying Underlying::left_meet(const Underlying &b) const {
     if ((type == 0) || (b.type == 0) ||
-        ((type == 2) && (b.type == 2) && (point != b.point))) {
+        ((type == 2) && (b.type == 2) && (vertex != b.vertex))) {
         return Underlying(get_parameter());
     }
     if (type == 1) {
@@ -107,18 +124,6 @@ Underlying Underlying::left_meet(const Underlying &b) const {
     return c;
 }
 
-Underlying Underlying::right_meet(const Underlying &b) const {
-    return left_meet(b);
-}
-
-void Underlying::identity() { type = 0; }
-
-void Underlying::delta() { type = 1; }
-
-bool Underlying::compare(const Underlying &b) const {
-    return ((type == b.type) && ((type != 2) || (point == b.point)));
-}
-
 Underlying Underlying::product(const Underlying &b) const {
     Underlying f = Underlying(get_parameter());
     if (type == 0) {
@@ -126,13 +131,13 @@ Underlying Underlying::product(const Underlying &b) const {
     } else if (b.type == 0) {
         f = *this;
     } else if ((type == 2) && (b.type == 2) &&
-               ((point - b.point + get_parameter()) % get_parameter() == 1)) {
+               ((vertex - b.vertex + get_parameter()) % get_parameter() == 1)) {
         f.delta();
     } else {
         throw NotBelow();
     }
     return f;
-};
+}
 
 Underlying Underlying::left_complement(const Underlying &b) const {
     Underlying f = Underlying(get_parameter());
@@ -141,16 +146,16 @@ Underlying Underlying::left_complement(const Underlying &b) const {
             f.delta();
         } else if (type == 2) {
             f.type = 2;
-            if (point == get_parameter() - 1) {
-                f.point = 0;
+            if (vertex == get_parameter() - 1) {
+                f.vertex = 0;
             } else {
-                f.point = point + 1;
+                f.vertex = vertex + 1;
             }
         }
     } else if (b.type == 2) {
         if (type == 0) {
             f = b;
-        } else if ((type == 2) && (point == b.point)) {
+        } else if ((type == 2) && (vertex == b.vertex)) {
             f.identity();
         } else {
             throw NotBelow();
@@ -161,7 +166,7 @@ Underlying Underlying::left_complement(const Underlying &b) const {
         }
     }
     return f;
-};
+}
 
 Underlying Underlying::right_complement(const Underlying &b) const {
     Underlying f = Underlying(get_parameter());
@@ -170,16 +175,16 @@ Underlying Underlying::right_complement(const Underlying &b) const {
             f.delta();
         } else if (type == 2) {
             f.type = 2;
-            if (point == 0) {
-                f.point = get_parameter() - 1;
+            if (vertex == 0) {
+                f.vertex = get_parameter() - 1;
             } else {
-                f.point = point - 1;
+                f.vertex = vertex - 1;
             }
         }
     } else if (b.type == 2) {
         if (type == 0) {
             f = b;
-        } else if ((type == 2) && (point == b.point)) {
+        } else if ((type == 2) && (vertex == b.vertex)) {
             f.identity();
         } else {
             throw NotBelow();
@@ -190,22 +195,12 @@ Underlying Underlying::right_complement(const Underlying &b) const {
         }
     }
     return f;
-};
+}
 
-Underlying Underlying::delta_conjugate_mut(i16 k) const {
-    Underlying under = Underlying(*this);
-    i16 n = get_parameter();
-    if (type != 2) {
-        under = *this;
-    } else {
-        if (k > 0) {
-            k = k - k * n;
-        }
-        under.type = 2;
-        under.point = (point - 2 * k) % n;
+void Underlying::delta_conjugate_mut(i16 k) {
+    if (type == 2) {
+        vertex = Rem(vertex - 2 * k, get_parameter());
     }
-
-    return under;
 }
 
 void Underlying::randomize() {
@@ -216,7 +211,7 @@ void Underlying::randomize() {
         type = 1;
     } else {
         type = 2;
-        point = rand;
+        vertex = rand;
     }
 }
 
@@ -226,7 +221,7 @@ std::vector<Underlying> Underlying::atoms() const {
     atom.type = 2;
     std::vector<Underlying> atoms;
     for (i16 i = 0; i < n; i++) {
-        atom.point = i;
+        atom.vertex = i;
         atoms.push_back(atom);
     }
     return atoms;

@@ -328,7 +328,7 @@ class Underlying {
      * @brief Left complement computations.
      *
      * Computes the left complement of `*this` to `b`, under the assumption that
-     * `*this` left-divides `b`.
+     * `*this` divides `b`.
      *
      * Linear in the parameter.
      *
@@ -341,7 +341,7 @@ class Underlying {
      * @brief Right complement computations.
      *
      * Computes the right complement of `*this` to `b`, under the assumption
-     * that `*this` right-divides `b`.
+     * that `*this` divides `b`.
      *
      * Linear in the parameter.
      *
@@ -372,14 +372,11 @@ class Underlying {
     std::vector<Underlying> atoms() const;
 
     /**
-     * @brief Conjugates by \f$\Delta_n^k\f$.
+     * @brief Conjugates by \f$\Delta^k\f$.
      *
-     * Here \f$n\f$ denotes the number of strands.
-     *
-     * Linear in the number of strands (in particular, does not depend on `k`).
+     * Linear in the parameter (in particular, does not depend on `k`).
      *
      * @param k The exponent.
-     * @return Underlying
      */
     void delta_conjugate_mut(i16 k);
 
@@ -397,7 +394,7 @@ class Underlying {
      * @brief Computes the factor associated with the inverse of the permutation
      * of this factor.
      *
-     * Linear in the number of strands.
+     * Linear in the parameter.
      *
      * @return The factor associated with the inverse of the permutation of
      * `*this`.

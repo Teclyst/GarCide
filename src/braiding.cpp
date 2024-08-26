@@ -268,7 +268,7 @@ void print_header(IndentedOStream &os) {
        << EndLine()
        << "│││││                   Based on Braiding                  │││││"
        << EndLine()
-       << "│││││       Copyright (C) 2004 Juan Gonzalez-Meneses.      │││││"
+       << "│││││       Copyright (C) 2004 Juan González-Meneses.      │││││"
        << EndLine()
        << "├───┴──┬────────────────────────────────────────────────┬──┴───┤"
        << EndLine()
