@@ -124,3 +124,5 @@ See `doc/implementing_garside_groups.md`.
 If you have _Doxygen_, and assuming that `GENERATE_DOC` is set to `TRUE`, then documentation will be automatically generated when building the project.
 
 To read it, open `build/html/index.html`.
+
+The _Doxygen_ pages use the _[Doxygen Awesome](https://github.com/jothepro/doxygen-awesome-css)_ theme by **[jothepro](https://github.com/jothepro)**.
