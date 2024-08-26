@@ -1,5 +1,5 @@
 /**
- * @file band.h
+ * @file band.hpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
  * @brief Header file for standard braid groups (dual Garside structure).
  * @version 0.1

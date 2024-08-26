@@ -1,5 +1,5 @@
 /**
- * @file artin.h
+ * @file artin.hpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
  * @brief Header file for standard braid groups (classic Garside structure).
  * @version 0.1

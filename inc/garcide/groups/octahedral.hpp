@@ -1,5 +1,5 @@
 /**
- * @file octahedral.h
+ * @file octahedral.hpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
  * @brief Header file for \f$\mathbf B\f$-series Artin groups (dual Garside
  * structure).
