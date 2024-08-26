@@ -137,7 +137,7 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
     } else {
         throw InvalidStringError(std::string(
             "Could not extract a factor from\n\"" + str.substr(pos) +
-            "\"!\nA factor should match regex Z | 'D',\nwhere Z matches "
+            "\"!\nA factor should match regex ('s' '_'?)? Z | 'D',\nwhere Z matches "
             "integers."));
     }
 }

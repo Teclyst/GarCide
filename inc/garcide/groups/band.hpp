@@ -77,9 +77,9 @@ class Underlying {
 
   public:
     /**
-     * @brief Maximum braid index.
+     * @brief Maximum number of strands.
      *
-     * The greatest index that may be used for braids.
+     * The greatest number of strands that may be used for braids.
      *
      * It is used because we use `thread_local` objects to avoid some
      * allocations, and their size must be known at compile time.
@@ -211,6 +211,8 @@ class Underlying {
      * representing a partition, then for all \f$i\in[\![1,n]\!]\f$, \f$\mathrm
      * A[i]\f$ is the minimum of the cell \f$i\f$ belongs to.
      *
+     * Linear in the number of strands.
+     * 
      * @param x A `i16` array.
      */
     void assign_partition(i16 *x) const;
@@ -224,6 +226,8 @@ class Underlying {
      * representing a partition, then for all \f$i\in[\![1,n]\!]\f$, \f$\mathrm
      * A[i]\f$ is the minimum of the cell \f$i\f$ belongs to.
      *
+     * Linear in the number of strands.
+     * 
      * @param x A `i16` array.
      */
     void of_partition(const i16 *x);
@@ -353,7 +357,7 @@ class Underlying {
      *
      * It should end up being quasilinear in the number of strands.
      *
-     * @exception `NonRandomizable` Thrown, unless by some miracle you are
+     * @exception NonRandomizable Thrown, unless by some miracle you are
      * compiling the project with _CLN_.
      */
     void randomize();
@@ -372,7 +376,7 @@ class Underlying {
      *
      * Here \f$n\f$ denotes the number of strands.
      *
-     * Linear in the number of strands (but does nothing if `k` is even).
+     * Linear in the number of strands (in particular, does not depend on `k`).
      *
      * @param k The exponent.
      * @return Underlying
@@ -389,8 +393,9 @@ class Underlying {
     size_t hash() const;
 
     /**
-     * @brief Sets the factor to the one associated with a given ballot sequence.
-     * 
+     * @brief Sets the factor to the one associated with a given ballot
+     * sequence.
+     *
      * @param s The ballot sequence.
      */
     void of_ballot_sequence(const i8 *s);
@@ -426,7 +431,7 @@ using Braid = BraidTemplate<Factor>;
  * The order (and the algorithm) are described in Cha, Ko, Lee, Han, Cheon, _An
  * Efficient Implementation of Braid Groups_, 2001
  *
- * @param n Length of the ballot sequence, divided by \f$2\f$. 
+ * @param n Length of the ballot sequence, divided by \f$2\f$.
  * @param k Rank of the ballot sequence.
  * @param s Integer array to be set to the ballot sequence.
  */
@@ -434,9 +439,9 @@ void ballot_sequence(i16 n, cln::cl_I k, i8 *s);
 
 /**
  * @brief Returns the `n`-th Catalan number.
- * 
+ *
  * These are pre-computed, so this is a constant-time operation.
- * 
+ *
  * @param n Rank of the Catalan number.
  * @return The `n`-th Catalan number.
  */

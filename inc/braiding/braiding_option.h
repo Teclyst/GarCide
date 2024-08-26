@@ -40,7 +40,7 @@
 
 #elif BRAIDING_CLASS == 2
 
-#include "garcide/groups/octahedral.h"
+#include "garcide/groups/octahedral.hpp"
 
 #elif BRAIDING_CLASS == 3
 

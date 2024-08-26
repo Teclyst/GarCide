@@ -141,10 +141,11 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
                 ") is not a valid factor.");
         }
     } else {
-        throw InvalidStringError(
-            "Could not extract a factor from\n\"" + str.substr(pos) +
-            "\"!\nA factor should match regex '('Z ','? Z ')' | 'D',\nwhere Z "
-            "matches integers, and ignoring whitespaces.");
+        throw InvalidStringError("Could not extract a factor from\n\"" +
+                                 str.substr(pos) +
+                                 "\"!\nA factor should match regex ('a' '_'?)? "
+                                 "'('Z ','? Z ')' | 'D',\nwhere Z "
+                                 "matches integers, and ignoring whitespaces.");
     }
 }
 

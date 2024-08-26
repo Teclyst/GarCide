@@ -71,9 +71,9 @@ class Underlying {
 
   public:
     /**
-     * @brief Maximum braid index.
+     * @brief Maximum number of strands.
      *
-     * The greatest index that may be used for braids.
+     * The greatest number of strands that may be used for braids.
      *
      * It is used because we use `thread_local` objects to avoid some
      * allocations, and their size must be known at compile time.

@@ -3,7 +3,7 @@ set(HEADERS_LIST
     utility.hpp
     groups/artin.hpp 
     groups/band.hpp 
-    groups/octahedral.h 
+    groups/octahedral.hpp 
     groups/dihedral.h 
     groups/dual_complex.h 
     groups/standard_complex.h
