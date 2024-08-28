@@ -430,11 +430,11 @@ We use regular expressions (regexes from now on) to specify what patterns should
 
 Typically, in this case we want to allow several different ways of entering the same atom $e_i$: it's going to be printed as `ei`, but it could be equally be reasonnable to enter it as shorter `i`, or longer `e i`, `e_i`, `e _ i`, or some wilder alternative with $42$ tabs. (For convenience sake however we should make sure that output is compatible with input, so `ei` should be a valid input).
 
-Now the great thing about regular expressions is that they make it very easy to specify all these kinds of patterns at the same time: it is simply expressed by regular expression $(\texttt e (\texttt{\textbackslash s} \mid \texttt{\textbackslash t})^*\texttt \_?(\texttt{\textbackslash s} \mid \texttt{\textbackslash t})^*)?([\texttt 1 - \texttt 9][\texttt 0 - \texttt 9]^* \mid \texttt 0).$
+Now the great thing about regular expressions is that they make it very easy to specify all these kinds of patterns at the same time: it is simply expressed by regular expression $$(\texttt e (\texttt{\char'134s} \mid \texttt{\char'134t})^*\texttt \_?(\texttt{\char'134s} \mid \texttt{\char'134t})^*)?([\texttt 1 - \texttt 9][\texttt 0 - \texttt 9]^* \mid \texttt 0).$$
 
 The second part, $[\texttt 1 - \texttt 9][\texttt 0 - \texttt 9]^* \mid \texttt 0$, matches either $\texttt 0$ or a sequence of digits starting by a non-zero one, _i.e._ a positive integer. (Here $[a - b]$ matches the _range_ of characters between $a$ and $b$).
 
-The first is optional (the whole group is tagged with a postfix quotation mark), and is composed of an $\texttt e$, followed by a sequence of whitespaces ($\texttt{\textbackslash s}$) and of tabs ($\texttt{\textbackslash t}$), with an optional underscore in the middle.
+The first is optional (the whole group is tagged with a postfix quotation mark), and is composed of an $\texttt e$, followed by a sequence of whitespaces ($\texttt{\char'134s}$) and of tabs ($\texttt{\char'134t}$), with an optional underscore in the middle.
 
 Notice than in all cases, the meaningful part does not change: it's always the second one. This can be expressed in C++ regexes using _capture groups_. `std::regex_search`, when executed with positions, and flag `std::regex_constants::match_continuous`, will try to find a match for the regex starting at the first provided position and ending before the second. When it finds one, it will also extract substrings from all subexpressions enclosed by parenthesis in the big one, and store them in `match`. These parenthesis denote capture groups.
 
