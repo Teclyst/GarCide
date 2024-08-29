@@ -1,5 +1,5 @@
 /**
- * @file super_summit.h
+ * @file super_summit.hpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
  * @brief Header (and implementation) file for super summit sets.
  * @version 0.1
@@ -30,7 +30,7 @@
 #ifndef SUPER_SUMMIT
 #define SUPER_SUMMIT
 
-#include "garcide/garcide.h"
+#include "garcide/garcide.hpp"
 #include <cstddef>
 #include <iterator>
 

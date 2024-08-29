@@ -31,7 +31,7 @@
 #ifndef OCTAHEDRAL
 #define OCTAHEDRAL
 
-#include "garcide/garcide.h"
+#include "garcide/garcide.hpp"
 
 /**
  * @brief Namespace for \f$\mathbf B\f$-series Artin groups, dual Garside
@@ -67,9 +67,9 @@ class Underlying {
      * @brief Inverse table of the permutation that corresponds to the factor.
      *
      * Given a permutation \f$\sigma\in\mathfrak S_{2n}\f$, the inverse
-     * permutation table of \f$\sigma\f$ is the table $\f\mathrm T_\sigma\f$
+     * permutation table of \f$\sigma\f$ is the table \f$\mathrm T_\sigma\f$
      * such that
-     * $\forall i\in[\![1,2n]\!],\mathrm T_\sigma\f[\sigma(i)]=i\f$.
+     * \f$\forall i\in[\![1,2n]\!],\mathrm T_\sigma\f[\sigma(i)]=i\f$.
      *
      * Indexes start at \f$1\f$.
      */

@@ -1,5 +1,5 @@
 /**
- * @file dual_complex.h
+ * @file dual_complex.hpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
  * @brief Header file for \f$\mathrm B(e,e,n+1)\f$ groups (dual Garside
  * structure).
@@ -28,7 +28,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "garcide/garcide.h"
+#include "garcide/garcide.hpp"
 
 namespace garcide {
 

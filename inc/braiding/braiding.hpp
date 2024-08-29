@@ -1,5 +1,5 @@
 /**
- * @file braiding.h
+ * @file braiding.hpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
  * @brief Header file for most of braiding.
  * @version 0.1
@@ -27,7 +27,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "braiding_option.h"
+#include "braiding_option.hpp"
 
 #ifndef BRAIDING
 #define BRAIDING
@@ -81,8 +81,8 @@ enum class Option {
  *
  * @param b The braid that is to be set to what is read from `is`.
  * @param is The input stream we read from. Its default value is `std::cin`.
- * @exception `garcide::InvalidStringError`: may be raised by `of_string`.
- * @exception `HelpAskedFor`: raised when `"?"` is entered.
+ * @exception garcide::InvalidStringError May be raised by `Braid::of_string`.
+ * @exception HelpAskedFor Raised when `"?"` is entered.
  * @exception InterruptAskedFor Raised when `"q"` or `"Q"` is entered.
  */
 void read_braid(Braid &b, std::istream &is = std::cin);
@@ -91,9 +91,9 @@ void read_braid(Braid &b, std::istream &is = std::cin);
  * @brief Reads a line from `is` as a parameter and returns it.
  *
  * @param is The input stream we read from. Its default value is `std::cin`.
- * @exception `garcide::InvalidStringError`: may be raised by
- * `parameter_of_string`.
- * @exception `HelpAskedFor`: raised when `"?"` is entered.
+ * @exception garcide::InvalidStringError May be raised by
+ * `Braid::parameter_of_string`.
+ * @exception HelpAskedFor Raised when `"?"` is entered.
  * @exception InterruptAskedFor Raised when `"q"` or `"Q"` is entered.
  */
 Braid::Parameter read_braid_parameter(std::istream &is = std::cin);

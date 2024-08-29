@@ -30,7 +30,7 @@
 #ifndef EUCLIDEAN_LATTICE
 #define EUCLIDEAN_LATTICE
 
-#include "garcide/garcide.h"
+#include "garcide/garcide.hpp"
 
 /**
  * @brief Namespace for euclidian lattices \f$\mathbb Z^n\f$.

@@ -1,5 +1,5 @@
 /**
- * @file sliding_circuits.h
+ * @file sliding_circuits.hpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
  * @brief Header (and implementation) file for sliding circuit sets.
  * @version 0.1
@@ -30,7 +30,7 @@
 #ifndef SLIDING_CIRCUITS
 #define SLIDING_CIRCUITS
 
-#include "garcide/super_summit.h"
+#include "garcide/super_summit.hpp"
 
 /**
  * @brief Namespace for sliding circuits sets calculations.

@@ -1,3 +1,4 @@
+# Define header files.
 set(HEADERS_PATH "${GarCide_SOURCE_DIR}/inc/garcide/")
 set(HEADERS_LIST
     utility.hpp
@@ -5,15 +6,13 @@ set(HEADERS_LIST
     groups/band.hpp 
     groups/octahedral.hpp 
     groups/dihedral.hpp 
-    groups/dual_complex.h 
-    groups/standard_complex.h
+    groups/dual_complex.hpp 
+    groups/standard_complex.hpp
     groups/euclidean_lattice.hpp
 )
 list(TRANSFORM HEADERS_LIST PREPEND ${HEADERS_PATH})
 
-set(DOXYGEN_USE_MATHJAX YES CACHE STRING "If enabled, compiled documentation will use MathJax.")
-set(RANDOMIZE_AS_WORD FALSE CACHE BOOL "If enabled, random braids are produced by taking random words in the atoms.")
-
+# Configure the garcide library target.
 add_library(
     garcide
     garcide/utility.cpp
@@ -29,11 +28,13 @@ add_library(
 target_include_directories(garcide PRIVATE ../inc)
 target_compile_options(garcide PRIVATE -Wall -Wextra -Wpedantic)
 
+# Link TBB if it is present and desired.
 if (${USE_PAR} AND ${TBB_FOUND})
     target_compile_definitions(garcide PRIVATE -DUSE_PAR)
     target_link_libraries(garcide PRIVATE TBB::tbb)
 endif()
 
+# Define the RANDOMIZE_AS_WORD preprocessor variable if asked to.
 if (${RANDOMIZE_AS_WORD})
     target_compile_definitions(garcide PRIVATE -DRANDOMIZE_AS_WORD)
 endif()

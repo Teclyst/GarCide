@@ -28,7 +28,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "garcide/garcide.h"
+#include "garcide/garcide.hpp"
 
 /**
  * @brief Namespace for \f$\mathbf I\f$-series Artin groups, dual Garside

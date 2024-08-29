@@ -1,5 +1,5 @@
 /**
- * @file braiding_option.h
+ * @file braiding_option.hpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
  * @brief Header file to configure the braiding executable.
  * @version 0.1
@@ -48,11 +48,11 @@
 
 #elif BRAIDING_CLASS == 4
 
-#include "garcide/groups/dual_complex.h"
+#include "garcide/groups/dual_complex.hpp"
 
 #elif BRAIDING_CLASS == 5
 
-#include "garcide/groups/standard_complex.h"
+#include "garcide/groups/standard_complex.hpp"
 
 #elif BRAIDING_CLASS == 6
 

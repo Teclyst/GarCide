@@ -1,5 +1,5 @@
 /**
- * @file standard_complex.h
+ * @file standard_complex.hpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
  * @brief Header file for \f$\mathrm B(e, e, n)\f$ groups (semi-classic Garside
  * structure).
@@ -28,7 +28,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "garcide/garcide.h"
+#include "garcide/garcide.hpp"
 
 namespace garcide {
 

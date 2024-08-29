@@ -1,5 +1,5 @@
 /**
- * @file garcide.h
+ * @file garcide.hpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
  * @brief Header (and implementation) file for generic Garside groups.
  * @version 0.1
@@ -1511,7 +1511,7 @@ template <class F> class BraidTemplate {
      * @brief Computes the preferred suffix of the braid, given in RCF.
      *
      * The preferred suffix of a braid whose RCF is \f$u_0\cdots
-     * u_{m-1}\Delta^k\f$, $m\leqslant 1$ is defined as \f$ (\Delta
+     * u_{m-1}\Delta^k\f$, \f$m\leq 1\f$ is defined as \f$ (\Delta
      * u_0^{-1})\land_{\mathrm R}(\Delta^{-k}u_{m-1}\Delta^{k})\f$.
      *
      * For braid whose canonical length is \f$0\f$, it is simply defined as the

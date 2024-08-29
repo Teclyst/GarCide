@@ -28,7 +28,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "garcide/groups/standard_complex.h"
+#include "garcide/groups/standard_complex.hpp"
 
 namespace garcide::standard_complex {
 

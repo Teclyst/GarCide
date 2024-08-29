@@ -111,6 +111,10 @@ Now for the available options (in bold are the values before any change is ever 
 
 * `GENERATE_DOC` (possible values **`TRUE`**, `FALSE`) - whether documentation should be generated when building the project.
 
+* `DOXYGEN_WARNINGS` (possible values `YES`, **`NO`**) - whether _Doxygen_ should be allowed to output warnings.
+
+* `DOXYGEN_QUIET` (possible values **`YES`**, `NO`) - whether _Doxygen_ should avoid outputing build details.
+
 * `CMAKE_BUILD_TYPE` (possible values `Debug`, **`Release`**) - whether the project should be built in debug mode (debug symbols, no compiler optimizations, better for development) or release mode (compiler optimizations, no debug symbols).
 
     Build with the latter for benchmarking.

@@ -30,7 +30,7 @@
 #ifndef ARTIN
 #define ARTIN
 
-#include "garcide/ultra_summit.h"
+#include "garcide/ultra_summit.hpp"
 
 namespace garcide {
 
@@ -62,8 +62,8 @@ class Underlying {
      * @brief Inverse table of the permutation that corresponds to the factor.
      *
      * Given a permutation \f$\sigma\in\mathfrak S_n\f$, the inverse permutation
-     * table of \f$\sigma\f$ is the table $\f\mathrm T_\sigma\f$ such that
-     * $\forall i\in[\![1,n]\!],\mathrm T_\sigma\f[\sigma(i)]=i\f$.
+     * table of \f$\sigma\f$ is the table \f$\mathrm T_\sigma\f$ such that
+     * \f$\forall i\in[\![1,n]\!],\mathrm T_\sigma\f[\sigma(i)]=i\f$.
      *
      * Indexes start at \f$1\f$.
      */

@@ -1,5 +1,5 @@
 /**
- * @file centralizer.h
+ * @file centralizer.hpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
  * @brief Header (and implementation) file for centralizer computations.
  * @version 0.1
@@ -30,7 +30,7 @@
 #ifndef CENTRALIZER
 #define CENTRALIZER
 
-#include "garcide/ultra_summit.h"
+#include "garcide/ultra_summit.hpp"
 
 /**
  * @brief Namespace for centralizers.

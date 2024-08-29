@@ -10,7 +10,7 @@ Because of that, it is possible to abstract away a lot of implementation details
 
 in C++, this sort of things can be done using _templates_. Code is written using (abstract) class arguments, and when an instantiation of the object, for given (concrete) class arguments is given, the code is copied, substituting every occurence of the abstract argument by its concrete value.
 
-This is exactly what is done in _GarCide_. Most of the code is written in terms of two template classes, defined in `garcide.h`:
+This is exactly what is done in _GarCide_. Most of the code is written in terms of two template classes, defined in `garcide.hpp`:
 
 ```cpp
 template<class U>
@@ -30,7 +30,7 @@ The typical way to implement a Garside group is to write code for a class `Under
 
 ### Code Organization and naming conventions
 
-It is advised separate the code in two files (if you are working within the _GarCide_ library). On one hand, declarations should go in a _header_ file (ending with `.hpp` or `.h`) in `inc/garcide/groups`. On the other hand, definitions (a.k.a. the real code) should go in an _implementation file_ (ending with `.cpp`) located in `lib/garcide/groups`.
+It is advised separate the code in two files (if you are working within the _GarCide_ library). On one hand, declarations should go in a _header_ file (ending with `.hpp`) in `inc/garcide/groups`. On the other hand, definitions (a.k.a. the real code) should go in an _implementation file_ (ending with `.cpp`) located in `lib/garcide/groups`.
 
 It is also advised to work in a sub-namespace of `cgarcide` (_e.g._ `cgarcide::your_garside_group`).
 
@@ -131,7 +131,7 @@ cgarcide::IndentedOStream
 
 must be implemented. This is in particular the case if the same is true, but for `std::ostream` instead of `cgarcide::IndentedOStream`, and therefore in particular for all base types (integers, booleans, ...).
 
-If `SomeType` is more complicated however, you may have to specialize the template yourself. This should be done in namespace `cgarcide` specifically (otherwise it will not compile, even in one of its strict sub-namespace). See `dual_complex.h` and `dual_complex.cpp` for an example.
+If `SomeType` is more complicated however, you may have to specialize the template yourself. This should be done in namespace `cgarcide` specifically (otherwise it will not compile, even in one of its strict sub-namespace). See `dual_complex.hpp` and `dual_complex.cpp` for an example.
 
 These class members will be called all the time (and it is very likely that most of execution time will be spent executing these), so it is a good place to optimize.
 

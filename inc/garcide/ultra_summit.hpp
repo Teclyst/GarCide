@@ -1,5 +1,5 @@
 /**
- * @file ultra_summit.h
+ * @file ultra_summit.hpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
  * @brief Header (and implementation) file for ultra summit sets.
  * @version 0.1
@@ -29,7 +29,7 @@
 #ifndef ULTRA_SUMMIT
 #define ULTRA_SUMMIT
 
-#include "garcide/super_summit.h"
+#include "garcide/super_summit.hpp"
 
 /**
  * @brief Namespace for ultra summit sets.
