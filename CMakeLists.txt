@@ -55,9 +55,8 @@ if (${GENERATE_DOC})
     if (${DOXYGEN_FOUND})
         doxygen_add_docs(
             doxygen
-            ${PROJECT_SOURCE_DIR}/inc
+            ${PROJECT_SOURCE_DIR}/inc/garcide
             ${PROJECT_SOURCE_DIR}/lib
-            ${PROJECT_SOURCE_DIR}/src
             ${PROJECT_SOURCE_DIR}/doc/main_page.dox
             ALL
         )

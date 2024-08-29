@@ -102,7 +102,7 @@ Braid::Parameter read_braid_parameter(std::istream &is = std::cin);
 /**
  * @brief Prints a text that briefly explains the Garside structure of the group.
  *
- * Called when `"grp"` is entered in the option menu. 
+ * Called when `"gar"` is entered in the option menu. 
  */
 void explain_garside_structure();
 
