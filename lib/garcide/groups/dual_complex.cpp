@@ -575,17 +575,6 @@ void Underlying::delta() {
     coefficient_table[n] = 1;
 }
 
-bool Underlying::compare(const Underlying &b) const {
-    i16 i;
-    for (i = 0; i <= get_parameter().n; i++) {
-        if ((permutation_table[i] != b.permutation_table[i]) ||
-            (coefficient_table[i] != b.coefficient_table[i])) {
-            return false;
-        }
-    }
-    return true;
-}
-
 Underlying Underlying::inverse() const {
     Underlying f = Underlying(get_parameter());
     i16 i, n = get_parameter().n, e = get_parameter().e;

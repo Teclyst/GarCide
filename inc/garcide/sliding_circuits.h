@@ -269,7 +269,6 @@ template <class F> F pullback(const BraidTemplate<F> &b, const F &f) {
  *
  * @tparam F A class representing factors.
  * @param b The braid where the main pullback is computed.
- * @param b_rcf `b`, in RCF.
  * @param f The factor whose main pullback is computed.
  * @return The main pullback of `f` at `b`.
  */

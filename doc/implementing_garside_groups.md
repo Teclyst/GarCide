@@ -438,7 +438,7 @@ Now the great thing about regular expressions is that they make it very easy to 
 
 The second part, $[\texttt 1 - \texttt 9][\texttt 0 - \texttt 9]^* \mid \texttt 0$, matches either $\texttt 0$ or a sequence of digits starting by a non-zero one, _i.e._ a positive integer. (Here $[a - b]$ matches the _range_ of characters between $a$ and $b$).
 
-The first is optional (the whole group is tagged with a postfix quotation mark), and is composed of an $\texttt e$, followed by a sequence of whitespaces ($\backslash\texttt{s}$) and of tabs ($\backslash\texttt{t}$), with an optional underscore in the middle.
+The first is optional (the whole group is tagged with a postfix quotation mark), and is composed of an $\texttt e$, followed by a sequence of whitespaces ($\backslash\texttt{s}$) and tabs ($\backslash\texttt{t}$), with an optional underscore in the middle.
 
 Notice than in all cases, the meaningful part does not change: it's always the second one. This can be expressed in C++ regexes using _capture groups_. `std::regex_search`, when executed with positions, and flag `std::regex_constants::match_continuous`, will try to find a match for the regex starting at the first provided position and ending before the second. When it finds one, it will also extract substrings from all subexpressions enclosed by parenthesis in the big one, and store them in `match`. These parenthesis denote capture groups.
 

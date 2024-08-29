@@ -69,8 +69,6 @@ void Underlying::debug(IndentedOStream &os) const {
     os << "}";
 }
 
-EENParameter Underlying::get_parameter() const { return een_index; }
-
 Underlying::Parameter Underlying::parameter_of_string(const std::string &str) {
     std::smatch match;
 
@@ -109,11 +107,6 @@ Underlying::Parameter Underlying::parameter_of_string(const std::string &str) {
         throw InvalidStringError(
             std::string("Could not extract an integer from \"str\"!"));
     }
-}
-
-i16 Underlying::lattice_height() const {
-    i16 n = get_parameter().n;
-    return n * (n + 1);
 }
 
 Underlying::Underlying(Parameter p)
@@ -308,17 +301,6 @@ void Underlying::delta() {
     coefficient_table[0] = Rem(-n + 1, e);
 }
 
-bool Underlying::compare(const Underlying &b) const {
-    i16 i;
-    for (i = 0; i < get_parameter().n; i++) {
-        if ((permutation_table[i] != b.permutation_table[i]) ||
-            (coefficient_table[i] != b.coefficient_table[i])) {
-            return false;
-        }
-    }
-    return true;
-}
-
 Underlying Underlying::inverse() const {
     Underlying f = Underlying(get_parameter());
     i16 i, n = get_parameter().n, e = get_parameter().e;
@@ -373,6 +355,17 @@ void Underlying::delta_conjugate_mut(i16 k) {
 }
 
 void Underlying::randomize() { throw NonRandomizable(); }
+
+std::size_t Underlying::hash() const {
+        std::size_t h = 0;
+        for (i16 i = 0; i < get_parameter().n; i++) {
+            h = h * 31 + permutation_table[i];
+        }
+        for (i16 i = 0; i < get_parameter().n; i++) {
+            h = h * 31 + coefficient_table[i];
+        }
+        return h;
+    }
 
 std::vector<Underlying> Underlying::atoms() const {
     Parameter p = get_parameter();

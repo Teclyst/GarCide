@@ -110,9 +110,7 @@ class Underlying {
      *
      * @return The group parameter.
      */
-    inline i16 get_parameter() const {
-        return permutation_table.size() / 2;
-    }
+    inline i16 get_parameter() const { return permutation_table.size() / 2; }
 
     /**
      * @brief Height of the lattice.
@@ -255,9 +253,8 @@ class Underlying {
     /**
      * @brief Sets the factor to the Garside element.
      *
-     * (_I.e._ sets the permutation table to the one of \f$\delta_n\f$,
-     * where \f$n\f$ is the parameter. This is the table \f$\mathrm
-     * T_{\Delta}\f$ such that \f$\forall
+     * (_I.e._ sets the permutation table to the one of \f$\Delta\f$. This is
+     * the table \f$\mathrm T_{\Delta}\f$ such that \f$\forall
      * i\in[\![1,2n]\!],T_{\Delta}[i]\equiv i+1\ [2n]\f$.)
      *
      * Linear in the parameter.
@@ -294,7 +291,9 @@ class Underlying {
      * @param b Second operand.
      * @return The meet of `*this` and `b`.
      */
-    Underlying right_meet(const Underlying &b) const;
+    inline Underlying right_meet(const Underlying &b) const {
+        return left_meet(b);
+    }
 
     /**
      * @brief Equality check.
@@ -410,7 +409,7 @@ typedef FactorTemplate<Underlying> Factor;
 
 /**
  * @brief Class for dual Garside structure \f$\mathbf B\f$-series Artin groups
- * canonical factors.
+ * elements.
  */
 typedef BraidTemplate<Factor> Braid;
 

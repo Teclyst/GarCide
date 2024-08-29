@@ -38,21 +38,68 @@ namespace garcide {
  */
 namespace standard_complex {
 
-// We represent B(e, e, n).
+/**
+ * @brief Class for complex braid groups parameters.
+ *
+ * An instance with members `e` and `n` set to \f$e\f$ and \f$n\f$ respectively
+ * is the parameter of \f$\mathrm B(e,e,n)\f$.
+ */
 struct EENParameter {
+    /**
+     * @brief \f$e\f$ field.
+     *
+     * It is the `e` such that coefficients are in \f$\mathbb U_e\f$.
+     */
     i16 e;
+
+    /**
+     * @brief \f$n\f$ field.
+     *
+     * Factors are (conceptually) square matrix of dimension `n`.
+     */
     i16 n;
 
+    /**
+     * @brief Construct a new `EENParameter`.
+     *
+     * @param e Its `e` member.
+     * @param n Its `n` member.
+     */
     EENParameter(i16 e, i16 n) : e(e), n(n) {}
 
+    /**
+     * @brief Equality check.
+     *
+     * @param p Second operand.
+     * @return If `*this` and `p` are equal.
+     */
     inline bool compare(const EENParameter &p) const {
         return ((e == p.e) && (n == p.n));
     }
 
+    /**
+     * @brief Equality check.
+     *
+     * Syntactic sugar for `compare()`.
+     *
+     * @param p Second operand.
+     * @return If `*this` and `p` are equal.
+     */
     inline bool operator==(const EENParameter &p) const { return compare(p); }
 
+    /**
+     * @brief Unequality check.
+     *
+     * @param p Second operand.
+     * @return If `*this` and `p` are not equal.
+     */
     inline bool operator!=(const EENParameter &p) const { return !compare(p); }
 
+    /**
+     * @brief Prints the parameter to output stream `os`.
+     *
+     * @param os The output stream it is printed in.
+     */
     void print(IndentedOStream &os) const;
 };
 
@@ -64,26 +111,52 @@ struct EENParameter {
  * [math.GR]](https://arxiv.org/abs/0901.0645) and Neaime, _Interval Garside
  * Structures for the Complex Braid Groups_ \f$B(e,e,n)\f$, 2019, arXiv:
  * [arXiv:1707.06864 [math.GR]](https://arxiv.org/abs/1707.06864).
+ *
+ * They are most of the time thought of as matrices (elements of semi-direct
+ * product \f$\mathrm G(e,e,n)=\Delta(e,e,n)\mathop{⋊}\mathfrak S_{n}\f$,
+ * where \f$\Delta(e,e,n)\f$ is the group of diagonal matrices of dimension
+ * \f$n\f$ whose determinant is \f$1\f$ and whose diagonal coefficients are in
+ * \f$\mathbb U_e\f$, and where \f$\mathfrak S_{n}\f$ is seen as the group of
+ * permutation matrices).
+ *
+ * In practice, only \f$\mathrm O(n)\f$ memory is needed as these matrices are very
+ * sparse. They are represented using two vectors, one for the permutation and
+ * one for the coefficients (_i.e._ the diagonal part of the semi-direct
+ * product).
+ *
+ * Let \f$\zeta_{e}=\mathrm e^{i\frac{1}{e}\tau}\f$.
  */
 class Underlying {
 
   public:
+    /**
+     * @brief Parameter type.
+     */
     using Parameter = EENParameter;
 
   private:
+    /**
+     * @brief The group parameter.
+     *
+     * An instance with members `e` and `n` set to \f$e\f$ and \f$n\f$
+     * respectively is the parameter of \f$\mathrm B(e,e,n)\f$.
+     */
     Parameter een_index;
 
     /**
      * @brief The induced permutation.
      *
-     * The table of the permutation induced by the matrix on indexes (from 0
-     * to `een_index.n` - 1), through its action by left
-     * multiplication on vectors.
+     * The inverse table of the permutation induced by the matrix on indexes
+     * (from \f$0\f$ to \f$n - 1\f$), through its action by left multiplication
+     * on vectors.
      *
-     * This permutation sends i to the j such that the i-th coordinate is the
-     * j-th after multiplication. That is to say, j is the index such that the
-     * coefficient at (i, j) is non zero (c_i in George Neaime, _Interval
-     * Garside Structures for the Complex Braid Groups_ \f$B(e,e,n)\f$,
+     * This permutation sends \f$i\f$ to the \f$j\f$ such that the \f$i\f$-th
+     * coordinate is the \f$j\f$-th after multiplication. That is to say,
+     * \f$j\f$ is the index such that the coefficient at \f$(j, i)\f$ is non
+     * zero. Thus, in the inverse table, the integer \f$k\f$ at the
+     * \f$f\f$-position is the one such that the coefficient at \f$(i,k)\f$ is
+     * non zero (which is \f$c_i\f$ in George Neaime, _Interval Garside
+     * Structures for the Complex Braid Groups_ \f$B(e,e,n)\f$,
      * [arXiv:1707.06864](https://arxiv.org/abs/1707.06864)).
      */
     std::vector<i16> permutation_table;
@@ -91,23 +164,22 @@ class Underlying {
     /**
      * @brief The multiplicating coefficients.
      *
-     * Let e = `een_index.e` and n = `een_index.n`.
+     * The multiplicating coefficients. These are \f$e\f$-th roots of unity,
+     * with the added condition of their product's being one. They are
+     * represented by integer ranging between \f$0\f$ and \f$e - 1\f$, with
+     * \f$i\f$ standing for \f$\zeta_e^i\f$.
      *
-     * The multiplicating coefficients. These are e-th roots of unity, with the
-     * added condition of their product's being one. They are represented by
-     * integer ranging between 0 and e - 1, with i standing for zeta^i (with
-     * zeta an e-th root of unity).
-     *
-     * `coefficient_table` is the diagonal coefficient matrix, when considering
-     * G(e, e, n) as the semi-direct product delta(e, e, n) ⋊ S(n).
+     * `coefficient_table` is the diagonal coefficient matrix, when writing the
+     * matrix as a profuct of a diagonal matrix on the left and a permutation
+     * matrix on the right.
      */
     std::vector<i16> coefficient_table;
 
   public:
     /**
-     * @brief Maximum braid index.
+     * @brief Maximum value for the \f$n\f$ index.
      *
-     * The greatest index that may be used for braids.
+     * The greatest \f$n\f$ value that may be used for factors.
      *
      * It is used because we use `thread_local` objects to avoid some
      * allocations, and their size must be known at compile time.
@@ -117,19 +189,67 @@ class Underlying {
      */
     static const i16 MAX_N_PARAMETER = 256;
 
+    /**
+     * @brief Converts a string to a parameter.
+     *
+     * Converts a string to a parameter by tring to parse it as a couple of
+     * integers.
+     *
+     * In case of failure, `InvalidStringError` is raised.
+     *
+     * @param str The string to read.
+     * @return A parameter matching `str`.
+     * @exception InvalidStringError Thrown in case of failure.
+     */
     static Parameter parameter_of_string(const std::string &str);
 
-    Parameter get_parameter() const;
+    /**
+     * @brief Gets the group parameter.
+     *
+     * That is to say, the \f$(e,n)\f$ in \f$\mathrm B(e,e,n)\f$.
+     *
+     * @return The parameter.
+     */
+    inline Parameter get_parameter() const { return een_index; }
 
-    i16 lattice_height() const;
+    /**
+     * @brief Height of the lattice.
+     *
+     * (_I.e._, letting `n` be the number of of strands, the length of
+     * the Garside element \f$\Delta\f$ as a word in the generators, which is
+     * \f$n(n+1)\f$.)
+     *
+     * @return The height of the lattice.
+     */
+    inline i16 lattice_height() const {
+        return get_parameter().n * (get_parameter().n + 1);
+    }
 
-    // Constructor
+    /**
+     * @brief Construct a new `Underlying`.
+     *
+     * Construct a new `Underlying`, with `p` as its
+     * parameter.
+     *
+     * Its tables will have length `p.n`, and will be filled with
+     * zeros (thus this is not a valid factor). It should be initialized it with
+     * `identity()`, `delta()`, or another similar member.
+     *
+     * @param p The parameter of the factor (also the length of
+     * its tables, minus one).
+     */
     Underlying(Parameter p);
 
     void of_string(const std::string &str, size_t &pos);
 
-    // Prints to `os` the internal representation of the factor.
-    // @param os The `std::ostream` we are printing to.
+    /**
+     * @brief Prints internal representation in `os`.
+     *
+     * Prints private members `een_index`, `permutation_table` and
+     * `coefficient_table`, typically for debugging.
+     *
+     * @param os The output stream it is printed in.
+     */
     void debug(IndentedOStream &os) const;
 
     /**
@@ -144,17 +264,170 @@ class Underlying {
      */
     void print(IndentedOStream &os) const;
 
-    // Set to the identity element (here the identity).
+    /**
+     * @brief Sets the factor to the identity.
+     *
+     * (_I.e._ sets the permutation table to the one of the identity
+     * matrix.)
+     *
+     * Linear in \f$n\f$.
+     */
     void identity();
 
-    // Set to delta.
+    /**
+     * @brief Sets the factor to the Garside element.
+     *
+     * (_I.e._ sets the tables to the ones of \f$\lambda_{en}\f$.
+     * \f$\lambda_{en}\f$ is the matrix such that
+     * \f$[\lambda_{en}]_{0,0}=\zeta_e^{-n+1}\f$, and then
+     * for \f$i\in[\![1,n-1]\!]\f$, \f$[\Delta]_{i,i}=\zeta_e\f$.)
+     *
+     * Linear in  \f$n\f$.
+     */
     void delta();
 
-    // Gets the direct permutation table associated with the factor.
-    // (i.e., perm[i] is the image of i by the permutation).
-    // Used as dividing by atoms requires columns to be easily findable.
-    // @param dir_perm The table that is to be filled.
+    /**
+     * @brief Computes the left meet of `*this` and `b`.
+     *
+     * This is done by extracting it atom by atom in Neaime's normal form for
+     * factors.
+     *
+     * Runs in \f$\mathrm O(n^2+en)\f$ time.
+     *
+     * @param b Second operand.
+     * @return The meet of `*this` and `b`.
+     */
+    Underlying left_meet(const Underlying &b) const;
+
+    /**
+     * @brief Computes the right meet of `*this` and `b`.
+     *
+     * Uses an identity to reduce the calculation to the left case.
+     *
+     * @param b Second operand.
+     * @return The right meet of `*this` and `b`.
+     */
+    inline Underlying right_meet(const Underlying &b) const {
+        return inverse().left_meet(b.inverse()).inverse();
+    }
+
+    /**
+     * @brief Equality check.
+     *
+     * Compares `*this` and `b`, returning `true` if they are equal (_i.e._
+     * they represent the same matrix).
+     *
+     * Linear in \f$n\f$.
+     *
+     * @param b Second operand.
+     * @return If `*this` and `b` are equal.
+     */
+    inline bool compare(const Underlying &b) const {
+        return (permutation_table == b.permutation_table) &&
+               (coefficient_table == b.coefficient_table);
+    }
+
+    /**
+     * @brief Product computations.
+     *
+     * Computes the product of `*this` and `b` (_i.e._ matrix product), under
+     * the assumption that it is a factor.
+     *
+     * Linear in \f$n\f$.
+     *
+     * @param b Second (right) operand.
+     * @return The product of `*this` and `b`.
+     */
+    Underlying product(const Underlying &b) const;
+
+    /**
+     * @brief Left complement computations.
+     *
+     * Computes the left complement of `*this` to `b`, under the assumption
+     * that `*this` divides `b`.
+     *
+     * Linear in \f$n\f$.
+     *
+     * @param b Second operand.
+     * @return The left complement of `*this` to `b`.
+     */
+    Underlying left_complement(const Underlying &b) const;
+
+    /**
+     * @brief Right complement computations.
+     *
+     * Computes the right complement of `*this` to `b`, under the assumption
+     * that `*this` divides `b`.
+     *
+     * Linear in \f$n\f$.
+     *
+     * @param b Second operand.
+     * @return The right complement of `*this` to `b`.
+     */
+    Underlying right_complement(const Underlying &b) const;
+
+    /**
+     * @brief Sets `*this` to a random factor.
+     *
+     * Currently always throws `NonRandomizable`.
+     *
+     * @exception NonRandomizable Thrown.
+     */
+    void randomize();
+
+    /**
+     * @brief List of the atoms.
+     *
+     * Returns the list of the atoms (_i.e._ Corran-Picantin \f$s\f$ and \f$t\f$
+     * generators).
+     *
+     * See Corran, Picantin, _A New Garside Structure
+     * for the Braid Groups of Type_ \f$(e, e, r)\f$, 2011, arXiv:
+     * [arxiv/0901.0645 [math.GR]](https://arxiv.org/abs/0901.0645)<.
+     *
+     * @return A vector containing the atoms.
+     */
+    std::vector<Underlying> atoms() const;
+
+    /**
+     * @brief Conjugates by \f$\Delta^k\f$.
+     *
+     * Linear in \f$n\f$ (in particular, does not depend on `k`).
+     *
+     * @param k The exponent.
+     */
+    void delta_conjugate_mut(i16 k);
+
+    /**
+     * @brief Hashes the factor.
+     *
+     * Linear in \f$n\f$.
+     *
+     * @return The hash.
+     */
+    std::size_t hash() const;
+
+  private:
+    /**
+     * @brief Gets the direct permutation table associated with the factor.
+     *
+     * (I.e., perm[i] is the image of i by the permutation.)
+     * Used as dividing by atoms requires columns to be easily findable.
+     *
+     * @param dir_perm The table that is to be filled.
+     */
     void direct(i16 *dir_perm) const;
+
+    /**
+     * @brief Computes the factor associated to the inverse of the matrix
+     * of this factor.
+     *
+     * Linear in \f$n\f$.
+     *
+     * @return The factor associated to the inverse of the matrix of
+     * `*this`.
+     */
+    Underlying inverse() const;
 
     // Checks if s_i left divides `*this`. (See George Neaime, Interval Garside
     // Structures for the Complex Braid Groups, Proposition 3.13,
@@ -166,7 +439,7 @@ class Underlying {
         return (permutation_table[i - 1] > permutation_table[i - 2])
                    ? (coefficient_table[i - 1] != 0)
                    : (coefficient_table[i - 2] == 0);
-    };
+    }
 
     // Checks if t_i left divides `*this`. (See George Neaime, Interval Garside
     // Structures for the Complex Braid Groups, Proposition 3.13,
@@ -179,7 +452,7 @@ class Underlying {
                    ? (coefficient_table[1] != 0)
                    : (coefficient_table[0] ==
                       ((i == 0) ? 0 : get_parameter().e - i));
-    };
+    }
 
     // Left multiplies by s_i (or divides, which is the same as it has order 2).
     // @param dir_perm A table that holds the direct table of the permutation
@@ -191,7 +464,7 @@ class Underlying {
         std::swap(permutation_table[i - 1], permutation_table[i - 2]);
         std::swap(dir_perm[permutation_table[i - 1]],
                   dir_perm[permutation_table[i - 2]]);
-    };
+    }
 
     // Left multiplies by t_i (or divides, which is the same as it has order 2).
     // @param dir_perm A table that holds the direct table of the permutation
@@ -205,7 +478,7 @@ class Underlying {
         coefficient_table[1] = Rem(coefficient_table[1] + i, get_parameter().e);
         std::swap(dir_perm[permutation_table[0]],
                   dir_perm[permutation_table[1]]);
-    };
+    }
 
     // Right multiplies by s_i (or divides, which is the same as it has order
     // 2).
@@ -217,14 +490,18 @@ class Underlying {
         std::swap(permutation_table[dir_perm[i - 1]],
                   permutation_table[dir_perm[i - 2]]);
         std::swap(dir_perm[i - 1], dir_perm[i - 2]);
-    };
+    }
 
-    // Right multiplies by t_i (or divides, which is the same as it has order
-    // 2).
-    // @param dir_perm A table that holds the direct table of the permutation
-    // induced by the factor. Modified by this function so that it remains up to
-    // date.
-    // @param i The integer i for which we multiply by t_i the factor.
+    /** Right multiplies by t_i.
+     *
+     * (Or divides, which is the same as it has order \f$2\f$.)
+     *
+     * @param dir_perm A table that holds the direct table of the permutation
+     * induced by the factor. Modified by this function so that it remains up to
+     * date.
+     * @param i The integer \f$i\f$ for which we multiply the factor by
+     * \f$t_i\f$.
+     */
     inline void t_right_multiply(i16 *dir_perm, i16 i) {
         std::swap(permutation_table[dir_perm[0]],
                   permutation_table[dir_perm[1]]);
@@ -233,55 +510,19 @@ class Underlying {
         coefficient_table[dir_perm[1]] =
             Rem(coefficient_table[dir_perm[1]] + i, get_parameter().e);
         std::swap(dir_perm[0], dir_perm[1]);
-    };
-
-    Underlying left_meet(const Underlying &b) const;
-
-    inline Underlying right_meet(const Underlying &b) const {
-        return inverse().left_meet(b.inverse()).inverse();
-    };
-
-    // Equality check.
-    // We check whether the underlying permutation table are (pointwise) equal.
-    bool compare(const Underlying &b) const;
-
-    // Computes the factor corresponding to the inverse permutation.
-    // Used to simplify complement operation.
-    Underlying inverse() const;
-
-    // product under the hypothesis that it is still simple.
-    Underlying product(const Underlying &b) const;
-
-    // Under the assumption a <= b, a.left_complement(b) computes
-    // The factor c such that ac = b.
-    Underlying left_complement(const Underlying &b) const;
-
-    Underlying right_complement(const Underlying &b) const;
-
-    // Generate a random factor.
-    void randomize();
-
-    // List of atoms.
-    std::vector<Underlying> atoms() const;
-
-    // Conjugate by delta^k.
-    // Used to speed up calculations compared to the default implementation.
-    void delta_conjugate_mut(i16 k);
-
-    std::size_t hash() const {
-        std::size_t h = 0;
-        for (i16 i = 0; i < get_parameter().n; i++) {
-            h = h * 31 + permutation_table[i];
-        }
-        for (i16 i = 0; i < get_parameter().n; i++) {
-            h = h * 31 + coefficient_table[i];
-        }
-        return h;
     }
 };
 
+/**
+ * @brief Class for semi-classic Garside structure \f$\mathrm B(e,e,n+1)\f$ complex
+ * braid groups canonical factors.
+ */
 using Factor = FactorTemplate<Underlying>;
 
+/**
+ * @brief Class for semi-classic Garside structure \f$\mathrm B(e,e,n+1)\f$ complex
+ * braid groups elements.
+ */
 using Braid = BraidTemplate<Factor>;
 
 } // namespace standard_complex

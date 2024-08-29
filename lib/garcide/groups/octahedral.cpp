@@ -237,10 +237,6 @@ Underlying Underlying::left_meet(const Underlying &b) const {
     return c;
 }
 
-Underlying Underlying::right_meet(const Underlying &b) const {
-    return left_meet(b);
-}
-
 void Underlying::identity() {
     for (i16 i = 1; i <= 2 * get_parameter(); i++) {
         permutation_table[i] = i;
