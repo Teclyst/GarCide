@@ -212,7 +212,7 @@ class Underlying {
      * @brief Equality check.
      *
      * Compares `*this` and `b`, returning `true` if they are equal (_i.e._
-     * coordinate-wise equal).
+     * componentwise equal).
      *
      * Linear in the dimension.
      *
@@ -226,7 +226,7 @@ class Underlying {
     /**
      * @brief Product computations.
      *
-     * Computes the product of `*this` and `b` (_i.e._ coordinate-wise xor),
+     * Computes the product of `*this` and `b` (_i.e._ componentwise xor),
      * under the assumption that it is a factor.
      *
      * Linear in the dimension.

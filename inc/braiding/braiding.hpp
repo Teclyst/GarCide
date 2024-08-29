@@ -37,9 +37,9 @@
  */
 namespace braiding {
 using garcide::EndLine;
+using garcide::i16;
 using garcide::ind_cout;
 using garcide::IndentedOStream;
-using garcide::i16;
 
 /**
  * @brief Exception raised to ask for help.
@@ -67,6 +67,7 @@ enum class Option {
     SCS,
     Centralizer,
     Conjugacy,
+    Garside,
     Header,
     Quit,
 #if BRAIDING_CLASS == 0
@@ -97,6 +98,13 @@ void read_braid(Braid &b, std::istream &is = std::cin);
  * @exception InterruptAskedFor Raised when `"q"` or `"Q"` is entered.
  */
 Braid::Parameter read_braid_parameter(std::istream &is = std::cin);
+
+/**
+ * @brief Prints a text that briefly explains the Garside structure of the group.
+ *
+ * Called when `"grp"` is entered in the option menu. 
+ */
+void explain_garside_structure();
 
 /**
  * @brief Prints a text that explains what a correct braid input is.
@@ -132,7 +140,7 @@ void prompt_braid(Braid &b);
  *
  * Keeps asking for parameters until a valid one is entered.
  *
-  * @exception InterruptAskedFor Raised when `"q"` or `"Q"` is entered.
+ * @exception InterruptAskedFor Raised when `"q"` or `"Q"` is entered.
  */
 Braid::Parameter prompt_braid_parameter();
 
@@ -293,7 +301,7 @@ void conjugacy_case();
  * prints it in standard output.
  *
  * Only defined if preprocessor variable `BRAIDING_CLASS` is set to `0`.
- * 
+ *
  * @exception InterruptAskedFor Raised when `"q"` or `"Q"` is entered.
  */
 void thurston_type_case();

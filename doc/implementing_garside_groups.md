@@ -194,6 +194,8 @@ You will need to make a bunch of other modifications to _Braiding_ files.
     ```
 
 * In `braiding.cpp`, same thing for `explain_braid_parameter_input`, where you detail how to enter group parameters in the terminal.
+* In `braiding.cpp`, same thing for `explain_garside_structure`, where you quickly explain what the Garside structure on your group is, and optionally point to some documentation (with the idea being that an user that reads this can understand the results he gets).
+* In `braiding.cpp`, same thing for `print_options`, add a line which gives the name of your group.
 * In `braiding.cpp`, add specific UTF8 art for the header, in `print_header`, under an `#elif` branch. (Obviously optional, yet of utmost importance).
 * Edit the __README__. Once again, this is optional but good if you plan to share your version.
 
@@ -226,9 +228,9 @@ The following assumes very limited C++ knowledge, and hence will be very detaill
 
 ### $\mathbb Z^n$'s Garside structure
 
-It is known in folklore that $\mathbb Z^n$ has a Garside structure, with its Garside element being $\Delta=(1,\ldots, 1)$, and the sublattice of canonical factors being the cube $[e, \Delta]=\{0,1\}^n$, with the divisibility order being the usual coordinate-wise order.
+It is known in folklore that $\mathbb Z^n$ has a Garside structure, with its Garside element being $\Delta=(1,\ldots, 1)$, and the sublattice of canonical factors being the cube $[e, \Delta]=\{0,1\}^n$, with the divisibility order being the usual componentwise order.
 
-$[e,\Delta]$ is a section of the canonical surjection $\mathbb Z^n\to(\mathbb Z/2\mathbb Z)^n$, so it is good idea to represent canonical factors as boolean vectors (as it uses less memory). Product is then coordinate-wise XOR, and meets are coordinate-wise MIN (as $\mathbb Z^n$ is abelian, operations are always the same on both sides).
+$[e,\Delta]$ is a section of the canonical surjection $\mathbb Z^n\to(\mathbb Z/2\mathbb Z)^n$, so it is good idea to represent canonical factors as boolean vectors (as it uses less memory). Product is then componentwise XOR, and meets are componentwise MIN (as $\mathbb Z^n$ is abelian, operations are always the same on both sides).
 
 ### Owned data
 
@@ -512,7 +514,7 @@ class Underlying {
 
 The first two are fairly trivial: just set every coordinate to `false` or `true` respectively.
 
-Meets aren't very difficult either: they are both coordinate-wise AND.
+Meets aren't very difficult either: they are both componentwise AND.
 
 `euclidean_lattice.cpp`:
 
@@ -629,7 +631,7 @@ class Underlying {
 }
 ```
 
-Randomizing is pretty simple: just do it coordinate-wise.
+Randomizing is pretty simple: just do it componentwise.
 
 For hashing, we want a function that is easy to compute, and collision-resistant; we need hashing for several data structures whose efficiency really depends on `hash` being resistant to collisions. In our case, we actually have an injection of canonical factors to $[\![0, 2^n[\![$, given by interpreting a factor as a polynomial in $2$.
 

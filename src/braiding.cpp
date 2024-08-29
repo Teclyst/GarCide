@@ -93,9 +93,9 @@ void explain_braid_input() {
                 "Birman-Ko-Lee's a_i,j."
              << EndLine() << "i and j must therefore be distinct and in [1, n],"
              << EndLine() << "where n is the number of strands." << EndLine()
-             << "\"D\" represents Birman-Ko-Lee's cyclic permutation δ."
+             << "\"D\" represents Birman-Ko-Lee's cyclic permutation δ_n."
              << EndLine(1) << "For example, with n = 3," << EndLine()
-             << "\"a_(3 2) ^1 (1, 2)\" or \"D\" are two ways to enter δ."
+             << "\"a_(3 2) ^1 (1, 2)\" or \"D\" are two ways to enter δ_n."
              << EndLine(1);
 
 #elif BRAIDING_CLASS == 2
@@ -176,6 +176,141 @@ void explain_braid_input() {
 #else
 
     ind_cout << "Enter a braid (no more details for that group)." << EndLine(1);
+
+#endif
+}
+
+void explain_garside_structure() {
+
+#if BRAIDING_CLASS == 0
+
+    ind_cout << "In the classic Garside structure of braid group B_n there is a"
+             << EndLine()
+             << "one-to-one mapping between canonical factors and permutations."
+             << EndLine(1)
+             << "The atoms are the Artin generators σ_i, i ∈ [1, n - 1]."
+             << EndLine()
+             << "As a permutation, σ_i is the transposition (i i+1), and it is"
+             << EndLine() << "printed as si." << EndLine(1)
+             << "Factors are printed as words in the σ_i." << EndLine(1)
+             << "The Garside element Δ_n corresponds to the permutation that"
+             << EndLine()
+             << "sends i to n - i + 1 (Garside's half-twist). It has length"
+             << EndLine() << "n (n - 1) / 2 as a product in the atoms."
+             << EndLine(1);
+
+#elif BRAIDING_CLASS == 1
+
+    ind_cout
+        << "In the dual Garside structure of braid group B_n, canonical"
+        << EndLine()
+        << "factors correspond to a subset of the n-th symmetric group."
+        << EndLine()
+        << "These are the permutations whose disjoint cycle decomposition"
+        << EndLine() << "is composed of decreasing cycles, that give rise to a"
+        << EndLine() << "non-crossing partition on [1,n]." << EndLine(1)
+        << "Thus there is a one-to-one correspondance between factors and"
+        << EndLine()
+        << "non-crossing partitions. The lattice structure (on both sides)"
+        << EndLine() << "is the one induced by that mapping." << EndLine(1)
+        << "The atoms are the Birman-Ko-Lee generators a_i,j, where"
+        << EndLine() << "(i, j) ∈ [1, n] and i > j." << EndLine()
+        << "As a permutation, a_i,j is the transposition (i j), and it is"
+        << EndLine()
+        << "printed as a(i, j). The corresponding partition is the one"
+        << EndLine() << "whose cells are {i, j}, and the {k}, for k != i, j."
+        << EndLine(1)
+        << "Factors are printed as words in the a_i,j, in a way that makes"
+        << EndLine()
+        << "it easy to parse the cycle decomposition: for instance, cycle"
+        << EndLine() << "(5 2 1) would be printed as a(5, 2) a(2, 1)."
+        << EndLine(1)
+        << "The Garside element δ_n corresponds to the permutation that"
+        << EndLine()
+        << "sends i to i + 1 (mod n). It has length n - 1 as a product in"
+        << EndLine()
+        << "the atoms, and corresponds to the partition with only one cell."
+        << EndLine(1)
+        << "See Birman, Ko, Lee, A New Approach to the Word and Conjugacy"
+        << EndLine() << "Problems in the Braid Groups, 1997, arXiv:math/9712211"
+        << EndLine() << "[math.GT]." << EndLine(1);
+
+#elif BRAIDING_CLASS == 2
+
+    ind_cout
+        << "There is a morphism from B-series Artin Group A_n(B) to B_2n"
+        << EndLine()
+        << "that induces an injective Garside group morphism between their"
+        << EndLine() << "dual Garside structures." << EndLine(1)
+        << "Factors correspond to the permutations whose disjoint cycle"
+        << EndLine()
+        << "decomposition is composed of decreasing cycles, that give rise"
+        << EndLine()
+        << "to a non-crossing partition on [1,2n] that is stable by the"
+        << EndLine() << "permutation that sends i to i + n (mod 2n)."
+        << EndLine(1)
+        << "Thus there is a one-to-one correspondance between factors and"
+        << EndLine()
+        << "those non-crossing partitions. The lattice structure (on both"
+        << EndLine() << "sides) is the one induced by that mapping."
+        << EndLine(1)
+        << "The atoms are the Bessis short and long generators, s_i,j and"
+        << EndLine() << "l_i, with i, j ∈ [1, 2n], and i and j distinct mod n."
+        << EndLine(1) << "As a permutation, s_i,j is the double transposition"
+        << EndLine() << "(i j) (i+n j+n), and it is printed as s(i, j)."
+        << EndLine() << "The corresponding partition is the one whose cells are"
+        << EndLine()
+        << "{i, j}, {i+n, j+n} and the {k}, for k != i, j, i+n, j+n."
+        << EndLine(1)
+        << "l_i is the transposition (i i+n), and is printed as li."
+        << EndLine() << "The corresponding partition is the one" << EndLine()
+        << "whose cells are {i, i+n} and the {k}, for k != i, i+n" << EndLine(1)
+        << "Factors are printed as words in the s_i,j and l_k, in a way that"
+        << EndLine()
+        << "makes it easy to parse the cycle decomposition: for instance,"
+        << EndLine()
+        << "double cycle (5 2 1) (10 7 6) would be printed as s(5, 2)"
+        << EndLine() << "s(2, 1)." << EndLine(1)
+        << "The Garside element Δ corresponds to the permutation that sends"
+        << EndLine()
+        << "i to i + 1 (mod 2n). It has length n as a product in the atoms,"
+        << EndLine() << "and corresponds to the partition with only one cell."
+        << EndLine(1)
+        << "See Bessis, The Dual Braid Monoid, 2001, arXiv:math/0101158"
+        << EndLine() << "[math.GR]." << EndLine(1);
+
+#elif BRAIDING_CLASS == 3
+
+    ind_cout
+        << "Canonical factors for the dual Garside structure of I-series"
+        << EndLine()
+        << "Artin group A_n(I) are in bijection with a subset of dihedral"
+        << EndLine()
+        << "group D_2n. More specifically, the identity, the reflections"
+        << EndLine()
+        << "(which are the atoms), and a rotation (the Garside element)."
+        << EndLine(1)
+        << "The divisibility lattice has height 2, thus it is particularily"
+        << EndLine()
+        << "trivial: the identity is the min, the rotattion the max, and"
+        << EndLine() << "the reflexions make up the middle layer." << EndLine(1)
+        << "The reflexion that sends 0 to exp(k/n iτ) is printed as sk."
+        << EndLine(1);
+
+#elif BRAIDING_CLASS == 6
+
+    ind_cout
+        << "In the Garside structure for Z^n, canonical factors are the"
+        << EndLine() << "vectors whose coordinates are all in {0, 1}."
+        << EndLine(1)
+        << "The divisibility order is the natural componentwise order."
+        << EndLine(1)
+        << "The Garside element is vector (1, ..., 1), and the atoms are the"
+        << EndLine() << "base vectors, printed as ei." << EndLine(1);
+
+#else
+
+    ind_cout << "No more details." << EndLine(1);
 
 #endif
 }
@@ -281,7 +416,9 @@ void print_header(IndentedOStream &os) {
        << "││││││││  See GNU General Public License in LICENCE.md. ││││││││"
        << EndLine()
        << "├──────┴──┬──────────────────────────────────────────┬──┴──────┤"
+
 #if BRAIDING_CLASS == 0
+
        << EndLine()
        << "│││││││││││     _____________________ __________     │││││││││││"
        << EndLine()
@@ -296,7 +433,9 @@ void print_header(IndentedOStream &os) {
        << "│││││││││││     _/___/_____/_______/_________/__     │││││││││││"
        << EndLine()
        << "│││││││││││                                          │││││││││││"
+
 #elif BRAIDING_CLASS == 1
+
        << EndLine()
        << "│││││││││││               _ __________               │││││││││││"
        << EndLine()
@@ -311,7 +450,9 @@ void print_header(IndentedOStream &os) {
        << "│││││││││││               _________/__               │││││││││││"
        << EndLine()
        << "│││││││││││                                          │││││││││││"
+
 #elif BRAIDING_CLASS == 2
+
        << EndLine()
        << "│││││││││││                 +------+                 │││││││││││"
        << EndLine()
@@ -326,7 +467,9 @@ void print_header(IndentedOStream &os) {
        << "│││││││││││                \\ /      /                │││││││││││"
        << EndLine()
        << "│││││││││││                 +------+                 │││││││││││"
+
 #elif BRAIDING_CLASS == 3
+
        << EndLine()
        << "│││││││││││                 +------+                 │││││││││││"
        << EndLine()
@@ -341,7 +484,9 @@ void print_header(IndentedOStream &os) {
        << "│││││││││││                \\        /                │││││││││││"
        << EndLine()
        << "│││││││││││                 +------+                 │││││││││││"
+
 #elif BRAIDING_CLASS == 4
+
        << EndLine()
        << "│││││││││││                 <------>                 │││││││││││"
        << EndLine()
@@ -356,7 +501,9 @@ void print_header(IndentedOStream &os) {
        << "│││││││││││                \\ /      /                │││││││││││"
        << EndLine()
        << "│││││││││││                 ∨      ∨                 │││││││││││"
+
 #elif BRAIDING_CLASS == 5
+
        << EndLine()
        << "│││││││││││                _                         │││││││││││"
        << EndLine()
@@ -371,7 +518,9 @@ void print_header(IndentedOStream &os) {
        << "│││││││││││              | 0 0 0 0 j |               │││││││││││"
        << EndLine()
        << "│││││││││││                                          │││││││││││"
+
 #elif (BRAIDING_CLASS == 6)
+
        << EndLine()
        << "│││││││││││   |    |    |    |    |    |    |    |   │││││││││││"
        << EndLine()
@@ -386,7 +535,9 @@ void print_header(IndentedOStream &os) {
        << "│││││││││││---+----+----+----+----+----+----+----+---│││││││││││"
        << EndLine()
        << "│││││││││││   |    |    |    |    |    |    |    |   │││││││││││"
+
 #else
+
        << EndLine()
        << "│││││││││││                                          │││││││││││"
        << EndLine()
@@ -401,29 +552,49 @@ void print_header(IndentedOStream &os) {
        << "│││││││││││                                          │││││││││││"
        << EndLine()
        << "│││││││││││                                          │││││││││││"
+
 #endif
+
        << EndLine()
        << "└─────────┴──────────────────────────────────────────┴─────────┘"
        << EndLine(1);
 }
 
 void print_options(IndentedOStream &os) {
+
 #if BRAIDING_CLASS == 0
+
     os << "Using Garside's classic structure for Artin braids." << EndLine(1);
+
 #elif BRAIDING_CLASS == 1
+
     os << "Using Birman-Ko-Lee's dual structure for Artin braid groups."
        << EndLine(1);
+
 #elif BRAIDING_CLASS == 2
+
     os << "Using the dual structure for B-series Artin groups." << EndLine(1);
+
 #elif BRAIDING_CLASS == 3
+
     os << "Using the dual structure for I-series Artin groups." << EndLine(1);
+
 #elif BRAIDING_CLASS == 4
+
     os << "Using Bessis-Corran's dual structure for B(e,e,n) complex"
        << EndLine() << "reflection braid groups." << EndLine(1);
+
 #elif BRAIDING_CLASS == 5
+
     os << "Using Corran-Picantin's semi-classic structure for B(e,e,n)"
        << EndLine() << "complex reflection braid groups." << EndLine(1);
+
+#elif BRAIDING_CLASS == 6
+
+    os << "Using the Garside structure for euclidean lattice Z^n.";
+
 #endif
+
     os << "l:      Left Normal Form        r:      Right Normal Form       "
        << EndLine(1)
        << "^l:     Left GCD                ^r:     Right GCD               "
@@ -434,9 +605,13 @@ void print_options(IndentedOStream &os) {
        << EndLine(1)
        << "scs:    Sliding Circuits Set    ctr:    Centralizer             "
        << EndLine(1) << "c:      Conjugacy Test          "
+
 #if BRAIDING_CLASS == 0
+
        << "t:      Thurston Type           " << EndLine(1)
+       
 #endif
+
        << "q:      Quit" << EndLine(1);
 }
 
@@ -444,7 +619,8 @@ Option prompt_option() {
     while (true) {
         print_line();
         ind_cout << EndLine();
-        ind_cout << "Choose an option (? for help):" << EndLine(1) << ">>> ";
+        ind_cout << "Choose an option (? for help, gar for a description of the"
+                 << EndLine() << "Garside structure):" << EndLine(1) << ">>> ";
         std::string str;
         std::getline(std::cin, str);
         if (std::regex_match(str, std::regex{"[\\s\\t]*\\?[\\s\\t]*"})) {
@@ -489,6 +665,9 @@ Option prompt_option() {
         } else if (std::regex_match(str,
                                     std::regex{"[\\s\\t]*[hH][\\s\\t]*"})) {
             return Option::Header;
+        } else if (std::regex_match(
+                       str, std::regex{"[\\s\\t]*[gG][aA][rR][\\s\\t]*"})) {
+            return Option::Garside;
 #if BRAIDING_CLASS == 0
         } else if (std::regex_match(str,
                                     std::regex{"[\\s\\t]*[tT][\\s\\t]*"})) {

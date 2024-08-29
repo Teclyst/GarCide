@@ -146,6 +146,10 @@ int main() {
             print_header();
             break;
         }
+        case Option::Garside: {
+            explain_garside_structure();
+            break;
+        }
         case Option::Quit: {
             ind_cout << "Leaving Braiding." << EndLine(1);
             return 0;

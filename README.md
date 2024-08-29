@@ -1,8 +1,11 @@
 # _GarCide_ (prerelease)
 
-## Overview
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/Teclyst/GarCide)](https://github.com/Teclyst/GarCide/releases/latest)
+[![GitHub](https://img.shields.io/github/license/Teclyst/GarCide)](https://github.com/Teclyst/GarCide/blob/main/LICENSE)
 
 _Garcide_ is a C++ library and application for computations in Garside groups. It was written during a L3 internship, under the supervision of **[Bert Wiest](https://perso.univ-rennes1.fr/bertold.wiest/)**.
+
+## Overview
 
 The project contains two parts: on one side, the _GarCide_ library, that provides functions for various computations in Garside groups, and is meant to allow users to easily define classes for their own Garside groups.
 
