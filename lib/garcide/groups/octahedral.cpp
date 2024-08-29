@@ -78,9 +78,9 @@ void Underlying::print(IndentedOStream &os) const {
         if (!seen[i]) {
             curr_cycle.clear();
             j = i;
-            while (!seen[Rem(j - 1, n) + 1]) {
+            while (!seen[rem(j - 1, n) + 1]) {
                 curr_cycle.push_back(j);
-                seen[Rem(j - 1, n) + 1] = true;
+                seen[rem(j - 1, n) + 1] = true;
                 j = permutation_table[j];
             }
             if (!is_first && int(curr_cycle.size()) > 1) {
@@ -148,17 +148,17 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
             throw InvalidStringError("Index is too big!\n" + match.str(2) +
                                      " can not be converted to a C++ integer.");
         }
-        i = Rem(i - 1, 2 * n) + 1;
-        j = Rem(j - 1, 2 * n) + 1;
+        i = rem(i - 1, 2 * n) + 1;
+        j = rem(j - 1, 2 * n) + 1;
         pos += match[0].length();
-        if ((i != j) && (i != Rem(j + n - 1, 2 * n) + 1)) {
+        if ((i != j) && (i != rem(j + n - 1, 2 * n) + 1)) {
             identity();
             permutation_table[i] = j;
             permutation_table[j] = i;
-            permutation_table[Rem(i + n - 1, 2 * n) + 1] =
-                Rem(j + n - 1, 2 * n) + 1;
-            permutation_table[Rem(j + n - 1, 2 * n) + 1] =
-                Rem(i + n - 1, 2 * n) + 1;
+            permutation_table[rem(i + n - 1, 2 * n) + 1] =
+                rem(j + n - 1, 2 * n) + 1;
+            permutation_table[rem(j + n - 1, 2 * n) + 1] =
+                rem(i + n - 1, 2 * n) + 1;
         } else {
             throw InvalidStringError(
                 "Indexes for short generators should not be equal mod " +
@@ -176,11 +176,11 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
             throw InvalidStringError("Index is too big!\n" + match.str(1) +
                                      " can not be converted to a C++ integer.");
         }
-        i = Rem(i - 1, 2 * n) + 1;
+        i = rem(i - 1, 2 * n) + 1;
         pos += match[0].length();
         identity();
-        permutation_table[i] = Rem(i + n - 1, 2 * n) + 1;
-        permutation_table[Rem(i + n - 1, 2 * n) + 1] = i;
+        permutation_table[i] = rem(i + n - 1, 2 * n) + 1;
+        permutation_table[rem(i + n - 1, 2 * n) + 1] = i;
     } else {
         throw InvalidStringError(
             "Could not extract a factor from \"" + str.substr(pos) +
@@ -283,7 +283,7 @@ void Underlying::delta_conjugate_mut(i16 k) {
 
     for (i = 1; i <= 2 * n; i++) {
         under.permutation_table[i] =
-            Rem(permutation_table[Rem(i - k - 1, 2 * n) + 1] + k - 1, 2 * n) +
+            rem(permutation_table[rem(i - k - 1, 2 * n) + 1] + k - 1, 2 * n) +
             1;
     }
     *this = under;

@@ -77,7 +77,7 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
                                  std::regex{"(:?s[\\s\\t]*_?)?[\\s\\t]*(" +
                                             number_regex + ")"},
                                  std::regex_constants::match_continuous)) {
-        vertex = Rem(std::stoi(match[1]), get_parameter());
+        vertex = rem(std::stoi(match[1]), get_parameter());
         type = 2;
         pos += match[0].length();
     } else {
@@ -199,7 +199,7 @@ Underlying Underlying::right_complement(const Underlying &b) const {
 
 void Underlying::delta_conjugate_mut(i16 k) {
     if (type == 2) {
-        vertex = Rem(vertex - 2 * k, get_parameter());
+        vertex = rem(vertex - 2 * k, get_parameter());
     }
 }
 

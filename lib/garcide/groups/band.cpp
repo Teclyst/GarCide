@@ -259,7 +259,7 @@ void Underlying::delta_conjugate_mut(i16 k) {
 
     for (i = 1; i <= n; i++) {
         under.permutation_table[i] =
-            Rem(permutation_table[Rem(i - k - 1, n) + 1] + k - 1, n) + 1;
+            rem(permutation_table[rem(i - k - 1, n) + 1] + k - 1, n) + 1;
     }
     *this = under;
 }

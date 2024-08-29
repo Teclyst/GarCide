@@ -201,7 +201,7 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
             }
         } else {
             // t_i.
-            i = Rem(i, e);
+            i = rem(i, e);
             identity();
             permutation_table[0] = 1;
             permutation_table[1] = 0;
@@ -298,7 +298,7 @@ void Underlying::delta() {
         coefficient_table[i] = 1;
     }
     permutation_table[0] = 0;
-    coefficient_table[0] = Rem(-n + 1, e);
+    coefficient_table[0] = rem(-n + 1, e);
 }
 
 Underlying Underlying::inverse() const {
@@ -317,7 +317,7 @@ Underlying Underlying::product(const Underlying &b) const {
     i16 i, n = get_parameter().n, e = get_parameter().e;
     for (i = 0; i < n; i++) {
         f.permutation_table[i] = b.permutation_table[permutation_table[i]];
-        f.coefficient_table[i] = Rem(b.coefficient_table[permutation_table[i]] +
+        f.coefficient_table[i] = rem(b.coefficient_table[permutation_table[i]] +
                                          coefficient_table[i],
                                      e);
     }
@@ -345,10 +345,10 @@ void Underlying::delta_conjugate_mut(i16 k) {
 
     // Otherwise the two non trivial coefficient are 0 and the i such that
     // `permutation_table[i] == 0`.
-    coefficient_table[0] = Rem(coefficient_table[0] + k * n, e);
+    coefficient_table[0] = rem(coefficient_table[0] + k * n, e);
     for (i16 i = 1; i < n; i++) {
         if (permutation_table[i] == 0) {
-            coefficient_table[i] = Rem(coefficient_table[i] - k * n, e);
+            coefficient_table[i] = rem(coefficient_table[i] - k * n, e);
             return;
         }
     }

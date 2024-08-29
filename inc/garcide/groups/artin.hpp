@@ -136,14 +136,15 @@ class Underlying {
      * @brief Extraction from string.
      *
      * Reads the string `str`, starting at position `pos`, and sets `this` to
-     * the corresponding atom.
+     * the corresponding atom. If it succeeds, increases `pos` so that it points
+     * to just after what was extracted.
      *
      * Letting \f$Z = \texttt{-}? ([\texttt{1} - \texttt{9}] [\texttt{0} -
      * \texttt{9}]^* \mid \texttt{0})\f$ be a regular expression representing
      * integers, accepted strings are those represented by regular expression
      * \f$(\texttt{s} \texttt{_}?)? Z\mid \texttt{D}\f$, under the additional
-     * hypothesis that the integer they represent is in \f$[1, n[\f$, where
-     * \f$n\f$ is the number of strands, and ignoring whitespaces.
+     * hypothesis that the integer they represent is in \f$[\![1, n-1]\!]\f$,
+     * where \f$n\f$ is the number of strands, and ignoring whitespaces.
      *
      * \f$\texttt{s_}i\f$, \f$\texttt{s}i\f$ and \f$i\f$ all stand for
      * Artin generator \f$\sigma_i\f$.
@@ -154,7 +155,7 @@ class Underlying {
      * @param pos The position to start from.
      * @exception InvalidStringError Thrown when there is no subword starting
      * from `pos` that matches the expression, or if there is one, if the
-     * corresponding integer does not belong to \f$[1,n[\f$.
+     * corresponding integer does not belong to \f$[\![1, n-1]\!]\f$.
      */
     void of_string(const std::string &str, size_t &pos);
 
@@ -358,8 +359,7 @@ class Underlying {
     Underlying inverse() const;
 
     // Subroutine called by left_meet() and right_meet().
-    static void MeetSub(const i16 *a, const i16 *b, i16 *r, i16 s,
-                        i16 t);
+    static void MeetSub(const i16 *a, const i16 *b, i16 *r, i16 s, i16 t);
 };
 
 /**

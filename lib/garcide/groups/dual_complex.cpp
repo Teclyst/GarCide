@@ -145,14 +145,14 @@ void Underlying::print(IndentedOStream &os) const {
             is_first = false;
         }
         for (i16 i = int(curr_cycle.size()) - 1; i >= 1; i--) {
-            os << "("
+            os << "s("
                << ((i >= other_smallest)
-                       ? curr_cycle[i] + Rem(coefficient_table[0] + 1, e) * n
+                       ? curr_cycle[i] + rem(coefficient_table[0] + 1, e) * n
                        : curr_cycle[i] + coefficient_table[0] * n)
                << ", "
                << ((i >= other_smallest + 1)
                        ? curr_cycle[i - 1] +
-                             Rem(coefficient_table[0] + 1, e) * n
+                             rem(coefficient_table[0] + 1, e) * n
                        : curr_cycle[i - 1] + coefficient_table[0] * n)
                << ") ";
         }
@@ -182,14 +182,14 @@ void Underlying::print(IndentedOStream &os) const {
                 curr = permutation_table[curr];
             }
             // If cycle_type == 0, then the cycle is short.
-            if (Rem(cycle_type, e) == 0) {
+            if (rem(cycle_type, e) == 0) {
                 if (int(curr_cycle.size()) > 1 && !is_first) {
                     os << " ";
                 } else if (int(curr_cycle.size()) > 1) {
                     is_first = false;
                 }
                 for (i16 i = int(curr_cycle.size()) - 1; i >= 1; i--) {
-                    os << "("
+                    os << "s("
                        << ((other_smallest + i >= int(curr_cycle.size()))
                                ? curr_cycle[other_smallest + i -
                                             int(curr_cycle.size())] +
@@ -214,7 +214,7 @@ void Underlying::print(IndentedOStream &os) const {
                 other_smallest = ((other_smallest == 0) ? int(curr_cycle.size())
                                                         : other_smallest);
                 for (i16 i = int(curr_cycle.size()) - 1; i >= 1; i--) {
-                    os << "("
+                    os << "s("
                        << ((i >= other_smallest) ? curr_cycle[i] + n
                                                  : curr_cycle[i])
                        << ", "
@@ -222,7 +222,7 @@ void Underlying::print(IndentedOStream &os) const {
                                                      : curr_cycle[i - 1])
                        << ") ";
                 }
-                os << curr_cycle[0] << " " << curr_cycle[0] + n;
+                os << "a" << curr_cycle[0] << " a" << curr_cycle[0] + n;
             }
         }
     }
@@ -235,16 +235,17 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
                           std::regex_constants::match_continuous)) {
         pos += match[0].length();
         delta();
-    } else if (std::regex_search(str.begin() + pos, str.end(), match,
-                                 std::regex{"\\([\\s\\t]*(" + number_regex +
-                                            ")[\\s\\t]*,?[\\s\\t]*(" +
-                                            number_regex + ")[\\s\\t]*\\)"},
-                                 std::regex_constants::match_continuous)) {
+    } else if (std::regex_search(
+                   str.begin() + pos, str.end(), match,
+                   std::regex{"(:?a[\\s\\t]*_?)?[\\s\\t]*\\([\\s\\t]*(" +
+                              number_regex + ")[\\s\\t]*,?[\\s\\t]*(" +
+                              number_regex + ")[\\s\\t]*\\)"},
+                   std::regex_constants::match_continuous)) {
         i16 i = std::stoi(match[1]);
         i16 j = std::stoi(match[2]);
         pos += match[0].length();
-        i = Rem(i - 1, e * n) + 1;
-        j = Rem(j - 1, e * n) + 1;
+        i = rem(i - 1, e * n) + 1;
+        j = rem(j - 1, e * n) + 1;
         if (i > j) {
             std::swap(i, j);
         }
@@ -254,15 +255,15 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
         }
 
         if ((j - i < n) && (j != i)) {
-            i = Rem(i - 1, n) + 1;
-            j = Rem(j - 1, n) + 1;
+            i = rem(i - 1, n) + 1;
+            j = rem(j - 1, n) + 1;
             j = (j < i) ? j + n : j;
             identity();
             permutation_table[i] = (j > n) ? j - n : j;
             permutation_table[(j > n) ? j - n : j] = i;
             coefficient_table[i] = (j > n) ? 1 : 0;
             coefficient_table[(j > n) ? j - n : j] = (j > n) ? e - 1 : 0;
-        } else if ((Rem(i, n) == Rem(j, n))) {
+        } else if ((rem(i, n) == rem(j, n))) {
             throw InvalidStringError("Indexes for short symmetric generators "
                                      "should not be equal mod " +
                                      std::to_string(e * n) + "!\n(" +
@@ -279,13 +280,14 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
                 ") is not a valid factor.");
         }
     } else if (std::regex_search(str.begin() + pos, str.end(), match,
-                                 std::regex{"(" + number_regex + ")"},
+                                 std::regex{"(:?a[\\s\\t]*_?)?[\\s\\t]*(" +
+                                            number_regex + ")"},
                                  std::regex_constants::match_continuous)) {
         i16 i = std::stoi(match[1]);
         pos += match[0].length();
-        i = Rem(i - 1, e * n) + 1;
-        i16 q = Rem(Quot(i - 1, n), e);
-        i16 r = Rem(i - 1, n) + 1;
+        i = rem(i - 1, e * n) + 1;
+        i16 q = rem(quot(i - 1, n), e);
+        i16 r = rem(i - 1, n) + 1;
         identity();
         permutation_table[0] = r;
         permutation_table[r] = 0;
@@ -294,7 +296,8 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
     } else {
         throw InvalidStringError(
             "Could not extract a factor from \"" + str.substr(pos) +
-            "\"!\nA factor should match regex '(' Z ','? Z ')' | Z | "
+            "\"!\nA factor should match regex\n('s' '_'?)? '(' Z ','? Z ')' | "
+            "('a' '_'?)?Z | "
             "'D',\nwhere Z matches integers, and ignoring whitespaces.");
     }
 }
@@ -327,21 +330,21 @@ void Underlying::assign_partition(i16 *x) const {
                     x[curr_cycle[k] + l * n] = curr_cycle[0] + l * n;
                 }
                 x[curr_cycle[k] + (e - 1) * n] = curr_cycle[other_smallest];
-                x[curr_cycle[k] + Rem(coefficient_table[0], e) * n] = 0;
+                x[curr_cycle[k] + rem(coefficient_table[0], e) * n] = 0;
             }
             for (i16 k = other_smallest; k < int(curr_cycle.size()); k++) {
                 for (i16 l = 0; l < e - 1; l++) {
                     x[curr_cycle[k] + (l + 1) * n] = curr_cycle[0] + l * n;
                 }
                 x[curr_cycle[k]] = curr_cycle[other_smallest];
-                x[curr_cycle[k] + Rem(coefficient_table[0] + 1, e) * n] = 0;
+                x[curr_cycle[k] + rem(coefficient_table[0] + 1, e) * n] = 0;
             }
         } else {
             for (i16 k = 0; k < int(curr_cycle.size()); k++) {
                 for (i16 l = 0; l < e; l++) {
                     x[curr_cycle[k] + l * n] = curr_cycle[0] + l * n;
                 }
-                x[curr_cycle[k] + Rem(coefficient_table[0], e) * n] = 0;
+                x[curr_cycle[k] + rem(coefficient_table[0], e) * n] = 0;
             }
         }
     }
@@ -367,7 +370,7 @@ void Underlying::assign_partition(i16 *x) const {
                 curr = permutation_table[curr];
             }
             // If cycle_type == 0, then the cycle is short.
-            if (Rem(cycle_type, e) == 0) {
+            if (rem(cycle_type, e) == 0) {
                 if (other_smallest != 0) {
                     for (i16 k = 0; k < other_smallest; k++) {
                         x[curr_cycle[k]] = i;
@@ -452,7 +455,7 @@ void Underlying::of_partition(const i16 *x) {
     }
     if (min_cycle_0 != 0) {
         // Determine if it is long symmetric.
-        if (x[Rem(min_cycle_0 + n - 1, e * n) + 1] == 0) {
+        if (x[rem(min_cycle_0 + n - 1, e * n) + 1] == 0) {
             coefficient_table[0] = e - 1;
             permutation_table[0] = 0;
             for (i16 i = n; i >= 1; i--) {
@@ -490,29 +493,29 @@ void Underlying::of_partition(const i16 *x) {
                     }
                 }
             }
-            i16 q_min = Quot(min_cycle_0 - 1, n),
-                q_max = Quot(max_cycle_0 - 1, n);
-            i16 r_min = Rem(min_cycle_0 - 1, n) + 1;
+            i16 q_min = quot(min_cycle_0 - 1, n),
+                q_max = quot(max_cycle_0 - 1, n);
+            i16 r_min = rem(min_cycle_0 - 1, n) + 1;
             z[0] = 0;
             coefficient_table[0] = q_min;
             permutation_table[0] = r_min;
 
             for (i16 i = n - 1; i >= n - r_min + 1; --i) {
-                i16 i_en = Rem(i + min_cycle_0 - 1, e * n) + 1;
-                r = Rem(i + min_cycle_0 - 1, n) + 1;
+                i16 i_en = rem(i + min_cycle_0 - 1, e * n) + 1;
+                r = rem(i + min_cycle_0 - 1, n) + 1;
                 if (x[i_en] == 0) {
                     permutation_table[r] = z[0];
-                    coefficient_table[r] = (z[0] == 0) ? Rem(e - q_max, e) : 0;
+                    coefficient_table[r] = (z[0] == 0) ? rem(e - q_max, e) : 0;
                     z[0] = r;
                 }
             }
             for (i16 i = n - r_min; i >= 0; --i) {
-                i16 i_en = Rem(i + min_cycle_0 - 1, e * n) + 1;
-                r = Rem(i + min_cycle_0 - 1, n) + 1;
+                i16 i_en = rem(i + min_cycle_0 - 1, e * n) + 1;
+                r = rem(i + min_cycle_0 - 1, n) + 1;
                 if ((x[i_en] == 0)) {
                     if (z[0] == 0) {
                         permutation_table[r] = z[0];
-                        coefficient_table[r] = Rem(e - q_min, e);
+                        coefficient_table[r] = rem(e - q_min, e);
                     } else {
                         coefficient_table[r] = (z[0] < r) ? 1 : 0;
                         permutation_table[r] = z[0];
@@ -595,7 +598,7 @@ Underlying Underlying::product(const Underlying &b) const {
     i16 i, n = get_parameter().n, e = get_parameter().e;
     for (i = 0; i <= n; i++) {
         f.permutation_table[i] = b.permutation_table[permutation_table[i]];
-        f.coefficient_table[i] = Rem(b.coefficient_table[permutation_table[i]] +
+        f.coefficient_table[i] = rem(b.coefficient_table[permutation_table[i]] +
                                          coefficient_table[i],
                                      e);
     }
@@ -612,20 +615,20 @@ Underlying Underlying::right_complement(const Underlying &b) const {
 
 void Underlying::delta_conjugate_mut(i16 k) {
     i16 i, n = get_parameter().n, e = get_parameter().e;
-    i16 q = Quot(k, n), r = Rem(k, n), q_e = Rem(q, e);
+    i16 q = quot(k, n), r = rem(k, n), q_e = rem(q, e);
 
     Underlying delta_k = Underlying(get_parameter());
 
     delta_k.permutation_table[0] = 0;
-    delta_k.coefficient_table[0] = Rem(-k, e);
+    delta_k.coefficient_table[0] = rem(-k, e);
     for (i = 1; i <= n - r; i++) {
-        delta_k.permutation_table[i] = Rem(i + k - 1, n) + 1;
+        delta_k.permutation_table[i] = rem(i + k - 1, n) + 1;
         delta_k.coefficient_table[i] = q_e;
     }
     q_e += 1;
     q_e = ((q_e == e) ? 0 : q_e);
     for (i = n - r + 1; i <= n; i++) {
-        delta_k.permutation_table[i] = Rem(i + k - 1, n) + 1;
+        delta_k.permutation_table[i] = rem(i + k - 1, n) + 1;
         delta_k.coefficient_table[i] = q_e;
     }
 

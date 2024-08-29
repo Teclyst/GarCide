@@ -119,9 +119,9 @@ struct EENParameter {
  * \f$\mathbb U_e\f$, and where \f$\mathfrak S_{n}\f$ is seen as the group of
  * permutation matrices).
  *
- * In practice, only \f$\mathrm O(n)\f$ memory is needed as these matrices are very
- * sparse. They are represented using two vectors, one for the permutation and
- * one for the coefficients (_i.e._ the diagonal part of the semi-direct
+ * In practice, only \f$\mathrm O(n)\f$ memory is needed as these matrices are
+ * very sparse. They are represented using two vectors, one for the permutation
+ * and one for the coefficients (_i.e._ the diagonal part of the semi-direct
  * product).
  *
  * Let \f$\zeta_{e}=\mathrm e^{i\frac{1}{e}\tau}\f$.
@@ -240,6 +240,41 @@ class Underlying {
      */
     Underlying(Parameter p);
 
+    /**
+     * @brief Extraction from string.
+     *
+     * Reads the string `str`, starting at position `pos`, and sets `this` to
+     * the corresponding atom. If it succeeds, increases `pos` so that it points
+     * to just after what was extracted.
+     *
+     * Letting \f$Z = \texttt{-}? ([\texttt{1} - \texttt{9}] [\texttt{0} -
+     * \texttt{9}]^* \mid \texttt{0})\f$ be a regular expression representing
+     * integers, accepted strings are those represented by regular expression
+     * \f$\texttt{s} \texttt{_}? Z\mid \texttt{t} \texttt{_}? Z \mid
+     * \texttt{D}\f$, ignoring whitespaces.
+     *
+     * If the first letter is \f$\texttt s\f$, then the integer must be in
+     * represent is in \f$[\![3, n]\!]\f$.
+     *
+     * If the first letter is \f$\texttt s\f$, then the integer is considered
+     * mod \f$e\f$.
+     *
+     * \f$\texttt{s_}i\f$ and \f$\texttt{s}i\f$ and \f$i\f$ all stand for
+     * Corran-Picantin generator \f$s_i\f$, with \f$\texttt{t_}i\f$ and
+     * \f$\texttt{t}i\f$ representing Corran-Picantin generator \f$t_i\f$.
+     *
+     * \f$\texttt{D}\f$ represents \f$\lambda_{en}\f$, the Garside element.
+     *
+     * See Corran, Picantin, _A New Garside Structure for the Braid Groups of
+     * Type_ \f$(e, e, r)\f$, 2011, arXiv: [arxiv/0901.0645
+     * [math.GR]](https://arxiv.org/abs/0901.0645)
+     *
+     * @param str The string to extract from.
+     * @param pos The position to start from.
+     * @exception InvalidStringError Thrown when there is no subword starting
+     * from `pos` that matches the expression, or if there is one and the first
+     * letter is \f$\texttt s\f$, if the integer is not in \f$[\![3, n]\!]\f$..
+     */
     void of_string(const std::string &str, size_t &pos);
 
     /**
@@ -429,24 +464,34 @@ class Underlying {
      */
     Underlying inverse() const;
 
-    // Checks if s_i left divides `*this`. (See George Neaime, Interval Garside
-    // Structures for the Complex Braid Groups, Proposition 3.13,
-    // [arXiv:1707.06864](https://arxiv.org/abs/1707.06864)).
-    // @param dir_perm A table that holds the direct table of the permutation
-    // induced by the factor.
-    // @param i The integer i for which we check if s_i left divides the factor.
+    /** @brief Checks if s_i left divides `*this`.
+     *
+     * See George Neaime, Interval Garside Structures for the Complex Braid
+     * Groups, 2017, Proposition 3.13,
+     * [arXiv:1707.06864](https://arxiv.org/abs/1707.06864).
+     *
+     * @param dir_perm A table that holds the direct table of the permutation
+     * induced by the factor.
+     * @param i The integer \f$i\f$ for which we check if \f$s_i\f$ left divides
+     * the factor.
+     */
     inline bool is_s_left_divisor(i16 i) const {
         return (permutation_table[i - 1] > permutation_table[i - 2])
                    ? (coefficient_table[i - 1] != 0)
                    : (coefficient_table[i - 2] == 0);
     }
 
-    // Checks if t_i left divides `*this`. (See George Neaime, Interval Garside
-    // Structures for the Complex Braid Groups, Proposition 3.13,
-    // [arXiv:1707.06864](https://arxiv.org/abs/1707.06864)).
-    // @param dir_perm A table that holds the direct table of the permutation
-    // induced by the factor.
-    // @param i The integer i for which we check if t_i left divides the factor.
+    /** @brief Checks if t_i left divides `*this`.
+     *
+     * See George Neaime, Interval Garside Structures for the Complex Braid
+     * Groups, 2017, Proposition 3.13,
+     * [arXiv:1707.06864](https://arxiv.org/abs/1707.06864).
+     *
+     * @param dir_perm A table that holds the direct table of the permutation
+     * induced by the factor.
+     * @param i The integer \f$i\f$ for which we check if \f$t_i\f$ left divides
+     * the factor.
+     */
     inline bool is_t_left_divisor(i16 i) const {
         return (permutation_table[1] > permutation_table[0])
                    ? (coefficient_table[1] != 0)
@@ -454,11 +499,16 @@ class Underlying {
                       ((i == 0) ? 0 : get_parameter().e - i));
     }
 
-    // Left multiplies by s_i (or divides, which is the same as it has order 2).
-    // @param dir_perm A table that holds the direct table of the permutation
-    // induced by the factor. Modified by this function so that it remains up to
-    // date.
-    // @param i The integer i for which we multiply by s_i the factor.
+    /** @brief Left multiplies by \f$s_i\f$.
+     *
+     * (Or divides, which is the same as it has order \f$2\f$.)
+     *
+     * @param dir_perm A table that holds the direct table of the permutation
+     * induced by the factor. Modified by this function so that it remains up to
+     * date.
+     * @param i The integer \f$i\f$ for which we multiply the factor by
+     * \f$s_i\f$.
+     */
     inline void s_left_multiply(i16 *dir_perm, i16 i) {
         std::swap(coefficient_table[i - 1], coefficient_table[i - 2]);
         std::swap(permutation_table[i - 1], permutation_table[i - 2]);
@@ -466,33 +516,42 @@ class Underlying {
                   dir_perm[permutation_table[i - 2]]);
     }
 
-    // Left multiplies by t_i (or divides, which is the same as it has order 2).
-    // @param dir_perm A table that holds the direct table of the permutation
-    // induced by the factor. Modified by this function so that it remains up to
-    // date.
-    // @param i The integer i for which we multiply by t_i the factor.
+    /** @brief Left multiplies by \f$t_i\f$.
+     *
+     * (Or divides, which is the same as it has order \f$2\f$.)
+     *
+     * @param dir_perm A table that holds the direct table of the permutation
+     * induced by the factor. Modified by this function so that it remains up to
+     * date.
+     * @param i The integer \f$i\f$ for which we multiply the factor by
+     * \f$t_i\f$.
+     */
     inline void t_left_multiply(i16 *dir_perm, i16 i) {
         std::swap(coefficient_table[0], coefficient_table[1]);
         std::swap(permutation_table[0], permutation_table[1]);
-        coefficient_table[0] = Rem(coefficient_table[0] - i, get_parameter().e);
-        coefficient_table[1] = Rem(coefficient_table[1] + i, get_parameter().e);
+        coefficient_table[0] = rem(coefficient_table[0] - i, get_parameter().e);
+        coefficient_table[1] = rem(coefficient_table[1] + i, get_parameter().e);
         std::swap(dir_perm[permutation_table[0]],
                   dir_perm[permutation_table[1]]);
     }
 
-    // Right multiplies by s_i (or divides, which is the same as it has order
-    // 2).
-    // @param dir_perm A table that holds the direct table of the permutation
-    // induced by the factor. Modified by this function so that it remains up to
-    // date.
-    // @param i The integer i for which we multiply by s_i the factor.
+    /** @brief Right multiplies by \f$s_i\f$.
+     *
+     * (Or divides, which is the same as it has order \f$2\f$.)
+     *
+     * @param dir_perm A table that holds the direct table of the permutation
+     * induced by the factor. Modified by this function so that it remains up to
+     * date.
+     * @param i The integer \f$i\f$ for which we multiply the factor by
+     * \f$s_i\f$.
+     */
     inline void s_right_multiply(i16 *dir_perm, i16 i) {
         std::swap(permutation_table[dir_perm[i - 1]],
                   permutation_table[dir_perm[i - 2]]);
         std::swap(dir_perm[i - 1], dir_perm[i - 2]);
     }
 
-    /** Right multiplies by t_i.
+    /** @brief Right multiplies by \f$t_i\f$.
      *
      * (Or divides, which is the same as it has order \f$2\f$.)
      *
@@ -506,22 +565,22 @@ class Underlying {
         std::swap(permutation_table[dir_perm[0]],
                   permutation_table[dir_perm[1]]);
         coefficient_table[dir_perm[0]] =
-            Rem(coefficient_table[dir_perm[0]] - i, get_parameter().e);
+            rem(coefficient_table[dir_perm[0]] - i, get_parameter().e);
         coefficient_table[dir_perm[1]] =
-            Rem(coefficient_table[dir_perm[1]] + i, get_parameter().e);
+            rem(coefficient_table[dir_perm[1]] + i, get_parameter().e);
         std::swap(dir_perm[0], dir_perm[1]);
     }
 };
 
 /**
- * @brief Class for semi-classic Garside structure \f$\mathrm B(e,e,n+1)\f$ complex
- * braid groups canonical factors.
+ * @brief Class for semi-classic Garside structure \f$\mathrm B(e,e,n+1)\f$
+ * complex braid groups canonical factors.
  */
 using Factor = FactorTemplate<Underlying>;
 
 /**
- * @brief Class for semi-classic Garside structure \f$\mathrm B(e,e,n+1)\f$ complex
- * braid groups elements.
+ * @brief Class for semi-classic Garside structure \f$\mathrm B(e,e,n+1)\f$
+ * complex braid groups elements.
  */
 using Braid = BraidTemplate<Factor>;
 

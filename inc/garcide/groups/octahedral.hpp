@@ -169,12 +169,12 @@ class Underlying {
      * \f$\texttt{s(}i\texttt{ }j\texttt)\f$,
      * \f$\texttt{(}i\texttt{,}j\texttt)\f$ and
      * \f$\texttt{(}i\texttt{ }j\texttt)\f$
-     * all stand for the Bessis short generator that swaps \f$i\f$ and \f$j\f$,
+     * all stand for the Bessis **short** generator that swaps \f$i\f$ and \f$j\f$,
      * mod \f$2n\f$.
      *
      * \f$\texttt{l_}i\f$,
      * \f$\texttt{l}i\f$ and
-     * \f$i\f$, represent the Bessis long generator that swaps \f$i\f$ and
+     * \f$i\f$ represent the Bessis **long** generator that swaps \f$i\f$ and
      * \f$i+n\f$, mod \f$2n\f$.
      *
      * See Bessis, _The Dual Braid Monoid_, 2001, [arXiv:math/0101158
@@ -184,7 +184,7 @@ class Underlying {
      *
      * @param str The string to extract from.
      * @param pos The position to start from.
-     * @exception `InvalidStringError`: Thrown when there is no subword starting
+     * @exception InvalidStringError Thrown when there is no subword starting
      * from `pos` that matches the expression, or if there is one,
      * it matches the first part, and both integers are equal mod \f$n\f$.
      */

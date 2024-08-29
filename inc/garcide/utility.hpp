@@ -46,16 +46,16 @@ namespace garcide {
 
 /**
  * @brief Signed 8-bits integer type.
- * 
+ *
  * Alias for `char`.
- * 
+ *
  * We use our own types for portability.
  */
 using i8 = char;
 
 /**
  * @brief Unsigned 8-bits integer type.
- * 
+ *
  * Alias for `unsigned char`.
  *
  * We use our own types for portability.
@@ -63,8 +63,8 @@ using i8 = char;
 using u8 = unsigned char;
 
 /**
- * @brief Signed 16-bits integer type. 
- * 
+ * @brief Signed 16-bits integer type.
+ *
  * Alias for `int`.
  *
  * We use our own types for portability.
@@ -73,7 +73,7 @@ using i16 = int;
 
 /**
  * @brief Unsigned 16-bits integer type.
- * 
+ *
  * Alias for `unsigned int`.
  *
  * We use our own types for portability.
@@ -81,8 +81,8 @@ using i16 = int;
 using u16 = unsigned int;
 
 /**
- * @brief Signed 32-bits integer type. 
- * 
+ * @brief Signed 32-bits integer type.
+ *
  * Alias for `long`.
  *
  * We use our own types for portability.
@@ -91,7 +91,7 @@ using i32 = long;
 
 /**
  * @brief Unsigned 32-bits integer type.
- * 
+ *
  * Alias for `unsigned long`.
  *
  * We use our own types for portability.
@@ -99,8 +99,8 @@ using i32 = long;
 using u32 = unsigned long;
 
 /**
- * @brief Signed 64-bits integer type. 
- * 
+ * @brief Signed 64-bits integer type.
+ *
  * Alias for `long long`.
  *
  * We use our own types for portability.
@@ -108,8 +108,8 @@ using u32 = unsigned long;
 using i64 = long long;
 
 /**
- * @brief Unsigned 64-bits integer type. 
- * 
+ * @brief Unsigned 64-bits integer type.
+ *
  * Alias for `unsigned long long`.
  *
  * We use our own types for portability.
@@ -129,15 +129,16 @@ const std::string number_regex{"-?[1-9][0-9]*|0"};
  *
  * Computes the quotient in the euclidian division of `a` by `b`.
  *
- * `Quot(a, b)` and `Rem(a, b)` satisfy the usual relation `a = Quot(a, b) * b +
- * Rem(a, b)`.
+ * `quot(a, b)` and `rem(a, b)` satisfy the usual relation `a == quot(a, b) * b +
+ * rem(a, b)`.
+ *
+ * @warning Dividing by zero is undefined behaviour.
  *
  * @param a Dividend.
  * @param b Divisor.
- * @exception Dividing by zero is undefined behaviour.
  * @return The euclidian quotient of `a` by `b`.
  */
-inline i16 Quot(i16 a, i16 b) {
+inline i16 quot(i16 a, i16 b) {
     i16 r = a % b;
     i16 q = a / b;
     return r >= 0 ? q : q + (b >= 0 ? -1 : 1);
@@ -148,15 +149,16 @@ inline i16 Quot(i16 a, i16 b) {
  *
  * Computes the remainder in the euclidian division of `a` by `b`.
  *
- * `Quot(a, b)` and `Rem(a, b)` satisfy the usual relation `a = Quot(a, b) * b +
- * Rem(a, b)`.
+ * `quot(a, b)` and `rem(a, b)` satisfy the usual relation `a == quot(a, b) * b +
+ * rem(a, b)`.
  *
+ * @warning Dividing by zero is undefined behaviour.
+ * 
  * @param a Dividend.
  * @param b Divisor.
- * @exception Dividing by zero is undefined behaviour.
  * @return The euclidian remainder of `a` by `b`.
  */
-inline i16 Rem(i16 a, i16 b) {
+inline i16 rem(i16 a, i16 b) {
     i16 r = a % b;
     return r >= 0 ? r : r + (b >= 0 ? b : -b);
 };

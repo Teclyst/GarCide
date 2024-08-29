@@ -117,9 +117,9 @@ struct EENParameter {
  * \f$\mathbb U_e\f$, and where \f$\mathfrak S_{n+1}\f$ is seen as the group of
  * permutation matrices).
  *
- * In practice, only \f$\mathrm O(n)\f$ memory is needed as these matrices are very
- * sparse. They are represented using two vectors, one for the permutation and
- * one for the coefficients (_i.e._ the diagonal part of the semi-direct
+ * In practice, only \f$\mathrm O(n)\f$ memory is needed as these matrices are
+ * very sparse. They are represented using two vectors, one for the permutation
+ * and one for the coefficients (_i.e._ the diagonal part of the semi-direct
  * product).
  *
  * Let \f$\zeta_{ne}=\mathrm e^{i\frac{1}{en}\tau}\f$ and \f$\zeta_{e}=\mathrm
@@ -255,6 +255,54 @@ class Underlying {
      */
     Underlying(Parameter p);
 
+    /**
+     * @brief Extraction from string.
+     *
+     * Reads the string `str`, starting at position `pos`, tries to extract an
+     * atom to set `this` to. If it succeeds, increases `pos` so that it points
+     * to just after what was extracted.
+     *
+     * Letting \f$Z = \texttt{-}? ([\texttt{1} - \texttt{9}] [\texttt{0} -
+     * \texttt{9}]^* \mid \texttt{0})\f$ be a regular expression representing
+     * integers, accepted strings are those represented by regular expression
+     * \f$(\texttt{a} \texttt{_}?)?\texttt{(}Z \texttt{,}? Z\texttt{)}\mid
+     * (\texttt{a} \texttt{_}?)? Z \mid \texttt{D}\f$. Whitespaces are ignored
+     * and integers are considered mod \f$en\f$.
+     *
+     * In the case with two integers, they must be distinct mod \f$en\f$, and at
+     * a distance at most \f$n-1\f$ in \f$\mathbb Z/en\mathbb Z\f$.
+     *
+     * \f$\texttt{a_(}i\texttt{,}j\texttt)\f$,
+     * \f$\texttt{a_(}i\texttt{ }j\texttt)\f$,
+     * \f$\texttt{a(}i\texttt{,}j\texttt)\f$,
+     * \f$\texttt{a(}i\texttt{ }j\texttt)\f$,
+     * \f$\texttt{(}i\texttt{,}j\texttt)\f$ and
+     * \f$\texttt{(}i\texttt{ }j\texttt)\f$
+     * all stand for the Corran-Bessis short symmetrical generator that
+     * corresponds to the minimal non crossing partition of type \f$(e,e,n)\f$
+     * such that \f$\zeta_{en}^{-i}\f$ and \f$\zeta_{en}^{-j}\f$ are in the same
+     * cell.
+     *
+     * \f$\texttt{a_}i\f$,
+     * \f$\texttt{a}i\f$ and
+     * \f$i\f$, represent the Corran-Bessis short assymetrical generator
+     * that corresponds to the minimal non crossing partition of type
+     * \f$(e,e,n)\f$ such that \f$0\f$ and \f$\zeta_{en}^{-i}\f$ are in the
+     * same cell.
+     *
+     * \f$\texttt{D}\f$ represents \f$\Delta\f$.
+     *
+     * See Bessis, Corran, _Non-Crossing Partitions of
+     * Type_ \f$(e, e, r)\f$, 2004, arXiv: [math/0101158
+     * [math.GR]](https://arxiv.org/abs/math/0403400).
+     *
+     * @param str The string to extract from.
+     * @param pos The position to start from.
+     * @exception InvalidStringError Thrown when there is no subword starting
+     * from `pos` that matches the expression, or if there is one,
+     * it matches the first part, and both integers are either equal mod
+     * \f$en\f$, or more than \f$n\f$ apart in \f$\mathbb Z/en\mathbb Z\f$.
+     */
     void of_string(const std::string &str, size_t &pos);
 
     /**
