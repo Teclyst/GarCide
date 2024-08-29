@@ -1,5 +1,5 @@
 /**
- * @file braiding_option.h
+ * @file braiding_option.hpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
  * @brief Header file to configure the braiding executable.
  * @version 0.1
@@ -32,27 +32,27 @@
 
 #if BRAIDING_CLASS == 0
 
-#include "garcide/groups/artin.h"
+#include "garcide/groups/artin.hpp"
 
 #elif BRAIDING_CLASS == 1
 
-#include "garcide/groups/band.h"
+#include "garcide/groups/band.hpp"
 
 #elif BRAIDING_CLASS == 2
 
-#include "garcide/groups/octahedral.h"
+#include "garcide/groups/octahedral.hpp"
 
 #elif BRAIDING_CLASS == 3
 
-#include "garcide/groups/dihedral.h"
+#include "garcide/groups/dihedral.hpp"
 
 #elif BRAIDING_CLASS == 4
 
-#include "garcide/groups/dual_complex.h"
+#include "garcide/groups/dual_complex.hpp"
 
 #elif BRAIDING_CLASS == 5
 
-#include "garcide/groups/standard_complex.h"
+#include "garcide/groups/standard_complex.hpp"
 
 #elif BRAIDING_CLASS == 6
 
@@ -63,7 +63,20 @@
 namespace braiding {
 #if BRAIDING_CLASS == 0
 
+/**
+ * @brief The factor class used for _Braiding_.
+ * 
+ * Depends on preprocessor variable `BRAIDING_CLASS`. Therefore, it isn't
+ * necessarily set to `garcide::artin::Factor`.
+ */
 using Factor = garcide::artin::Factor;
+
+/**
+ * @brief The braid class used for _Braiding_.
+ * 
+ * Depends on preprocessor variable `BRAIDING_CLASS`. Therefore, it isn't
+ * necessarily set to `garcide::artin::Braid`.
+ */
 using Braid = garcide::artin::Braid;
 
 #elif BRAIDING_CLASS == 1

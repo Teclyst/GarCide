@@ -1,7 +1,8 @@
 /**
  * @file octahedral.cpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
- * @brief Implementation file for B-series Artin groups (dual Garside structure).
+ * @brief Implementation file for \f$\mathbf B\f$-series Artin groups (dual
+ * Garside structure).
  * @version 0.1
  * @date 2024-07-28
  *
@@ -27,38 +28,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "garcide/groups/octahedral.h"
+#include "garcide/groups/octahedral.hpp"
 
 namespace garcide::octahedral {
 
-/**
- * @brief Maximum braid index.
- *
- * The greatest index that may be used for braids.
- *
- * It is used because we use `thread_local` objects to avoid some allocations,
- * and their size must be known at compile time.
- *
- * Having too big `thread_local` objects might cause some issue with thread
- * spawning.
- */
-const sint16 MaxBraidIndex = 256;
-
-Underlying::Parameter
-Underlying::parameter_of_string(const std::string &str) {
+Underlying::Parameter Underlying::parameter_of_string(const std::string &str) {
     std::smatch match;
 
     if (std::regex_match(str, match,
                          std::regex{"[\\s\\t]*(" + number_regex + ")[\\s\\t]*"},
                          std::regex_constants::match_continuous)) {
-        sint16 i;
+        i16 i;
         try {
             i = std::stoi(match[1]);
         } catch (std::out_of_range const &) {
             throw InvalidStringError("Parameter is too big!\n" + match.str(1) +
                                      " can not be converted to a C++ integer.");
         }
-        if (((1 <= i) && (i <= MaxBraidIndex))) {
+        if (((1 <= i) && (i <= MAX_PARAMETER))) {
             return i;
         } else if (1 > i) {
             throw InvalidStringError("Parameter should be at least 1!");
@@ -66,25 +53,20 @@ Underlying::parameter_of_string(const std::string &str) {
             throw InvalidStringError("Parameter strands is too big!\n" +
                                      match.str(1) +
                                      " is strictly greater than " +
-                                     std::to_string(MaxBraidIndex) + ".");
+                                     std::to_string(MAX_PARAMETER) + ".");
         }
     } else {
         throw InvalidStringError(
             std::string("Could not extract an integer from \"str\"!"));
     }
-};
+}
 
-sint16 Underlying::get_parameter() const { return PresentationParameter; }
-
-sint16 Underlying::lattice_height() const { return get_parameter(); }
-
-Underlying::Underlying(sint16 n)
-    : PresentationParameter(n), permutation_table(2 * n + 1) {}
+Underlying::Underlying(i16 n) : permutation_table(2 * n + 1) {}
 
 void Underlying::print(IndentedOStream &os) const {
     // Recall that a band braid is represented by decreasing cycles.
-    sint16 i, j, n = get_parameter();
-    std::vector<sint16> curr_cycle;
+    i16 i, j, n = get_parameter();
+    std::vector<i16> curr_cycle;
     std::vector<bool> seen(n + 1, false);
     for (i = 1; i <= n; i++) {
         seen[i] = false;
@@ -96,9 +78,9 @@ void Underlying::print(IndentedOStream &os) const {
         if (!seen[i]) {
             curr_cycle.clear();
             j = i;
-            while (!seen[Rem(j - 1, n) + 1]) {
+            while (!seen[rem(j - 1, n) + 1]) {
                 curr_cycle.push_back(j);
-                seen[Rem(j - 1, n) + 1] = true;
+                seen[rem(j - 1, n) + 1] = true;
                 j = permutation_table[j];
             }
             if (!is_first && int(curr_cycle.size()) > 1) {
@@ -106,13 +88,13 @@ void Underlying::print(IndentedOStream &os) const {
             } else if (int(curr_cycle.size()) > 1) {
                 is_first = false;
             }
-            for (sint16 l = int(curr_cycle.size()) - 1; l >= 1; --l) {
-                os << "(" << curr_cycle[l] << ", " << curr_cycle[l - 1] << ")"
+            for (i16 l = int(curr_cycle.size()) - 1; l >= 1; --l) {
+                os << "s(" << curr_cycle[l] << ", " << curr_cycle[l - 1] << ")"
                    << ((l == 1) ? "" : " ");
             }
             // Long cycle.
             if (j > n) {
-                os << (is_first ? "" : " ") << j - n;
+                os << (is_first ? "l" : " l") << j - n;
             }
         }
     }
@@ -130,7 +112,7 @@ void Underlying::debug(IndentedOStream &os) const {
     os.Indent(4);
     os << EndLine();
     os << "[";
-    for (sint16 i = 1; i < 2 * get_parameter(); i++) {
+    for (i16 i = 1; i < 2 * get_parameter(); i++) {
         os << permutation_table[i] << ", ";
     }
     os << permutation_table[2 * get_parameter()];
@@ -141,18 +123,19 @@ void Underlying::debug(IndentedOStream &os) const {
 }
 
 void Underlying::of_string(const std::string &str, size_t &pos) {
-    sint16 n = get_parameter();
+    i16 n = get_parameter();
     std::smatch match;
     if (std::regex_search(str.begin() + pos, str.end(), match, std::regex{"D"},
                           std::regex_constants::match_continuous)) {
         pos += match[0].length();
         delta();
-    } else if (std::regex_search(str.begin() + pos, str.end(), match,
-                                 std::regex{"\\([\\s\\t]*(" + number_regex +
-                                            ")[\\s\\t]*,?[\\s\\t]*(" +
-                                            number_regex + ")[\\s\\t]*\\)"},
-                                 std::regex_constants::match_continuous)) {
-        sint16 i, j;
+    } else if (std::regex_search(
+                   str.begin() + pos, str.end(), match,
+                   std::regex{"(?:s[\\s\\t]*_?[\\s\\t]*)?\\([\\s\\t]*(" +
+                              number_regex + ")[\\s\\t]*,?[\\s\\t]*(" +
+                              number_regex + ")[\\s\\t]*\\)"},
+                   std::regex_constants::match_continuous)) {
+        i16 i, j;
         try {
             i = std::stoi(match[1]);
         } catch (std::out_of_range const &) {
@@ -165,17 +148,17 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
             throw InvalidStringError("Index is too big!\n" + match.str(2) +
                                      " can not be converted to a C++ integer.");
         }
-        i = Rem(i - 1, 2 * n) + 1;
-        j = Rem(j - 1, 2 * n) + 1;
+        i = rem(i - 1, 2 * n) + 1;
+        j = rem(j - 1, 2 * n) + 1;
         pos += match[0].length();
-        if ((i != j) && (i != Rem(j + n - 1, 2 * n) + 1)) {
+        if ((i != j) && (i != rem(j + n - 1, 2 * n) + 1)) {
             identity();
             permutation_table[i] = j;
             permutation_table[j] = i;
-            permutation_table[Rem(i + n - 1, 2 * n) + 1] =
-                Rem(j + n - 1, 2 * n) + 1;
-            permutation_table[Rem(j + n - 1, 2 * n) + 1] =
-                Rem(i + n - 1, 2 * n) + 1;
+            permutation_table[rem(i + n - 1, 2 * n) + 1] =
+                rem(j + n - 1, 2 * n) + 1;
+            permutation_table[rem(j + n - 1, 2 * n) + 1] =
+                rem(i + n - 1, 2 * n) + 1;
         } else {
             throw InvalidStringError(
                 "Indexes for short generators should not be equal mod " +
@@ -183,32 +166,35 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
                 match.str(2) + ") is not a valid factor.");
         }
     } else if (std::regex_search(str.begin() + pos, str.end(), match,
-                                 std::regex{"(" + number_regex + ")"},
+                                 std::regex{"(?:l[\\s\\t]*_?[\\s\\t]*)?(" +
+                                            number_regex + ")"},
                                  std::regex_constants::match_continuous)) {
-        sint16 i;
+        i16 i;
         try {
             i = std::stoi(match[1]);
         } catch (std::out_of_range const &) {
             throw InvalidStringError("Index is too big!\n" + match.str(1) +
                                      " can not be converted to a C++ integer.");
         }
-        i = Rem(i - 1, 2 * n) + 1;
+        i = rem(i - 1, 2 * n) + 1;
         pos += match[0].length();
         identity();
-        permutation_table[i] = Rem(i + n - 1, 2 * n) + 1;
-        permutation_table[Rem(i + n - 1, 2 * n) + 1] = i;
+        permutation_table[i] = rem(i + n - 1, 2 * n) + 1;
+        permutation_table[rem(i + n - 1, 2 * n) + 1] = i;
     } else {
         throw InvalidStringError(
             "Could not extract a factor from \"" + str.substr(pos) +
-            "\"!\nA factor should match regex '(' Z ','? Z ')' | Z | "
+            "\"!\nA factor should match regex\n('s' '_'?)? '(' Z ','? Z ')' | "
+            "('l' '_'?)? Z "
+            "| "
             "'D',\nwhere Z matches integers, and ignoring whitespaces.");
     }
 }
 
-void Underlying::assign_partition(sint16 *x) const {
-    for (sint16 i = 1; i <= 2 * get_parameter(); ++i)
+void Underlying::assign_partition(i16 *x) const {
+    for (i16 i = 1; i <= 2 * get_parameter(); ++i)
         x[i] = 0;
-    for (sint16 i = 1; i <= 2 * get_parameter(); ++i) {
+    for (i16 i = 1; i <= 2 * get_parameter(); ++i) {
         if (x[i] == 0)
             x[i] = i;
         if (permutation_table[i] > i)
@@ -216,31 +202,31 @@ void Underlying::assign_partition(sint16 *x) const {
     }
 }
 
-void Underlying::of_partition(const sint16 *x) {
-    thread_local sint16 z[2 * MaxBraidIndex + 1];
+void Underlying::of_partition(const i16 *x) {
+    thread_local i16 z[2 * MAX_PARAMETER + 1];
 
-    for (sint16 i = 1; i <= 2 * get_parameter(); ++i)
+    for (i16 i = 1; i <= 2 * get_parameter(); ++i)
         z[i] = 0;
-    for (sint16 i = 2 * get_parameter(); i >= 1; --i) {
+    for (i16 i = 2 * get_parameter(); i >= 1; --i) {
         permutation_table[i] = (z[x[i]] == 0) ? x[i] : z[x[i]];
         z[x[i]] = i;
     }
 }
 
 Underlying Underlying::left_meet(const Underlying &b) const {
-    thread_local sint16 x[2 * MaxBraidIndex + 1], y[2 * MaxBraidIndex + 1],
-        z[2 * MaxBraidIndex + 1];
+    thread_local i16 x[2 * MAX_PARAMETER + 1], y[2 * MAX_PARAMETER + 1],
+        z[2 * MAX_PARAMETER + 1];
 
     assign_partition(x);
     b.assign_partition(y);
 
-    thread_local sint16 P[2 * MaxBraidIndex + 1][2 * MaxBraidIndex + 1];
+    thread_local i16 P[2 * MAX_PARAMETER + 1][2 * MAX_PARAMETER + 1];
 
-    for (sint16 i = 2 * get_parameter(); i >= 1; i--) {
+    for (i16 i = 2 * get_parameter(); i >= 1; i--) {
         P[x[i]][y[i]] = i;
     }
 
-    for (sint16 i = 1; i <= 2 * get_parameter(); i++) {
+    for (i16 i = 1; i <= 2 * get_parameter(); i++) {
         z[i] = P[x[i]][y[i]];
     }
 
@@ -251,78 +237,63 @@ Underlying Underlying::left_meet(const Underlying &b) const {
     return c;
 }
 
-Underlying Underlying::right_meet(const Underlying &b) const {
-    return left_meet(b);
-}
-
 void Underlying::identity() {
-    for (sint16 i = 1; i <= 2 * get_parameter(); i++) {
+    for (i16 i = 1; i <= 2 * get_parameter(); i++) {
         permutation_table[i] = i;
     }
 }
 
 void Underlying::delta() {
-    sint16 i, n = get_parameter();
+    i16 i, n = get_parameter();
     for (i = 1; i < 2 * n; i++) {
         permutation_table[i] = i + 1;
     }
     permutation_table[2 * n] = 1;
 }
 
-bool Underlying::compare(const Underlying &b) const {
-    sint16 i;
-    for (i = 1; i <= get_parameter(); i++) {
-        if (permutation_table[i] != b.permutation_table[i]) {
-            return false;
-        }
-    }
-    return true;
-};
-
 Underlying Underlying::inverse() const {
     Underlying f = Underlying(get_parameter());
-    sint16 i;
+    i16 i;
     for (i = 1; i <= 2 * get_parameter(); i++) {
         f.permutation_table[permutation_table[i]] = i;
     }
     return f;
-};
+}
 
 Underlying Underlying::product(const Underlying &b) const {
     Underlying f = Underlying(get_parameter());
-    sint16 i;
+    i16 i;
     for (i = 1; i <= 2 * get_parameter(); i++) {
         f.permutation_table[i] = b.permutation_table[permutation_table[i]];
     }
     return f;
-};
+}
 
 Underlying Underlying::left_complement(const Underlying &b) const {
     return b.product(inverse());
-};
+}
 
 Underlying Underlying::right_complement(const Underlying &b) const {
     return inverse().product(b);
-};
+}
 
-void Underlying::delta_conjugate_mut(sint16 k) {
+void Underlying::delta_conjugate_mut(i16 k) {
     Underlying under = *this;
-    sint16 i, n = get_parameter();
+    i16 i, n = get_parameter();
 
     for (i = 1; i <= 2 * n; i++) {
         under.permutation_table[i] =
-            Rem(permutation_table[Rem(i - k - 1, 2 * n) + 1] + k - 1, 2 * n) + 1;
+            rem(permutation_table[rem(i - k - 1, 2 * n) + 1] + k - 1, 2 * n) +
+            1;
     }
     *this = under;
 }
 
-void Underlying::randomize() { throw NonRandomizable(); }
-
 std::vector<Underlying> Underlying::atoms() const {
-    sint16 n = get_parameter();
+    i16 n = get_parameter();
     std::vector<Underlying> atoms;
-    for (sint16 i = 1; i <= n; i++) {
-        for (sint16 j = i + 1; j <= n; j++) {
+    for (i16 i = 1; i <= n; i++) {
+        for (i16 j = i + 1; j <= n; j++) {
             Underlying atom = Underlying(n);
             atom.identity();
             atom.permutation_table[i] = j;
@@ -331,7 +302,7 @@ std::vector<Underlying> Underlying::atoms() const {
             atom.permutation_table[j + n] = i + n;
             atoms.push_back(atom);
         }
-        for (sint16 j = n + i + 1; j <= 2 * n; j++) {
+        for (i16 j = n + i + 1; j <= 2 * n; j++) {
             Underlying atom = Underlying(n);
             atom.identity();
             atom.permutation_table[i] = j;
@@ -349,4 +320,12 @@ std::vector<Underlying> Underlying::atoms() const {
     return atoms;
 }
 
-} // namespace cgarside::octahedral
+std::size_t Underlying::hash() const {
+    std::size_t h = 0;
+    for (i16 i = 1; i <= 2 * get_parameter(); i++) {
+        h = h * 31 + permutation_table[i];
+    }
+    return h;
+}
+
+} // namespace garcide::octahedral

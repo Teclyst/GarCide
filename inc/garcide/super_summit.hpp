@@ -1,5 +1,5 @@
 /**
- * @file super_summit.h
+ * @file super_summit.hpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
  * @brief Header (and implementation) file for super summit sets.
  * @version 0.1
@@ -30,22 +30,34 @@
 #ifndef SUPER_SUMMIT
 #define SUPER_SUMMIT
 
-#include "garcide/garcide.h"
+#include "garcide/garcide.hpp"
 #include <cstddef>
 #include <iterator>
 
+/**
+ * @brief Namespace for super summit sets.
+ */
 namespace garcide::super_summit {
 
+/**
+ * @brief Computes a super summit conjugate of `b`.
+ *
+ * This is done through iterated cycling until a repetition is found.
+ *
+ * @tparam F A class representing factors.
+ * @param b The braid of whom a super summit conjugate is computed.
+ * @return A super summit conjugate of `b`.
+ */
 template <class F>
 BraidTemplate<F> send_to_super_summit(const BraidTemplate<F> &b) {
     typename F::Parameter n = b.get_parameter();
 
-    sint16 k = F(n).lattice_height();
+    i16 k = F(n).lattice_height();
 
     BraidTemplate<F> b2 = b, b3 = b;
 
-    sint16 p = b.inf();
-    sint16 j = 0;
+    i16 p = b.inf();
+    i16 j = 0;
 
     while (j <= k) {
         b2.cycling();
@@ -61,7 +73,7 @@ BraidTemplate<F> send_to_super_summit(const BraidTemplate<F> &b) {
 
     j = 0;
     b2 = b3;
-    sint16 l = b2.sup();
+    i16 l = b2.sup();
     while (j <= k) {
         b2.decycling();
 
@@ -77,20 +89,28 @@ BraidTemplate<F> send_to_super_summit(const BraidTemplate<F> &b) {
     return b3;
 }
 
+/**
+ * Computes a super summit conjugate of `b`, with a conjugator.
+ *
+ * @tparam F A class representing factors.
+ * @param b The braid of whom a super summit conjugate is computed.
+ * @param c A braid that is set to a conjugator sending `b` to what is returned.
+ * @return An ultra summit conjugate of `b`.
+ */
 template <class F>
 BraidTemplate<F> send_to_super_summit(const BraidTemplate<F> &b,
                                       BraidTemplate<F> &c) {
 
     typename F::Parameter n = b.get_parameter();
 
-    sint16 k = F(n).lattice_height();
+    i16 k = F(n).lattice_height();
 
     BraidTemplate<F> b2 = b, b3 = b, c2 = BraidTemplate<F>(n);
 
     c.identity();
 
-    sint16 p = b.inf();
-    sint16 j = 0;
+    i16 p = b.inf();
+    i16 j = 0;
 
     while (j <= k) {
         if (b2.canonical_length() == 0) {
@@ -113,7 +133,7 @@ BraidTemplate<F> send_to_super_summit(const BraidTemplate<F> &b,
 
     j = 0;
     b2 = b3;
-    sint16 l = b2.sup();
+    i16 l = b2.sup();
     c2.identity();
 
     while (j <= k) {
@@ -134,6 +154,17 @@ BraidTemplate<F> send_to_super_summit(const BraidTemplate<F> &b,
     return b3;
 }
 
+/**
+ * @brief Computes the smallest factor above `f` that conjugates `b` to an
+ * element of its summit set.
+ *
+ * `b` is assumed to be in its summit set.
+ *
+ * @tparam F A class representing factors.
+ * @param b A braid, assumed to be in its summit set.
+ * @param f A factor.
+ * @return The smallest factor above `f` that conjugates `b` to its summit set.
+ */
 template <class F> F min_summit(const BraidTemplate<F> &b, const F &f) {
     F r2 = f, r = F(f.get_parameter());
     r.identity();
@@ -149,6 +180,19 @@ template <class F> F min_summit(const BraidTemplate<F> &b, const F &f) {
     return r;
 }
 
+/**
+ * @brief Computes the smallest factor above `f` that conjugates `b` to an
+ * element of its super summit set.
+ *
+ * `b` is assumed to be in its super summit set.
+ *
+ * @tparam F A class representing factors.
+ * @param b A braid, assumed to be in its super summit set.
+ * @param b_rcf `b` in RCF.
+ * @param f A factor.
+ * @return The smallest factor above `f` that conjugates `b` to its super summit
+ * set.
+ */
 template <class F>
 F min_super_summit(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf,
                    const F &f) {
@@ -164,6 +208,19 @@ F min_super_summit(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf,
     return r;
 }
 
+/**
+ * @brief Computes the super summit indecomposable conjugators at `b`.
+ *
+ * `b` is assumed to be in its super summit set.
+ *
+ * The indecomposable conjugators at `b` are the minimal non-trivial simple
+ * factors that conjugate `b` to its super summit set.
+ *
+ * @tparam F A class representing canonical factors.
+ * @param b A braid, assumed to be in its ultra summit set.
+ * @param b_rcf `b` in RCF.
+ * @return The super summit indecomposable conjugators at `b`.
+ */
 template <class F>
 std::vector<F> min_super_summit(const BraidTemplate<F> &b,
                                 const BraidTemplate<F> &b_rcf) {
@@ -190,13 +247,13 @@ std::vector<F> min_super_summit(const BraidTemplate<F> &b,
     std::vector<bool> table(atoms.size(), false);
     bool should_be_added;
 
-    for (sint16 i = 0; i < int(atoms.size()); i++) {
+    for (i16 i = 0; i < int(atoms.size()); i++) {
         f = factors[i];
         should_be_added = true;
 
         // We check, before adding f, that a divisor of it wasn't added already
         // with some other atom dividing it.
-        for (sint16 j = 0; j < i && should_be_added; j++) {
+        for (i16 j = 0; j < i && should_be_added; j++) {
             should_be_added = !(table[j] && ((atoms[j] ^ f) == atoms[j]));
         }
         // If that is not the case, we also check if the atom we see is the last
@@ -204,7 +261,7 @@ std::vector<F> min_super_summit(const BraidTemplate<F> &b,
         // some strict left divisor of f can be generated by an atom, doing
         // things in this order ensures that it would have been detected by the
         // first loop by the time we try to add f.
-        for (sint16 j = i + 1; j < int(atoms.size()) && should_be_added; j++) {
+        for (i16 j = i + 1; j < int(atoms.size()) && should_be_added; j++) {
             should_be_added = !((atoms[j] ^ f) == atoms[j]);
         }
         if (should_be_added) {
@@ -216,28 +273,68 @@ std::vector<F> min_super_summit(const BraidTemplate<F> &b,
     return min;
 }
 
-// A SuperSummitSet is basically a wrapper for an unordered set.
-// The reason for doing it that way being to have function signatures that are
-// closer to those for USSs and SCSs. This might change later - it could be
-// interesting to instead use a map and save for each element a conjugator.
+/**
+ * @brief A class for ultra summit sets.
+ *
+ * This is wrapper for a `std::unordered_set`.
+ *
+ * @tparam B A class representing braids.
+ */
 template <class B> class SuperSummitSet {
   private:
+    /**
+     * @brief Set of the elements.
+     */
     std::unordered_set<B> set;
 
   public:
+    /**
+     * @brief Constant iterator type.
+     */
     using ConstIterator = typename std::unordered_set<B>::const_iterator;
 
+    /**
+     * @brief Constant iterator to the first element of the super summit set.
+     *
+     * @return An iterator to the first element of `this`.
+     */
     inline ConstIterator begin() const { return ConstIterator(set.begin()); }
 
+    /**
+     * @brief Constant iterator to the after-last element of the super summit
+     * set.
+     *
+     * @return An iterator to the after-last element of `this`.
+     */
     inline ConstIterator end() const { return ConstIterator(set.end()); }
 
+    /**
+     * @brief Pushes a braid into the ultra summit set.
+     *
+     * @param b The braid to be pushed.
+     */
     inline void insert(B b) { set.insert(b); }
 
-    // Checks membership.
+    /**
+     * @brief Membership test.
+     *
+     * @param b The braid whose membership is tested
+     * @return If `b` is in `*this`.
+     */
     inline bool mem(const B &b) const { return set.find(b) != set.end(); }
 
-    inline sint16 card() const { return set.size(); }
+    /**
+     * @brief Cardinal of the super summit set.
+     *
+     * @return The cardinal of `*this`.
+     */
+    inline i16 card() const { return set.size(); }
 
+    /**
+     * @brief Prints the super summit set in output stream `os`.
+     *
+     * @param os The `IndentedOStream` `*this` is printed in.
+     */
     void print(IndentedOStream &os = ind_cout) const {
         os << "There " << (card() > 1 ? "are " : "is ") << card() << " element"
            << (card() > 1 ? "s " : " ") << "in the super summit set."
@@ -249,11 +346,11 @@ template <class B> class SuperSummitSet {
 
         os << EndLine(1);
 
-        sint16 indent = (int(std::to_string(card() - 1).length()) + 1) / 4 + 1;
-        sint16 count = 0;
+        i16 indent = (int(std::to_string(card() - 1).length()) + 1) / 4 + 1;
+        i16 count = 0;
         for (ConstIterator it = begin(); it != end(); it++) {
             os << count << ":";
-            for (sint16 _ = 0;
+            for (i16 _ = 0;
                  _ < 4 * indent - 1 - int(std::to_string(card() - 1).length());
                  _++) {
                 os << " ";
@@ -268,6 +365,14 @@ template <class B> class SuperSummitSet {
         os << EndLine(1);
     }
 
+    /**
+     * @brief Prints the internal data of the ultra summit set in output stream
+     * `os`.
+     *
+     * Private member `set` is printed.
+     *
+     * @param os The `IndentedOStream` `*this` is printed in.
+     */
     void debug(IndentedOStream &os = ind_cout) const {
         bool is_first = true;
         os << "{   ";
@@ -294,6 +399,13 @@ template <class B> class SuperSummitSet {
     }
 };
 
+/**
+ * @brief Computes the super summit set of `b`.
+ *
+ * @tparam F A class representing factors.
+ * @param b The braid whose ultra summit set is computed.
+ * @return The super summit set of `b`.
+ */
 template <class F>
 SuperSummitSet<BraidTemplate<F>> super_summit_set(const BraidTemplate<F> &b) {
     std::list<BraidTemplate<F>> queue, queue_rcf;
@@ -333,6 +445,16 @@ SuperSummitSet<BraidTemplate<F>> super_summit_set(const BraidTemplate<F> &b) {
     return sss;
 }
 
+/**
+ * @brief Checks if two braids are conjugates.
+ *
+ * This function uses super summit sets.
+ *  
+ * @tparam F A class representing factors.
+ * @param u A braid.
+ * @param v Another braid.
+ * @return if `u` and `v` are conjugates.
+ */
 template <class F>
 inline bool are_conjugate(const BraidTemplate<F> &u,
                           const BraidTemplate<F> &v) {

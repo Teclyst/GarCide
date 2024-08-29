@@ -1,7 +1,7 @@
 /**
  * @file utility.hpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
- * @brief Header file a bunch of utility functions used everywhere.
+ * @brief Header file a bunch for of utility functions used everywhere.
  * @version 0.1
  * @date 2024-07-28
  *
@@ -45,58 +45,80 @@
 namespace garcide {
 
 /**
- * @brief Alias for `char`.
+ * @brief Signed 8-bits integer type.
+ *
+ * Alias for `char`.
  *
  * We use our own types for portability.
  */
-typedef char sint8;
+using i8 = char;
+
 /**
- * @brief Alias for `unsigned char`.
+ * @brief Unsigned 8-bits integer type.
+ *
+ * Alias for `unsigned char`.
  *
  * We use our own types for portability.
  */
-typedef unsigned char uint8;
+using u8 = unsigned char;
+
 /**
- * @brief Alias for `int`.
+ * @brief Signed 16-bits integer type.
+ *
+ * Alias for `int`.
  *
  * We use our own types for portability.
  */
-typedef int sint16;
+using i16 = int;
+
 /**
- * @brief Alias for `unsigned int`.
+ * @brief Unsigned 16-bits integer type.
+ *
+ * Alias for `unsigned int`.
  *
  * We use our own types for portability.
  */
-typedef unsigned int uint16;
+using u16 = unsigned int;
+
 /**
- * @brief Alias for `long`.
+ * @brief Signed 32-bits integer type.
+ *
+ * Alias for `long`.
  *
  * We use our own types for portability.
  */
-typedef long sint32;
+using i32 = long;
+
 /**
- * @brief Alias for `unsigned long`.
+ * @brief Unsigned 32-bits integer type.
+ *
+ * Alias for `unsigned long`.
  *
  * We use our own types for portability.
  */
-typedef unsigned long uint32;
+using u32 = unsigned long;
+
 /**
- * @brief Alias for `long long`.
+ * @brief Signed 64-bits integer type.
+ *
+ * Alias for `long long`.
  *
  * We use our own types for portability.
  */
-typedef long long sint64;
+using i64 = long long;
+
 /**
- * @brief Alias for `unsigned long long`.
+ * @brief Unsigned 64-bits integer type.
+ *
+ * Alias for `unsigned long long`.
  *
  * We use our own types for portability.
  */
-typedef unsigned long long uint64;
+using u64 = unsigned long long;
 
 /**
  * @brief Regex representing integers.
  *
- * A regular expression that matches well-formed integers.
  * It is a string because we often add it as a part of more complex regular
  * expressions, and there is no way to build them within `std::regex`.
  */
@@ -107,17 +129,18 @@ const std::string number_regex{"-?[1-9][0-9]*|0"};
  *
  * Computes the quotient in the euclidian division of `a` by `b`.
  *
- * `Quot(a, b)` and `Rem(a, b)` satisfy the usual relation `a = Quot(a, b) * b +
- * Rem(a, b)`.
+ * `quot(a, b)` and `rem(a, b)` satisfy the usual relation `a == quot(a, b) * b +
+ * rem(a, b)`.
+ *
+ * @warning Dividing by zero is undefined behaviour.
  *
  * @param a Dividend.
  * @param b Divisor.
- * @exception Dividing by zero is undefined behaviour.
  * @return The euclidian quotient of `a` by `b`.
  */
-inline sint16 Quot(sint16 a, sint16 b) {
-    sint16 r = a % b;
-    sint16 q = a / b;
+inline i16 quot(i16 a, i16 b) {
+    i16 r = a % b;
+    i16 q = a / b;
     return r >= 0 ? q : q + (b >= 0 ? -1 : 1);
 };
 
@@ -126,16 +149,17 @@ inline sint16 Quot(sint16 a, sint16 b) {
  *
  * Computes the remainder in the euclidian division of `a` by `b`.
  *
- * `Quot(a, b)` and `Rem(a, b)` satisfy the usual relation `a = Quot(a, b) * b +
- * Rem(a, b)`.
+ * `quot(a, b)` and `rem(a, b)` satisfy the usual relation `a == quot(a, b) * b +
+ * rem(a, b)`.
  *
+ * @warning Dividing by zero is undefined behaviour.
+ * 
  * @param a Dividend.
  * @param b Divisor.
- * @exception Dividing by zero is undefined behaviour.
  * @return The euclidian remainder of `a` by `b`.
  */
-inline sint16 Rem(sint16 a, sint16 b) {
-    sint16 r = a % b;
+inline i16 rem(i16 a, i16 b) {
+    i16 r = a % b;
     return r >= 0 ? r : r + (b >= 0 ? b : -b);
 };
 
@@ -156,7 +180,7 @@ struct InvalidStringError {
     /**
      * @brief Construct a new `InvalidStringError` exception.
      *
-     * Construct a new `InvalidStringError`, which will hold `error_source` as
+     * It will hold `error_source` as
      * its error message.
      *
      * @param error_source Source of the error.
@@ -174,9 +198,6 @@ struct NonRandomizable {};
 
 /**
  * @brief Forward iterates applications of `f` on pairs of successive elements.
- *
- * Forward iterates applications of binary function `f` on pairs of successive
- * elements, between `first` and `last`.
  *
  * `f` must return a boolean, and `apply_binfun` will stop at the first pair for
  * which `f` returns `true`, returning an iterator to that position.
@@ -204,9 +225,6 @@ inline ForItr apply_binfun(ForItr first, ForItr last, BinFunc f) {
 
 /**
  * @brief Backward iterates applications of `f` on pairs of successive elements.
- *
- * Backward iterates applications of binary function `f` on pairs of successive
- * elements, between `first` and `last`.
  *
  * `f` must return a boolean, and `apply_binfun` will stop at the (backwardly)
  * first pair for which `f` returns `true`, returning an iterator to that
@@ -237,12 +255,12 @@ inline BiItr reverse_apply_binfun(BiItr first, BiItr last, BinFunc f) {
 /**
  * @brief Applies `f` on pairs following the bubble sort pattern.
  *
- * Applies `f` on pairs following the bubble sort pattern (i.e. (n - 2, n - 1);
- * (n - 3, n - 2), (n - 2, n - 1); ...; (0, 1), (1, 2), ..., (n - 2, n - 1)).
+ * _I.e._ \f[(n - 2, n - 1);
+ * (n - 3, n - 2), (n - 2, n - 1); ...; (0, 1), (1, 2), ..., (n - 2, n - 1).\f]
  *
  * For each subsequence, it breaks to the next one if `f` returns `true`.
  *
- * Quadratic in the sequence's length.
+ * Quadratic in the length of the sequence.
  *
  * @tparam ForItr A class of bidirectional iterators.
  * @tparam BinFun A class of binary functions of signature `bool _(&T, &T)`,
@@ -263,7 +281,7 @@ inline void bubble_sort(ForItr first, ForItr last, BinFun f) {
 /**
  * @brief A struct that represents a endline character.
  *
- * A struct that represents a endline character. Used as an equivalent for
+ * Used as an equivalent for
  * `std::endl` for `IndentedOStream`.
  *
  * You may pass an integer parameter to its constructor to specify the number of
@@ -272,28 +290,28 @@ inline void bubble_sort(ForItr first, ForItr last, BinFun f) {
 struct EndLine {
 
     /**
-     * @brief Number of lines to skip.
+     * @brief Number of lines to skip when this is inserted in
+     * `IndentedOStream`.
      *
-     * The number of lines that should be skipped when this is inserted in
-     * `IndentedOStream` (i.e., the number of fully white lines, inserting an
-     * `EndLine` will always result in a linebreak).
+     * _I.e._, the number of fully white lines, as inserting an
+     * `EndLine` will always result in a linebreak.
      */
-    sint16 lines_to_skip;
+    i16 lines_to_skip;
 
     /**
      * @brief Constructs a new `EndLine`.
      *
-     * Constructs a new `Endline` object, whith `lines_to_skip` set to `skip`.
+     * `lines_to_skip` is set to `skip`.
      *
      * @param skip What `lines_to_skip` is to be set to. Default value is 0.
      */
-    EndLine(sint16 skip = 0);
+    EndLine(i16 skip = 0);
 };
 
 /**
  * @brief A class for output streams that keep track of indentation.
  *
- * A class for output streams that keep track of indentation. It is not a very
+ * It is not a very
  * smart implementation - the only thing it does is adding indentation after
  * seing a `Endline`. Otherwise it is just a wrapper for its `os` object.
  *
@@ -307,15 +325,13 @@ class IndentedOStream {
     /**
      * @brief Current level of indentation.
      *
-     * The current level of indentation. You should ensure that it never changes
+     * It should be ensured that it never changes
      * after a function call.
      */
-    sint16 indent_level;
+    i16 indent_level;
 
     /**
-     * @brief Output stream.
-     *
-     * The output stream `*this` is a wrapper for.
+     * @brief The output stream `*this` is a wrapper for.
      */
     std::ostream &os;
 
@@ -323,37 +339,28 @@ class IndentedOStream {
     /**
      * @brief Constructs a new `IndentedOStream`.
      *
-     * Constructs a new `IndentedOStream`, from the output stream it wraps
-     * around.
-     *
-     * @param os The output stream `*this` is a wrapper for.
+     * @param os The output stream `*this` wraps around.
      */
     IndentedOStream(std::ostream &os);
 
     /**
-     * @brief Set `indent_level`.
-     *
-     *  Set the `indent_level` field to `new_indent_level`.
+     * @brief Changes indentation level.
      *
      * @param new_indent_level New level of indentation.
      */
-    inline void SetIndentLevel(sint16 new_indent_level) {
+    inline void SetIndentLevel(i16 new_indent_level) {
         indent_level = new_indent_level;
     }
 
     /**
-     * @brief Increment `indent_level`.
-     *
-     * Increment the `indent_level` field by `indentation`.
+     * @brief Increment indentation level.
      *
      * @param indentation Variation of indentation.
      */
-    inline void Indent(sint16 indentation) { indent_level += indentation; }
+    inline void Indent(i16 indentation = 1) { indent_level += indentation; }
 
     /**
      * @brief Inserts something in the stream.
-     *
-     * Inserts something in the stream, by inserting it in `os`.
      *
      * @tparam C A class, the only requirement is that `<<<std::ostream, C>` is
      * implemented.
@@ -369,22 +376,20 @@ class IndentedOStream {
 /**
  * @brief Inserts an `EndLine` in the stream.
  *
- * Inserts an `EndLine` in the stream, by going to the next line in `os`, then
- * flushing it and inserting the right amount of spaces.
+ * Pushes a linebreak in `os`, then
+ * flushes it and inserts the right number of spaces.
  *
- * @param el An EndLine value.
+ * @param el An `EndLine` value.
  * @return A reference to `*this`, so that `<<` may be chained.
  */
 template <>
 IndentedOStream &IndentedOStream::operator<< <EndLine>(const EndLine &el);
 
 /**
- * @brief Indented version of `std::cout`
- *
- * An `IndentedOStream` that wraps around `std::cout`.
+ * @brief Indented version of `std::cout`.
  */
 static IndentedOStream ind_cout(std::cout);
 
-} // namespace CGarside
+} // namespace garcide
 
 #endif

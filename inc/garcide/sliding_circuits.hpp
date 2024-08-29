@@ -1,5 +1,5 @@
 /**
- * @file sliding_circuits.h
+ * @file sliding_circuits.hpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
  * @brief Header (and implementation) file for sliding circuit sets.
  * @version 0.1
@@ -30,10 +30,23 @@
 #ifndef SLIDING_CIRCUITS
 #define SLIDING_CIRCUITS
 
-#include "garcide/super_summit.h"
+#include "garcide/super_summit.hpp"
 
+/**
+ * @brief Namespace for sliding circuits sets calculations.
+ */
 namespace garcide::sliding_circuits {
 
+/**
+ * @brief Computes the trajectory of `b` for sliding.
+ *
+ * That is, slides b until a repetition
+ * occurs, and then returns the list of the conjugates up to that point.
+ *
+ * @tparam F A class representing factors.
+ * @param b The braid whose trajectory is to be computed.
+ * @return The trajectory of `b` for sliding.
+ */
 template <class F>
 std::vector<BraidTemplate<F>> trajectory(BraidTemplate<F> b) {
     std::vector<BraidTemplate<F>> t;
@@ -48,9 +61,26 @@ std::vector<BraidTemplate<F>> trajectory(BraidTemplate<F> b) {
     return t;
 }
 
+/**
+ * @brief Computes the trajectory of `b` for sliding, with a conjugator and a
+ * sliding circuit conjugate.
+ *
+ * That is, slides b until a repetition
+ * occurs, and then returns the list of the conjugates up to that point, with
+ * the index of the first sliding circuit conjugate in it. Also returns a
+ * conjugator to it.
+ *
+ * @tparam F A class representing factors.
+ * @param b The braid whose trajectory is to be computed.
+ * @param c A braid that is set by the function to a conjugator sending `b` to
+ * what is returned.
+ * @param d An integer that is set by the function to the index of the first
+ * sliding circuit conjugate in the trajectory.
+ * @return The trajectory of `b` for sliding.
+ */
 template <class F>
 std::vector<BraidTemplate<F>> trajectory(BraidTemplate<F> b,
-                                         BraidTemplate<F> &c, sint16 &d) {
+                                         BraidTemplate<F> &c, i16 &d) {
     std::vector<BraidTemplate<F>> t;
     std::unordered_set<BraidTemplate<F>> t_set;
 
@@ -79,6 +109,15 @@ std::vector<BraidTemplate<F>> trajectory(BraidTemplate<F> b,
     return t;
 }
 
+/**
+ * @brief Computes a sliding circuit conjugate of `b`.
+ *
+ * This is done through iterated sliding until a repetition is found.
+ *
+ * @tparam F A class representing factors.
+ * @param b The braid of whom a sliding circuit conjugate is computed.
+ * @return A sliding circuit conjugate of `b`.
+ */
 template <class F>
 BraidTemplate<F> send_to_sliding_circuits(const BraidTemplate<F> &b) {
     BraidTemplate<F> b_sc = trajectory(b).back();
@@ -86,15 +125,39 @@ BraidTemplate<F> send_to_sliding_circuits(const BraidTemplate<F> &b) {
     return b_sc;
 }
 
+/**
+ * Computes a sliding circuit conjugate of `b`, with a conjugator.
+ *
+ * This is done through iterated sliding until a repetition is found.
+ * In the mean time, a conjugator is computed, and `c` is set
+ * to it.
+ *
+ * @tparam F A class representing factors.
+ * @param b The braid of whom a sliding circuit conjugate is computed.
+ * @param c A braid that is set by the function to a conjugator sending `b` to
+ * what is returned.
+ * @return A sliding circuit conjugate of `b`.
+ */
 template <class F>
 BraidTemplate<F> send_to_sliding_circuits(const BraidTemplate<F> &b,
                                           BraidTemplate<F> &c) {
-    sint16 d;
+    i16 d;
     BraidTemplate<F> b_sc = trajectory(b, c, d).back();
     b_sc.sliding();
     return b_sc;
 }
 
+/**
+ * @brief Computes the transport of `f` at `b` for sliding.
+ *
+ * See Gebhardt, González-Meneses, _The cyclic sliding operation in Garside
+ * groups_, 2003, [arXiv:0808.1430 [math.GR]](https://arxiv.org/abs/0808.1430).
+ *
+ * @tparam F A class representing factors.
+ * @param b The braid where a transport is computed.
+ * @param f The factor whose transport is computed.
+ * @return The transport of `f` at `b`.
+ */
 template <class F> F transport(const BraidTemplate<F> &b, const F &f) {
     BraidTemplate<F> b2 = b;
     b2.conjugate(f);
@@ -114,6 +177,19 @@ template <class F> F transport(const BraidTemplate<F> &b, const F &f) {
     return f2;
 }
 
+/**
+ * @brief Computes the iterated transport of `f` at `b` sending `b` to an
+ * element in the trajectory of `b.conjugate(f)`.
+ *
+ * It is assumed that `b` is in its sliding circuits set, and that `f`
+ * conjugates it to its super summit set.
+ *
+ * @tparam F A class representing factors.
+ * @param b The braid where iterated transports are computed.
+ * @param f The factor whose iterated transports are computed.
+ * @return The list of the iterated transport of `f` at `b` sending `b` to an
+ * element in the trajectory of `b.conjugate(f)`.
+ */
 template <class F>
 std::list<F> transports_sending_to_trajectory(const BraidTemplate<F> &b,
                                               const F &f) {
@@ -122,7 +198,7 @@ std::list<F> transports_sending_to_trajectory(const BraidTemplate<F> &b,
     F g = f;
 
     BraidTemplate<F> b1 = b;
-    sint16 i, N = 1;
+    i16 i, N = 1;
 
     b1.sliding();
 
@@ -149,6 +225,18 @@ std::list<F> transports_sending_to_trajectory(const BraidTemplate<F> &b,
     return ret;
 }
 
+/**
+ * @brief Computes the pullback for sliding of `f` at `b`.
+ *
+ * See Gebhardt, González-Meneses, _Solving the Conjugacy Problem in Garside
+ * Groups by Cyclic Sliding_, 2003, [arXiv:0809.0948
+ * [math.GT]](https://arxiv.org/abs/0809.0948).
+ *
+ * @tparam F A class representing factors.
+ * @param b The braid where a pullback is computed.
+ * @param f The factor whose pullback is computed.
+ * @return The pullback of `f` at `b`.
+ */
 template <class F> F pullback(const BraidTemplate<F> &b, const F &f) {
     BraidTemplate<F> b2 = BraidTemplate(b.preferred_prefix());
     b2.right_multiply(f);
@@ -172,6 +260,18 @@ template <class F> F pullback(const BraidTemplate<F> &b, const F &f) {
     }
 }
 
+/**
+ * @brief Computes the main pullback for sliding of `f` at `b`.
+ *
+ * See Gebhardt, González-Meneses, _Solving the Conjugacy Problem in Garside
+ * Groups by Cyclic Sliding_, 2003, [arXiv:0809.0948
+ * [math.GT]](https://arxiv.org/abs/0809.0948).
+ *
+ * @tparam F A class representing factors.
+ * @param b The braid where the main pullback is computed.
+ * @param f The factor whose main pullback is computed.
+ * @return The main pullback of `f` at `b`.
+ */
 template <class F> F main_pullback(const BraidTemplate<F> &b, const F &f) {
     std::vector<F> ret;
     std::unordered_set<F> ret_set;
@@ -198,6 +298,19 @@ template <class F> F main_pullback(const BraidTemplate<F> &b, const F &f) {
     return f2;
 }
 
+/**
+ * @brief Computes the smallest factor above `f` that conjugates `b` to an
+ * element of its sliding circuits set.
+ *
+ * `b` is assumed to be in its sliding circuits set.
+ *
+ * @tparam F A class representing factors.
+ * @param b A braid, assumed to be in its sliding circuits set.
+ * @param b_rcf `b` in RCF.
+ * @param f A factor.
+ * @return The smallest factor above `f` that conjugates `b` to its sliding
+ * circuits set.
+ */
 template <class F>
 F min_sliding_circuits(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf,
                        const F &f) {
@@ -227,6 +340,19 @@ F min_sliding_circuits(const BraidTemplate<F> &b, const BraidTemplate<F> &b_rcf,
     return f2;
 }
 
+/**
+ * @brief Computes the sliding circuit indecomposable conjugators at `b`.
+ *
+ * `b` is assumed to be in its sliding circuits set.
+ *
+ * The indecomposable conjugators at `b` are the minimal non-trivial simple
+ * factors that conjugate `b` to its sliding circuits set.
+ *
+ * @tparam F A class representing factors.
+ * @param b A braid, assumed to be in its sliding circuits set.
+ * @param b_rcf `b` in RCF.
+ * @return The sliding circuit indecomposable conjugators at `b`.
+ */
 template <class F>
 std::vector<F> min_sliding_circuits(const BraidTemplate<F> &b,
                                     const BraidTemplate<F> &b_rcf) {
@@ -253,13 +379,13 @@ std::vector<F> min_sliding_circuits(const BraidTemplate<F> &b,
     std::vector<bool> table(atoms.size(), false);
     bool should_be_added;
 
-    for (sint16 i = 0; i < int(atoms.size()); i++) {
+    for (i16 i = 0; i < int(atoms.size()); i++) {
         f = factors[i];
         should_be_added = true;
 
         // We check, before adding f, that a divisor of it wasn't added already
         // with some other atom dividing it.
-        for (sint16 j = 0; j < i && should_be_added; j++) {
+        for (i16 j = 0; j < i && should_be_added; j++) {
             should_be_added = !(table[j] && ((atoms[j] ^ f) == atoms[j]));
         }
         // If that is not the case, we also check if the atom we see is the last
@@ -267,7 +393,7 @@ std::vector<F> min_sliding_circuits(const BraidTemplate<F> &b,
         // some strict left divisor of f can be generated by an atom, doing
         // things in this order ensures that it would have been detected by the
         // first loop by the time we try to add f.
-        for (sint16 j = i + 1; (j < int(atoms.size())) && should_be_added;
+        for (i16 j = i + 1; (j < int(atoms.size())) && should_be_added;
              j++) {
             should_be_added = !((atoms[j] ^ f) == atoms[j]);
         }
@@ -280,58 +406,154 @@ std::vector<F> min_sliding_circuits(const BraidTemplate<F> &b,
     return min;
 }
 
-template <class B> struct SCSConstIterator {
+/**
+ * @brief Constant iterator class for sliding circuits sets.
+ *
+ * @tparam B A class representing braids.
+ */
+template <class B> struct SlidingCircuitsConstIterator {
 
   public:
+    /**
+     * @brief Iterator category.
+     */
     using iterator_category = std::forward_iterator_tag;
+
+    /**
+     * @brief Difference type.
+     */
     using difference_type = std::ptrdiff_t;
+
+    /**
+     * @brief Value type.
+     */
     using value_type = B;
+
+    /**
+     * @brief Pointer type.
+     */
     using pointer = typename std::unordered_map<B, int>::const_iterator;
+
+    /**
+     * @brief Reference type.
+     */
     using reference = const B &;
 
   private:
     pointer ptr;
 
   public:
-    SCSConstIterator(pointer ptr) : ptr(ptr) {}
+    /**
+     * @brief Constructs a new `SlidingCircuitsConstIterator` from a pointer.
+     *
+     * @param ptr A pointer to an instance of `B`.
+     */
+    SlidingCircuitsConstIterator(pointer ptr) : ptr(ptr) {}
 
+    /**
+     * @brief Dereference operator.
+     *
+     * @return A reference to the instance of `B` the iterator points to.
+     */
     reference operator*() const { return std::get<0>(*ptr); }
+
+    /**
+     * @brief Structure dereference operator.
+     *
+     * @return The pointer that the iterator corresponds to.
+     */
     pointer operator->() { return ptr; }
 
-    // Prefix increment
-    SCSConstIterator &operator++() {
+    /**
+     * @brief Prefix incrementation operator.
+     *
+     * @return A reference to `*this`, after having increased it.
+     */
+    SlidingCircuitsConstIterator &operator++() {
         ptr++;
         return *this;
     }
 
-    // Postfix increment
-    SCSConstIterator operator++(int) {
-        SCSConstIterator tmp = *this;
+    /**
+     * @brief Postfix incrementation operator.
+     *
+     * @return A reference to `*this`, before it was incremented.
+     */
+    SlidingCircuitsConstIterator operator++(int) {
+        SlidingCircuitsConstIterator tmp = *this;
         ++(*this);
         return tmp;
     }
 
-    bool operator==(const SCSConstIterator &b) const { return ptr == b.ptr; }
-    bool operator!=(const SCSConstIterator &b) const { return ptr != b.ptr; }
+    /**
+     * @brief Equality check.
+     *
+     * @param b Second argument.
+     * @return If `*this` and `b` point to the same adress.
+     */
+    bool operator==(const SlidingCircuitsConstIterator &b) const {
+        return ptr == b.ptr;
+    }
+
+    /**
+     * @brief Unequality check.
+     *
+     * @param b Second argument.
+     * @return If `*this` and `b` do no point to the same adress.
+     */
+    bool operator!=(const SlidingCircuitsConstIterator &b) const {
+        return ptr != b.ptr;
+    }
 };
 
-// A SCS is stored as both an union of (disjoint) circuits, and a set.
-// The set is actually a map: for each key it stores the circuit it belongs to
-// (as an index referring to circuits). Both are built concurrently; the set
-// part is used to speed up membership tests. Up to names, this is exactly the
-// same data structure as `ultra_summit_set::UltraSummitSet`.
+/**
+ * @brief A class for sliding circuits sets.
+ *
+ * @tparam B A class representing braids.
+ */
 template <class B> class SlidingCircuitsSet {
-  public:
+  private:
+    /**
+     * @brief Circuits for sliding.
+     */
     std::vector<std::vector<B>> circuits;
-    std::unordered_map<B, sint16> set;
-    using ConstIterator = SCSConstIterator<B>;
 
+    /**
+     * @brief Set of the elements.
+     *
+     * It maps a braid to the index of the circuit it belongs to.
+     */
+    std::unordered_map<B, i16> set;
+
+  public:
+    /**
+     * @brief Constant iterator type.
+     *
+     * Does not iterates through `*this` circuit by circuit.
+     */
+    using ConstIterator = SlidingCircuitsConstIterator<B>;
+
+    /**
+     * @brief Constant iterator to the first element of the sliding circuits
+     * set.
+     *
+     * @return An iterator to the first element of `this`.
+     */
     inline ConstIterator begin() const { return ConstIterator(set.begin()); }
 
+    /**
+     * @brief Constant iterator to the after-last element of the sliding
+     * circuits set.
+     *
+     * @return An iterator to the after-last element of `this`.
+     */
     inline ConstIterator end() const { return ConstIterator(set.end()); }
 
-    // Adds a trajectory to the SCS.
-    // Linear in the trajectory's length.
+    /**
+     * @brief Pushes a circuit into the sliding circuits set.
+     *
+     * @param t The circuit to be pushed.
+     */
     inline void insert(std::vector<B> t) {
         circuits.push_back(t);
         for (typename std::vector<B>::iterator it = t.begin(); it != t.end();
@@ -340,27 +562,76 @@ template <class B> class SlidingCircuitsSet {
         }
     }
 
-    // Checks membership.
+    /**
+     * @brief Membership test.
+     *
+     * @param b The braid whose membership is tested
+     * @return If `b` is in `*this`.
+     */
     inline bool mem(const B &b) const { return set.find(b) != set.end(); }
 
-    // Finds b's circuit.
-    inline sint16 circuit(const B &b) const { return set.at(b); }
-
-    inline size_t number_of_circuits() const { return circuits.size(); }
-
-    inline size_t card() const { return set.size(); }
-
-    inline std::vector<size_t> circuit_sizes() const {
-        std::vector<size_t> sizes;
-        for (size_t i = 0; i < circuits.size(); i++) {
-            sizes.push_back(circuits[i].size());
-        }
-        return sizes;
+    /**
+     * @brief Access a braid in the sliding circuits set with its position.
+     *
+     * @param circuit_index Index of its orbit.
+     * @param shift Position within that orbit.
+     * @return The braid at that position
+     */
+    inline B at(size_t circuit_index, size_t shift) const {
+        return circuits[circuit_index][shift];
     }
 
+    /**
+     * @brief Finds the circuit of an element of the ultra summit set.
+     *
+     * @param b The element whose circuit is searched.
+     * @return The index of its circuit.
+     */
+    inline i16 find_circuit(const B &b) const { return set.at(b); }
+
+    /**
+     * @brief Number of circuits.
+     *
+     * @return The number of circuits in `*this`.
+     */
+    inline size_t number_of_circuits() const { return circuits.size(); }
+
+    /**
+     * @brief Cardinal of the sliding circuits set.
+     *
+     * @return The cardinal of `*this`.
+     */
+    inline size_t card() const { return set.size(); }
+
+    /**
+     * @brief Size of a given circuit.
+     *
+     * @param orbit_index The index of the circuit.
+     * @return The size of the circuit.
+     */
+    inline size_t circuit_size(size_t orbit_index) const {
+        return circuits[orbit_index].size();
+    }
+
+    /**
+     * @brief Size of a given circuit.
+     *
+     * @param orbit_index The index of the circuit.
+     * @return The size of the circuit.
+     */
+    inline size_t circuit_size(i16 orbit_index) const {
+        return circuits[orbit_index].size();
+    }
+
+    /**
+     * @brief Prints the sliding circuits set in output stream `os`.
+     *
+     * The sizes of the circuits are printed, as well as their contents.
+     *
+     * @param os The `IndentedOStream` `*this` is printed in.
+     */
     void print(IndentedOStream &os = ind_cout) const {
 
-        std::vector<size_t> sizes = circuit_sizes();
         os << "There " << (card() > 1 ? "are " : "is ") << card() << " element"
            << (card() > 1 ? "s " : " ") << "in the sliding circuit set."
            << EndLine(1);
@@ -369,11 +640,11 @@ template <class B> class SlidingCircuitsSet {
             os << "They are split among " << number_of_circuits()
                << " circuits, of respective sizes ";
 
-            for (sint16 i = 0; i < int(circuits.size()); i++) {
-                os << sizes[i]
-                   << (i == int(circuits.size()) - 1     ? "."
-                       : (i == int(circuits.size()) - 2) ? " and "
-                                                         : ", ");
+            for (size_t i = 0; i < number_of_circuits(); i++) {
+                os << circuit_size(i)
+                   << (i == circuits.size() - 1     ? "."
+                       : (i == circuits.size() - 2) ? " and "
+                                                    : ", ");
             }
         } else {
             os << "There is only one cicuit.";
@@ -381,7 +652,7 @@ template <class B> class SlidingCircuitsSet {
 
         os << EndLine(2);
 
-        for (sint16 i = 0; i < int(circuits.size()); i++) {
+        for (size_t i = 0; i < number_of_circuits(); i++) {
             std::string str_i = std::to_string(i);
             for (size_t _ = 0; _ < str_i.length() + 10; _++) {
                 os << "─";
@@ -391,25 +662,24 @@ template <class B> class SlidingCircuitsSet {
                 os << "─";
             }
             os.Indent(4);
-            os << EndLine(1) << "There " << (sizes[i] > 1 ? "are " : "is ")
-               << sizes[i] << " element" << (sizes[i] > 1 ? "s " : " ")
+            os << EndLine(1) << "There "
+               << (circuit_size(i) > 1 ? "are " : "is ") << circuit_size(i)
+               << " element" << (circuit_size(i) > 1 ? "s " : " ")
                << "in this circuit." << EndLine(1);
-            sint16 indent =
-                (int(std::to_string(circuits[i].size() - 1).length()) + 1) / 4 +
-                1;
-            for (sint16 j = 0; j < int(circuits[i].size()); j++) {
+            i16 indent =
+                (int(std::to_string(circuit_size(i) - 1).length()) + 1) / 4 + 1;
+            for (size_t j = 0; j < circuit_size(i); j++) {
                 os << j << ":";
-                for (sint16 _ = 0;
-                     _ <
-                     4 * indent - 1 -
-                         int(std::to_string(circuits[i].size() - 1).length());
+                for (size_t _ = 0;
+                     _ < 4 * indent - 1 -
+                             std::to_string(circuit_size(i) - 1).length();
                      _++) {
                     os << " ";
                 }
                 os.Indent(4 * indent);
-                circuits[i][j].print(os);
+                at(i, j).print(os);
                 os.Indent(-4 * indent);
-                if (j == int(circuits[i].size()) - 1) {
+                if (j == circuit_size(i) - 1) {
                     os.Indent(-4);
                 } else {
                     os << EndLine();
@@ -419,6 +689,14 @@ template <class B> class SlidingCircuitsSet {
         }
     }
 
+    /**
+     * @brief Prints the internal data of the sliding circuits set in output
+     * stream `os`.
+     *
+     * Private members `circuits` and `set` are printed.
+     *
+     * @param os The `IndentedOStream` `*this` is printed in.
+     */
     void debug(IndentedOStream &os) const {
         os << "{   ";
         os.Indent(4);
@@ -427,12 +705,12 @@ template <class B> class SlidingCircuitsSet {
         os << EndLine();
         os << "[   ";
         os.Indent(4);
-        for (sint16 i = 0; i < int(circuits.size()); i++) {
+        for (size_t i = 0; i < number_of_circuits(); i++) {
             os << "[   ";
             os.Indent(4);
-            for (sint16 j = 0; j < int(circuits[i].size()); j++) {
-                circuits[i][j].debug(os);
-                if (j == int(circuits[i].size()) - 1) {
+            for (size_t j = 0; j < circuit_size(i); j++) {
+                at(i, j).debug(os);
+                if (j == circuit_size(i) - 1) {
                     os.Indent(-4);
                 } else {
                     os << ",";
@@ -440,7 +718,7 @@ template <class B> class SlidingCircuitsSet {
                 os << EndLine();
             }
             os << "]";
-            if (i == int(circuits.size()) - 1) {
+            if (i == number_of_circuits() - 1) {
                 os.Indent(-4);
             } else {
                 os << ",";
@@ -456,7 +734,7 @@ template <class B> class SlidingCircuitsSet {
         os << "{   ";
         os.Indent(4);
         bool is_first = true;
-        for (typename std::unordered_map<B, sint16>::const_iterator it =
+        for (typename std::unordered_map<B, i16>::const_iterator it =
                  set.begin();
              it != set.end(); it++) {
             if (!is_first) {
@@ -476,6 +754,13 @@ template <class B> class SlidingCircuitsSet {
     }
 };
 
+/**
+ * @brief Computes the sliding circuits set of `b`.
+ *
+ * @tparam F A class representing factors.
+ * @param b The braid whose sliding circuits set is computed.
+ * @return The sliding circuits set of `b`.
+ */
 template <class F>
 SlidingCircuitsSet<BraidTemplate<F>>
 sliding_circuits_set(const BraidTemplate<F> &b) {
@@ -537,14 +822,32 @@ sliding_circuits_set(const BraidTemplate<F> &b) {
     return scs;
 }
 
+/**
+ * @brief Computes the sliding circuits set of `b`, with extra internal
+ * structure.
+ *
+ * `mins` and `prev` are modified to be able to to retrieve conjugators:
+ * `prev[i]` is the coordinate of the circuit that is the predecessor the `i`-th
+ * one in the graph BFS of its sliding circuits set, and `mins[i]` the
+ * corresponding conjugator.
+ *
+ * @tparam F A class representing factors.
+ * @param b The braid whose sliding circuits set is computed.
+ * @param mins A vector that is set to contain, for each `i`, an element that
+ * conjugates the base of circuit `prev[i]` to the base of circuit `i`.
+ * @param prev A vector that is set to contain integers, such that, for each
+ * `i`, `mins[i]` conjugates the base of circuit `prev[i]` to the base of
+ * circuit `i`.
+ * @return The sliding circuits set of `b`.
+ */
 template <class F>
 SlidingCircuitsSet<BraidTemplate<F>>
 sliding_circuits_set(const BraidTemplate<F> &b, std::vector<F> &mins,
-                     std::vector<sint16> &prev) {
+                     std::vector<i16> &prev) {
     SlidingCircuitsSet<BraidTemplate<F>> scs;
     std::list<BraidTemplate<F>> queue, queue_rcf;
 
-    sint16 current = 0;
+    i16 current = 0;
     mins.clear();
     prev.clear();
     mins.push_back(F(b.get_parameter()));
@@ -588,23 +891,36 @@ sliding_circuits_set(const BraidTemplate<F> &b, std::vector<F> &mins,
     return scs;
 }
 
+/**
+ * @brief Computes a conjugator from the first element of `scs` to `b`.
+ *
+ * It is assumed that `b` is an element of `scs`.
+ *
+ * @tparam F A class representing factors.
+ * @param b An element of `scs`.
+ * @param scs A sliding circuits set.
+ * @param mins A vector that is set to contain, for each `i`, an element that
+ * conjugates the base of circuit `prev[i]` to the base of circuit `i`.
+ * @param prev A vector that is set to contain integers, such that, for each
+ * `i`, `mins[i]` conjugates the base of circuit `prev[i]` to the base of
+ * circuit `i`.
+ * @return A conjugator from the first element of `scs` to `b`.
+ */
 template <class F>
 BraidTemplate<F> tree_path(const BraidTemplate<F> &b,
                            const SlidingCircuitsSet<BraidTemplate<F>> &scs,
                            const std::vector<F> &mins,
-                           const std::vector<sint16> &prev) {
+                           const std::vector<i16> &prev) {
     BraidTemplate<F> c = BraidTemplate<F>(b.get_parameter());
 
     if (b.canonical_length() == 0) {
         return c;
     }
 
-    sint16 current = scs.circuit(b);
+    i16 current = scs.find_circuit(b);
 
-    for (typename std::vector<BraidTemplate<F>>::const_iterator itb =
-             scs.circuits[current].begin();
-         *itb != b; itb++) {
-        c.right_multiply((*itb).preferred_prefix());
+    for (size_t shift = 0; shift < scs.circuit_size(current); shift++) {
+        c.right_multiply(scs.at(current, shift).preferred_prefix());
     }
 
     while (current != 0) {
@@ -615,6 +931,20 @@ BraidTemplate<F> tree_path(const BraidTemplate<F> &b,
     return c;
 }
 
+/**
+ * @brief Checks if two braids are conjugates, and computes a conjugator.
+ *
+ * `c` is not modified if `b1` and `b2` are not conjugates.
+ *
+ * This function uses sliding circuits sets.
+ *
+ * @tparam F A class representing factors.
+ * @param b1 A braid.
+ * @param b2 Another braid.
+ * @param c A braid, that is set by the function to the conjugator that takes
+ * `b1` to `b2`, if it exists.
+ * @return If `b1` and `b2` are conjugates.
+ */
 template <class F>
 bool are_conjugate(const BraidTemplate<F> &b1, const BraidTemplate<F> &b2,
                    BraidTemplate<F> &c) {
@@ -635,7 +965,7 @@ bool are_conjugate(const BraidTemplate<F> &b1, const BraidTemplate<F> &b2,
     }
 
     std::vector<F> mins;
-    std::vector<sint16> prev;
+    std::vector<i16> prev;
 
     SlidingCircuitsSet<BraidTemplate<F>> scs =
         sliding_circuits_set(bt1, mins, prev);

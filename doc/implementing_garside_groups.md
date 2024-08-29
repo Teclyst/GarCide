@@ -10,7 +10,7 @@ Because of that, it is possible to abstract away a lot of implementation details
 
 in C++, this sort of things can be done using _templates_. Code is written using (abstract) class arguments, and when an instantiation of the object, for given (concrete) class arguments is given, the code is copied, substituting every occurence of the abstract argument by its concrete value.
 
-This is exactly what is done in _GarCide_. Most of the code is written in terms of two template classes, defined in `garcide.h`:
+This is exactly what is done in _GarCide_. Most of the code is written in terms of two template classes, defined in `garcide.hpp`:
 
 ```cpp
 template<class U>
@@ -30,7 +30,7 @@ The typical way to implement a Garside group is to write code for a class `Under
 
 ### Code Organization and naming conventions
 
-It is advised separate the code in two files (if you are working within the _GarCide_ library). On one hand, declarations should go in a _header_ file (ending with `.hpp` or `.h`) in `inc/garcide/groups`. On the other hand, definitions (a.k.a. the real code) should go in an _implementation file_ (ending with `.cpp`) located in `lib/garcide/groups`.
+It is advised separate the code in two files (if you are working within the _GarCide_ library). On one hand, declarations should go in a _header_ file (ending with `.hpp`) in `inc/garcide/groups`. On the other hand, definitions (a.k.a. the real code) should go in an _implementation file_ (ending with `.cpp`) located in `lib/garcide/groups`.
 
 It is also advised to work in a sub-namespace of `cgarcide` (_e.g._ `cgarcide::your_garside_group`).
 
@@ -131,7 +131,7 @@ cgarcide::IndentedOStream
 
 must be implemented. This is in particular the case if the same is true, but for `std::ostream` instead of `cgarcide::IndentedOStream`, and therefore in particular for all base types (integers, booleans, ...).
 
-If `SomeType` is more complicated however, you may have to specialize the template yourself. This should be done in namespace `cgarcide` specifically (otherwise it will not compile, even in one of its strict sub-namespace). See `dual_complex.h` and `dual_complex.cpp` for an example.
+If `SomeType` is more complicated however, you may have to specialize the template yourself. This should be done in namespace `cgarcide` specifically (otherwise it will not compile, even in one of its strict sub-namespace). See `dual_complex.hpp` and `dual_complex.cpp` for an example.
 
 These class members will be called all the time (and it is very likely that most of execution time will be spent executing these), so it is a good place to optimize.
 
@@ -430,11 +430,15 @@ We use regular expressions (regexes from now on) to specify what patterns should
 
 Typically, in this case we want to allow several different ways of entering the same atom $e_i$: it's going to be printed as `ei`, but it could be equally be reasonnable to enter it as shorter `i`, or longer `e i`, `e_i`, `e _ i`, or some wilder alternative with $42$ tabs. (For convenience sake however we should make sure that output is compatible with input, so `ei` should be a valid input).
 
-Now the great thing about regular expressions is that they make it very easy to specify all these kinds of patterns at the same time: it is simply expressed by regular expression $$(\texttt e (\texttt{\textbackslash s} \mid \texttt{\textbackslash t})^*\texttt \_?(\texttt{\textbackslash s} \mid \texttt{\textbackslash t})^*)?([\texttt 1 - \texttt 9][\texttt 0 - \texttt 9]^* \mid \texttt 0).$$
+Now the great thing about regular expressions is that they make it very easy to specify all these kinds of patterns at the same time: it is simply expressed by regular expression
+
+```math
+(\texttt e (\backslash\texttt{s} \mid \backslash\texttt{t})^*\texttt \_?(\backslash\texttt{s} \mid \backslash\texttt{t})^*)?([\texttt 1 - \texttt 9][\texttt 0 - \texttt 9]^* \mid \texttt 0).
+```
 
 The second part, $[\texttt 1 - \texttt 9][\texttt 0 - \texttt 9]^* \mid \texttt 0$, matches either $\texttt 0$ or a sequence of digits starting by a non-zero one, _i.e._ a positive integer. (Here $[a - b]$ matches the _range_ of characters between $a$ and $b$).
 
-The first is optional (the whole group is tagged with a postfix quotation mark), and is composed of an $\texttt e$, followed by a sequence of whitespaces ($\texttt \textbackslash s$) and of tabs ($\texttt \textbackslash t$), with an optional underscore in the middle.
+The first is optional (the whole group is tagged with a postfix quotation mark), and is composed of an $\texttt e$, followed by a sequence of whitespaces ($\backslash\texttt{s}$) and tabs ($\backslash\texttt{t}$), with an optional underscore in the middle.
 
 Notice than in all cases, the meaningful part does not change: it's always the second one. This can be expressed in C++ regexes using _capture groups_. `std::regex_search`, when executed with positions, and flag `std::regex_constants::match_continuous`, will try to find a match for the regex starting at the first provided position and ending before the second. When it finds one, it will also extract substrings from all subexpressions enclosed by parenthesis in the big one, and store them in `match`. These parenthesis denote capture groups.
 

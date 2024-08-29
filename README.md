@@ -101,15 +101,19 @@ Now for the available options (in bold are the values before any change is ever 
 * `USE_FOR_BRAIDING` (possible values **`ARTIN`**, `BAND`, `OCTAHEDRAL`, `DIHEDRAL`, `DUAL_COMPLEX`, `STANDARD_COMPLEX`, `EUCLIDEAN_LATTICE`) - Selects which group should be used for _Braiding_.
 
     Currently supported:
-  * Regular braid groups (a.k.a. $\mathrm A$-series Artin groups), classic Garside structure (`ARTIN`).
+  * Regular braid groups (a.k.a. $\mathbf A$-series Artin groups), classic Garside structure (`ARTIN`).
   * Regular braid groups, dual Garside structure (`BAND`).
-  * $\mathrm B$-series Artin groups, dual Garside structure (`OCTAHEDRAL`).
-  * $\mathrm I$-series Artin groups, dual Garside structure (`DIHEDRAL`).
+  * $\mathbf B$-series Artin groups, dual Garside structure (`OCTAHEDRAL`).
+  * $\mathbf I$-series Artin groups, dual Garside structure (`DIHEDRAL`).
   * Complex reflection braid groups $\mathrm B(e, e, n)$, dual Garside structure (`DUAL_COMPLEX`).
   * Complex reflection braid groups $\mathrm B(e, e, n)$, semi-classic Garside structure (`STANDARD_COMPLEX`), NOT FULLY WORKING AS OF NOW.
   * Euclidean lattices $\mathbb Z^n$ (`EUCLIDEAN_LATTICE`).
 
 * `GENERATE_DOC` (possible values **`TRUE`**, `FALSE`) - whether documentation should be generated when building the project.
+
+* `DOXYGEN_WARNINGS` (possible values `YES`, **`NO`**) - whether _Doxygen_ should be allowed to output warnings.
+
+* `DOXYGEN_QUIET` (possible values **`YES`**, `NO`) - whether _Doxygen_ should avoid outputing build details.
 
 * `CMAKE_BUILD_TYPE` (possible values `Debug`, **`Release`**) - whether the project should be built in debug mode (debug symbols, no compiler optimizations, better for development) or release mode (compiler optimizations, no debug symbols).
 
@@ -123,4 +127,10 @@ See `doc/implementing_garside_groups.md`.
 
 If you have _Doxygen_, and assuming that `GENERATE_DOC` is set to `TRUE`, then documentation will be automatically generated when building the project.
 
-To read it, open `build/html/index.html`.
+To read it, open `build/html/index.html` with a browser. By the command line and with _Firefox_,
+
+```shell
+firefox build/html/index.html
+```
+
+The _Doxygen_ pages use the _**[Doxygen Awesome](https://github.com/jothepro/doxygen-awesome-css)**_ theme by **[jothepro](https://github.com/jothepro)**.

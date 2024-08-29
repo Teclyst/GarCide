@@ -27,10 +27,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "braiding/braiding.h"
+#include "braiding/braiding.hpp"
 
 using namespace braiding;
 
+/**
+ * @brief Main function.
+ * 
+ * @return `0`.
+ */
 int main() {
     ind_cout << EndLine();
     print_header();

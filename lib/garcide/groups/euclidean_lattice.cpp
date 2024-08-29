@@ -1,7 +1,7 @@
 /**
  * @file euclidean_lattice.cpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
- * @brief Implementation file for Z ^ n.
+ * @brief Implementation file for euclidian lattices \f$\mathbb Z^n\f$.
  * @version 0.1
  * @date 2024-08-02
  *
@@ -52,7 +52,7 @@ void Underlying::of_string(const std::string &str, size_t &pos) {
             std::regex{"(?:e[\\s\\t]*_?[\\s\\t]*)?(" + number_regex + ")"},
             std::regex_constants::match_continuous)) {
         // Try to extract a substring starting at pos that matches the regex.
-        sint16 i;
+        i16 i;
         try {
             i = std::stoi(match[1]);
         } catch (std::out_of_range const &) {
