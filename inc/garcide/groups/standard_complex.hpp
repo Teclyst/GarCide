@@ -317,7 +317,7 @@ class Underlying {
      * \f$[\lambda_{en}]_{0,0}=\zeta_e^{-n+1}\f$, and then
      * for \f$i\in[\![1,n-1]\!]\f$, \f$[\Delta]_{i,i}=\zeta_e\f$.)
      *
-     * Linear in  \f$n\f$.
+     * Linear in \f$n\f$.
      */
     void delta();
 

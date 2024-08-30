@@ -137,7 +137,7 @@ void explain_braid_input() {
 #elif BRAIDING_CLASS == 4
 
     ind_cout
-        << "For the dual structure on B(e, e, n + 1)," << EndLine()
+        << "For the dual structure on B(e, e, n+1)," << EndLine()
         << "F = '(' Z ','? Z ')' | Z | 'D'." << EndLine()
         << "\"a_(i, j)\" (optional \"s_\" and \",\") stands for Bessis-Corran's"
         << EndLine() << "symmetric generator a_i,j," << EndLine()
@@ -296,6 +296,98 @@ void explain_garside_structure() {
         << EndLine() << "the reflexions make up the middle layer." << EndLine(1)
         << "The reflexion that sends 0 to exp(k/n iτ) is printed as sk."
         << EndLine(1);
+
+#elif BRAIDING_CLASS == 4
+
+    ind_cout
+        << "In the dual structure for complex braid group B(e, e, n+1),"
+        << EndLine()
+        << "canonical factors correspond to a subset of the semi-direct"
+        << EndLine()
+        << "product Δ(e, e, n+1) ⋊ S_n+1, where Δ(e, e, n+1) is the group"
+        << EndLine()
+        << "of diagonal matrices of dimension n+1 whose determinant is 1 and"
+        << EndLine()
+        << "whose diagonal coefficients are in U_e, and S_n+1 is seen as the"
+        << EndLine() << "group of permutation matrices." << EndLine(1)
+        << "To these matrices one can associate partitions of U_en ∪ {0}, that"
+        << EndLine()
+        << "have the following symmetry: for all i and j, if ζ_en^i and ζ_en^j"
+        << EndLine()
+        << "are in the same cell, then the same is true for ζ_en^i+n and"
+        << EndLine()
+        << "ζ_en^j+n, where ζ_en = exp(1/en iτ) (but ζ_en^i and ζ_en^i+n can"
+        << EndLine() << "be in different cells)." << EndLine(1)
+        << "There is a one-to-one correspondance between factors and the"
+        << EndLine()
+        << "partitions satisfying that property that also are non-crossing:"
+        << EndLine() << "the convex hulls of cells do not intersect."
+        << EndLine(1)
+        << "The atoms are the Corran-Bessis short symmetrical and assymetrical"
+        << EndLine()
+        << "generators, noted a_i,j and a_i respectively. i and j are taken"
+        << EndLine() << "mod en, and must be distinct and at at most n-1 apart."
+        << EndLine(1)
+        << "a_i,j corresponds to the partition whose cells are the" << EndLine()
+        << "{ζ_en^-i+kn, ζ_en^-j+kn} for k an integer, and the {ζ_en^-k} for"
+        << EndLine() << "k != i, j mod n. It is printed as a(i, j)."
+        << EndLine()
+        << "For instance, in B(3, 3, 5), a_3,5 would, writing i != 0 for"
+        << EndLine() << "ζ_en^-i, represent partition" << EndLine()
+        << "{{0}, {3, 5}, {7, 9}, {11, 1}, {2}, {4}, {6}, {8}, {10}, {12}}."
+        << EndLine(1) << "a_i corresponds to the partition whose cells are"
+        << EndLine()
+        << "{0, ζ_en^-i} and the {ζ_en^-j} for j != -i mod en. It is printed"
+        << EndLine() << "as ai." << EndLine()
+        << "For instance, in B(3, 3, 4), a_8 would, writing i != 0 for"
+        << EndLine() << "ζ_en^-i, represent partition" << EndLine()
+        << "{{0, 8}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {9}}." << EndLine(1)
+        << "Factors are printed as words in the a_i,j and a_k, in a way that"
+        << EndLine()
+        << "makes it easy to read the partition: in B(3, 3, 4) partition"
+        << EndLine()
+        << "{{0, 2, 3}, {5, 6}, {8, 9}, {1}, {4}, {7}} would be printed as"
+        << EndLine() << "a(3, 2) a2." << EndLine(1)
+        << "The Garside element corresponds to the partition with one part."
+        << EndLine(1)
+        << "See Bessis, Corran, Non-Crossing Partitions of Type (e, e, r),"
+        << EndLine() << "2004, arXiv:math/0101158 [math.GR]." << EndLine(1);
+
+#elif BRAIDING_CLASS == 5
+
+    ind_cout
+        << "In the semi-classic structure for complex braid group" << EndLine()
+        << "B(e, e, n), canonical factors correspond to a subset of the"
+        << EndLine()
+        << "semi-direct product Δ(e, e, n) ⋊ S_n, where Δ(e, e, n) is the"
+        << EndLine()
+        << "group of diagonal matrices of dimension n whose determinant is 1"
+        << EndLine()
+        << "and whose diagonal coefficients are in U_e, and S_n is seen as"
+        << EndLine() << "the group of permutation matrices." << EndLine(1)
+        << "The atoms are the Corran-Picantin s_i and t_j generators, with"
+        << EndLine() << "i ∈ [3, n], and j taken mod e." << EndLine(1)
+        << "s_i corresponds to transposition matrix T_i-2,i-1, and is"
+        << EndLine() << "printed as si." << EndLine(1)
+        << "t_j corresponds to the matrix T_j such that [T_j]_i,i = 1 for i"
+        << EndLine() << "in [2, n-1], [T_j]_0,1 = exp(-j/e iτ) and" << EndLine()
+        << "[T_j]_1,0 = exp(j/e iτ) with all other entries being zeroes."
+        << EndLine() << "It is printed as ti." << EndLine(1)
+        << "A factor is printed as its Neaime's shortest word" << EndLine()
+        << "representative." << EndLine(1)
+        << "The Garside element λ_en corresponds to the diagonal matrix Λ_en"
+        << EndLine()
+        << "such that [Λ_en]_0,0 = exp(-(n-1)/e iτ), and, for j in [1, n-1],"
+        << EndLine() << "[Λ_en]_j,j = exp(1/e iτ)." << EndLine(1)
+        << "See Corran, Picantin, A New Garside Structure for the Braid"
+        << EndLine()
+        << "Groups of Type (e, e, r), 2011, arXiv:0901.0645 [math.GR], and"
+        << EndLine()
+        << "Neaime, Interval Garside Structures for the Complex Braid Groups"
+        << EndLine() << "B(e,e,n), 2019, arXiv:1707.06864 [math.GR]."
+        << EndLine(1)
+        << "Notice that we index matrices starting from 0, contrasting with"
+        << EndLine() << "those articles." << EndLine(1);
 
 #elif BRAIDING_CLASS == 6
 
@@ -581,13 +673,13 @@ void print_options(IndentedOStream &os) {
 
 #elif BRAIDING_CLASS == 4
 
-    os << "Using Bessis-Corran's dual structure for B(e,e,n) complex"
+    os << "Using Bessis-Corran's dual structure for B(e, e, n) complex"
        << EndLine() << "reflection braid groups." << EndLine(1);
 
 #elif BRAIDING_CLASS == 5
 
-    os << "Using Corran-Picantin's semi-classic structure for B(e,e,n)"
-       << EndLine() << "complex reflection braid groups." << EndLine(1);
+    os << "Using Corran-Picantin's semi-classic structure for" << EndLine()
+       << "B(e, e, n+1) complex reflection braid groups." << EndLine(1);
 
 #elif BRAIDING_CLASS == 6
 
@@ -609,7 +701,7 @@ void print_options(IndentedOStream &os) {
 #if BRAIDING_CLASS == 0
 
        << "t:      Thurston Type           " << EndLine(1)
-       
+
 #endif
 
        << "q:      Quit" << EndLine(1);
