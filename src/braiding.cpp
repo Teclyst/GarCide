@@ -2,8 +2,8 @@
  * @file braiding.cpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
  * @brief Implementation file for most of braiding.
- * @version 0.1
- * @date 2024-07-28
+ * @version 1.0.0
+ * @date 2024-08-31
  *
  * @copyright Copyright (C) 2024. Distributed under the GNU General Public
  * License, version 3.
@@ -486,8 +486,6 @@ void print_header(IndentedOStream &os) {
     os << "┌──────────────────┬────────────────────────┬──────────────────┐"
        << EndLine()
        << "│──────────────────│    This is Braiding    │──────────────────│"
-       << EndLine()
-       << "│──────────────────│      Pre-release       │──────────────────│"
        << EndLine()
        << "├───┬──────────────┴────────────────────────┴──────────────┬───┤"
        << EndLine()

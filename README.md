@@ -1,4 +1,4 @@
-# _GarCide_ (prerelease)
+# _GarCide_
 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/Teclyst/GarCide)](https://github.com/Teclyst/GarCide/releases/latest)
 [![GitHub](https://img.shields.io/github/license/Teclyst/GarCide)](https://github.com/Teclyst/GarCide/blob/main/LICENSE)
@@ -15,7 +15,7 @@ This library is based on 2001 _CBraid_ by **[Jae Choon Cha](http://gt.postech.ac
 
 These two projects, maintained by **[Jean-Luc Thiffeault](http://www.math.wisc.edu/~jeanluc)**, can be found [here](https://github.com/jeanluct/cbraid).
 
-Although names may suggest otherwise, _GarCide_ roughly corresponds to a merge of _CBraid_ and computation-oriented parts of the original _Braiding_, with _Braiding_ only encompassing shell-handling parts.
+Although names may suggest otherwise, _GarCide_ roughly corresponds to a merge of _CBraid_ and computation-oriented parts of the original _Braiding_, while _Braiding_ only encompasses shell interaction.
 
 ## Requirements
 

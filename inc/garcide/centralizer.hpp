@@ -2,8 +2,8 @@
  * @file centralizer.hpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
  * @brief Header (and implementation) file for centralizer computations.
- * @version 0.1
- * @date 2024-07-28
+ * @version 1.0.0
+ * @date 2024-08-31
  *
  * @copyright Copyright (C) 2024. Distributed under the GNU General Public
  * License, version 3.
@@ -218,7 +218,7 @@ centralizer(const ultra_summit::UltraSummitSet<BraidTemplate<F>> &uss,
         BraidTemplate<F> d = ultra_summit::tree_path(
                              uss.at(orbit_index, (size_t)0), uss, mins, prev),
                          c = d, b2(b.get_parameter());
-                         
+
         for (size_t shift = 0; shift < uss.orbit_size(orbit_index); shift++) {
             c.right_multiply(uss.at(orbit_index, shift).initial());
         }

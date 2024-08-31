@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Project declaration.
-project(GarCide VERSION 0.1)
+project(GarCide VERSION 1.0.0)
 
 # Dependencies.
 find_package(TBB)

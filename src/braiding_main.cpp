@@ -2,8 +2,8 @@
  * @file braiding_main.cpp
  * @author Matteo Wei (matteo.wei@ens.psl.eu)
  * @brief Main file for braiding executable.
- * @version 0.1
- * @date 2024-07-28
+ * @version 1.0.0
+ * @date 2024-08-31
  *
  * @copyright Copyright (C) 2024. Distributed under the GNU General Public
  * License, version 3.
