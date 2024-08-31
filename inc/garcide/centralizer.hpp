@@ -218,9 +218,9 @@ centralizer(const ultra_summit::UltraSummitSet<BraidTemplate<F>> &uss,
         BraidTemplate<F> d = ultra_summit::tree_path(
                              uss.at(orbit_index, (size_t)0), uss, mins, prev),
                          c = d, b2(b.get_parameter());
+                         
         for (size_t shift = 0; shift < uss.orbit_size(orbit_index); shift++) {
-            c.right_multiply(
-                uss.at(orbit_index, shift).first().delta_conjugate(b.inf()));
+            c.right_multiply(uss.at(orbit_index, shift).initial());
         }
         c.right_multiply(!d);
 

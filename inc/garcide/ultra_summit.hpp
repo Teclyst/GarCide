@@ -936,7 +936,7 @@ BraidTemplate<F> tree_path(const BraidTemplate<F> &b,
 
     size_t current = (size_t)uss.find_orbit(b);
 
-    for (size_t shift = 0; shift < uss.orbit_size(current); shift++) {
+    for (size_t shift = 0; uss.at(current, shift) != b; shift++) {
         c.right_multiply(uss.at(current, shift).initial());
     }
 

@@ -919,7 +919,7 @@ BraidTemplate<F> tree_path(const BraidTemplate<F> &b,
 
     i16 current = scs.find_circuit(b);
 
-    for (size_t shift = 0; shift < scs.circuit_size(current); shift++) {
+    for (size_t shift = 0; scs.at(current, shift) != b; shift++) {
         c.right_multiply(scs.at(current, shift).preferred_prefix());
     }
 
